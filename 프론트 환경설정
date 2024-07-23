@@ -1,0 +1,40 @@
+
+# Please enter the commit message for your changes. Lines starting
+# with '#' will be ignored, and an empty message aborts the commit.
+#
+# On branch S11P12B206-285-프론트-서버-react
+# Changes to be committed:
+#	new file:   frontend/gongtong_front/.eslintrc.cjs
+#	new file:   frontend/gongtong_front/.gitignore
+#	new file:   frontend/gongtong_front/README.md
+#	new file:   frontend/gongtong_front/index.html
+#	new file:   frontend/gongtong_front/package-lock.json
+#	new file:   frontend/gongtong_front/package.json
+#	new file:   frontend/gongtong_front/src/App.jsx
+#	renamed:    frontend/dump.txt -> frontend/gongtong_front/src/common/components/Album.jsx
+#	new file:   frontend/gongtong_front/src/common/components/Alert.jsx
+#	new file:   frontend/gongtong_front/src/common/components/Lecture.jsx
+#	new file:   frontend/gongtong_front/src/common/components/Shorts.jsx
+#	new file:   frontend/gongtong_front/src/common/pages/Complete.jsx
+#	new file:   frontend/gongtong_front/src/main.jsx
+#	new file:   frontend/gongtong_front/src/pages/AlbumPage.jsx
+#	new file:   frontend/gongtong_front/src/pages/ChatRoom.jsx
+#	new file:   frontend/gongtong_front/src/pages/ClassDetail.jsx
+#	new file:   frontend/gongtong_front/src/pages/ClassList.jsx
+#	new file:   frontend/gongtong_front/src/pages/ClassRegist.jsx
+#	new file:   frontend/gongtong_front/src/pages/ClassWaiting.jsx
+#	new file:   frontend/gongtong_front/src/pages/LiveClass.jsx
+#	new file:   frontend/gongtong_front/src/pages/Login.jsx
+#	new file:   frontend/gongtong_front/src/pages/MyPage.jsx
+#	new file:   frontend/gongtong_front/src/pages/Profile.jsx
+#	new file:   frontend/gongtong_front/src/pages/Ranking.jsx
+#	new file:   frontend/gongtong_front/src/pages/ReplayClass.jsx
+#	new file:   frontend/gongtong_front/src/pages/ShortsList.jsx
+#	new file:   frontend/gongtong_front/src/pages/ShortsSearch.jsx
+#	new file:   frontend/gongtong_front/src/pages/ShortsWatch.jsx
+#	new file:   frontend/gongtong_front/src/pages/SignUp.jsx
+#	new file:   frontend/gongtong_front/src/styles/App.css
+#	new file:   frontend/gongtong_front/src/styles/index.css
+#	new file:   frontend/gongtong_front/vite.config.js
+#	new file:   frontend/package-lock.json
+#
