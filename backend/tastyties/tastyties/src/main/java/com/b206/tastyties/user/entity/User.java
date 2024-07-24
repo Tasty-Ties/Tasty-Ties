@@ -1,9 +1,6 @@
 package com.b206.tastyties.user.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -18,22 +15,30 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int userId;
 
+    @Column(nullable = false)
     private String countryCode;
+    @Column(nullable = false)
     private String languageCode;
 
+    @Column(nullable = false)
     private String username;
+    @Column(nullable = false)
     private String password;
+    @Column(nullable = false)
     private String nickname;
 
     private String profileImageUrl;
+    @Column(nullable = false)
     private LocalDate birth;
 
+    @Column(nullable = false)
     private String emailId;
+    @Column(nullable = false)
     private String emailDomain;
 
     private String description;
-    private boolean isDeleted;
-    private boolean isAdult;
+    private boolean isDeleted = Boolean.FALSE;
+    private boolean isAdult = Boolean.FALSE;
 
     private String instagramUrl;
     private String instagramHandle;
