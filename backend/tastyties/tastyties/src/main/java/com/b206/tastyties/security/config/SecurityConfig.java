@@ -21,6 +21,11 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
+                // 이곳 코드에 수정 필요
+                .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers("/login", "/logout", "/public/**").permitAll()
+                        .anyRequest().authenticated()
+                )
                 .formLogin(formLogin ->
                         formLogin
                                 .loginPage("/login")
