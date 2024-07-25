@@ -13,6 +13,6 @@ import java.io.IOException;
 public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
-        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "인증 토큰이 누락되었거나 유효하지 않습니다.");
+        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "액세스 토큰이 누락되었거나 유효하지 않습니다.");
     }
 }
