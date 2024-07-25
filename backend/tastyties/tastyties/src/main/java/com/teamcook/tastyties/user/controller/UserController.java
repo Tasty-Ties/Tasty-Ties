@@ -21,9 +21,9 @@ public class UserController {
 
     @PostMapping()
     public ResponseEntity<CommonResponseDTO> registerUser(@RequestBody UserRegistrationDTO request) {
-        userService.registerUser(request);
+        String savedUsername = userService.registerUser(request);
 
-        CommonResponseDTO response = new CommonResponseDTO(201, "회원가입 성공", null);
+        CommonResponseDTO response = new CommonResponseDTO(201, "회원가입 성공", savedUsername);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 

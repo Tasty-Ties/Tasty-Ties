@@ -20,7 +20,7 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public void registerUser(UserRegistrationDTO request) {
+    public String registerUser(UserRegistrationDTO request) {
         String encodedPassword = passwordEncoder.encode(request.getPassword());
         if (userRepository.existsByUsername(request.getUsername())) {
             throw new UserIDAlreadyExistsException("이미 존재하는 사용자 ID입니다");
@@ -35,7 +35,8 @@ public class UserService {
         newUser.setEmail(request.getEmailId() + "@" + request.getEmailDomain());
         newUser.setBirth(request.getBirth());
 
-        userRepository.save(newUser);
+        User savedUser = userRepository.save(newUser);
+        return savedUser.getUsername();
     }
 
     public boolean isUserNameAvailable(String username) {
