@@ -6,7 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
-@ControllerAdvice(basePackages = "com.b206.tastyties.user")
+@ControllerAdvice(basePackages = "com.teamcook.tastyties.user")
 public class UserExceptionHandler {
 
     @ExceptionHandler(UserIDAlreadyExistsException.class)
