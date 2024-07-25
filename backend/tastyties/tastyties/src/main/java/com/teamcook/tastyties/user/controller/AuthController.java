@@ -12,11 +12,13 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/auth")
@@ -39,10 +41,15 @@ public class AuthController {
                     new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword()));
 
             // 인증이 성공하면 JWT 토큰 생성
-            String token = tokenProvider.generateToken(authentication);
+            String accessToken = tokenProvider.generateAccessToken(authentication);
+            String refreshToken = tokenProvider.generateRefreshToken(authentication);
+
+            Map<String, String> tokens = new HashMap<>();
+            tokens.put("accessToken", accessToken);
+            tokens.put("refreshToken", refreshToken);
 
             // 토큰과 함께 성공 응답
-            CommonResponseDTO response = new CommonResponseDTO(200, "로그인 성공", token);
+            CommonResponseDTO response = new CommonResponseDTO(200, "로그인 성공", tokens);
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (BadCredentialsException e) {
             // 아이디 또는 비밀번호가 틀린 경우

@@ -10,32 +10,53 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
+import java.nio.charset.StandardCharsets;
 import java.security.Key;
+import java.util.Base64;
 import java.util.Date;
 
 @Component
 public class JwtTokenProvider {
 
-    private Key jwtSecret;
+    @Value("${jwt.secret}")
+    private String secret;
 
-    @Value("${jwt.expiration}")
-    private long jwtExpirationInMs;
+    @Value("${jwt.accessTokenExpiration}")
+    private long accessTokenExpirationInMs;
+
+    @Value("${jwt.refreshTokenExpiration}")
+    private long refreshTokenExpirationInMs;
+
+    private Key jwtSecret;
 
     @PostConstruct
     public void init() {
-        this.jwtSecret = Keys.secretKeyFor(SignatureAlgorithm.HS512);
+        this.jwtSecret = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
     }
 
-    public String generateToken(Authentication authentication) {
+    public String generateAccessToken(Authentication authentication) {
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         Date now = new Date();
-        Date expiryDate = new Date(now.getTime() + jwtExpirationInMs);
+        Date expiryDate = new Date(now.getTime() + accessTokenExpirationInMs);
 
         return Jwts.builder()
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(now)
                 .setExpiration(expiryDate)
-                .signWith(jwtSecret, SignatureAlgorithm.HS512)
+                .signWith(jwtSecret, SignatureAlgorithm.HS256)
+                .compact();
+    }
+
+    public String generateRefreshToken(Authentication authentication) {
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        Date now = new Date();
+        Date expiryDate = new Date(now.getTime() + refreshTokenExpirationInMs);
+
+        return Jwts.builder()
+                .setSubject(userDetails.getUsername())
+                .setIssuedAt(now)
+                .setExpiration(expiryDate)
+                .signWith(jwtSecret, SignatureAlgorithm.HS256)
                 .compact();
     }
 
