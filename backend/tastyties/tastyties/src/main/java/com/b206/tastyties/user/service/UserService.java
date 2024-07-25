@@ -2,6 +2,7 @@ package com.b206.tastyties.user.service;
 
 import com.b206.tastyties.user.dto.UserRegistrationDTO;
 import com.b206.tastyties.user.entity.User;
+import com.b206.tastyties.user.exception.UserIDAlreadyExistsException;
 import com.b206.tastyties.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -21,7 +22,9 @@ public class UserService {
 
     public void registerUser(UserRegistrationDTO request) {
         String encodedPassword = passwordEncoder.encode(request.getPassword());
-
+        if (userRepository.existsByUsername(request.getUsername())) {
+            throw new UserIDAlreadyExistsException("이미 존재하는 사용자 ID입니다");
+        }
         User newUser = new User();
         newUser.setUsername(request.getUsername());
         newUser.setPassword(encodedPassword);
