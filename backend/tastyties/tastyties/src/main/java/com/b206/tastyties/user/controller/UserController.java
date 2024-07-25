@@ -29,18 +29,18 @@ public class UserController {
     @GetMapping("/check-username")
     public ResponseEntity<CommonResponseDTO> checkUsername(@RequestParam("username") String username) {
         if (!userService.isUserNameAvailable(username)) {
-            throw new UserIDAlreadyExistsException("중복된 ID 입니다.");
+            throw new UserIDAlreadyExistsException("해당 아이디는 이미 존재합니다.");
         }
-        return new ResponseEntity<>(new CommonResponseDTO(200, "사용가능한 ID입니다.", null)
+        return new ResponseEntity<>(new CommonResponseDTO(200, "아이디 중복 체크 성공.", null)
                 , HttpStatus.OK);
     }
 
     @GetMapping("/check-nickname")
     public ResponseEntity<CommonResponseDTO> checkNickname(@RequestParam("nickname") String nickname) {
         if (!userService.isNicknameAvailable(nickname)) {
-            throw new UserIDAlreadyExistsException("중복된 닉네임입니다.");
+            throw new UserIDAlreadyExistsException("해당 닉네임은 이미 존재합니다.");
         }
-        return new ResponseEntity<>(new CommonResponseDTO(200, "사용가능한 닉네임입니다.", null)
+        return new ResponseEntity<>(new CommonResponseDTO(200, "닉네임 중복 체크 성공.", null)
                 , HttpStatus.OK);
     }
 }
