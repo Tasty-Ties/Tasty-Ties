@@ -1,4 +1,4 @@
-package com.b206.tastyties.security.common.dto;
+package com.b206.tastyties.common.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

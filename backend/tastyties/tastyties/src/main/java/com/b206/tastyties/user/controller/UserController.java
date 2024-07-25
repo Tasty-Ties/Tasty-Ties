@@ -1,8 +1,7 @@
 package com.b206.tastyties.user.controller;
 
-import com.b206.tastyties.security.common.dto.CommonResponseDTO;
+import com.b206.tastyties.common.dto.CommonResponseDTO;
 import com.b206.tastyties.user.dto.UserRegistrationDTO;
-import com.b206.tastyties.user.entity.User;
 import com.b206.tastyties.user.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
