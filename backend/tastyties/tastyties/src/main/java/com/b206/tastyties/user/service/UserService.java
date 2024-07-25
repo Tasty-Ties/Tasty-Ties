@@ -37,4 +37,12 @@ public class UserService {
 
         userRepository.save(newUser);
     }
+
+    public boolean isUserNameAvailable(String username) {
+        return !userRepository.existsByUsername(username);
+    }
+
+    public boolean isNicknameAvailable(String nickname) {
+        return !userRepository.existsByNickname(nickname);
+    }
 }
