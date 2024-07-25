@@ -31,10 +31,8 @@ public class User {
     @Column(nullable = false)
     private LocalDate birth;
 
-    @Column(nullable = false)
-    private String emailId;
-    @Column(nullable = false)
-    private String emailDomain;
+    @Column(nullable = false, unique = true)
+    private String email;
 
     private String description;
     private boolean isDeleted = Boolean.FALSE;

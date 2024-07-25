@@ -29,9 +29,7 @@ public class UserService {
         newUser.setCountryCode(request.getCountryCode());
         newUser.setLanguageCode(request.getLanguageCode());
 
-        newUser.setEmailId(request.getEmailId());
-        newUser.setEmailDomain(request.getEmailDomain());
-
+        newUser.setEmail(request.getEmailId() + "@" + request.getEmailDomain());
         newUser.setBirth(request.getBirth());
 
         userRepository.save(newUser);
