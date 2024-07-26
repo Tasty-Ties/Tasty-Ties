@@ -1,6 +1,7 @@
 package com.teamcook.tastyties.user.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -15,23 +16,23 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int userId;
 
-    @Column(nullable = false)
+    @NotNull @Column(nullable = false)
     private String countryCode;
-    @Column(nullable = false)
+    @NotNull @Column(nullable = false)
     private String languageCode;
 
-    @Column(nullable = false)
+    @NotNull @Column(nullable = false)
     private String username;
-    @Column(nullable = false)
+    @NotNull @Column(nullable = false)
     private String password;
-    @Column(nullable = false)
+    @NotNull @Column(nullable = false)
     private String nickname;
 
     private String profileImageUrl;
-    @Column(nullable = false)
+    @NotNull @Column(nullable = false)
     private LocalDate birth;
 
-    @Column(nullable = false, unique = true)
+    @NotNull @Column(nullable = false, unique = true)
     private String email;
 
     private String description;
