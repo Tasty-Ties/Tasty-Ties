@@ -45,4 +45,13 @@ public class CookingClass {
     private LocalDateTime updateTime = LocalDateTime.now();
 
     private boolean isDelete = false;
+
+    @OneToMany(mappedBy = "cookingClass")
+    private Set<Recipe> recipes = new HashSet<>();
+
+    @OneToMany(mappedBy = "cookingClass")
+    private Set<Ingredient> ingredients = new HashSet<>();
+
+    @OneToMany(mappedBy = "cookingClass")
+    private Set<CookingTool> cookingTools = new HashSet<>();
 }
