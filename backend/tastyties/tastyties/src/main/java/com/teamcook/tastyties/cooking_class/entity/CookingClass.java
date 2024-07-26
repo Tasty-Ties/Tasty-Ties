@@ -4,12 +4,18 @@ import com.teamcook.tastyties.shared.entity.UserAndCookingClass;
 import com.teamcook.tastyties.user.entity.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity
+@Getter @Setter @AllArgsConstructor
+@NoArgsConstructor
 public class CookingClass {
 
     @Id
@@ -31,7 +37,7 @@ public class CookingClass {
 
     private String title;
     private String description;
-    private String dish_name;
+    private String dishName;
     private int dishCookingTime;
     private int level;
     private int quota;
