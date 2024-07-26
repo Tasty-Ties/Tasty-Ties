@@ -30,7 +30,9 @@
 
 + `jwt.secret` 에 충분히 긴 문자열을 넣어주세요 
 
+### 그 외 설정
 
+설정 파일(application.properties)에 문자가 깨진다면, `File` -> `Settings` -> `File Encodings` -> `Default encoding for properties` 를 UTF-8 로 바꾸고 적용하세요   
 
 ## 기여 방법
 기여하고 싶은 분들은 [기여 가이드](CONTRIBUTING.md)를 참고하세요.
