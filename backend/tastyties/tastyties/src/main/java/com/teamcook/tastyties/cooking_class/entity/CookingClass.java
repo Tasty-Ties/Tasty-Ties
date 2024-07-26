@@ -1,12 +1,13 @@
 package com.teamcook.tastyties.cooking_class.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import com.teamcook.tastyties.shared.entity.UserAndCookingClass;
+import com.teamcook.tastyties.user.entity.User;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 public class CookingClass {
@@ -15,7 +16,13 @@ public class CookingClass {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int cookingClassId;
 
-    private int userId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "host_id", referencedColumnName = "userId")
+    private User host;
+
+    // orphanremoval, cascade 관계 고려 필요
+    @OneToMany(mappedBy = "cookingClass")
+    private Set<UserAndCookingClass> userAndCookingClasses = new HashSet<>();
 
     @NotNull
     private String languageCode;
