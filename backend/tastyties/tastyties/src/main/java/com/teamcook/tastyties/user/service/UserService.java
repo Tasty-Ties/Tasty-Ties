@@ -46,4 +46,9 @@ public class UserService {
     public boolean isNicknameAvailable(String nickname) {
         return !userRepository.existsByNickname(nickname);
     }
+
+    public boolean isEmailIdAvailable(String emailId, String emailDomain) {
+        String email = emailId + "@" + emailDomain;
+        return !userRepository.existsByEmail(email);
+    }
 }

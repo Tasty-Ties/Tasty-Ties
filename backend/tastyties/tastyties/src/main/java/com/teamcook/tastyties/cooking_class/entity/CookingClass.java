@@ -1,5 +1,6 @@
 package com.teamcook.tastyties.cooking_class.entity;
 
+import com.teamcook.tastyties.shared.entity.CookingClassAndCookingClassTag;
 import com.teamcook.tastyties.shared.entity.UserAndCookingClass;
 import com.teamcook.tastyties.user.entity.User;
 import jakarta.persistence.*;
@@ -11,6 +12,7 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -60,4 +62,7 @@ public class CookingClass {
 
     @OneToMany(mappedBy = "cookingClass")
     private Set<CookingTool> cookingTools = new HashSet<>();
+
+    @OneToMany(mappedBy = "cookingClass")
+    private List<CookingClassAndCookingClassTag> cookingClassAndCookingClassTags;
 }
