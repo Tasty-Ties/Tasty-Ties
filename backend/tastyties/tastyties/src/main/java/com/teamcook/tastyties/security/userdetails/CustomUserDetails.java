@@ -10,7 +10,7 @@ import java.util.Collections;
 
 public class CustomUserDetails implements UserDetails {
 
-    private User user;
+    private final User user;
 
     public CustomUserDetails(User user) {
         this.user = user;
@@ -19,6 +19,14 @@ public class CustomUserDetails implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return Collections.emptyList();
+    }
+
+    public Integer getUserId() {
+        return user.getUserId();
+    }
+
+    public User getUser() {
+        return user;
     }
 
     @Override

@@ -49,8 +49,8 @@ public class CookingClass {
     private LocalDateTime cookingClassEndTime;
 
     private LocalDateTime replayEndTime;
-    private LocalDateTime createTime = LocalDateTime.now();
-    private LocalDateTime updateTime = LocalDateTime.now();
+    private LocalDateTime createTime;
+    private LocalDateTime updateTime;
 
     private boolean isDelete = false;
 
@@ -65,4 +65,15 @@ public class CookingClass {
 
     @OneToMany(mappedBy = "cookingClass")
     private List<CookingClassAndCookingClassTag> cookingClassAndCookingClassTags;
+
+    @PrePersist
+    protected void onCreate() {
+        createTime = LocalDateTime.now();
+        updateTime = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updateTime = LocalDateTime.now();
+    }
 }
