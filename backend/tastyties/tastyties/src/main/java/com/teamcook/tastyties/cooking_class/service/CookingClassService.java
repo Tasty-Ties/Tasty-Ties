@@ -1,7 +1,8 @@
 package com.teamcook.tastyties.cooking_class.service;
 
+import com.teamcook.tastyties.common.utils.UUIDConverter;
 import com.teamcook.tastyties.cooking_class.dto.CookingClassListDto;
-import com.teamcook.tastyties.cooking_class.dto.CookingClassRegisterDto;
+import com.teamcook.tastyties.cooking_class.dto.CookingClassDto;
 import com.teamcook.tastyties.cooking_class.dto.CookingClassSearchCondition;
 import com.teamcook.tastyties.cooking_class.entity.*;
 import com.teamcook.tastyties.cooking_class.repository.*;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -43,7 +45,7 @@ public class CookingClassService {
     }
 
     @Transactional
-    public CookingClassRegisterDto registerClass(User user, CookingClassRegisterDto registerDto) {
+    public CookingClassDto registerClass(User user, CookingClassDto registerDto) {
         CookingClass cc = new CookingClass();
         cc.setHost(user);
 
@@ -122,5 +124,27 @@ public class CookingClassService {
 
     public Page<CookingClassListDto> searchCookingClassList(CookingClassSearchCondition condition, Pageable pageable) {
         return cookingClassRepository.searchClass(condition, pageable);
+    }
+
+    public CookingClassDto getCookingClassDetail(String uuid) {
+        CookingClass cc = cookingClassRepository.findByUuid(uuid);
+        return new CookingClassDto(
+                cc.getTitle(),
+                cc.getDishName(),
+                cc.isLimitedAge(),
+                cc.getCountryCode(),
+                null,
+                cc.getDescription(),
+                cc.getLanguageCode(),
+                cc.getLevel(),
+                cc.getCookingClassStartTime(),
+                cc.getCookingClassEndTime(),
+                cc.getDishCookingTime(),
+                null,
+                null,
+                null,
+                cc.getQuota(),
+                cc.getReplayEndTime()
+        );
     }
 }

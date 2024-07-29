@@ -1,17 +1,13 @@
 package com.teamcook.tastyties.cooking_class.repository;
 
-import com.querydsl.core.Tuple;
-import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.teamcook.tastyties.cooking_class.dto.CookingClassListDto;
-import com.teamcook.tastyties.cooking_class.dto.CookingClassRegisterDto;
 import com.teamcook.tastyties.cooking_class.dto.CookingClassSearchCondition;
 import com.teamcook.tastyties.cooking_class.dto.QCookingClassListDto;
+import com.teamcook.tastyties.cooking_class.entity.CookingClass;
 import com.teamcook.tastyties.cooking_class.entity.CookingClassTag;
-import com.teamcook.tastyties.cooking_class.entity.QCookingClass;
-import com.teamcook.tastyties.user.entity.QUser;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
@@ -50,7 +46,8 @@ public class CookingClassRepositoryImpl implements CookingClassCustomRepository 
                 .select(new QCookingClassListDto(cookingClass.title,
                         cookingClass.cookingClassStartTime.as("startTime"),
                         cookingClass.cookingClassEndTime.as("endTime"),
-                        user.username.as("hostName")))
+                        user.username.as("hostName"),
+                        cookingClass.uuid))
                 .from(cookingClass)
                 .leftJoin(cookingClass.host, user)
                 .where(

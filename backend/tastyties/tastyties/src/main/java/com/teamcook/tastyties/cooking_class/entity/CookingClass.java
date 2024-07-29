@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 @Entity
 @Getter @Setter @AllArgsConstructor
@@ -23,6 +24,7 @@ public class CookingClass {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int cookingClassId;
+    private String uuid;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "host_id", referencedColumnName = "userId")
@@ -65,4 +67,17 @@ public class CookingClass {
 
     @OneToMany(mappedBy = "cookingClass")
     private List<CookingClassAndCookingClassTag> cookingClassAndCookingClassTags;
+
+
+    @PrePersist
+    protected void onCreate() {
+        createTime = LocalDateTime.now();
+        updateTime = LocalDateTime.now();
+        uuid = UUID.randomUUID().toString();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updateTime = LocalDateTime.now();
+    }
 }
