@@ -17,15 +17,15 @@ public class CookingClassRegisterDto {
     private String dishName;
     private boolean isLimitedAge;
     private String countryCode;
-    private List<String> cookingClassTag;
+    private List<String> cookingClassTags;
     private String description;
     private String languageCode;
     private int level;
     private LocalDateTime cookingClassStartTime;
     private LocalDateTime cookingClassEndTime;
     private int dishCookingTime;
-    private List<Ingredient> ingredients;
-    private List<Recipe> recipe;
+    private List<IngredientDto> ingredients;
+    private List<RecipeDto> recipe;
     private List<String> cookingTools;
     private int quota;
     private LocalDateTime replayEndTime;

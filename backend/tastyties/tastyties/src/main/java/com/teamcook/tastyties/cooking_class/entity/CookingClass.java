@@ -65,15 +65,4 @@ public class CookingClass {
 
     @OneToMany(mappedBy = "cookingClass")
     private List<CookingClassAndCookingClassTag> cookingClassAndCookingClassTags;
-
-    @PrePersist
-    protected void onCreate() {
-        createTime = LocalDateTime.now();
-        updateTime = LocalDateTime.now();
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-        updateTime = LocalDateTime.now();
-    }
 }
