@@ -1,7 +1,5 @@
 package com.teamcook.tastyties.cooking_class.dto;
 
-import com.teamcook.tastyties.cooking_class.entity.Ingredient;
-import com.teamcook.tastyties.cooking_class.entity.Recipe;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

@@ -1,6 +1,8 @@
 package com.teamcook.tastyties.cooking_class.service;
 
+import com.teamcook.tastyties.cooking_class.dto.CookingClassListDto;
 import com.teamcook.tastyties.cooking_class.dto.CookingClassRegisterDto;
+import com.teamcook.tastyties.cooking_class.dto.CookingClassSearchCondition;
 import com.teamcook.tastyties.cooking_class.entity.*;
 import com.teamcook.tastyties.cooking_class.repository.*;
 import com.teamcook.tastyties.shared.entity.CookingClassAndCookingClassTag;
@@ -9,6 +11,8 @@ import com.teamcook.tastyties.shared.repository.CookingClassAndCookingClassTagRe
 import com.teamcook.tastyties.shared.repository.UserAndCookingClassRepository;
 import com.teamcook.tastyties.user.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,9 +28,10 @@ public class CookingClassService {
     private final CookingClassAndCookingClassTagRepository ccAndcctRepository;
     private final UserAndCookingClassRepository uAndcRepository;
     private final CookingClassTagRepository cookingClassTagRepository;
+    private final CookingClassRepository cookingClassRepository;
 
     @Autowired
-    public CookingClassService(CookingClassRepository ccRepository, IngredientRepository ingredientRepository, RecipeRepository recipeRepository, CookingToolRepository cookingToolRepository, CookingClassAndCookingClassTagRepository ccAndcctRepository, UserAndCookingClassRepository uAndcRepository, CookingClassTagRepository cookingClassTagRepository) {
+    public CookingClassService(CookingClassRepository ccRepository, IngredientRepository ingredientRepository, RecipeRepository recipeRepository, CookingToolRepository cookingToolRepository, CookingClassAndCookingClassTagRepository ccAndcctRepository, UserAndCookingClassRepository uAndcRepository, CookingClassTagRepository cookingClassTagRepository, CookingClassRepository cookingClassRepository) {
         this.ccRepository = ccRepository;
         this.ingredientRepository = ingredientRepository;
         this.recipeRepository = recipeRepository;
@@ -34,6 +39,7 @@ public class CookingClassService {
         this.ccAndcctRepository = ccAndcctRepository;
         this.uAndcRepository = uAndcRepository;
         this.cookingClassTagRepository = cookingClassTagRepository;
+        this.cookingClassRepository = cookingClassRepository;
     }
 
     @Transactional
@@ -112,5 +118,9 @@ public class CookingClassService {
     private CookingClassTag findOrCreateTag(String tagName) {
         return cookingClassTagRepository.findByCookingClassTagName(tagName)
                 .orElseGet(() -> cookingClassTagRepository.save(new CookingClassTag(tagName)));
+    }
+
+    public Page<CookingClassListDto> searchCookingClassList(CookingClassSearchCondition condition, Pageable pageable) {
+        return cookingClassRepository.searchClass(condition, pageable);
     }
 }
