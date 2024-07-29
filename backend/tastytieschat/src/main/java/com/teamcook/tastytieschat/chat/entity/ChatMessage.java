@@ -9,6 +9,7 @@ import org.springframework.data.mongodb.config.EnableMongoAuditing;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.Map;
 
 @Document(collection = "chatmessage")
@@ -38,6 +39,15 @@ public class ChatMessage {
         this.userNickname = userNickname;
         this.originLanguage = originLanguage;
         this.originMessage = chatRequestDTO.getMessage();
+        this.translatedMessages = new HashMap<>();
+    }
+
+    public void addTranslatedMessage(String key, String value) {
+        translatedMessages.put(key, value);
+    }
+
+    public boolean containTranslatedLanguage(String translatedLanguage) {
+        return translatedMessages.containsKey(translatedLanguage);
     }
 
 }

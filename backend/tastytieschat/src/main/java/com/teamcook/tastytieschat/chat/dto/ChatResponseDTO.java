@@ -25,8 +25,7 @@ public class ChatResponseDTO {
         this.userNickname = chatMessage.getUserNickname();
         this.messages = new HashMap<>();
         this.messages.put(chatMessage.getOriginLanguage(), chatMessage.getOriginMessage());
-        // TODO: 원본 메시지 번역 후 저장
-//        this.messages.putAll(chatMessage.getTranslatedMessages());
+        this.messages.putAll(chatMessage.getTranslatedMessages());
         this.createdTime = chatMessage.getCreatedTime();
     }
 
