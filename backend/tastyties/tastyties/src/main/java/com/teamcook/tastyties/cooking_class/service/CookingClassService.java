@@ -4,6 +4,7 @@ import com.teamcook.tastyties.cooking_class.dto.*;
 import com.teamcook.tastyties.cooking_class.entity.*;
 import com.teamcook.tastyties.cooking_class.exception.ClassIsDeletedException;
 import com.teamcook.tastyties.cooking_class.repository.*;
+import com.teamcook.tastyties.security.userdetails.CustomUserDetails;
 import com.teamcook.tastyties.shared.entity.CookingClassAndCookingClassTag;
 import com.teamcook.tastyties.shared.entity.UserAndCookingClass;
 import com.teamcook.tastyties.shared.repository.CookingClassAndCookingClassTagRepository;
@@ -138,9 +139,16 @@ public class CookingClassService {
 
     // 클래스 상세 조회
     @Transactional
-    public CookingClassDto getCookingClassDetail(String uuid) {
+    public CookingClassDto getCookingClassDetail(CustomUserDetails userDetails, String uuid) {
         CookingClass cc = cookingClassRepository.findWithUuid(uuid);
-        log.debug("cooking class ingredients: {}", cc.getIngredients());
+
+        boolean isEnrolledClass = false;
+        long enrolledCount = 0;
+        if (userDetails != null) {
+            User user = userDetails.user();
+            isEnrolledClass = uAndcRepository.isUserEnrolledInClass(user, cc);
+            enrolledCount = uAndcRepository.countQuota(cc);
+        }
 
         Set<IngredientDto> ingredientDtos = mapToIngredientDtos(cc.getIngredients());
         Set<RecipeDto> recipeDtos = mapToRecipeDtos(cc.getRecipes());
@@ -148,13 +156,13 @@ public class CookingClassService {
         Set<String> tags = mapToTagNames(cc.getCookingClassAndCookingClassTags());
 
         return new CookingClassDto(
-                cc.getUuid(),
+                cc.getUuid(), cc.getHost().getNickname(),
                 cc.getTitle(), cc.getDishName(), cc.isLimitedAge(),
                 cc.getCountryCode(), tags, cc.getDescription(),
                 cc.getLanguageCode(), cc.getLevel(), cc.getCookingClassStartTime(),
                 cc.getCookingClassEndTime(), cc.getDishCookingTime(), ingredientDtos,
                 recipeDtos, cookingTools, cc.getQuota(),
-                cc.getReplayEndTime()
+                cc.getReplayEndTime(), isEnrolledClass, enrolledCount
         );
     }
 

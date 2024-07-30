@@ -11,8 +11,10 @@ import java.util.Set;
 
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 public class CookingClassDto {
     private String uuid;
+    private String hostName;
     private String title;
     private String dishName;
     private boolean isLimitedAge;
@@ -30,24 +32,6 @@ public class CookingClassDto {
     private int quota;
     private LocalDateTime replayEndTime;
 
-    @QueryProjection
-    public CookingClassDto(String uuid, String title, String dishName, boolean isLimitedAge, String countryCode, Set<String> cookingClassTags, String description, String languageCode, int level, LocalDateTime cookingClassStartTime, LocalDateTime cookingClassEndTime, int dishCookingTime, Set<IngredientDto> ingredients, Set<RecipeDto> recipe, Set<String> cookingTools, int quota, LocalDateTime replayEndTime) {
-        this.uuid = uuid;
-        this.title = title;
-        this.dishName = dishName;
-        this.isLimitedAge = isLimitedAge;
-        this.countryCode = countryCode;
-        this.cookingClassTags = cookingClassTags;
-        this.description = description;
-        this.languageCode = languageCode;
-        this.level = level;
-        this.cookingClassStartTime = cookingClassStartTime;
-        this.cookingClassEndTime = cookingClassEndTime;
-        this.dishCookingTime = dishCookingTime;
-        this.ingredients = ingredients;
-        this.recipe = recipe;
-        this.cookingTools = cookingTools;
-        this.quota = quota;
-        this.replayEndTime = replayEndTime;
-    }
+    private boolean isUserEnrolled;
+    private long reservedCount;
 }

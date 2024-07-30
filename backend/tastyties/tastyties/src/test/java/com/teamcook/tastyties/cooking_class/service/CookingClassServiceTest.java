@@ -19,7 +19,7 @@ class CookingClassServiceTest {
     // 본인 로컬 db에 들어있는 데이터로 테스트해야해요 ㅠㅠ
     @Test
     void 조회_테스트() {
-        CookingClassDto classDetail = service.getCookingClassDetail("195c9b9a-cf69-404a-96d8-19c528c6c2f6");
+        CookingClassDto classDetail = service.getCookingClassDetail(null, "195c9b9a-cf69-404a-96d8-19c528c6c2f6");
         assertThat(classDetail).isNotNull();
         assertThat(classDetail.getTitle()).isEqualTo("1000원의 행복2");
         assertThat(classDetail.getCookingClassTags()).containsExactly("간편한", "한끼", "저렴한");

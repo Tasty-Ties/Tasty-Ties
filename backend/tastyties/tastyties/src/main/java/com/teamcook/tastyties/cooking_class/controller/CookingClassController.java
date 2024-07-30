@@ -67,8 +67,9 @@ public class CookingClassController {
     }
 
     @GetMapping("/{uuid}")
-    public ResponseEntity<CommonResponseDTO> getClassDetail(@PathVariable String uuid) {
-        CookingClassDto cookingClassDetail = cookingClassService.getCookingClassDetail(uuid);
+    public ResponseEntity<CommonResponseDTO> getClassDetail(@AuthenticationPrincipal CustomUserDetails userDetails, @PathVariable String uuid) {
+
+        CookingClassDto cookingClassDetail = cookingClassService.getCookingClassDetail(userDetails, uuid);
         return ResponseEntity.ok()
                 .body(CommonResponseDTO.builder()
                         .stateCode(200)

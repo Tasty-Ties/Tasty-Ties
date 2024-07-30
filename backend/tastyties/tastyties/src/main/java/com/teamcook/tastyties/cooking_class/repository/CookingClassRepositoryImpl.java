@@ -48,7 +48,7 @@ public class CookingClassRepositoryImpl implements CookingClassCustomRepository 
                 .select(new QCookingClassListDto(cookingClass.title,
                         cookingClass.cookingClassStartTime.as("startTime"),
                         cookingClass.cookingClassEndTime.as("endTime"),
-                        user.username.as("hostName"),
+                        user.nickname.as("hostName"),
                         cookingClass.uuid))
                 .from(cookingClass)
                 .leftJoin(cookingClass.host, user)
@@ -72,6 +72,14 @@ public class CookingClassRepositoryImpl implements CookingClassCustomRepository 
     }
 
     // fetchjoin을 사용한 조회
+    private BooleanExpression titleLike(String title) {
+        return hasText(title) ? cookingClass.title.contains(title) : null;
+    }
+
+    private BooleanExpression usernameEq(String username) {
+        return hasText(username) ?user.username.eq(username) : null;
+    }
+
     @Override
     public CookingClass findWithUuid(String uuid) {
         QCookingClassAndCookingClassTag ccAndTag = QCookingClassAndCookingClassTag.cookingClassAndCookingClassTag;
@@ -86,14 +94,6 @@ public class CookingClassRepositoryImpl implements CookingClassCustomRepository 
                 .leftJoin(ccAndTag.cookingClassTag, cookingClassTag).fetchJoin()
                 .where(cookingClass.uuid.eq(uuid), cookingClass.isDelete.eq(false))
                 .fetchOne();
-    }
-
-    private BooleanExpression titleLike(String title) {
-        return hasText(title) ? cookingClass.title.contains(title) : null;
-    }
-
-    private BooleanExpression usernameEq(String username) {
-        return hasText(username) ?user.username.eq(username) : null;
     }
 
 }
