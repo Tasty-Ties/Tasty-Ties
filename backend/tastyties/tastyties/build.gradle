@@ -45,6 +45,12 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+	//S3
+	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
+	//Openvidu
+	implementation group: 'io.openvidu', name: 'openvidu-java-client', version: '2.30.0'
+
 }
 
 tasks.named('test') {

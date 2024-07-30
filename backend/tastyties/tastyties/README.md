@@ -29,6 +29,7 @@
 
 
 + `jwt.secret` 에 충분히 긴 문자열을 넣어주세요 
++ `access key` 와 `secret key` 는 노션을 보고 키를 입력해주세요
 
 ### 그 외 설정
 
