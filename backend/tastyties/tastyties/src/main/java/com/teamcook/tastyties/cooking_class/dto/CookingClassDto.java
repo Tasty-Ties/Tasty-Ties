@@ -31,7 +31,6 @@ public class CookingClassDto {
     private LocalDateTime replayEndTime;
 
     @QueryProjection
-
     public CookingClassDto(String uuid, String title, String dishName, boolean isLimitedAge, String countryCode, Set<String> cookingClassTags, String description, String languageCode, int level, LocalDateTime cookingClassStartTime, LocalDateTime cookingClassEndTime, int dishCookingTime, Set<IngredientDto> ingredients, Set<RecipeDto> recipe, Set<String> cookingTools, int quota, LocalDateTime replayEndTime) {
         this.uuid = uuid;
         this.title = title;

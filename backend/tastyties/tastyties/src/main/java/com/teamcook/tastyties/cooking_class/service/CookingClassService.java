@@ -2,6 +2,7 @@ package com.teamcook.tastyties.cooking_class.service;
 
 import com.teamcook.tastyties.cooking_class.dto.*;
 import com.teamcook.tastyties.cooking_class.entity.*;
+import com.teamcook.tastyties.cooking_class.exception.ClassIsDeletedException;
 import com.teamcook.tastyties.cooking_class.repository.*;
 import com.teamcook.tastyties.shared.entity.CookingClassAndCookingClassTag;
 import com.teamcook.tastyties.shared.entity.UserAndCookingClass;
@@ -195,5 +196,16 @@ public class CookingClassService {
         uAndc.setUser(user);
         uAndc.setCookingClass(cc);
         uAndcRepository.save(uAndc);
+    }
+
+    public void reserveClass(User user, String uuid) {
+        CookingClass cc = cookingClassRepository.findWithUuid(uuid);
+        log.debug(uuid);
+        log.debug("cooking class {}", cc);
+
+        if (cc.isDelete()) {
+            throw new ClassIsDeletedException("삭제된 클래스입니다.");
+        }
+        createUserAndCookingClassRelationship(user, cc);
     }
 }
