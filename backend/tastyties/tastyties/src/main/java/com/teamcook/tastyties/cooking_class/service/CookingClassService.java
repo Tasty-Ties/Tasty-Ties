@@ -199,7 +199,7 @@ public class CookingClassService {
     }
 
 
-
+    // 클래스 예약
     public void reserveClass(User user, String uuid) {
         CookingClass cc = cookingClassRepository.findWithUuid(uuid);
 

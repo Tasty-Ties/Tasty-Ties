@@ -1,10 +1,11 @@
 package com.teamcook.tastyties.common.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import com.teamcook.tastyties.shared.entity.UserAndCountry;
+import jakarta.persistence.*;
 import lombok.Getter;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -15,6 +16,9 @@ public class Country {
   private String alpha2;
   private String englishName;
   private String koreanName;
+
+  @OneToMany(mappedBy = "country")
+  private Set<UserAndCountry> userAndCountries = new HashSet<>();
 }
 
 //CREATE TABLE Country (

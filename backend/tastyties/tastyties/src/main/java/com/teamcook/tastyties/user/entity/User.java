@@ -2,6 +2,7 @@ package com.teamcook.tastyties.user.entity;
 
 import com.teamcook.tastyties.cooking_class.entity.CookingClass;
 import com.teamcook.tastyties.shared.entity.UserAndCookingClass;
+import com.teamcook.tastyties.shared.entity.UserAndCountry;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -28,6 +29,8 @@ public class User {
     @OneToMany(mappedBy = "host")
     private Set<CookingClass> hostingClasses = new HashSet<>();
 
+    @OneToMany(mappedBy = "user")
+    private Set<UserAndCountry> userAndCountries = new HashSet<>();
 
     @NotNull @Column(nullable = false)
     private String countryCode;

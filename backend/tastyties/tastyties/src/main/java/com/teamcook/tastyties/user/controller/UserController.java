@@ -74,7 +74,7 @@ public class UserController {
 
     @GetMapping("/me")
     public ResponseEntity<CommonResponseDTO> myProfile(@AuthenticationPrincipal CustomUserDetails userDetails) {
-
+        userDetails.user();
         return null;
     }
 }

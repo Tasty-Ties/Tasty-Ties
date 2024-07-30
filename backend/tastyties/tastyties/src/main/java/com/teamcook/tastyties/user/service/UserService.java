@@ -1,5 +1,10 @@
 package com.teamcook.tastyties.user.service;
 
+import com.teamcook.tastyties.common.entity.Country;
+import com.teamcook.tastyties.common.repository.CountryRepository;
+import com.teamcook.tastyties.cooking_class.entity.CookingClass;
+import com.teamcook.tastyties.shared.entity.UserAndCookingClass;
+import com.teamcook.tastyties.shared.repository.UserAndCountryRepository;
 import com.teamcook.tastyties.user.dto.UserRegistrationDTO;
 import com.teamcook.tastyties.user.entity.User;
 import com.teamcook.tastyties.user.exception.UserIDAlreadyExistsException;
@@ -13,11 +18,16 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final CountryRepository countryRepository;
+    private final UserAndCountryRepository userAndCountryRepository;
 
     @Autowired
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder,
+                       CountryRepository countryRepository, UserAndCountryRepository userAndCountryRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.countryRepository = countryRepository;
+        this.userAndCountryRepository = userAndCountryRepository;
     }
 
     public String registerUser(UserRegistrationDTO request) {
@@ -51,4 +61,28 @@ public class UserService {
         String email = emailId + "@" + emailDomain;
         return !userRepository.existsByEmail(email);
     }
+
+    public Country collectFlag(User user, String countryCode) {
+        Country country = countryRepository.findByAlpha2(countryCode);
+        if (country == null) {
+            // countrynotfoundexception
+        }
+        boolean alreadyCollected = userAndCountryRepository.alreadyCollected(user, country);
+
+        if (alreadyCollected) {
+            return country;
+        }
+        return null;
+    }
+
+    // user와 cookingclass 관계 생성
+//    private void createUserAndCookingClassRelationship(User user, CookingClass cc) {
+//        if (userAndCookingClassRepository.isUserEnrolledInClass(user, cc)) {
+//            throw new IllegalArgumentException("이미 예약되어있습니다.");
+//        }
+//        UserAndCookingClass uAndc = new UserAndCookingClass();
+//        uAndc.setUser(user);
+//        uAndc.setCookingClass(cc);
+//        uAndcRepository.save(uAndc);
+//    }
 }
