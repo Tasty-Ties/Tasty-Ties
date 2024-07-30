@@ -1,12 +1,14 @@
 package com.teamcook.tastyties.user.controller;
 
 import com.teamcook.tastyties.common.dto.CommonResponseDTO;
+import com.teamcook.tastyties.security.userdetails.CustomUserDetails;
 import com.teamcook.tastyties.user.dto.UserRegistrationDTO;
 import com.teamcook.tastyties.user.exception.UserIDAlreadyExistsException;
 import com.teamcook.tastyties.user.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -68,5 +70,11 @@ public class UserController {
                         .message("이메일 중복 체크 성공.")
                         .data(null)
                         .build());
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<CommonResponseDTO> myProfile(@AuthenticationPrincipal CustomUserDetails userDetails) {
+
+        return null;
     }
 }
