@@ -3,8 +3,10 @@ package com.teamcook.tastyties.shared.entity;
 import com.teamcook.tastyties.cooking_class.entity.CookingClass;
 import com.teamcook.tastyties.cooking_class.entity.CookingClassTag;
 import jakarta.persistence.*;
+import lombok.Data;
 
 @Entity
+@Data
 public class CookingClassAndCookingClassTag {
 
     @Id

@@ -49,8 +49,8 @@ public class CookingClass {
     private LocalDateTime cookingClassEndTime;
 
     private LocalDateTime replayEndTime;
-    private LocalDateTime createTime = LocalDateTime.now();
-    private LocalDateTime updateTime = LocalDateTime.now();
+    private LocalDateTime createTime;
+    private LocalDateTime updateTime;
 
     private boolean isDelete = false;
 

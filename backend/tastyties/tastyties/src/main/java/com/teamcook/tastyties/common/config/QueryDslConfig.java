@@ -1,4 +1,4 @@
-package com.teamcook.tastyties.config;
+package com.teamcook.tastyties.common.config;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;

@@ -48,6 +48,9 @@ public class SecurityConfig {
                         .requestMatchers("/users/profile/**").authenticated()  // 로그인한 사용자만 접근 가능
                         .anyRequest().permitAll()
                 )
+                .exceptionHandling(exceptionHandling ->
+                        exceptionHandling.authenticationEntryPoint(jwtAuthenticationEntryPoint)
+                )
                 .formLogin(formLogin ->
                         formLogin
                                 .loginPage("/login")
