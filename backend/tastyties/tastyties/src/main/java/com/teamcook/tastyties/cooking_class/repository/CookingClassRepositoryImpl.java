@@ -6,6 +6,8 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.teamcook.tastyties.cooking_class.dto.*;
 import com.teamcook.tastyties.cooking_class.entity.CookingClass;
 import com.teamcook.tastyties.cooking_class.entity.CookingClassTag;
+import com.teamcook.tastyties.cooking_class.entity.QCookingClassTag;
+import com.teamcook.tastyties.shared.entity.QCookingClassAndCookingClassTag;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
@@ -72,12 +74,16 @@ public class CookingClassRepositoryImpl implements CookingClassCustomRepository 
     // fetchjoin을 사용한 조회
     @Override
     public CookingClass findWithUuid(String uuid) {
+        QCookingClassAndCookingClassTag ccAndTag = QCookingClassAndCookingClassTag.cookingClassAndCookingClassTag;
+
         return queryFactory
                 .selectFrom(cookingClass)
                 .leftJoin(cookingClass.host).fetchJoin()
                 .leftJoin(cookingClass.recipes).fetchJoin()
                 .leftJoin(cookingClass.ingredients).fetchJoin()
                 .leftJoin(cookingClass.cookingTools).fetchJoin()
+                .leftJoin(cookingClass.cookingClassAndCookingClassTags, ccAndTag).fetchJoin()
+                .leftJoin(ccAndTag.cookingClassTag, cookingClassTag).fetchJoin()
                 .where(cookingClass.uuid.eq(uuid), cookingClass.isDelete.eq(false))
                 .fetchOne();
     }

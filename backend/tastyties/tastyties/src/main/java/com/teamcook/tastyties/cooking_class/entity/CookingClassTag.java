@@ -2,12 +2,14 @@ package com.teamcook.tastyties.cooking_class.entity;
 
 import com.teamcook.tastyties.shared.entity.CookingClassAndCookingClassTag;
 import jakarta.persistence.*;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
 
 @Entity
 @NoArgsConstructor
+@Getter
 public class CookingClassTag {
     public CookingClassTag(String cookingClassTagName) {
         this.cookingClassTagName = cookingClassTagName;

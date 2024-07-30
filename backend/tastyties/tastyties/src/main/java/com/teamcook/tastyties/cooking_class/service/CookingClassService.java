@@ -43,6 +43,7 @@ public class CookingClassService {
         this.cookingClassRepository = cookingClassRepository;
     }
 
+    // 클래스 생성
     @Transactional
     public CookingClassDto registerClass(User user, CookingClassDto registerDto) {
         CookingClass cc = createCookingClass(user, registerDto);
@@ -144,6 +145,8 @@ public class CookingClassService {
         return cookingClassRepository.searchClass(condition, pageable);
     }
 
+    // 클래스 상세 조회
+    @Transactional
     public CookingClassDto getCookingClassDetail(String uuid) {
         CookingClass cc = cookingClassRepository.findWithUuid(uuid);
         log.debug("cooking class ingredients: {}", cc.getIngredients());
@@ -151,15 +154,22 @@ public class CookingClassService {
         Set<IngredientDto> ingredientDtos = mapToIngredientDtos(cc.getIngredients());
         Set<RecipeDto> recipeDtos = mapToRecipeDtos(cc.getRecipes());
         Set<String> cookingTools = mapToCookingToolNames(cc.getCookingTools());
+        Set<String> tags = mapToTagNames(cc.getCookingClassAndCookingClassTags());
 
         return new CookingClassDto(
                 cc.getTitle(), cc.getDishName(), cc.isLimitedAge(),
-                cc.getCountryCode(), null, cc.getDescription(),
+                cc.getCountryCode(), tags, cc.getDescription(),
                 cc.getLanguageCode(), cc.getLevel(), cc.getCookingClassStartTime(),
                 cc.getCookingClassEndTime(), cc.getDishCookingTime(), ingredientDtos,
                 recipeDtos, cookingTools, cc.getQuota(),
                 cc.getReplayEndTime()
         );
+    }
+
+    private Set<String> mapToTagNames(List<CookingClassAndCookingClassTag> ccAndTags) {
+        return ccAndTags.stream()
+                .map(ccAndTag -> ccAndTag.getCookingClassTag().getCookingClassTagName())
+                .collect(Collectors.toSet());
     }
 
     private Set<IngredientDto> mapToIngredientDtos(Set<Ingredient> ingredients) {
