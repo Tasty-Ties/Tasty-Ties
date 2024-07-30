@@ -1,30 +1,40 @@
 import React, { useState } from "react";
 import useApiStore from "../store/ApiStore";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const Login = () => {
   const { baseURL } = useApiStore();
   const nav = useNavigate();
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+
+  const [input, setInput] = useState({
+    username: "",
+    password: "",
+  });
+
+  const onChangeInput = (e) => {
+    console.log(e.target.name + ":" + e.target.value);
+    setInput({
+      ...input,
+      [e.target.name]: e.target.value,
+    });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const response = await fetch(`${baseURL}/auth/login`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ username, password }),
+    const response = await axios.post(`${baseURL}/auth/login`, {
+      username: input.username,
+      password: input.password,
     });
 
-    if (response.ok) {
-      const data = await response.json();
-      console.log("Access Token:", data.data.accessToken);
-      console.log("Refresh Token:", data.data.refreshToken);
-      document.cookie = `accessToken=${data.data.accessToken}; path=/; SameSite=Lax`;
-      document.cookie = `refreshToken=${data.data.refreshToken}; path=/; SameSite=Lax`;
+    if (response.status === 200) {
+      const accessToken = response.data.data.accessToken;
+      const refreshToken = response.data.data.refreshToken;
+      console.log("Access Token:", accessToken);
+      console.log("Refresh Token:", refreshToken);
+      document.cookie = `accessToken=${accessToken}; path=/; SameSite=Lax`;
+      document.cookie = `refreshToken=${refreshToken}; path=/; SameSite=Lax`;
       nav("/");
     } else if (response.status === 401) {
       alert("아이디 또는 비밀번호가 잘못되었습니다.");
@@ -38,17 +48,17 @@ const Login = () => {
       <form onSubmit={handleSubmit}>
         <input
           type="text"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
+          name="username"
+          value={input.username}
+          onChange={onChangeInput}
           placeholder="Username"
-          required
         />
         <input
           type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          name="password"
+          value={input.password}
+          onChange={onChangeInput}
           placeholder="Password"
-          required
         />
         <button type="submit">Login</button>
       </form>
