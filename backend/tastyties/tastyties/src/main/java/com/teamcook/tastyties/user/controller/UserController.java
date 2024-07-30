@@ -44,4 +44,13 @@ public class UserController {
         return new ResponseEntity<>(new CommonResponseDTO(200, "닉네임 중복 체크 성공.", null)
                 , HttpStatus.OK);
     }
+
+    @GetMapping("/check-email")
+    public ResponseEntity<CommonResponseDTO> checkEmail(@RequestParam("email_id") String emailId, @RequestParam("email_domain") String emailDomain) {
+        if (!userService.isEmailIdAvailable(emailId, emailDomain)) {
+            throw new UserIDAlreadyExistsException("해당 이메일은 이미 존재합니다.");
+        }
+        return new ResponseEntity<>(new CommonResponseDTO(200, "이메일 중복 체크 성공.", null)
+                , HttpStatus.OK);
+    }
 }
