@@ -61,8 +61,6 @@ public class CookingClassService {
         List<CookingClassAndCookingClassTag> cookingClassTags = createCookingClassTags(registerDto.getCookingClassTags(), cc);
         ccAndcctRepository.saveAll(cookingClassTags);
 
-        createUserAndCookingClassRelationship(user, cc);
-
         return registerDto;
     }
 
@@ -128,14 +126,6 @@ public class CookingClassService {
                 }).collect(Collectors.toList());
     }
 
-    private void createUserAndCookingClassRelationship(User user, CookingClass cc) {
-        UserAndCookingClass uAndc = new UserAndCookingClass();
-        uAndc.setUser(user);
-        uAndc.setCookingClass(cc);
-        uAndcRepository.save(uAndc);
-    }
-
-
     private CookingClassTag findOrCreateTag(String tagName) {
         return cookingClassTagRepository.findByCookingClassTagName(tagName)
                 .orElseGet(() -> cookingClassTagRepository.save(new CookingClassTag(tagName)));
@@ -157,6 +147,7 @@ public class CookingClassService {
         Set<String> tags = mapToTagNames(cc.getCookingClassAndCookingClassTags());
 
         return new CookingClassDto(
+                cc.getUuid(),
                 cc.getTitle(), cc.getDishName(), cc.isLimitedAge(),
                 cc.getCountryCode(), tags, cc.getDescription(),
                 cc.getLanguageCode(), cc.getLevel(), cc.getCookingClassStartTime(),
@@ -196,4 +187,13 @@ public class CookingClassService {
                 .collect(Collectors.toSet());
     }
 
+
+
+    // user와 cookingclass 관계 생성
+    private void createUserAndCookingClassRelationship(User user, CookingClass cc) {
+        UserAndCookingClass uAndc = new UserAndCookingClass();
+        uAndc.setUser(user);
+        uAndc.setCookingClass(cc);
+        uAndcRepository.save(uAndc);
+    }
 }

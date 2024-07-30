@@ -60,4 +60,14 @@ public class CookingClassController {
         CookingClassDto cookingClassDetail = cookingClassService.getCookingClassDetail(uuid);
         return new ResponseEntity<>(new CommonResponseDTO(200, "정상적으로 조회되었습니다.", cookingClassDetail), HttpStatus.OK);
     }
+
+    @PostMapping("/reservation")
+    public ResponseEntity<CommonResponseDTO> reserveClass(@AuthenticationPrincipal CustomUserDetails userDetails, String uuid) {
+        if (userDetails == null) {
+            return new ResponseEntity<>(new CommonResponseDTO(401, "인증 오류가 발생했습니다", null), HttpStatus.UNAUTHORIZED);
+        }
+
+        //cookingClassService.reserveClass(userDetails.getUserId(), uuid);
+        return null;
+    }
 }

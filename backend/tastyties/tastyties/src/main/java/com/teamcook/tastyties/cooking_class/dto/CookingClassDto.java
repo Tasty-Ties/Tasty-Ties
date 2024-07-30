@@ -12,6 +12,7 @@ import java.util.Set;
 @Data
 @NoArgsConstructor
 public class CookingClassDto {
+    private String uuid;
     private String title;
     private String dishName;
     private boolean isLimitedAge;
@@ -30,7 +31,9 @@ public class CookingClassDto {
     private LocalDateTime replayEndTime;
 
     @QueryProjection
-    public CookingClassDto(String title, String dishName, boolean isLimitedAge, String countryCode, Set<String> cookingClassTags, String description, String languageCode, int level, LocalDateTime cookingClassStartTime, LocalDateTime cookingClassEndTime, int dishCookingTime, Set<IngredientDto> ingredients, Set<RecipeDto> recipe, Set<String> cookingTools, int quota, LocalDateTime replayEndTime) {
+
+    public CookingClassDto(String uuid, String title, String dishName, boolean isLimitedAge, String countryCode, Set<String> cookingClassTags, String description, String languageCode, int level, LocalDateTime cookingClassStartTime, LocalDateTime cookingClassEndTime, int dishCookingTime, Set<IngredientDto> ingredients, Set<RecipeDto> recipe, Set<String> cookingTools, int quota, LocalDateTime replayEndTime) {
+        this.uuid = uuid;
         this.title = title;
         this.dishName = dishName;
         this.isLimitedAge = isLimitedAge;
