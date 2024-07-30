@@ -1,4 +1,4 @@
-package com.teamcook.tastytieschat.translation.config;
+package com.teamcook.tastytieschat.chat.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

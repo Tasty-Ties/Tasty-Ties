@@ -5,7 +5,7 @@ import com.teamcook.tastytieschat.chat.dto.ChatMessageRequestDTO;
 import com.teamcook.tastytieschat.chat.dto.ChatMessageResponseDTO;
 import com.teamcook.tastytieschat.chat.entity.ChatMessage;
 import com.teamcook.tastytieschat.chat.service.ChatMessageService;
-import com.teamcook.tastytieschat.translation.service.TranslationService;
+import com.teamcook.tastytieschat.chat.service.TranslationService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
