@@ -1,0 +1,17 @@
+.classlist-components-box {
+  width: 65%;
+  margin: 0 auto;
+  justify-content: center;
+}
+.classlist-item-box {
+  margin-top: 4vh;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  column-gap: 1vw;
+  row-gap: 2vh;
+}
+.add-class-button {
+  position: fixed;
+  right: 10vw;
+  bottom: 25vh;
+}
