@@ -1,5 +1,7 @@
 package com.teamcook.tastyties.user.entity;
 
+import com.teamcook.tastyties.common.entity.Country;
+import com.teamcook.tastyties.common.entity.Language;
 import com.teamcook.tastyties.cooking_class.entity.CookingClass;
 import com.teamcook.tastyties.shared.entity.UserAndCookingClass;
 import com.teamcook.tastyties.shared.entity.UserAndCountry;
@@ -32,10 +34,13 @@ public class User {
     @OneToMany(mappedBy = "user")
     private Set<UserAndCountry> userAndCountries = new HashSet<>();
 
-    @NotNull @Column(nullable = false)
-    private String countryCode;
-    @NotNull @Column(nullable = false)
-    private String languageCode;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "country_id")
+    private Country country;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "language_id")
+    private Language language;
 
     @NotNull @Column(nullable = false)
     private String username;

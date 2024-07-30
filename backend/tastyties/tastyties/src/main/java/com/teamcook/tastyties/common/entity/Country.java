@@ -1,6 +1,7 @@
 package com.teamcook.tastyties.common.entity;
 
 import com.teamcook.tastyties.shared.entity.UserAndCountry;
+import com.teamcook.tastyties.user.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 
@@ -16,6 +17,9 @@ public class Country {
   private String alpha2;
   private String englishName;
   private String koreanName;
+
+  @OneToMany(mappedBy = "country")
+  private Set<User> user;
 
   @OneToMany(mappedBy = "country")
   private Set<UserAndCountry> userAndCountries = new HashSet<>();

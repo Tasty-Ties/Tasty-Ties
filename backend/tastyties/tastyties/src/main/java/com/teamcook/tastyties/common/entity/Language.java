@@ -1,10 +1,10 @@
 package com.teamcook.tastyties.common.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import com.teamcook.tastyties.user.entity.User;
+import jakarta.persistence.*;
 import lombok.Getter;
+
+import java.util.Set;
 
 @Entity
 @Getter
@@ -12,6 +12,9 @@ public class Language {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+
+    @OneToMany(mappedBy = "language")
+    private Set<User> user;
 
     private String alpha2;
     private String english;

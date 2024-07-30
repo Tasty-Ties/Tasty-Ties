@@ -3,8 +3,7 @@ package com.teamcook.tastyties.user.service;
 import com.teamcook.tastyties.common.dto.CountryResponseDTO;
 import com.teamcook.tastyties.common.entity.Country;
 import com.teamcook.tastyties.common.repository.CountryRepository;
-import com.teamcook.tastyties.cooking_class.entity.CookingClass;
-import com.teamcook.tastyties.shared.entity.UserAndCookingClass;
+import com.teamcook.tastyties.common.repository.LanguageRepository;
 import com.teamcook.tastyties.shared.entity.UserAndCountry;
 import com.teamcook.tastyties.shared.repository.UserAndCountryRepository;
 import com.teamcook.tastyties.user.dto.UserRegistrationDTO;
@@ -26,14 +25,17 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final CountryRepository countryRepository;
+    private final LanguageRepository languageRepository;
     private final UserAndCountryRepository userAndCountryRepository;
 
     @Autowired
     public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder,
-                       CountryRepository countryRepository, UserAndCountryRepository userAndCountryRepository) {
+                       CountryRepository countryRepository, LanguageRepository languageRepository,
+                       UserAndCountryRepository userAndCountryRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.countryRepository = countryRepository;
+        this.languageRepository = languageRepository;
         this.userAndCountryRepository = userAndCountryRepository;
     }
 
@@ -46,8 +48,8 @@ public class UserService {
         newUser.setUsername(request.getUsername());
         newUser.setPassword(encodedPassword);
         newUser.setNickname(request.getNickname());
-        newUser.setCountryCode(request.getCountryCode());
-        newUser.setLanguageCode(request.getLanguageCode());
+        newUser.setCountry(countryRepository.findByAlpha2(request.getCountryCode()));
+        newUser.setLanguage(languageRepository.findByAlpha2(request.getLanguageCode()));
 
         newUser.setEmail(request.getEmailId() + "@" + request.getEmailDomain());
         newUser.setBirth(request.getBirth());

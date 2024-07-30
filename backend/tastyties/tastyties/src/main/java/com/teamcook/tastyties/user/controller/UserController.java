@@ -3,9 +3,11 @@ package com.teamcook.tastyties.user.controller;
 import com.teamcook.tastyties.common.dto.CommonResponseDTO;
 import com.teamcook.tastyties.security.userdetails.CustomUserDetails;
 import com.teamcook.tastyties.user.dto.CollectFlagDto;
+import com.teamcook.tastyties.user.dto.UserProfileDTO;
 import com.teamcook.tastyties.user.dto.UserRegistrationDTO;
 import com.teamcook.tastyties.user.entity.User;
 import com.teamcook.tastyties.user.exception.UserIDAlreadyExistsException;
+import com.teamcook.tastyties.user.service.UserProfileService;
 import com.teamcook.tastyties.user.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,10 +21,11 @@ import java.util.Map;
 @RequestMapping("/users")
 public class UserController {
     private final UserService userService;
-
+    private final UserProfileService userProfileService;
     @Autowired
-    public UserController(UserService userService) {
+    public UserController(UserService userService, UserProfileService userProfileService) {
         this.userService = userService;
+        this.userProfileService = userProfileService;
     }
 
     @PostMapping()
@@ -78,8 +81,13 @@ public class UserController {
 
     @GetMapping("/me")
     public ResponseEntity<CommonResponseDTO> myProfile(@AuthenticationPrincipal CustomUserDetails userDetails) {
-        userDetails.user();
-        return null;
+        UserProfileDTO myProfile = userProfileService.getMyProfile(userDetails.getUserId());
+        return ResponseEntity.ok()
+                .body(CommonResponseDTO.builder()
+                        .stateCode(200)
+                        .message("프로필이 정상적으로 조회됐습니다.")
+                        .data(myProfile)
+                        .build());
     }
 
     @PostMapping("/collect-flag")

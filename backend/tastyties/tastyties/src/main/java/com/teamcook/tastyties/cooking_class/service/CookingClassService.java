@@ -3,6 +3,7 @@ package com.teamcook.tastyties.cooking_class.service;
 import com.teamcook.tastyties.cooking_class.dto.*;
 import com.teamcook.tastyties.cooking_class.entity.*;
 import com.teamcook.tastyties.cooking_class.exception.ClassIsDeletedException;
+import com.teamcook.tastyties.cooking_class.exception.ClassNotFoundException;
 import com.teamcook.tastyties.cooking_class.repository.*;
 import com.teamcook.tastyties.security.userdetails.CustomUserDetails;
 import com.teamcook.tastyties.shared.entity.CookingClassAndCookingClassTag;
@@ -68,11 +69,12 @@ public class CookingClassService {
         return registerDto;
     }
 
+
     private CookingClass createCookingClass(User user, CookingClassDto registerDto) {
         CookingClass cc = new CookingClass();
         cc.setHost(user);
-        cc.setLanguageCode(user.getLanguageCode());
-        cc.setCountryCode(user.getCountryCode());
+        cc.setLanguageCode(registerDto.getLanguageCode());
+        cc.setCountryCode(registerDto.getCountryCode());
         cc.setTitle(registerDto.getTitle());
         cc.setDescription(registerDto.getDescription());
         cc.setDishName(registerDto.getDishName());
@@ -202,6 +204,9 @@ public class CookingClassService {
     // 클래스 예약
     public void reserveClass(User user, String uuid) {
         CookingClass cc = cookingClassRepository.findWithUuid(uuid);
+        if (cc == null) {
+            throw new ClassNotFoundException("존재하지 않는 클래스입니다.");
+        }
 
         if (cc.isDelete()) {
             throw new ClassIsDeletedException("삭제된 클래스입니다.");
