@@ -13,7 +13,6 @@ const Login = () => {
   });
 
   const onChangeInput = (e) => {
-    console.log(e.target.name + ":" + e.target.value);
     setInput({
       ...input,
       [e.target.name]: e.target.value,
@@ -52,6 +51,7 @@ const Login = () => {
           value={input.username}
           onChange={onChangeInput}
           placeholder="Username"
+          required
         />
         <input
           type="password"
@@ -59,6 +59,7 @@ const Login = () => {
           value={input.password}
           onChange={onChangeInput}
           placeholder="Password"
+          required
         />
         <button type="submit">Login</button>
       </form>
