@@ -1,10 +1,12 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import useApiStore from "../store/ApiStore";
+import useAuthStore from "../store/AuthStore";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 const Login = () => {
   const { baseURL } = useApiStore();
+  const { login } = useAuthStore();
   const nav = useNavigate();
 
   const [input, setInput] = useState({
@@ -26,7 +28,7 @@ const Login = () => {
       username: input.username,
       password: input.password,
     });
-
+    console.log(response);
     if (response.status === 200) {
       const accessToken = response.data.data.accessToken;
       const refreshToken = response.data.data.refreshToken;
@@ -34,6 +36,7 @@ const Login = () => {
       console.log("Refresh Token:", refreshToken);
       document.cookie = `accessToken=${accessToken}; path=/; SameSite=Lax`;
       document.cookie = `refreshToken=${refreshToken}; path=/; SameSite=Lax`;
+      login(accessToken, refreshToken);
       nav("/");
     } else if (response.status === 401) {
       alert("아이디 또는 비밀번호가 잘못되었습니다.");
