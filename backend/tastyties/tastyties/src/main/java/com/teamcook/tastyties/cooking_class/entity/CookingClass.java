@@ -14,8 +14,8 @@ import java.util.Set;
 import java.util.UUID;
 
 @Entity
-@Getter @Setter @AllArgsConstructor
-@NoArgsConstructor
+@Getter @Setter
+@AllArgsConstructor @NoArgsConstructor
 public class CookingClass {
 
     @Id

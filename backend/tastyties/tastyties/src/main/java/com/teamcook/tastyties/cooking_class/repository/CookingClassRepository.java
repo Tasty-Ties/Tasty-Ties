@@ -10,7 +10,4 @@ import java.util.UUID;
 public interface CookingClassRepository extends JpaRepository<CookingClass, Integer>, CookingClassCustomRepository{
 
     CookingClass findByUuid(String uuid);
-
-    @Query("SELECT c.cookingClassId FROM CookingClass c WHERE c.uuid = :uuid")
-    int findCookingClassIdByUuid(@Param("uuid") String uuid);
 }

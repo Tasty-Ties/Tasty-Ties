@@ -56,17 +56,29 @@ public class AuthController {
             tokens.put("refreshToken", refreshToken);
 
             // 토큰과 함께 성공 응답
-            CommonResponseDTO response = new CommonResponseDTO(200, "로그인 성공", tokens);
-            return new ResponseEntity<>(response, HttpStatus.OK);
+            return ResponseEntity.ok()
+                    .body(CommonResponseDTO.builder()
+                            .stateCode(200)
+                            .message("로그인 성공")
+                            .data(tokens)
+                            .build());
         } catch (BadCredentialsException e) {
             // 아이디 또는 비밀번호가 틀린 경우
-            CommonResponseDTO response = new CommonResponseDTO(401, "아이디 또는 비밀번호가 잘못되었습니다.", null);
-            return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(CommonResponseDTO.builder()
+                            .stateCode(401)
+                            .message("아이디 또는 비밀번호가 잘못되었습니다.")
+                            .data(null)
+                            .build());
         } catch (AuthenticationException e) {
             // 기타 인증 예외 처리
-            CommonResponseDTO response = new CommonResponseDTO(500, "인증 오류가 발생했습니다.", null);
             e.printStackTrace();
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(CommonResponseDTO.builder()
+                            .stateCode(500)
+                            .message("인증 오류가 발생했습니다.")
+                            .data(null)
+                            .build());
         }
     }
 
@@ -75,8 +87,12 @@ public class AuthController {
         String refreshToken = request.get("refreshToken");
         log.debug(refreshToken);
         if (refreshToken == null || !tokenProvider.validateToken(refreshToken)) {
-            CommonResponseDTO response = new CommonResponseDTO(401, "적절하지 않은 refresh token 입니다.", null);
-            return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(CommonResponseDTO.builder()
+                            .stateCode(401)
+                            .message("적절하지 않은 refresh token 입니다.")
+                            .data(null)
+                            .build());
         }
 
         try {
@@ -91,12 +107,20 @@ public class AuthController {
             Map<String, String> tokens = new HashMap<>();
             tokens.put("accessToken", newAccessToken);
 
-            CommonResponseDTO response = new CommonResponseDTO(200, "토큰이 정상적으로 refresh 되었습니다. ", tokens);
-            return new ResponseEntity<>(response, HttpStatus.OK);
+            return ResponseEntity.ok()
+                    .body(CommonResponseDTO.builder()
+                            .stateCode(200)
+                            .message("토큰이 정상적으로 refresh 되었습니다.")
+                            .data(tokens)
+                            .build());
         } catch (Exception e) {
             e.printStackTrace();
-            CommonResponseDTO response = new CommonResponseDTO(500, "토큰 refresh 중 오류가 발생했습니다.", null);
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(CommonResponseDTO.builder()
+                            .stateCode(500)
+                            .message("토큰 refresh 중 오류가 발생했습니다.")
+                            .data(null)
+                            .build());
         }
     }
 
@@ -107,8 +131,12 @@ public class AuthController {
         // 리프레시 토큰 무효화 로직 추가 (DB에서 제거 등)
         invalidateRefreshToken(refreshToken);
 
-        CommonResponseDTO response = new CommonResponseDTO(200, "로그아웃 성공", null);
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return ResponseEntity.ok()
+                .body(CommonResponseDTO.builder()
+                        .stateCode(200)
+                        .message("로그아웃 성공")
+                        .data(null)
+                        .build());
     }
 
     private void invalidateRefreshToken(String refreshToken) {

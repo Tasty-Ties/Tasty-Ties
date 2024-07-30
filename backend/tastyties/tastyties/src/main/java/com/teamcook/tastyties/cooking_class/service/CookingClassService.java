@@ -2,7 +2,9 @@ package com.teamcook.tastyties.cooking_class.service;
 
 import com.teamcook.tastyties.cooking_class.dto.*;
 import com.teamcook.tastyties.cooking_class.entity.*;
+import com.teamcook.tastyties.cooking_class.exception.ClassIsDeletedException;
 import com.teamcook.tastyties.cooking_class.repository.*;
+import com.teamcook.tastyties.security.userdetails.CustomUserDetails;
 import com.teamcook.tastyties.shared.entity.CookingClassAndCookingClassTag;
 import com.teamcook.tastyties.shared.entity.UserAndCookingClass;
 import com.teamcook.tastyties.shared.repository.CookingClassAndCookingClassTagRepository;
@@ -30,9 +32,10 @@ public class CookingClassService {
     private final UserAndCookingClassRepository uAndcRepository;
     private final CookingClassTagRepository cookingClassTagRepository;
     private final CookingClassRepository cookingClassRepository;
+    private final UserAndCookingClassRepository userAndCookingClassRepository;
 
     @Autowired
-    public CookingClassService(CookingClassRepository ccRepository, IngredientRepository ingredientRepository, RecipeRepository recipeRepository, CookingToolRepository cookingToolRepository, CookingClassAndCookingClassTagRepository ccAndcctRepository, UserAndCookingClassRepository uAndcRepository, CookingClassTagRepository cookingClassTagRepository, CookingClassRepository cookingClassRepository) {
+    public CookingClassService(CookingClassRepository ccRepository, IngredientRepository ingredientRepository, RecipeRepository recipeRepository, CookingToolRepository cookingToolRepository, CookingClassAndCookingClassTagRepository ccAndcctRepository, UserAndCookingClassRepository uAndcRepository, CookingClassTagRepository cookingClassTagRepository, CookingClassRepository cookingClassRepository, UserAndCookingClassRepository userAndCookingClassRepository) {
         this.ccRepository = ccRepository;
         this.ingredientRepository = ingredientRepository;
         this.recipeRepository = recipeRepository;
@@ -41,6 +44,7 @@ public class CookingClassService {
         this.uAndcRepository = uAndcRepository;
         this.cookingClassTagRepository = cookingClassTagRepository;
         this.cookingClassRepository = cookingClassRepository;
+        this.userAndCookingClassRepository = userAndCookingClassRepository;
     }
 
     // 클래스 생성
@@ -137,9 +141,16 @@ public class CookingClassService {
 
     // 클래스 상세 조회
     @Transactional
-    public CookingClassDto getCookingClassDetail(String uuid) {
+    public CookingClassDto getCookingClassDetail(CustomUserDetails userDetails, String uuid) {
         CookingClass cc = cookingClassRepository.findWithUuid(uuid);
-        log.debug("cooking class ingredients: {}", cc.getIngredients());
+
+        boolean isEnrolledClass = false;
+        long enrolledCount = 0;
+        if (userDetails != null) {
+            User user = userDetails.user();
+            isEnrolledClass = uAndcRepository.isUserEnrolledInClass(user, cc);
+            enrolledCount = uAndcRepository.countQuota(cc);
+        }
 
         Set<IngredientDto> ingredientDtos = mapToIngredientDtos(cc.getIngredients());
         Set<RecipeDto> recipeDtos = mapToRecipeDtos(cc.getRecipes());
@@ -147,13 +158,13 @@ public class CookingClassService {
         Set<String> tags = mapToTagNames(cc.getCookingClassAndCookingClassTags());
 
         return new CookingClassDto(
-                cc.getUuid(),
+                cc.getUuid(), cc.getHost().getNickname(),
                 cc.getTitle(), cc.getDishName(), cc.isLimitedAge(),
                 cc.getCountryCode(), tags, cc.getDescription(),
                 cc.getLanguageCode(), cc.getLevel(), cc.getCookingClassStartTime(),
                 cc.getCookingClassEndTime(), cc.getDishCookingTime(), ingredientDtos,
                 recipeDtos, cookingTools, cc.getQuota(),
-                cc.getReplayEndTime()
+                cc.getReplayEndTime(), isEnrolledClass, enrolledCount
         );
     }
 
@@ -189,11 +200,41 @@ public class CookingClassService {
 
 
 
+    public void reserveClass(User user, String uuid) {
+        CookingClass cc = cookingClassRepository.findWithUuid(uuid);
+
+        if (cc.isDelete()) {
+            throw new ClassIsDeletedException("삭제된 클래스입니다.");
+        }
+        if (cc.getHost().getUserId() == user.getUserId()) {
+            throw new IllegalArgumentException("본인의 클래스에는 예약할 수 없습니다.");
+        }
+
+        createUserAndCookingClassRelationship(user, cc);
+    }
+
     // user와 cookingclass 관계 생성
     private void createUserAndCookingClassRelationship(User user, CookingClass cc) {
+        if (userAndCookingClassRepository.isUserEnrolledInClass(user, cc)) {
+            throw new IllegalArgumentException("이미 예약되어있습니다.");
+        }
         UserAndCookingClass uAndc = new UserAndCookingClass();
         uAndc.setUser(user);
         uAndc.setCookingClass(cc);
         uAndcRepository.save(uAndc);
+    }
+
+    @Transactional
+    public void deleteReservation(User user, String uuid) {
+        CookingClass cc = cookingClassRepository.findWithUuid(uuid);
+
+        if (cc.isDelete()) {
+            throw new ClassIsDeletedException("삭제된 클래스입니다.");
+        }
+        deleteUserAndCookingClassRelationship(user, cc);
+    }
+
+    private void deleteUserAndCookingClassRelationship(User user, CookingClass cc) {
+        userAndCookingClassRepository.deleteReservation(user, cc);
     }
 }
