@@ -10,4 +10,6 @@ public interface UserAndCookingClassCustomRepository {
 
     boolean isUserEnrolledInClass(User user, CookingClass cookingClass);
     Long countQuota(CookingClass cookingClass);
+
+    boolean deleteReservation(User user, CookingClass cookingClass);
 }

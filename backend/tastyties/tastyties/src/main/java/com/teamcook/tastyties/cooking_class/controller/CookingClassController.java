@@ -99,12 +99,22 @@ public class CookingClassController {
     }
 
     @DeleteMapping("/reservation/{uuid}")
-    public ResponseEntity<CommonResponseDTO> deleteClass(@PathVariable String uuid) {
-        // Implement the deletion logic here
+    public ResponseEntity<CommonResponseDTO> deleteReservation(@AuthenticationPrincipal CustomUserDetails userDetails, @PathVariable String uuid) {
+        if (userDetails == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(CommonResponseDTO.builder()
+                            .stateCode(401)
+                            .message("인증 오류가 발생했습니다")
+                            .data(null)
+                            .build());
+        }
+
+        cookingClassService.deleteReservation(userDetails.user(), uuid);
+
         return ResponseEntity.status(HttpStatus.NO_CONTENT)
                 .body(CommonResponseDTO.builder()
                         .stateCode(204)
-                        .message("클래스가 삭제되었습니다.")
+                        .message("예약이 정상적으로 취소되었습니다.")
                         .data(null)
                         .build());
     }

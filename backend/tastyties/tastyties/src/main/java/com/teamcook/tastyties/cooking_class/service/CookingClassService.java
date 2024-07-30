@@ -32,9 +32,10 @@ public class CookingClassService {
     private final UserAndCookingClassRepository uAndcRepository;
     private final CookingClassTagRepository cookingClassTagRepository;
     private final CookingClassRepository cookingClassRepository;
+    private final UserAndCookingClassRepository userAndCookingClassRepository;
 
     @Autowired
-    public CookingClassService(CookingClassRepository ccRepository, IngredientRepository ingredientRepository, RecipeRepository recipeRepository, CookingToolRepository cookingToolRepository, CookingClassAndCookingClassTagRepository ccAndcctRepository, UserAndCookingClassRepository uAndcRepository, CookingClassTagRepository cookingClassTagRepository, CookingClassRepository cookingClassRepository) {
+    public CookingClassService(CookingClassRepository ccRepository, IngredientRepository ingredientRepository, RecipeRepository recipeRepository, CookingToolRepository cookingToolRepository, CookingClassAndCookingClassTagRepository ccAndcctRepository, UserAndCookingClassRepository uAndcRepository, CookingClassTagRepository cookingClassTagRepository, CookingClassRepository cookingClassRepository, UserAndCookingClassRepository userAndCookingClassRepository) {
         this.ccRepository = ccRepository;
         this.ingredientRepository = ingredientRepository;
         this.recipeRepository = recipeRepository;
@@ -43,6 +44,7 @@ public class CookingClassService {
         this.uAndcRepository = uAndcRepository;
         this.cookingClassTagRepository = cookingClassTagRepository;
         this.cookingClassRepository = cookingClassRepository;
+        this.userAndCookingClassRepository = userAndCookingClassRepository;
     }
 
     // 클래스 생성
@@ -198,22 +200,41 @@ public class CookingClassService {
 
 
 
+    public void reserveClass(User user, String uuid) {
+        CookingClass cc = cookingClassRepository.findWithUuid(uuid);
+
+        if (cc.isDelete()) {
+            throw new ClassIsDeletedException("삭제된 클래스입니다.");
+        }
+        if (cc.getHost().getUserId() == user.getUserId()) {
+            throw new IllegalArgumentException("본인의 클래스에는 예약할 수 없습니다.");
+        }
+
+        createUserAndCookingClassRelationship(user, cc);
+    }
+
     // user와 cookingclass 관계 생성
     private void createUserAndCookingClassRelationship(User user, CookingClass cc) {
+        if (userAndCookingClassRepository.isUserEnrolledInClass(user, cc)) {
+            throw new IllegalArgumentException("이미 예약되어있습니다.");
+        }
         UserAndCookingClass uAndc = new UserAndCookingClass();
         uAndc.setUser(user);
         uAndc.setCookingClass(cc);
         uAndcRepository.save(uAndc);
     }
 
-    public void reserveClass(User user, String uuid) {
+    @Transactional
+    public void deleteReservation(User user, String uuid) {
         CookingClass cc = cookingClassRepository.findWithUuid(uuid);
-        log.debug(uuid);
-        log.debug("cooking class {}", cc);
 
         if (cc.isDelete()) {
             throw new ClassIsDeletedException("삭제된 클래스입니다.");
         }
-        createUserAndCookingClassRelationship(user, cc);
+        deleteUserAndCookingClassRelationship(user, cc);
+    }
+
+    private void deleteUserAndCookingClassRelationship(User user, CookingClass cc) {
+        userAndCookingClassRepository.deleteReservation(user, cc);
     }
 }

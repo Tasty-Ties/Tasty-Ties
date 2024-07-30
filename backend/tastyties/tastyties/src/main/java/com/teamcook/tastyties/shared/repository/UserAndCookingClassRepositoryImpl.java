@@ -42,4 +42,18 @@ public class UserAndCookingClassRepositoryImpl implements UserAndCookingClassCus
                 .where(userAndCookingClass.cookingClass.eq(cookingClass))
                 .fetchOne();
     }
+
+    @Override
+    public boolean deleteReservation(User user, CookingClass cookingClass) {
+        long row = queryFactory
+                .delete(userAndCookingClass)
+                .where(userAndCookingClass.cookingClass.eq(cookingClass),
+                        userAndCookingClass.user.eq(user))
+                .execute();
+
+        if (row == 0) {
+            throw new IllegalArgumentException("존재하지 않는 예약입니다.");
+        }
+        return true;
+    }
 }
