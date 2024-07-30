@@ -1,5 +1,6 @@
 package com.teamcook.tastytieschat.chat.dto;
 
+import com.teamcook.tastytieschat.chat.constant.Language;
 import com.teamcook.tastytieschat.chat.constant.UserType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,7 +16,7 @@ public class UserDTO {
     private int id;
     private UserType type;
     private String nickname;
-    private String language;
+    private Language language;
     private Instant enteredTime;
 
     @Override
