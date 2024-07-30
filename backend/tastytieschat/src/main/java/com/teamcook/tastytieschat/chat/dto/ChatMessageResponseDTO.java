@@ -11,7 +11,7 @@ import java.util.Map;
 
 @NoArgsConstructor
 @Getter
-public class ChatResponseDTO {
+public class ChatMessageResponseDTO {
 
     private MessageType type;
     private int userId;
@@ -19,7 +19,7 @@ public class ChatResponseDTO {
     private Map<String, String> messages;
     private Instant createdTime;
 
-    public ChatResponseDTO(ChatMessage chatMessage) {
+    public ChatMessageResponseDTO(ChatMessage chatMessage) {
         this.type = chatMessage.getType();
         this.userId = chatMessage.getUserId();
         this.userNickname = chatMessage.getUserNickname();
