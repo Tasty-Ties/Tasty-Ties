@@ -2,7 +2,9 @@ package com.teamcook.tastyties.user.controller;
 
 import com.teamcook.tastyties.common.dto.CommonResponseDTO;
 import com.teamcook.tastyties.security.userdetails.CustomUserDetails;
+import com.teamcook.tastyties.user.dto.CollectFlagDto;
 import com.teamcook.tastyties.user.dto.UserRegistrationDTO;
+import com.teamcook.tastyties.user.entity.User;
 import com.teamcook.tastyties.user.exception.UserIDAlreadyExistsException;
 import com.teamcook.tastyties.user.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/users")
@@ -77,4 +81,19 @@ public class UserController {
         userDetails.user();
         return null;
     }
+
+    @PostMapping("/collect-flag")
+    public ResponseEntity<CommonResponseDTO> collectFlag(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                                         @RequestBody CollectFlagDto request) {
+        User user = userDetails.user();
+        Map<String, Object> result = userService.collectFlag(user, request.getCountryCode());
+
+        return ResponseEntity.ok()
+                .body(CommonResponseDTO.builder()
+                        .stateCode(200)
+                        .message(result.get("message").toString())
+                        .data(result.get("country"))
+                        .build());
+    }
+
 }

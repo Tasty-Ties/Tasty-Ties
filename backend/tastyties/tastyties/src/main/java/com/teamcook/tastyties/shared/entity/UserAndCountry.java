@@ -23,6 +23,11 @@ public class UserAndCountry {
 
     private LocalDateTime flagCreateTime;
 
+    public UserAndCountry(User user, Country country) {
+        this.user = user;
+        this.country = country;
+    }
+
     @PrePersist
     protected void onCreate() {
         flagCreateTime = LocalDateTime.now();
