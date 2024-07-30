@@ -5,10 +5,7 @@ import com.teamcook.tastyties.shared.entity.UserAndCookingClass;
 import com.teamcook.tastyties.user.entity.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -34,23 +31,32 @@ public class CookingClass {
     @OneToMany(mappedBy = "cookingClass")
     private Set<UserAndCookingClass> userAndCookingClasses = new HashSet<>();
 
-    @NotNull
+    @NotNull @Column(nullable = false)
     private String languageCode;
-
+    @NotNull @Column(nullable = false)
     private String countryCode;
 
+    @NotNull @Column(nullable = false)
     private String title;
     private String description;
+    @NotNull @Column(nullable = false)
     private String dishName;
+    @NotNull @Column(nullable = false)
     private int dishCookingTime;
+    @NotNull @Column(nullable = false)
     private int level;
+    @NotNull @Column(nullable = false)
     private int quota;
+    @NotNull @Column(nullable = false)
     private boolean isLimitedAge;
 
+    @NotNull @Column(nullable = false)
     private LocalDateTime cookingClassStartTime;
+    @NotNull @Column(nullable = false)
     private LocalDateTime cookingClassEndTime;
 
     private LocalDateTime replayEndTime;
+
     private LocalDateTime createTime;
     private LocalDateTime updateTime;
 

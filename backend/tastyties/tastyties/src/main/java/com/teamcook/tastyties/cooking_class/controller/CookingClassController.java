@@ -7,6 +7,7 @@ import com.teamcook.tastyties.cooking_class.dto.CookingClassSearchCondition;
 import com.teamcook.tastyties.cooking_class.service.CookingClassService;
 import com.teamcook.tastyties.security.userdetails.CustomUserDetails;
 import com.teamcook.tastyties.user.entity.User;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,9 +23,9 @@ import java.util.UUID;
 
 @Controller
 @RequestMapping("/classes")
+@Slf4j
 public class CookingClassController {
 
-    private static final Logger log = LoggerFactory.getLogger(CookingClassController.class);
     private final CookingClassService ccService;
     private final CookingClassService cookingClassService;
 

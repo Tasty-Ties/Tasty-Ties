@@ -3,9 +3,7 @@ package com.teamcook.tastyties.cooking_class.repository;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.teamcook.tastyties.cooking_class.dto.CookingClassListDto;
-import com.teamcook.tastyties.cooking_class.dto.CookingClassSearchCondition;
-import com.teamcook.tastyties.cooking_class.dto.QCookingClassListDto;
+import com.teamcook.tastyties.cooking_class.dto.*;
 import com.teamcook.tastyties.cooking_class.entity.CookingClass;
 import com.teamcook.tastyties.cooking_class.entity.CookingClassTag;
 import org.springframework.data.domain.Page;
@@ -40,6 +38,8 @@ public class CookingClassRepositoryImpl implements CookingClassCustomRepository 
                 .fetchOne();
     }
 
+    // 제목, 호스트name을 통한 검색목록 반환
+    // 동적 쿼리 사용
     @Override
     public Page<CookingClassListDto> searchClass(CookingClassSearchCondition condition, Pageable pageable) {
         List<CookingClassListDto> results = queryFactory
@@ -67,6 +67,19 @@ public class CookingClassRepositoryImpl implements CookingClassCustomRepository 
 
 
         return PageableExecutionUtils.getPage(results, pageable, countQuery::fetchOne);
+    }
+
+    // fetchjoin을 사용한 조회
+    @Override
+    public CookingClass findWithUuid(String uuid) {
+        return queryFactory
+                .selectFrom(cookingClass)
+                .leftJoin(cookingClass.host).fetchJoin()
+                .leftJoin(cookingClass.recipes).fetchJoin()
+                .leftJoin(cookingClass.ingredients).fetchJoin()
+                .leftJoin(cookingClass.cookingTools).fetchJoin()
+                .where(cookingClass.uuid.eq(uuid), cookingClass.isDelete.eq(false))
+                .fetchOne();
     }
 
     private BooleanExpression titleLike(String title) {
