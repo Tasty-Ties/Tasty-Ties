@@ -1,0 +1,28 @@
+.food-img {
+  width: 15vw;
+  position: relative;
+  z-index: 1;
+}
+
+.flag-img {
+  position: absolute;
+  width: 2vw;
+  border-radius: 3px;
+  margin-left: -2.3vw;
+  margin-top: 0.75vh;
+  z-index: 2;
+}
+.ClassListItem-TextBox {
+  width: 14.9vw;
+}
+.title {
+  font-size: 1em;
+  font-weight: 500;
+}
+.sub-box {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.81em;
+  color: #555;
+  margin-top: 10px;
+}
