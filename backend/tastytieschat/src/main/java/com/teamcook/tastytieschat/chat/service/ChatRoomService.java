@@ -8,5 +8,5 @@ public interface ChatRoomService {
     void deleteChatRoom(String chatRoomId);
     void enterChatRoom(String chatRoomId, UserDTO userDto);
     String exitChatRoom(String chatRoomId, int userID);
-    boolean isContainedUser(String chatRoomId, int userId);
+    UserDTO findUser(String chatRoomId, int userId);
 }

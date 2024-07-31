@@ -75,12 +75,13 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     }
 
     @Override
-    public boolean isContainedUser(String chatRoomId, int userId) {
+    public UserDTO findUser(String chatRoomId, int userId) {
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId).orElse(null);
 
         if (chatRoom != null) {
-            if (chatRoom.isContainedUser(userId)) {
-                return true;
+            UserDTO userDto = chatRoom.getUser(userId);
+            if (userDto != null) {
+                return userDto;
             } else {
                 throw new UserNotExistException(userId);
             }

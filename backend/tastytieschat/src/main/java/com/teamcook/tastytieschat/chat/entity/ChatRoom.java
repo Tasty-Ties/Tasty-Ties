@@ -61,4 +61,14 @@ public class ChatRoom {
         return null;
     }
 
+    public UserDTO getUser(int userId) {
+        for (UserDTO userDto : users) {
+            if (userId == userDto.getId()) {
+                return userDto;
+            }
+        }
+
+        return null;
+    }
+
 }

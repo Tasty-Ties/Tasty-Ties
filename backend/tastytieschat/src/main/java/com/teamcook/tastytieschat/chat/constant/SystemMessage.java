@@ -8,7 +8,7 @@ import java.util.Map;
 public enum SystemMessage {
     ENTER(new HashMap<>(){{
         put(Language.KO, "님이 들어왔습니다.");
-        put(Language.EN, " came into the chat room.");
+        put(Language.EN, " has joined the chat room.");
     }}),
     EXIT(new HashMap<>(){{
         put(Language.KO, "님이 나갔습니다.");

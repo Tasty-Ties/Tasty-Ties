@@ -3,6 +3,7 @@ package com.teamcook.tastytieschat.chat.controller;
 import com.teamcook.tastytieschat.chat.constant.MessageType;
 import com.teamcook.tastytieschat.chat.dto.ChatMessageRequestDTO;
 import com.teamcook.tastytieschat.chat.dto.ChatMessageResponseDTO;
+import com.teamcook.tastytieschat.chat.dto.UserDTO;
 import com.teamcook.tastytieschat.chat.entity.ChatMessage;
 import com.teamcook.tastytieschat.chat.service.ChatMessageService;
 import com.teamcook.tastytieschat.chat.service.ChatRoomService;
@@ -38,43 +39,39 @@ public class ChatMessageController {
     @SendTo("/sub/chat/rooms/{roomId}")
     public ChatMessageResponseDTO sendMessage(@DestinationVariable String roomId, @Payload ChatMessageRequestDTO chatMessageRequestDto) {
         try {
-            chatRoomService.isContainedUser(roomId, chatMessageRequestDto.getUserId());
+            UserDTO userDto = chatRoomService.findUser(roomId, chatMessageRequestDto.getUserId());
+
+            ChatMessage chatMessage = ChatMessage.builder()
+                    .type(MessageType.USER)
+                    .chatRoomId(roomId)
+                    .userNickname(userDto.getNickname())
+                    .originLanguage(userDto.getLanguage())
+                    .chatMessageRequestDto(chatMessageRequestDto)
+                    .build();
+
+            // TODO: 번역할 언어 가져오기
+            Set<String> translatedLanguages = new HashSet<>();
+            translatedLanguages.add("English");
+            translatedLanguages.add("Spanish");
+            translatedLanguages.add("French");
+            translatedLanguages.add("Japanese");
+            translatedLanguages.add("Chinese");
+
+            try {
+                translationService.translationChatMessage(chatMessage, translatedLanguages);
+            } catch (Exception e) {
+                log.error("번역 실패: " + e.getMessage());
+                return null;
+            }
+
+            // 채팅 메시지 저장하기
+            chatMessageService.createChatMessage(chatMessage);
+
+            return new ChatMessageResponseDTO(chatMessage);
         } catch (Exception e) {
             log.error("채팅방 권한 실패: " + e.getMessage());
             return null;
         }
-        
-        // TODO: 사용자 닉네임, 메시지 언어 가져오기
-        String userNickname = "김싸피";
-        String originLanguage = "Korean";
-
-        ChatMessage chatMessage = ChatMessage.builder()
-                .type(MessageType.USER)
-                .chatRoomId(roomId)
-                .userNickname(userNickname)
-                .originLanguage(originLanguage)
-                .chatMessageRequestDto(chatMessageRequestDto)
-                .build();
-
-        // TODO: 번역할 언어 가져오기
-        Set<String> translatedLanguages = new HashSet<>();
-        translatedLanguages.add("English");
-        translatedLanguages.add("Spanish");
-        translatedLanguages.add("French");
-        translatedLanguages.add("Japanese");
-        translatedLanguages.add("Chinese");
-
-        try {
-            translationService.translationChatMessage(chatMessage, translatedLanguages);
-        } catch (Exception e) {
-            log.error("번역 실패: " + e.getMessage());
-            return null;
-        }
-
-        // 채팅 메시지 저장하기
-        chatMessageService.createChatMessage(chatMessage);
-
-        return new ChatMessageResponseDTO(chatMessage);
     }
 
 }
