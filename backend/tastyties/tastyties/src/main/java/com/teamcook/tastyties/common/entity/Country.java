@@ -1,10 +1,12 @@
 package com.teamcook.tastyties.common.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import com.teamcook.tastyties.shared.entity.UserAndCountry;
+import com.teamcook.tastyties.user.entity.User;
+import jakarta.persistence.*;
 import lombok.Getter;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -15,6 +17,13 @@ public class Country {
   private String alpha2;
   private String englishName;
   private String koreanName;
+  private String countryImageUrl;
+
+  @OneToMany(mappedBy = "country")
+  private Set<User> user;
+
+  @OneToMany(mappedBy = "country")
+  private Set<UserAndCountry> userAndCountries = new HashSet<>();
 }
 
 //CREATE TABLE Country (

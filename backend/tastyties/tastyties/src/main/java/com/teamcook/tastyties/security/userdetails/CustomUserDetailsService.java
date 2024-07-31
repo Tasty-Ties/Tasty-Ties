@@ -21,6 +21,9 @@ public class CustomUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws BadCredentialsException {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new BadCredentialsException(username));
+        if (user.isDeleted()) {
+            throw new BadCredentialsException("탈퇴한 사용자입니다.");
+        }
         return new CustomUserDetails(user);
     }
 }

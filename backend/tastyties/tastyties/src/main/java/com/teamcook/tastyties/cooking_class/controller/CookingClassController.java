@@ -47,6 +47,9 @@ public class CookingClassController {
         log.debug("userId= {}", user.getUserId());
 
         CookingClassDto cookingClass = cookingClassService.registerClass(user, registerDto);
+
+
+
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(CommonResponseDTO.builder()
                         .stateCode(201)

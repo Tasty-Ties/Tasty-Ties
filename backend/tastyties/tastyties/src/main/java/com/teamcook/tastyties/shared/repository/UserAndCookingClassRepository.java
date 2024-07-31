@@ -7,5 +7,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface UserAndCookingClassRepository extends JpaRepository<UserAndCookingClass, Integer>, UserAndCookingClassCustomRepository {
 
-
+    public void deleteAllByUser(User user);
 }

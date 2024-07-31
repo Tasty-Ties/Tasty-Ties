@@ -14,4 +14,10 @@ public class UserExceptionHandler {
         CommonResponseDTO errorResponse = new CommonResponseDTO(409, ex.getMessage(), null);
         return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT); // 409 Conflict
     }
+
+    @ExceptionHandler(CountryNotFoundException.class)
+    public ResponseEntity<CommonResponseDTO> handleCountryNotFoundException(CountryNotFoundException ex) {
+        CommonResponseDTO errorResponse = new CommonResponseDTO(404, ex.getMessage(), null);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+    }
 }

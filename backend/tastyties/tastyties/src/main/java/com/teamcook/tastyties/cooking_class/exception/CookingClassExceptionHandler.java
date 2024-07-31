@@ -15,4 +15,10 @@ public class CookingClassExceptionHandler {
         CommonResponseDTO errorResponse = new CommonResponseDTO(409, ex.getMessage(), null);
         return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT); // 409 Conflict
     }
+
+    @ExceptionHandler(ClassNotFoundException.class)
+    public ResponseEntity<CommonResponseDTO> handleClassNotFoundException(ClassNotFoundException ex) {
+        CommonResponseDTO errorResponse = new CommonResponseDTO(404, ex.getMessage(), null);
+        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND); // 409 Conflict
+    }
 }

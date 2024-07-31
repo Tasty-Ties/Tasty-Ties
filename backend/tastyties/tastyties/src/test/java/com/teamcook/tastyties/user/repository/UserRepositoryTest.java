@@ -1,8 +1,6 @@
 package com.teamcook.tastyties.user.repository;
 
-import com.teamcook.tastyties.user.dto.UserRegistrationDTO;
 import com.teamcook.tastyties.user.entity.User;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -24,8 +22,8 @@ class UserRepositoryTest {
         newUser.setUsername("ssafy");
         newUser.setPassword("password");
         newUser.setNickname("김싸피");
-        newUser.setCountryCode("KO");
-        newUser.setLanguageCode("ko");
+        newUser.setCountry("KO");
+        newUser.setLanguage("ko");
         newUser.setEmail("ssafy0718@gmail.com");
         newUser.setBirth(LocalDate.parse("2001-07-18"));
 
