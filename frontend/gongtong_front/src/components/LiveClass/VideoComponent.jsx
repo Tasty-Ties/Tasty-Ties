@@ -1,19 +1,20 @@
-import { useEffect, useState, useCallback, useRef } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useEffect, useState, useRef, useCallback } from "react";
+import { useLocation } from "react-router-dom";
 import axios from "axios";
 
 import useVideoStore from "./../../store/useVideoStore";
 import StreamComponent from "./StreamComponent";
 import ToolbarComponent from "./ToolbarComponent";
-
 import UserModel from "./UserModel";
 
-const APPLICATION_SERVER_URL = "http://localhost:5000/";
+import { Hands } from "@mediapipe/hands";
+import { Camera } from "@mediapipe/camera_utils";
+
+const APPLICATION_SERVER_URL = "http://localhost:8080/api/v1/";
 const localUserSetting = new UserModel();
 
 const VideoComponent = () => {
   const location = useLocation();
-
   const OV = useVideoStore((state) => state.OV);
   const setOV = useVideoStore((state) => state.setOV);
   const selectedAudioDevice = useVideoStore(
@@ -22,36 +23,42 @@ const VideoComponent = () => {
   const selectedVideoDevice = useVideoStore(
     (state) => state.selectedVideoDevice
   );
-
   const { audioActive, videoActive } = location.state;
   const [localUser, setLocalUser] = useState(null);
-
   const [session, setSession] = useState(undefined);
   const [subscribers, setSubscribers] = useState([]);
   const remotes = useRef([]);
-  const localUserAccessAllowed = useRef(false); // 카메라, 마이크 접근 권한?
+  const localUserAccessAllowed = useRef(false);
+  const [mySessionId, setMySessionId] = useState("SessionA");
+  const [myUserName, setMyUserName] = useState(
+    "OpenVidu_User" + Math.floor(Math.random() * 100)
+  );
 
+  const mediaRecorder = useRef(null);
+  const audioChunks = useRef([]);
+  const isRecording = useRef(false);
+  const raiseTimeout = useRef(null);
+  const lowerTimeout = useRef(null);
+  const hands = useRef(null);
+  const camera = useRef(null);
+  const audioStream = useRef(null);
+  
   useEffect(() => {
     window.addEventListener("beforeunload", onbeforeunload);
     joinSession();
+    initializeMediapipe();
+
     return () => {
       window.removeEventListener("beforeunload", onbeforeunload);
       leaveSession();
     };
   }, []);
 
-  const [mySessionId, setMySessionId] = useState("SessionA");
-  const [myUserName, setMyUserName] = useState(
-    "OpenVidu_User" + Math.floor(Math.random() * 100)
-  );
-
   const joinSession = async () => {
     const newSession = OV.initSession();
     setSession(newSession);
     await connectToSession(newSession);
     subscribeToStreamCreated(newSession);
-    // subscribeToStreamDestroyed(newSession);
-    // subscribeToUserChanged(newSession);
     console.log(newSession);
   };
 
@@ -223,7 +230,7 @@ const VideoComponent = () => {
 
   const createSession = useCallback(async (sessionId) => {
     const response = await axios.post(
-      APPLICATION_SERVER_URL + "api/sessions",
+      APPLICATION_SERVER_URL + "sessions",
       { customSessionId: sessionId },
       {
         headers: { "Content-Type": "application/json" },
@@ -234,7 +241,7 @@ const VideoComponent = () => {
 
   const createToken = useCallback(async (sessionId) => {
     const response = await axios.post(
-      APPLICATION_SERVER_URL + "api/sessions/" + sessionId + "/connections",
+      APPLICATION_SERVER_URL + "sessions/" + sessionId + "/connections",
       {},
       {
         headers: { "Content-Type": "application/json" },
@@ -254,6 +261,163 @@ const VideoComponent = () => {
 
   const toolcss = {
     float: "bottom",
+  };
+
+  const initializeMediapipe = () => {
+    const videoElement = document.querySelector(".input_video");
+
+    navigator.mediaDevices
+      .getUserMedia({ audio: true, video: true })
+      .then((stream) => {
+        videoElement.srcObject = stream;
+        videoElement.play();
+        audioStream.current = stream;
+      })
+      .catch((error) => {
+        console.error("Error accessing the camera: ", error);
+      });
+
+    hands.current = new Hands({
+      locateFile: (file) =>
+        `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`,
+    });
+
+    hands.current.setOptions({
+      maxNumHands: 1,
+      modelComplexity: 1,
+      minDetectionConfidence: 0.7,
+      minTrackingConfidence: 0.7,
+    });
+
+    hands.current.onResults(onResults);
+
+    camera.current = new Camera(videoElement, {
+      onFrame: async () => {
+        await hands.current.send({ image: videoElement });
+      },
+      width: 1280,
+      height: 720,
+    });
+
+    camera.current.start();
+  };
+
+  const onResults = (results) => {
+    if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
+      for (const landmarks of results.multiHandLandmarks) {
+        const wrist = landmarks[0]; // 손목 위치
+        const indexFingerTip = landmarks[8]; // 검지 손가락 끝 위치
+        const middleFingerTip = landmarks[12]; // 중지 손가락 끝 위치
+
+        // 손목보다 손가락 끝이 높으면 손을 든 것으로 간주 (y값이 작을수록 더 높음)
+        if (
+          indexFingerTip.y < wrist.y &&
+          middleFingerTip.y < wrist.y &&
+          isHandOpen(landmarks)
+        ) {
+          console.log("손을 들었음");
+          if (!isRecording.current && !raiseTimeout.current) {
+             // 손이 올라갔을 때 타이머
+            console.log("2초 동안 손 들고 있으면, 이후 녹화 시작");
+            raiseTimeout.current = setTimeout(() => {
+              startRecording();
+              raiseTimeout.current = null;
+            }, 2000);
+          }
+          if (lowerTimeout.current) {
+            // 손이 내려갔을 때 타이머 초기화
+            clearTimeout(lowerTimeout.current);
+            lowerTimeout.current = null;
+          }
+        } else {
+          if (raiseTimeout.current) {
+            // 손이 2초 동안 들리지 않으면 타이머 취소
+            console.log("녹화 취소");
+            clearTimeout(raiseTimeout.current);
+            raiseTimeout.current = null;
+          }
+        }
+      }
+    } else {
+      if (isRecording.current) {
+        if (!lowerTimeout.current) {
+          console.log("2초 동안 손 내리고 있으면, 이후 녹화 종료");
+          lowerTimeout.current = setTimeout(() => {
+            stopRecording();
+            lowerTimeout.current = null;
+          }, 2000);
+        }
+      } else {
+        if (raiseTimeout.current) {
+          clearTimeout(raiseTimeout.current);
+          raiseTimeout.current = null;
+        }
+      }
+    }
+  };
+
+  const isHandOpen = (landmarks) => {
+    const thumbTip = landmarks[4];
+    const indexFingerTip = landmarks[8];
+    const pinkyTip = landmarks[20];
+
+    const thumbIndexDistance = Math.sqrt(
+      Math.pow(thumbTip.x - indexFingerTip.x, 2) +
+        Math.pow(thumbTip.y - indexFingerTip.y, 2) +
+        Math.pow(thumbTip.z - indexFingerTip.z, 2)
+    );
+
+    const thumbPinkyDistance = Math.sqrt(
+      Math.pow(thumbTip.x - pinkyTip.x, 2) +
+        Math.pow(thumbTip.y - pinkyTip.y, 2) +
+        Math.pow(thumbTip.z - pinkyTip.z, 2)
+    );
+
+    return thumbIndexDistance > 0.1 && thumbPinkyDistance > 0.1;
+  };
+
+  const startRecording = () => {
+    isRecording.current = true;
+    if (!audioStream.current) {
+      console.error("Audio stream is not available.");
+      return;
+    }
+    mediaRecorder.current = new MediaRecorder(audioStream.current);
+    audioChunks.current = [];
+
+    mediaRecorder.current.ondataavailable = (event) => {
+      audioChunks.current.push(event.data);
+    };
+
+    mediaRecorder.current.onstop = () => {
+      console.log("음성 파일 서버에 전송");
+      const audioBlob = new Blob(audioChunks.current, { type: "audio/wav" });
+      saveAudioFile(audioBlob);
+      // sendRecordingToServer(audioBlob); // 서버로 전송을 원하면 주석 해제
+    };
+
+    mediaRecorder.current.start();
+    console.log("Recording started");
+  };
+
+  const stopRecording = () => {
+    isRecording.current = false;
+    if (mediaRecorder.current) {
+      mediaRecorder.current.stop();
+      console.log("Recording stopped");
+    }
+  };
+
+  const saveAudioFile = (audioBlob) => {
+    const url = window.URL.createObjectURL(audioBlob);
+    const a = document.createElement("a");
+    a.style.display = "none";
+    a.href = url;
+    a.download = "recording.wav";
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(a);
   };
 
   return (
@@ -280,6 +444,7 @@ const VideoComponent = () => {
         </div>
       </div>
       <ToolbarComponent leaveSession={leaveSession} style={toolcss} />
+      <video className="input_video" style={{ display: "none" }}></video>
     </>
   );
 };
