@@ -18,6 +18,7 @@ import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 @Controller
@@ -39,7 +40,9 @@ public class ChatMessageController {
     @SendTo("/sub/chat/rooms/{roomId}")
     public ChatMessageResponseDTO sendMessage(@DestinationVariable String roomId, @Payload ChatMessageRequestDTO chatMessageRequestDto) {
         try {
-            UserDTO userDto = chatRoomService.findUser(roomId, chatMessageRequestDto.getUserId());
+            Map<String, Object> map = chatRoomService.getUserAndTranslatedLanguages(roomId, chatMessageRequestDto.getUserId());
+
+            UserDTO userDto = (UserDTO) map.get("user");
 
             ChatMessage chatMessage = ChatMessage.builder()
                     .type(MessageType.USER)
@@ -50,12 +53,7 @@ public class ChatMessageController {
                     .build();
 
             // TODO: 번역할 언어 가져오기
-            Set<String> translatedLanguages = new HashSet<>();
-            translatedLanguages.add("English");
-            translatedLanguages.add("Spanish");
-            translatedLanguages.add("French");
-            translatedLanguages.add("Japanese");
-            translatedLanguages.add("Chinese");
+            Set<String> translatedLanguages = (Set<String>) map.get("translatedLanguages");
 
             try {
                 translationService.translationChatMessage(chatMessage, translatedLanguages);

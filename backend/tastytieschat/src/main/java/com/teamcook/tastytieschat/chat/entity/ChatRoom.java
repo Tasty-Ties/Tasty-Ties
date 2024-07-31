@@ -12,7 +12,9 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Document(collection = "chatroom")
 @NoArgsConstructor
@@ -69,6 +71,15 @@ public class ChatRoom {
         }
 
         return null;
+    }
+
+    public Set<String> getLanguages() {
+        Set<String> languages = new HashSet<>();
+        for (UserDTO userDto : users) {
+            languages.add(userDto.getLanguage());
+        }
+
+        return languages;
     }
 
 }

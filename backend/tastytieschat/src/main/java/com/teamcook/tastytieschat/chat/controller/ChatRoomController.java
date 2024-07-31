@@ -10,13 +10,10 @@ import com.teamcook.tastytieschat.chat.service.ChatRoomService;
 import com.teamcook.tastytieschat.common.dto.CommonResponseDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 
 @RestController

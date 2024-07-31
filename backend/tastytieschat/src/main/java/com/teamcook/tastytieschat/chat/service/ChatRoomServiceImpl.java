@@ -10,6 +10,11 @@ import com.teamcook.tastytieschat.chat.repository.ChatRoomRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 @Service
 public class ChatRoomServiceImpl implements ChatRoomService {
 
@@ -75,18 +80,24 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     }
 
     @Override
-    public UserDTO findUser(String chatRoomId, int userId) {
+    public Map<String, Object> getUserAndTranslatedLanguages(String chatRoomId, int userId) {
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId).orElse(null);
-
-        if (chatRoom != null) {
-            UserDTO userDto = chatRoom.getUser(userId);
-            if (userDto != null) {
-                return userDto;
-            } else {
-                throw new UserNotExistException(userId);
-            }
-        } else {
+        if (chatRoom == null) {
             throw new ChatRoomNotExistException(chatRoomId);
         }
+
+        UserDTO userDto = chatRoom.getUser(userId);
+        if (userDto == null) {
+            throw new UserNotExistException(userId);
+        }
+
+        Set<String> translatedLanguages = chatRoom.getLanguages();
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("user", userDto);
+        map.put("translatedLanguages", translatedLanguages);
+
+        return map;
     }
+
 }
