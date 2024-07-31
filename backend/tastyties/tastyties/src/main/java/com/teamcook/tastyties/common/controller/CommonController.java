@@ -1,8 +1,8 @@
 package com.teamcook.tastyties.common.controller;
 
-import com.teamcook.tastyties.common.dto.CommonResponseDTO;
-import com.teamcook.tastyties.common.dto.CountryResponseDTO;
-import com.teamcook.tastyties.common.dto.LanguageResponseDTO;
+import com.teamcook.tastyties.common.dto.CommonResponseDto;
+import com.teamcook.tastyties.common.dto.CountryResponseDto;
+import com.teamcook.tastyties.common.dto.LanguageResponseDto;
 import com.teamcook.tastyties.common.entity.Country;
 import com.teamcook.tastyties.common.entity.Language;
 import com.teamcook.tastyties.common.repository.CountryRepository;
@@ -30,34 +30,34 @@ public class CommonController {
     }
 
     @GetMapping("/countries")
-    public ResponseEntity<CommonResponseDTO> getCountryCodeList() {
+    public ResponseEntity<CommonResponseDto> getCountryCodeList() {
         List<Country> countryList = countryRepository.findAll();
-        List<CountryResponseDTO> countryResponseDTOList = new ArrayList<>();
+        List<CountryResponseDto> countryResponseDtoList = new ArrayList<>();
 
         for (Country country : countryList) {
-            countryResponseDTOList.add(new CountryResponseDTO(
+            countryResponseDtoList.add(new CountryResponseDto(
                     country.getAlpha2(), country.getEnglishName(),
                     country.getKoreanName(), country.getCountryImageUrl()));
 //            System.out.println("countryCode = " + countryCode + ", Country name= " + locale.getDisplayCountry());
         }
-        Map<String, List<CountryResponseDTO>> map = new HashMap<>();
-        map.put("countries", countryResponseDTOList);
-        return new ResponseEntity<>(new CommonResponseDTO(200, "국가 목록 조회 성공", map),
+        Map<String, List<CountryResponseDto>> map = new HashMap<>();
+        map.put("countries", countryResponseDtoList);
+        return new ResponseEntity<>(new CommonResponseDto(200, "국가 목록 조회 성공", map),
                 HttpStatus.OK);
     }
 
     @GetMapping("/languages")
-    public ResponseEntity<CommonResponseDTO> getLanguageCodeList() {
+    public ResponseEntity<CommonResponseDto> getLanguageCodeList() {
         List<Language> languageList = languageRepository.findAll();
-        List<LanguageResponseDTO> languageResponseDTOList = new ArrayList<>();
+        List<LanguageResponseDto> languageResponseDtoList = new ArrayList<>();
         for (Language language : languageList) {
-            languageResponseDTOList.add(new LanguageResponseDTO(
+            languageResponseDtoList.add(new LanguageResponseDto(
                     language.getAlpha2(), language.getEnglish(),
                     language.getKorean()));
         }
-        Map<String, List<LanguageResponseDTO>> map = new HashMap<>();
-        map.put("languages", languageResponseDTOList);
-        return new ResponseEntity<>(new CommonResponseDTO(200, "언어 목록 조회 성공", map),
+        Map<String, List<LanguageResponseDto>> map = new HashMap<>();
+        map.put("languages", languageResponseDtoList);
+        return new ResponseEntity<>(new CommonResponseDto(200, "언어 목록 조회 성공", map),
                 HttpStatus.OK);
     }
 }

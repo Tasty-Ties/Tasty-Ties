@@ -7,7 +7,7 @@ import lombok.Setter;
 
 @Getter @Setter @AllArgsConstructor
 @Builder
-public class CommonResponseDTO {
+public class CommonResponseDto {
     private int stateCode;
     private String message;
     private Object data;

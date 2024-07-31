@@ -1,13 +1,11 @@
 package com.teamcook.tastyties.cooking_class.dto;
 
-import com.querydsl.core.annotations.QueryProjection;
-import com.teamcook.tastyties.user.dto.UserProfileForClassDetailDTO;
+import com.teamcook.tastyties.user.dto.UserProfileForClassDetailDto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Set;
 
 @Data
@@ -40,5 +38,5 @@ public class CookingClassDto {
 
     private long reservedCount;
 
-    private Set<UserProfileForClassDetailDTO> userProfiles;
+    private Set<UserProfileForClassDetailDto> userProfiles;
 }

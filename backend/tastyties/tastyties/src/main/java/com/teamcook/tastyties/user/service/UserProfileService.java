@@ -1,14 +1,14 @@
 package com.teamcook.tastyties.user.service;
 
-import com.teamcook.tastyties.common.dto.CountryResponseDTO;
-import com.teamcook.tastyties.common.dto.LanguageResponseDTO;
+import com.teamcook.tastyties.common.dto.CountryResponseDto;
+import com.teamcook.tastyties.common.dto.LanguageResponseDto;
 import com.teamcook.tastyties.common.entity.Country;
 import com.teamcook.tastyties.common.entity.Language;
 import com.teamcook.tastyties.cooking_class.dto.CookingClassListDto;
 import com.teamcook.tastyties.cooking_class.repository.CookingClassRepository;
 import com.teamcook.tastyties.shared.repository.UserAndCookingClassRepository;
 import com.teamcook.tastyties.shared.repository.UserAndCountryRepository;
-import com.teamcook.tastyties.user.dto.UserProfileDTO;
+import com.teamcook.tastyties.user.dto.UserProfileDto;
 import com.teamcook.tastyties.user.entity.User;
 import com.teamcook.tastyties.user.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -39,24 +39,24 @@ public class UserProfileService {
     }
 
     @Transactional
-    public UserProfileDTO getMyProfile(Integer userId) {
+    public UserProfileDto getMyProfile(Integer userId) {
         log.debug("query before");
         User user = userRepository.findUserWithCollectedFlags(userId);
         log.debug("query after");
         Country country = user.getCountry();
         Language language = user.getLanguage();
 
-        List<CountryResponseDTO> collectedFlags = user.getUserAndCountries().stream()
-                .map(uc -> new CountryResponseDTO(uc.getCountry().getAlpha2(),
+        List<CountryResponseDto> collectedFlags = user.getUserAndCountries().stream()
+                .map(uc -> new CountryResponseDto(uc.getCountry().getAlpha2(),
                         uc.getCountry().getEnglishName(), uc.getCountry().getKoreanName()
                 ,uc.getCountry().getCountryImageUrl()))
                 .toList();
 
-        return new UserProfileDTO(null, user.getNickname(),
-                new CountryResponseDTO(country.getAlpha2(), country.getEnglishName(),
+        return new UserProfileDto(null, user.getNickname(),
+                new CountryResponseDto(country.getAlpha2(), country.getEnglishName(),
                         country.getKoreanName(), country.getCountryImageUrl()),
                 collectedFlags,
-                new LanguageResponseDTO(language.getAlpha2(), language.getEnglish(), language.getKorean()),
+                new LanguageResponseDto(language.getAlpha2(), language.getEnglish(), language.getKorean()),
                 user.getEmail(), user.getBirth(), 0,
                 user.getInstagramUrl(), user.getInstagramHandle(),
                 user.getYoutubeUrl(), user.getYoutubeHandle());

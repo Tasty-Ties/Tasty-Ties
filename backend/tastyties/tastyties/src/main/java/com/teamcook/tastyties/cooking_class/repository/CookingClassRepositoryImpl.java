@@ -64,6 +64,7 @@ public class CookingClassRepositoryImpl implements CookingClassCustomRepository 
                         titleLike(condition.getTitle()),
                         usernameEq(condition.getUsername())
                 )
+                .orderBy(cookingClass.createTime.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
@@ -122,6 +123,7 @@ public class CookingClassRepositoryImpl implements CookingClassCustomRepository 
                 .leftJoin(cookingClass.host, user)
                 .leftJoin(user.country, country)
                 .where(cookingClass.host.userId.eq(hostId))
+                .orderBy(cookingClass.cookingClassStartTime.asc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();

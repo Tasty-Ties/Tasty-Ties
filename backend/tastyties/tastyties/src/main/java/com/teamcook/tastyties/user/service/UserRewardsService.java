@@ -1,6 +1,6 @@
 package com.teamcook.tastyties.user.service;
 
-import com.teamcook.tastyties.common.dto.CountryResponseDTO;
+import com.teamcook.tastyties.common.dto.CountryResponseDto;
 import com.teamcook.tastyties.common.entity.Country;
 import com.teamcook.tastyties.common.repository.CountryRepository;
 import com.teamcook.tastyties.shared.entity.UserAndCountry;
@@ -41,7 +41,7 @@ public class UserRewardsService {
             result.put("message", "새롭게 수집한 국가의 국기입니다.");
         }
 
-        result.put("country", new CountryResponseDTO(country.getAlpha2(), country.getEnglishName(),
+        result.put("country", new CountryResponseDto(country.getAlpha2(), country.getEnglishName(),
                 country.getKoreanName(), country.getCountryImageUrl()));
         return result;
     }

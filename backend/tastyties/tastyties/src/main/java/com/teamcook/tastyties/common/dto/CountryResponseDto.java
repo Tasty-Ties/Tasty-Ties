@@ -4,9 +4,12 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
-@Getter @Setter @AllArgsConstructor
-public class LanguageResponseDTO {
-    private String languageCode;
+@Getter
+@Setter
+@AllArgsConstructor
+public class CountryResponseDto {
+    private String countryCode;
     private String englishName;
     private String koreanName;
+    private String countryImageUrl;
 }

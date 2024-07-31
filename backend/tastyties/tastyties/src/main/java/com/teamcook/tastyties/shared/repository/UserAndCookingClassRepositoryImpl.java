@@ -3,14 +3,12 @@ package com.teamcook.tastyties.shared.repository;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.teamcook.tastyties.common.dto.QCountryProfileDto;
-import com.teamcook.tastyties.common.entity.QCountry;
 import com.teamcook.tastyties.cooking_class.dto.CookingClassListDto;
 import com.teamcook.tastyties.cooking_class.dto.QCookingClassListDto;
 import com.teamcook.tastyties.cooking_class.entity.CookingClass;
-import com.teamcook.tastyties.cooking_class.entity.QCookingClass;
 import com.teamcook.tastyties.shared.entity.UserAndCookingClass;
-import com.teamcook.tastyties.user.dto.QUserProfileForClassDetailDTO;
-import com.teamcook.tastyties.user.dto.UserProfileForClassDetailDTO;
+import com.teamcook.tastyties.user.dto.QUserProfileForClassDetailDto;
+import com.teamcook.tastyties.user.dto.UserProfileForClassDetailDto;
 import com.teamcook.tastyties.user.entity.QUser;
 import com.teamcook.tastyties.user.entity.User;
 import org.springframework.data.domain.Page;
@@ -63,9 +61,9 @@ public class UserAndCookingClassRepositoryImpl implements UserAndCookingClassCus
     }
 
     @Override
-    public Set<UserProfileForClassDetailDTO> findUserEnrolledInClass(CookingClass cookingClass) {
+    public Set<UserProfileForClassDetailDto> findUserEnrolledInClass(CookingClass cookingClass) {
         return new HashSet<>(queryFactory
-                .select(new QUserProfileForClassDetailDTO(
+                .select(new QUserProfileForClassDetailDto(
                         user.profileImageUrl,
                         user.nickname,
                         user.username))
@@ -110,6 +108,7 @@ public class UserAndCookingClassRepositoryImpl implements UserAndCookingClassCus
                 .join(cookingClass.host, host)
                 .leftJoin(host.country, country)
                 .where(userAndCookingClass.user.userId.eq(userId))
+                .orderBy(cookingClass.cookingClassStartTime.asc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
