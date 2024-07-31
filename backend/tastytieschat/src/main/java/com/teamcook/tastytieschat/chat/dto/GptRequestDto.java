@@ -1,4 +1,4 @@
-package com.teamcook.tastytieschat.translation.dto;
+package com.teamcook.tastytieschat.chat.dto;
 
 import lombok.*;
 
