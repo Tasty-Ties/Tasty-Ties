@@ -4,12 +4,16 @@ import com.teamcook.tastyties.common.dto.CountryResponseDTO;
 import com.teamcook.tastyties.common.dto.LanguageResponseDTO;
 import com.teamcook.tastyties.common.entity.Country;
 import com.teamcook.tastyties.common.entity.Language;
+import com.teamcook.tastyties.cooking_class.dto.CookingClassListDto;
+import com.teamcook.tastyties.shared.repository.UserAndCookingClassRepository;
 import com.teamcook.tastyties.shared.repository.UserAndCountryRepository;
 import com.teamcook.tastyties.user.dto.UserProfileDTO;
 import com.teamcook.tastyties.user.entity.User;
 import com.teamcook.tastyties.user.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,11 +25,14 @@ public class UserProfileService {
 
     private final UserRepository userRepository;
     private final UserAndCountryRepository userAndCountryRepository;
+    private final UserAndCookingClassRepository userAndClassRepository;
 
     @Autowired
-    public UserProfileService(UserRepository userRepository, UserAndCountryRepository userAndCountryRepository) {
+    public UserProfileService(UserRepository userRepository, UserAndCountryRepository userAndCountryRepository,
+                              UserAndCookingClassRepository userAndClassRepository) {
         this.userRepository = userRepository;
         this.userAndCountryRepository = userAndCountryRepository;
+        this.userAndClassRepository = userAndClassRepository;
     }
 
     @Transactional
@@ -48,5 +55,10 @@ public class UserProfileService {
                 user.getEmail(), user.getBirth(), 0,
                 user.getInstagramUrl(), user.getInstagramHandle(),
                 user.getYoutubeUrl(), user.getYoutubeHandle());
+    }
+
+    @Transactional
+    public Page<CookingClassListDto> getReservedClasses(int userId, Pageable pageable) {
+        return userAndClassRepository.findReservedClassesByUserId(userId, pageable);
     }
 }

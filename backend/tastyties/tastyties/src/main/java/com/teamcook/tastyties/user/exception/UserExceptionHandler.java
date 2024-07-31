@@ -20,4 +20,13 @@ public class UserExceptionHandler {
         CommonResponseDTO errorResponse = new CommonResponseDTO(404, ex.getMessage(), null);
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
     }
+
+    @ExceptionHandler(UserDetailsNotFoundException.class)
+    public ResponseEntity<CommonResponseDTO> handleUserDetailsNotFoundException(UserDetailsNotFoundException ex) {
+        CommonResponseDTO response = CommonResponseDTO.builder()
+                .stateCode(HttpStatus.UNAUTHORIZED.value())
+                .message(ex.getMessage())
+                .build();
+        return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+    }
 }

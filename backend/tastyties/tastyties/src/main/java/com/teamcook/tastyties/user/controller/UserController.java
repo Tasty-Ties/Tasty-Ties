@@ -1,22 +1,22 @@
 package com.teamcook.tastyties.user.controller;
 
 import com.teamcook.tastyties.common.dto.CommonResponseDTO;
+import com.teamcook.tastyties.cooking_class.dto.CookingClassListDto;
 import com.teamcook.tastyties.security.userdetails.CustomUserDetails;
-import com.teamcook.tastyties.user.dto.CollectFlagDTO;
 import com.teamcook.tastyties.user.dto.UserProfileDTO;
 import com.teamcook.tastyties.user.dto.UserRegistrationDTO;
 import com.teamcook.tastyties.user.dto.UserUpdateDTO;
-import com.teamcook.tastyties.user.entity.User;
+import com.teamcook.tastyties.user.exception.UserDetailsNotFoundException;
 import com.teamcook.tastyties.user.exception.UserIDAlreadyExistsException;
 import com.teamcook.tastyties.user.service.UserProfileService;
 import com.teamcook.tastyties.user.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
 
 @RestController
 @RequestMapping("/users")
@@ -113,18 +113,19 @@ public class UserController {
                         .build());
     }
 
-    @PostMapping("/collect-flag")
-    public ResponseEntity<CommonResponseDTO> collectFlag(@AuthenticationPrincipal CustomUserDetails userDetails,
-                                                         @RequestBody CollectFlagDTO request) {
-        User user = userDetails.user();
-        Map<String, Object> result = userService.collectFlag(user, request.getCountryCode());
+    @GetMapping("/me/reservations")
+    public ResponseEntity<CommonResponseDTO> getMyReservations(@AuthenticationPrincipal CustomUserDetails userDetails, Pageable pageable) {
+        if (userDetails == null) {
+            throw new UserDetailsNotFoundException("인증 정보를 찾을 수 없습니다.");
+        }
+
+        Page<CookingClassListDto> reservedClasses = userProfileService.getReservedClasses(userDetails.getUserId(), pageable);
 
         return ResponseEntity.ok()
                 .body(CommonResponseDTO.builder()
                         .stateCode(200)
-                        .message(result.get("message").toString())
-                        .data(result.get("country"))
+                        .message("예약한 클래스가 정상적으로 조회되었습니다.")
+                        .data(reservedClasses)
                         .build());
     }
-
 }
