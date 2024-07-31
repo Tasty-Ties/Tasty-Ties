@@ -2,7 +2,9 @@ package com.teamcook.tastytieschat.chat.service;
 
 import com.teamcook.tastytieschat.chat.dto.RabbitMQRequestDTO;
 import com.teamcook.tastytieschat.chat.entity.ChatRoom;
+import com.teamcook.tastytieschat.chat.exception.ChatRoomNotExistException;
 import com.teamcook.tastytieschat.chat.repository.ChatRoomRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.Exchange;
 import org.springframework.amqp.rabbit.annotation.Queue;
@@ -15,6 +17,7 @@ import org.springframework.stereotype.Service;
 import java.util.HashMap;
 import java.util.Map;
 
+@Slf4j
 @Service
 public class RabbitMQConsumerImpl implements RabbitMQConsumer {
 
@@ -50,6 +53,26 @@ public class RabbitMQConsumerImpl implements RabbitMQConsumer {
             msg.getMessageProperties().setCorrelationId(correlationId);
             return msg;
         });
+    }
+
+    @Override
+    @RabbitListener(bindings = @QueueBinding(
+            value = @Queue(
+                    value = "${rabbitmq.queue.host}",
+                    durable = "true"
+            ),
+            exchange = @Exchange(value = "${rabbitmq.exchange"),
+            key = "${rabbitmq.routing.key.delete}"
+    ))
+    public void deleteChatRoom(RabbitMQRequestDTO rabbitMQRequestDto) {
+        String chatRoomId = rabbitMQRequestDto.getChatRoomId();
+        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId).orElse(null);
+
+        if (chatRoom != null) {
+            chatRoomRepository.delete(chatRoom);
+        } else {
+            log.error("Error deleting chat room: chat room does not exist.");
+        }
     }
 
 }

@@ -7,5 +7,6 @@ import org.springframework.amqp.core.Message;
 public interface RabbitMQConsumer {
 
     void createChatRoom(RabbitMQRequestDTO rabbitMQRequestDto, Message message);
+    void deleteChatRoom(RabbitMQRequestDTO rabbitMQRequestDto);
 
 }
