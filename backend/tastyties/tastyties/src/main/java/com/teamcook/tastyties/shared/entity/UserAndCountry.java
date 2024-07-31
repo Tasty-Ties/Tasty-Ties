@@ -4,11 +4,12 @@ import com.teamcook.tastyties.common.entity.Country;
 import com.teamcook.tastyties.user.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Getter
+@Getter @NoArgsConstructor
 public class UserAndCountry {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int userFlagId;
