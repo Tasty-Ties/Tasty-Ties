@@ -48,6 +48,8 @@ public class UserProfileService {
                 new CountryResponseDTO(country.getAlpha2(), country.getEnglishName(), country.getKoreanName()),
                 collectedFlags,
                 new LanguageResponseDTO(language.getAlpha2(), language.getEnglish(), language.getKorean()),
-                user.getEmail(), user.getBirth(), 0);
+                user.getEmail(), user.getBirth(), 0,
+                user.getInstagramUrl(), user.getInstagramHandle(),
+                user.getYoutubeUrl(), user.getYoutubeHandle());
     }
 }

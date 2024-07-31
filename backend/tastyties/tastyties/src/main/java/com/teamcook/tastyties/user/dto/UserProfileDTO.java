@@ -21,5 +21,10 @@ public class UserProfileDTO {
     private String email;
     private LocalDate birth;
     private int activityPoint;
-//    private List<CollectedCountry> collectedCountries;
+
+    //SNS
+    private String instagramUrl;
+    private String instagramHandle;
+    private String youtubeUrl;
+    private String youtubeHandle;
 }
