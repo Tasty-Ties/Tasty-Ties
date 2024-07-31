@@ -5,6 +5,7 @@ import com.teamcook.tastyties.common.entity.Language;
 import com.teamcook.tastyties.cooking_class.entity.CookingClass;
 import com.teamcook.tastyties.shared.entity.UserAndCookingClass;
 import com.teamcook.tastyties.shared.entity.UserAndCountry;
+import com.teamcook.tastyties.user.dto.UserUpdateDTO;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -65,4 +66,21 @@ public class User {
     private String instagramHandle;
     private String youtubeUrl;
     private String youtubeHandle;
+
+    public void updateUser(UserUpdateDTO request, String encodedPassword, String instagramHandle, String youtubeHandle) {
+        this.nickname = request.getNickname();
+        if (encodedPassword != null) {
+            this.password = encodedPassword;
+        }
+        this.description = request.getDescription();
+        this.email = request.getEmailId() + "@" + request.getEmailDomain();
+        if (request.getInstagramUrl() != null && !request.getInstagramUrl().isEmpty()) {
+            this.instagramUrl = request.getInstagramUrl();
+            this.instagramHandle = instagramHandle;
+        }
+        if (request.getYoutubeUrl() != null && !request.getYoutubeUrl().isEmpty()) {
+            this.youtubeUrl = request.getYoutubeUrl();
+            this.youtubeHandle = youtubeHandle;
+        }
+    }
 }

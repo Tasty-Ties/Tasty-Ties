@@ -7,17 +7,20 @@ import com.teamcook.tastyties.common.repository.LanguageRepository;
 import com.teamcook.tastyties.shared.entity.UserAndCountry;
 import com.teamcook.tastyties.shared.repository.UserAndCountryRepository;
 import com.teamcook.tastyties.user.dto.UserRegistrationDTO;
+import com.teamcook.tastyties.user.dto.UserUpdateDTO;
 import com.teamcook.tastyties.user.entity.User;
 import com.teamcook.tastyties.user.exception.CountryNotFoundException;
 import com.teamcook.tastyties.user.exception.UserIDAlreadyExistsException;
 import com.teamcook.tastyties.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class UserService {
@@ -99,14 +102,35 @@ public class UserService {
         userAndCountryRepository.save(userAndCountry);
     }
 
-    // user와 cookingclass 관계 생성
-//    private void createUserAndCookingClassRelationship(User user, CookingClass cc) {
-//        if (userAndCookingClassRepository.isUserEnrolledInClass(user, cc)) {
-//            throw new IllegalArgumentException("이미 예약되어있습니다.");
-//        }
-//        UserAndCookingClass uAndc = new UserAndCookingClass();
-//        uAndc.setUser(user);
-//        uAndc.setCookingClass(cc);
-//        uAndcRepository.save(uAndc);
-//    }
+    public UserUpdateDTO updateProfile(UserDetails userDetails, UserUpdateDTO request) {
+        Optional<User> findUser = userRepository.findByUsername(userDetails.getUsername());
+        if (findUser.isEmpty()) {
+            throw new IllegalArgumentException("유저의 정보를 찾을 수 없습니다.");
+        }
+        User user = findUser.get();
+
+        // URL에서 핸들 추출
+        String instagramHandle = extractInstagramHandle(request.getInstagramUrl());
+        String youtubeHandle = extractYoutubeHandle(request.getYoutubeUrl());
+
+        user.updateUser(request, passwordEncoder.encode(request.getPassword()),
+                instagramHandle, youtubeHandle);
+        userRepository.save(user);
+        return request;
+    }
+
+    private String extractInstagramHandle(String url) {
+        if (url == null || url.isEmpty()) return null;
+        if (url.endsWith("/")) url = url.substring(0, url.length() - 1);
+        return url.substring(url.lastIndexOf("/") + 1);
+    }
+
+    private String extractYoutubeHandle(String url) {
+        if (url == null || url.isEmpty()) return null;
+        int atIndex = url.lastIndexOf("@");
+        if (atIndex != -1) {
+            return url.substring(atIndex + 1);
+        }
+        return null;
+    }
 }

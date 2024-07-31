@@ -92,9 +92,14 @@ public class UserController {
     }
 
     @PatchMapping("/me")
-    public ResponseEntity<CommonResponseDTO> updateProfile(@RequestBody UserUpdateDTO request) {
-        
-        return null;
+    public ResponseEntity<CommonResponseDTO> updateProfile(@AuthenticationPrincipal CustomUserDetails userDetails, @RequestBody UserUpdateDTO request) {
+        UserUpdateDTO userUpdateDTO = userService.updateProfile(userDetails, request);
+        return ResponseEntity.ok()
+                .body(CommonResponseDTO.builder()
+                        .stateCode(200)
+                        .message("프로필이 정상적으로 수정됐습니다.")
+                        .data(userUpdateDTO)
+                        .build());
     }
 
     @PostMapping("/collect-flag")

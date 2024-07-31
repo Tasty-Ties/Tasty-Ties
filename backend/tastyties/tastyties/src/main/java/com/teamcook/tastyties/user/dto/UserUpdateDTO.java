@@ -5,8 +5,10 @@ import lombok.Data;
 @Data
 public class UserUpdateDTO {
     private String nickname;
-    private String email;
+    private String emailId;
+    private String emailDomain;
     private String password;
     private String description;
-    private String snsUrl;
+    private String instagramUrl;
+    private String youtubeUrl;
 }
