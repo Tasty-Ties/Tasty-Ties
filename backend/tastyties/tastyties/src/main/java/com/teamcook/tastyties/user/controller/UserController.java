@@ -102,6 +102,17 @@ public class UserController {
                         .build());
     }
 
+    @DeleteMapping("/me")
+    public ResponseEntity<CommonResponseDTO> deleteProfile(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        userService.deleteProfile(userDetails.getUsername());
+        return ResponseEntity.ok()
+                .body(CommonResponseDTO.builder()
+                        .stateCode(200)
+                        .message("프로필이 정상적으로 삭제됐습니다.")
+                        .data(true)
+                        .build());
+    }
+
     @PostMapping("/collect-flag")
     public ResponseEntity<CommonResponseDTO> collectFlag(@AuthenticationPrincipal CustomUserDetails userDetails,
                                                          @RequestBody CollectFlagDTO request) {

@@ -83,4 +83,8 @@ public class User {
             this.youtubeHandle = youtubeHandle;
         }
     }
+
+    public void delete() {
+        this.isDeleted = true;
+    }
 }

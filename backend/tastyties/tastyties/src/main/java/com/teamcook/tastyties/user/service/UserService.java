@@ -5,6 +5,7 @@ import com.teamcook.tastyties.common.entity.Country;
 import com.teamcook.tastyties.common.repository.CountryRepository;
 import com.teamcook.tastyties.common.repository.LanguageRepository;
 import com.teamcook.tastyties.shared.entity.UserAndCountry;
+import com.teamcook.tastyties.shared.repository.UserAndCookingClassRepository;
 import com.teamcook.tastyties.shared.repository.UserAndCountryRepository;
 import com.teamcook.tastyties.user.dto.UserRegistrationDTO;
 import com.teamcook.tastyties.user.dto.UserUpdateDTO;
@@ -30,16 +31,18 @@ public class UserService {
     private final CountryRepository countryRepository;
     private final LanguageRepository languageRepository;
     private final UserAndCountryRepository userAndCountryRepository;
+    private final UserAndCookingClassRepository userAndCookingClassRepository;
 
     @Autowired
     public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder,
                        CountryRepository countryRepository, LanguageRepository languageRepository,
-                       UserAndCountryRepository userAndCountryRepository) {
+                       UserAndCountryRepository userAndCountryRepository, UserAndCookingClassRepository userAndCookingClassRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.countryRepository = countryRepository;
         this.languageRepository = languageRepository;
         this.userAndCountryRepository = userAndCountryRepository;
+        this.userAndCookingClassRepository = userAndCookingClassRepository;
     }
 
     public String registerUser(UserRegistrationDTO request) {
@@ -132,5 +135,17 @@ public class UserService {
             return url.substring(atIndex + 1);
         }
         return null;
+    }
+
+    @Transactional
+    public void deleteProfile(String username) {
+        Optional<User> optionalUser = userRepository.findByUsername(username);
+        if (optionalUser.isEmpty()) {
+            throw new IllegalArgumentException("잘못된 요청입니다.");
+        }
+        User user = optionalUser.get();
+        user.delete();
+        userRepository.save(user);
+        userAndCookingClassRepository.deleteAllByUser(user);
     }
 }
