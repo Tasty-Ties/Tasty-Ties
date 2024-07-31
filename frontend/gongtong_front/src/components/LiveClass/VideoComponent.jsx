@@ -9,9 +9,18 @@ import UserModel from "./UserModel";
 
 import { Hands } from "@mediapipe/hands";
 import { Camera } from "@mediapipe/camera_utils";
+import { Client } from "@stomp/stompjs";
 
-const APPLICATION_SERVER_URL = "http://localhost:8080/api/v1/";
+const APPLICATION_SERVER_URL = "http://192.168.0.105:8080/api/v1/";
 const localUserSetting = new UserModel();
+
+//채팅 관련
+// const CHAT_SERVER_URL = "ws://192.168.31.83:8081/chat"; // 교육장
+const CHAT_SERVER_URL="ws://192.168.0.105:8081/chat" //집
+const roomId = "66a9c5dd498fe728acb763f8";
+const userId = 1;
+const userLang = "Japanese";
+const CHUNK_SIZE=16000;
 
 const VideoComponent = () => {
   const location = useLocation();
@@ -34,6 +43,7 @@ const VideoComponent = () => {
     "OpenVidu_User" + Math.floor(Math.random() * 100)
   );
 
+  //미디어 파이프 및 영상 녹화 관련
   const mediaRecorder = useRef(null);
   const audioChunks = useRef([]);
   const isRecording = useRef(false);
@@ -42,11 +52,33 @@ const VideoComponent = () => {
   const hands = useRef(null);
   const camera = useRef(null);
   const audioStream = useRef(null);
-  
+
+  //채팅 관련
+  const stompClient = useRef(null);
+
   useEffect(() => {
     window.addEventListener("beforeunload", onbeforeunload);
     joinSession();
     initializeMediapipe();
+
+    stompClient.current = new Client({
+      brokerURL: CHAT_SERVER_URL,
+      debug: (str) => {
+        console.log(str);
+      },
+      onConnect: async (frame) => {
+        console.log("Connected: " + frame);
+      },
+      onWebSocketError: (error) => {
+        console.error("Error with websocket", error);
+      },
+      onStompError: (frame) => {
+        console.error("Broker reported error: " + frame.headers["message"]);
+        console.error("Additional details: " + frame.body);
+      },
+    });
+
+    connectStompClient();
 
     return () => {
       window.removeEventListener("beforeunload", onbeforeunload);
@@ -263,6 +295,7 @@ const VideoComponent = () => {
     float: "bottom",
   };
 
+  //미디어파이프 관련
   const initializeMediapipe = () => {
     const videoElement = document.querySelector(".input_video");
 
@@ -317,7 +350,7 @@ const VideoComponent = () => {
         ) {
           console.log("손을 들었음");
           if (!isRecording.current && !raiseTimeout.current) {
-             // 손이 올라갔을 때 타이머
+            // 손이 올라갔을 때 타이머
             console.log("2초 동안 손 들고 있으면, 이후 녹화 시작");
             raiseTimeout.current = setTimeout(() => {
               startRecording();
@@ -392,13 +425,42 @@ const VideoComponent = () => {
     mediaRecorder.current.onstop = () => {
       console.log("음성 파일 서버에 전송");
       const audioBlob = new Blob(audioChunks.current, { type: "audio/wav" });
-      saveAudioFile(audioBlob);
-      // sendRecordingToServer(audioBlob); // 서버로 전송을 원하면 주석 해제
+      // saveAudioFile(audioBlob);
+      sendRecordingToServer(audioBlob);
     };
 
     mediaRecorder.current.start();
     console.log("Recording started");
   };
+
+  //서버로 오디오 보내기
+  const sendRecordingToServer = (audioBlob) => {
+    const reader = new FileReader();
+    
+    reader.onload = () => {
+      const base64Data = reader.result.split(",")[1];
+      const totalChunks = Math.ceil(base64Data.length / CHUNK_SIZE);
+  
+      for (let i = 0; i < totalChunks; i++) {
+        const chunk = base64Data.slice(i * CHUNK_SIZE, (i + 1) * CHUNK_SIZE);
+        const chatMessage = {
+          userId: parseInt(userId),
+          fileContent: chunk,
+          chunkIndex: i,
+          totalChunks: totalChunks,
+        };
+  
+        console.log(`Sending chunk ${i + 1} of ${totalChunks}`);
+        stompClient.current.publish({
+          destination: `/pub/chat/voice/rooms/${roomId}`,
+          body: JSON.stringify(chatMessage),
+        });
+      }
+    };
+  
+    reader.readAsDataURL(audioBlob);
+  };
+  
 
   const stopRecording = () => {
     isRecording.current = false;
@@ -408,6 +470,7 @@ const VideoComponent = () => {
     }
   };
 
+  //프론트에서 저장해보고 싶으면 사용(실제로는 필요 x)
   const saveAudioFile = (audioBlob) => {
     const url = window.URL.createObjectURL(audioBlob);
     const a = document.createElement("a");
@@ -419,6 +482,12 @@ const VideoComponent = () => {
     window.URL.revokeObjectURL(url);
     document.body.removeChild(a);
   };
+
+  //채팅
+  const connectStompClient = () => {
+    stompClient.current.activate();
+  };
+
 
   return (
     <>
