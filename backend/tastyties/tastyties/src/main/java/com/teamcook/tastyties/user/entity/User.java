@@ -42,14 +42,13 @@ public class User {
     @JoinColumn(name = "language_id")
     private Language language;
 
-    @NotNull @Column(nullable = false)
+    @NotNull @Column(nullable = false, unique = true)
     private String username;
     @NotNull @Column(nullable = false)
     private String password;
-    @NotNull @Column(nullable = false)
+    @NotNull @Column(nullable = false, unique = true)
     private String nickname;
 
-    private String profileImageUrl;
     @NotNull @Column(nullable = false)
     private LocalDate birth;
 
@@ -59,6 +58,8 @@ public class User {
     private String description;
     private boolean isDeleted = Boolean.FALSE;
     private boolean isAdult = Boolean.FALSE;
+
+    private String profileImageUrl;
 
     private String instagramUrl;
     private String instagramHandle;

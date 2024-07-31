@@ -2,9 +2,10 @@ package com.teamcook.tastyties.user.controller;
 
 import com.teamcook.tastyties.common.dto.CommonResponseDTO;
 import com.teamcook.tastyties.security.userdetails.CustomUserDetails;
-import com.teamcook.tastyties.user.dto.CollectFlagDto;
+import com.teamcook.tastyties.user.dto.CollectFlagDTO;
 import com.teamcook.tastyties.user.dto.UserProfileDTO;
 import com.teamcook.tastyties.user.dto.UserRegistrationDTO;
+import com.teamcook.tastyties.user.dto.UserUpdateDTO;
 import com.teamcook.tastyties.user.entity.User;
 import com.teamcook.tastyties.user.exception.UserIDAlreadyExistsException;
 import com.teamcook.tastyties.user.service.UserProfileService;
@@ -90,9 +91,15 @@ public class UserController {
                         .build());
     }
 
+    @PatchMapping("/me")
+    public ResponseEntity<CommonResponseDTO> updateProfile(@RequestBody UserUpdateDTO request) {
+        
+        return null;
+    }
+
     @PostMapping("/collect-flag")
     public ResponseEntity<CommonResponseDTO> collectFlag(@AuthenticationPrincipal CustomUserDetails userDetails,
-                                                         @RequestBody CollectFlagDto request) {
+                                                         @RequestBody CollectFlagDTO request) {
         User user = userDetails.user();
         Map<String, Object> result = userService.collectFlag(user, request.getCountryCode());
 

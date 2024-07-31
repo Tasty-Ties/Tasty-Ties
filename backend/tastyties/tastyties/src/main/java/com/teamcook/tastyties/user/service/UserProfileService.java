@@ -4,9 +4,7 @@ import com.teamcook.tastyties.common.dto.CountryResponseDTO;
 import com.teamcook.tastyties.common.dto.LanguageResponseDTO;
 import com.teamcook.tastyties.common.entity.Country;
 import com.teamcook.tastyties.common.entity.Language;
-import com.teamcook.tastyties.shared.entity.UserAndCountry;
 import com.teamcook.tastyties.shared.repository.UserAndCountryRepository;
-import com.teamcook.tastyties.user.dto.CollectFlagDto;
 import com.teamcook.tastyties.user.dto.UserProfileDTO;
 import com.teamcook.tastyties.user.entity.User;
 import com.teamcook.tastyties.user.repository.UserRepository;
@@ -16,7 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j

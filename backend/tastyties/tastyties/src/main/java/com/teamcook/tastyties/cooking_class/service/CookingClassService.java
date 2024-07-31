@@ -65,7 +65,6 @@ public class CookingClassService {
 
         List<CookingClassAndCookingClassTag> cookingClassTags = createCookingClassTags(registerDto.getCookingClassTags(), cc);
         ccAndcctRepository.saveAll(cookingClassTags);
-
         return registerDto;
     }
 

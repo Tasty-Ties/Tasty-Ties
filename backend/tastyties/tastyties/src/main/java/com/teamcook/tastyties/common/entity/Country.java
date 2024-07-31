@@ -17,6 +17,7 @@ public class Country {
   private String alpha2;
   private String englishName;
   private String koreanName;
+  private String countryImageUrl;
 
   @OneToMany(mappedBy = "country")
   private Set<User> user;
