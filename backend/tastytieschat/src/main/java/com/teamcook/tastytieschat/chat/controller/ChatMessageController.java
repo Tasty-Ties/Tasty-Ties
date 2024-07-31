@@ -7,7 +7,6 @@ import com.teamcook.tastytieschat.chat.dto.UserDTO;
 import com.teamcook.tastytieschat.chat.entity.ChatMessage;
 import com.teamcook.tastytieschat.chat.service.ChatMessageService;
 import com.teamcook.tastytieschat.chat.service.ChatRoomService;
-import com.teamcook.tastytieschat.chat.service.ChatRoomServiceImpl;
 import com.teamcook.tastytieschat.chat.service.TranslationService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +16,6 @@ import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
 
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
