@@ -5,6 +5,8 @@ import com.teamcook.tastytieschat.chat.dto.ChatMessageRequestDTO;
 import com.teamcook.tastytieschat.chat.dto.ChatMessageResponseDTO;
 import com.teamcook.tastytieschat.chat.entity.ChatMessage;
 import com.teamcook.tastytieschat.chat.service.ChatMessageService;
+import com.teamcook.tastytieschat.chat.service.ChatRoomService;
+import com.teamcook.tastytieschat.chat.service.ChatRoomServiceImpl;
 import com.teamcook.tastytieschat.chat.service.TranslationService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,17 +25,24 @@ public class ChatMessageController {
 
     private final ChatMessageService chatMessageService;
     private final TranslationService translationService;
+    private final ChatRoomService chatRoomService;
 
     @Autowired
-    public ChatMessageController(ChatMessageService chatMessageService, TranslationService translationService) {
+    public ChatMessageController(ChatMessageService chatMessageService, TranslationService translationService, ChatRoomService chatRoomService) {
         this.chatMessageService = chatMessageService;
         this.translationService = translationService;
+        this.chatRoomService = chatRoomService;
     }
 
     @MessageMapping("/chat/rooms/{roomId}")
     @SendTo("/sub/chat/rooms/{roomId}")
     public ChatMessageResponseDTO sendMessage(@DestinationVariable String roomId, @Payload ChatMessageRequestDTO chatMessageRequestDto) {
-        // TODO: 사용자가 채팅방 참가자인지 확인하기
+        try {
+            chatRoomService.isContainedUser(roomId, chatMessageRequestDto.getUserId());
+        } catch (Exception e) {
+            log.error("채팅방 권한 실패: " + e.getMessage());
+            return null;
+        }
         
         // TODO: 사용자 닉네임, 메시지 언어 가져오기
         String userNickname = "김싸피";
@@ -59,6 +68,7 @@ public class ChatMessageController {
             translationService.translationChatMessage(chatMessage, translatedLanguages);
         } catch (Exception e) {
             log.error("번역 실패: " + e.getMessage());
+            return null;
         }
 
         // 채팅 메시지 저장하기

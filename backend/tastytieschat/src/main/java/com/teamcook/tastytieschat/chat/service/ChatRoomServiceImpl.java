@@ -60,12 +60,27 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId).orElse(null);
 
         if (chatRoom != null) {
-            if (chatRoom.containUser(userId)) {
+            if (chatRoom.isContainedUser(userId)) {
                 String removedUserNickname = chatRoom.removeUser(userId);
 
                 chatRoomRepository.save(chatRoom);
 
                 return removedUserNickname;
+            } else {
+                throw new UserNotExistException(userId);
+            }
+        } else {
+            throw new ChatRoomNotExistException(chatRoomId);
+        }
+    }
+
+    @Override
+    public boolean isContainedUser(String chatRoomId, int userId) {
+        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId).orElse(null);
+
+        if (chatRoom != null) {
+            if (chatRoom.isContainedUser(userId)) {
+                return true;
             } else {
                 throw new UserNotExistException(userId);
             }

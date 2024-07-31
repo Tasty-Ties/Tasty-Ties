@@ -39,7 +39,7 @@ public class ChatRoom {
         users.add(userDto);
     }
 
-    public boolean containUser(int userId) {
+    public boolean isContainedUser(int userId) {
         for (UserDTO userDto : users) {
             if (userId == userDto.getId()) {
                 return true;
