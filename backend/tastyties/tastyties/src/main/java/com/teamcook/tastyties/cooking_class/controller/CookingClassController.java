@@ -81,6 +81,11 @@ public class CookingClassController {
                         .build());
     }
 
+    @DeleteMapping("/{uuid}")
+    public ResponseEntity<CommonResponseDTO> deleteClass(@AuthenticationPrincipal CustomUserDetails userDetails, @PathVariable String uuid) {
+        return null;
+    }
+
     @PostMapping("/reservation/{uuid}")
     public ResponseEntity<CommonResponseDTO> reserveClass(@AuthenticationPrincipal CustomUserDetails userDetails, @PathVariable String uuid) {
         if (userDetails == null) {

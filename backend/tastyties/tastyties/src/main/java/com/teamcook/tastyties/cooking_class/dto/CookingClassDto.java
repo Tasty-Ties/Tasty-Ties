@@ -36,6 +36,8 @@ public class CookingClassDto {
     private LocalDateTime replayEndTime;
 
     private boolean isUserEnrolled;
+    private boolean isHost;
+
     private long reservedCount;
 
     private Set<UserProfileForClassDetailDTO> userProfiles;

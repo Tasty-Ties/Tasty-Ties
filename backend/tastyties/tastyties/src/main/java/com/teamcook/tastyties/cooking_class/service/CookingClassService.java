@@ -149,12 +149,15 @@ public class CookingClassService {
         CookingClass cc = cookingClassRepository.findWithUuid(uuid);
 
         boolean isEnrolledClass = false;
+        boolean isHost = false;
         long enrolledCount = uAndcRepository.countQuota(cc);
         Set<UserProfileForClassDetailDTO> userEnrolledInClass = null;
+
         if (userDetails != null) {
             User user = userDetails.user();
             isEnrolledClass = uAndcRepository.isUserEnrolledInClass(user, cc);
             userEnrolledInClass = uAndcRepository.findUserEnrolledInClass(cc);
+            isHost = (user.getUsername().equals(cc.getHost().getUsername()));
         }
 
         Set<IngredientDto> ingredientDtos = mapToIngredientDtos(cc.getIngredients());
@@ -169,8 +172,8 @@ public class CookingClassService {
                 cc.getLanguageCode(), cc.getLanguageName(), cc.getLevel(), cc.getCookingClassStartTime(),
                 cc.getCookingClassEndTime(), cc.getDishCookingTime(), ingredientDtos,
                 recipeDtos, cookingTools, cc.getQuota(),
-                cc.getReplayEndTime(), isEnrolledClass, enrolledCount,
-                userEnrolledInClass
+                cc.getReplayEndTime(), isEnrolledClass, isHost,
+                enrolledCount, userEnrolledInClass
         );
     }
 
