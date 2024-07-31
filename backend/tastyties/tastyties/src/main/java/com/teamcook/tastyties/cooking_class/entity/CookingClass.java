@@ -34,7 +34,11 @@ public class CookingClass {
     @NotNull @Column(nullable = false)
     private String languageCode;
     @NotNull @Column(nullable = false)
+    private String languageName;
+    @NotNull @Column(nullable = false)
     private String countryCode;
+    @NotNull @Column(nullable = false)
+    private String countryName;
 
     @NotNull @Column(nullable = false)
     private String title;

@@ -3,6 +3,8 @@ package com.teamcook.tastyties.cooking_class.repository;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.teamcook.tastyties.common.dto.QCountryProfileDto;
+import com.teamcook.tastyties.common.entity.QCountry;
 import com.teamcook.tastyties.cooking_class.dto.*;
 import com.teamcook.tastyties.cooking_class.entity.CookingClass;
 import com.teamcook.tastyties.cooking_class.entity.CookingClassTag;
@@ -14,6 +16,7 @@ import org.springframework.data.support.PageableExecutionUtils;
 
 import java.util.List;
 
+import static com.teamcook.tastyties.common.entity.QCountry.country;
 import static com.teamcook.tastyties.cooking_class.entity.QCookingClass.cookingClass;
 import static com.teamcook.tastyties.cooking_class.entity.QCookingClassTag.cookingClassTag;
 import static com.teamcook.tastyties.user.entity.QUser.user;
@@ -49,9 +52,14 @@ public class CookingClassRepositoryImpl implements CookingClassCustomRepository 
                         cookingClass.cookingClassStartTime.as("startTime"),
                         cookingClass.cookingClassEndTime.as("endTime"),
                         user.nickname.as("hostName"),
-                        cookingClass.uuid))
+                        cookingClass.uuid,
+                        new QCountryProfileDto(
+                                country.alpha2,
+                                country.countryImageUrl
+                        )))
                 .from(cookingClass)
                 .leftJoin(cookingClass.host, user)
+                .leftJoin(user.country, country)
                 .where(
                         titleLike(condition.getTitle()),
                         usernameEq(condition.getUsername())

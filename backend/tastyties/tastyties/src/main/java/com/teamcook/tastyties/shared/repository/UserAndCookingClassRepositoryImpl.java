@@ -7,13 +7,17 @@ import com.teamcook.tastyties.cooking_class.dto.QCookingClassListDto;
 import com.teamcook.tastyties.cooking_class.entity.CookingClass;
 import com.teamcook.tastyties.cooking_class.entity.QCookingClass;
 import com.teamcook.tastyties.shared.entity.UserAndCookingClass;
+import com.teamcook.tastyties.user.dto.QUserProfileForClassDetailDTO;
+import com.teamcook.tastyties.user.dto.UserProfileForClassDetailDTO;
 import com.teamcook.tastyties.user.entity.QUser;
 import com.teamcook.tastyties.user.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static com.teamcook.tastyties.cooking_class.entity.QCookingClass.cookingClass;
 import static com.teamcook.tastyties.shared.entity.QUserAndCookingClass.userAndCookingClass;
@@ -56,6 +60,19 @@ public class UserAndCookingClassRepositoryImpl implements UserAndCookingClassCus
     }
 
     @Override
+    public Set<UserProfileForClassDetailDTO> findUserEnrolledInClass(CookingClass cookingClass) {
+        return new HashSet<>(queryFactory
+                .select(new QUserProfileForClassDetailDTO(
+                        user.profileImageUrl,
+                        user.nickname,
+                        user.username))
+                .from(userAndCookingClass)
+                .join(userAndCookingClass.user, user)
+                .where(userAndCookingClass.cookingClass.eq(cookingClass))
+                .fetch());
+    }
+
+    @Override
     public boolean deleteReservation(User user, CookingClass cookingClass) {
         long row = queryFactory
                 .delete(userAndCookingClass)
@@ -77,7 +94,7 @@ public class UserAndCookingClassRepositoryImpl implements UserAndCookingClassCus
                         cookingClass.cookingClassStartTime.as("startTime"),
                         cookingClass.cookingClassEndTime.as("endTime"),
                         user.nickname.as("hostName"),
-                        cookingClass.uuid))
+                        cookingClass.uuid, null))
                 .from(userAndCookingClass)
                 .join(userAndCookingClass.cookingClass, cookingClass)
                 .join(userAndCookingClass.user, user)

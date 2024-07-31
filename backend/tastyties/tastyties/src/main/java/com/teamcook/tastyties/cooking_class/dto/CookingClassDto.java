@@ -1,6 +1,7 @@
 package com.teamcook.tastyties.cooking_class.dto;
 
 import com.querydsl.core.annotations.QueryProjection;
+import com.teamcook.tastyties.user.dto.UserProfileForClassDetailDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,9 +20,11 @@ public class CookingClassDto {
     private String dishName;
     private boolean isLimitedAge;
     private String countryCode;
+    private String countryName;
     private Set<String> cookingClassTags;
     private String description;
     private String languageCode;
+    private String languageName;
     private int level;
     private LocalDateTime cookingClassStartTime;
     private LocalDateTime cookingClassEndTime;
@@ -34,4 +37,6 @@ public class CookingClassDto {
 
     private boolean isUserEnrolled;
     private long reservedCount;
+
+    private Set<UserProfileForClassDetailDTO> userProfiles;
 }
