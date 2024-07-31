@@ -1,8 +1,28 @@
+import VideoComponent from "../components/LiveClass/VideoComponent";
+import { useEffect } from "react";
+
 const LiveClass = () => {
+  useEffect(() => {
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, []);
+
+  const flexbox = {
+    display: "flex",
+  };
+  const vid = {
+    width: "75%",
+    height: "device-height",
+  };
+
   return (
-    <>
-      <h1>Live Class 페이지입니다.</h1>
-    </>
+    <div style={flexbox}>
+      <div style={vid}>
+        <VideoComponent />
+      </div>
+    </div>
   );
 };
 
