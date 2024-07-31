@@ -11,4 +11,5 @@ public class CountryResponseDTO {
     private String countryCode;
     private String englishName;
     private String koreanName;
+    private String countryImageUrl;
 }

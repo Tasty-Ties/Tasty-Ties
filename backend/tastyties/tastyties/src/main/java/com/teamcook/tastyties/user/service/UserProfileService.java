@@ -48,11 +48,13 @@ public class UserProfileService {
 
         List<CountryResponseDTO> collectedFlags = user.getUserAndCountries().stream()
                 .map(uc -> new CountryResponseDTO(uc.getCountry().getAlpha2(),
-                        uc.getCountry().getEnglishName(), uc.getCountry().getKoreanName()))
+                        uc.getCountry().getEnglishName(), uc.getCountry().getKoreanName()
+                ,uc.getCountry().getCountryImageUrl()))
                 .toList();
 
         return new UserProfileDTO(null, user.getNickname(),
-                new CountryResponseDTO(country.getAlpha2(), country.getEnglishName(), country.getKoreanName()),
+                new CountryResponseDTO(country.getAlpha2(), country.getEnglishName(),
+                        country.getKoreanName(), country.getCountryImageUrl()),
                 collectedFlags,
                 new LanguageResponseDTO(language.getAlpha2(), language.getEnglish(), language.getKorean()),
                 user.getEmail(), user.getBirth(), 0,

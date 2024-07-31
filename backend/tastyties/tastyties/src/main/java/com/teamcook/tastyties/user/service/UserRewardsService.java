@@ -7,11 +7,13 @@ import com.teamcook.tastyties.shared.entity.UserAndCountry;
 import com.teamcook.tastyties.shared.repository.UserAndCountryRepository;
 import com.teamcook.tastyties.user.entity.User;
 import com.teamcook.tastyties.user.exception.CountryNotFoundException;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.Map;
 
+@Service
 public class UserRewardsService {
 
     private final CountryRepository countryRepository;
@@ -40,7 +42,7 @@ public class UserRewardsService {
         }
 
         result.put("country", new CountryResponseDTO(country.getAlpha2(), country.getEnglishName(),
-                country.getKoreanName()));
+                country.getKoreanName(), country.getCountryImageUrl()));
         return result;
     }
 

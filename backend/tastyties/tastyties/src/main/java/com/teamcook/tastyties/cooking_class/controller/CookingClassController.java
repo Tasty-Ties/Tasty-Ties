@@ -33,6 +33,7 @@ public class CookingClassController {
         this.cookingClassService = cookingClassService;
     }
 
+    // 클래스 등록
     @PostMapping
     public ResponseEntity<CommonResponseDTO> registerClass(@AuthenticationPrincipal CustomUserDetails userDetails, @RequestBody final CookingClassDto registerDto) {
         if (userDetails == null) {
@@ -58,6 +59,7 @@ public class CookingClassController {
                         .build());
     }
 
+    // 클래스 목록 조회
     @GetMapping
     public ResponseEntity<CommonResponseDTO> getClasses(@ModelAttribute CookingClassSearchCondition searchCondition, Pageable pageable) {
         Page<CookingClassListDto> classList = cookingClassService.searchCookingClassList(searchCondition, pageable);
@@ -69,6 +71,7 @@ public class CookingClassController {
                         .build());
     }
 
+    // 클래스 상세 조회
     @GetMapping("/{uuid}")
     public ResponseEntity<CommonResponseDTO> getClassDetail(@AuthenticationPrincipal CustomUserDetails userDetails, @PathVariable String uuid) {
 
@@ -81,11 +84,13 @@ public class CookingClassController {
                         .build());
     }
 
+    // 클래스 삭제
     @DeleteMapping("/{uuid}")
     public ResponseEntity<CommonResponseDTO> deleteClass(@AuthenticationPrincipal CustomUserDetails userDetails, @PathVariable String uuid) {
         return null;
     }
 
+    // 클래스 예약
     @PostMapping("/reservation/{uuid}")
     public ResponseEntity<CommonResponseDTO> reserveClass(@AuthenticationPrincipal CustomUserDetails userDetails, @PathVariable String uuid) {
         if (userDetails == null) {
@@ -106,6 +111,7 @@ public class CookingClassController {
                         .build());
     }
 
+    // 클래스 예약 취소
     @DeleteMapping("/reservation/{uuid}")
     public ResponseEntity<CommonResponseDTO> deleteReservation(@AuthenticationPrincipal CustomUserDetails userDetails, @PathVariable String uuid) {
         if (userDetails == null) {

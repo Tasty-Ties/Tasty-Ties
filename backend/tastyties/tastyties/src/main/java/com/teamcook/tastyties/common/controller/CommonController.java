@@ -37,7 +37,7 @@ public class CommonController {
         for (Country country : countryList) {
             countryResponseDTOList.add(new CountryResponseDTO(
                     country.getAlpha2(), country.getEnglishName(),
-                    country.getKoreanName()));
+                    country.getKoreanName(), country.getCountryImageUrl()));
 //            System.out.println("countryCode = " + countryCode + ", Country name= " + locale.getDisplayCountry());
         }
         Map<String, List<CountryResponseDTO>> map = new HashMap<>();
