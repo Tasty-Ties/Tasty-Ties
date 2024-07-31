@@ -37,6 +37,11 @@ public class RabbitMQProducer {
         );
     }
 
+    public void send(RabbitMQRequestDTO rabbitMQRequestDTO) {
+        RabbitMQRequestType type = rabbitMQRequestDTO.getType();
+        rabbitTemplate.convertAndSend(exchange, routingKeys.get(type.getType()), rabbitMQRequestDTO);
+    }
+
     public Map<String, String> sendAndReceive(RabbitMQRequestDTO rabbitMQRequestDto) {
         RabbitMQRequestType type = rabbitMQRequestDto.getType();
 
