@@ -2,6 +2,8 @@ package com.teamcook.tastyties.shared.repository;
 
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.teamcook.tastyties.common.dto.QCountryProfileDto;
+import com.teamcook.tastyties.common.entity.QCountry;
 import com.teamcook.tastyties.cooking_class.dto.CookingClassListDto;
 import com.teamcook.tastyties.cooking_class.dto.QCookingClassListDto;
 import com.teamcook.tastyties.cooking_class.entity.CookingClass;
@@ -19,6 +21,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static com.teamcook.tastyties.common.entity.QCountry.country;
 import static com.teamcook.tastyties.cooking_class.entity.QCookingClass.cookingClass;
 import static com.teamcook.tastyties.shared.entity.QUserAndCookingClass.userAndCookingClass;
 import static com.teamcook.tastyties.user.entity.QUser.user;
@@ -88,16 +91,24 @@ public class UserAndCookingClassRepositoryImpl implements UserAndCookingClassCus
 
     @Override
     public Page<CookingClassListDto> findReservedClassesByUserId(int userId, Pageable pageable) {
+        QUser host = new QUser("host");
+
         List<CookingClassListDto> results = queryFactory
                 .select(new QCookingClassListDto(
                         cookingClass.title,
                         cookingClass.cookingClassStartTime.as("startTime"),
                         cookingClass.cookingClassEndTime.as("endTime"),
-                        user.nickname.as("hostName"),
-                        cookingClass.uuid, null))
+                        host.nickname.as("hostName"),
+                        cookingClass.uuid,
+                        new QCountryProfileDto(
+                                country.alpha2,
+                                country.countryImageUrl
+                        )))
                 .from(userAndCookingClass)
                 .join(userAndCookingClass.cookingClass, cookingClass)
                 .join(userAndCookingClass.user, user)
+                .join(cookingClass.host, host)
+                .leftJoin(host.country, country)
                 .where(userAndCookingClass.user.userId.eq(userId))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())

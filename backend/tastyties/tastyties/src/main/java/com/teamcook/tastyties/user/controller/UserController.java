@@ -128,4 +128,18 @@ public class UserController {
                         .data(reservedClasses)
                         .build());
     }
+
+    @GetMapping("/me/hosting")
+    public ResponseEntity<CommonResponseDTO> getHostingClass(@AuthenticationPrincipal CustomUserDetails userDetails, Pageable pageable) {
+        if (userDetails == null) {
+            throw new UserDetailsNotFoundException("인증 정보를 찾을 수 없습니다.");
+        }
+        Page<CookingClassListDto> hostingClasses = userProfileService.getHostingClasses(userDetails.getUserId(), pageable);
+        return ResponseEntity.ok()
+                .body(CommonResponseDTO.builder()
+                        .stateCode(200)
+                        .message("수업할 클래스가 정상적으로 조회되었습니다.")
+                        .data(hostingClasses)
+                        .build());
+    }
 }

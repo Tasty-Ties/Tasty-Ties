@@ -5,6 +5,7 @@ import com.teamcook.tastyties.common.dto.LanguageResponseDTO;
 import com.teamcook.tastyties.common.entity.Country;
 import com.teamcook.tastyties.common.entity.Language;
 import com.teamcook.tastyties.cooking_class.dto.CookingClassListDto;
+import com.teamcook.tastyties.cooking_class.repository.CookingClassRepository;
 import com.teamcook.tastyties.shared.repository.UserAndCookingClassRepository;
 import com.teamcook.tastyties.shared.repository.UserAndCountryRepository;
 import com.teamcook.tastyties.user.dto.UserProfileDTO;
@@ -26,13 +27,15 @@ public class UserProfileService {
     private final UserRepository userRepository;
     private final UserAndCountryRepository userAndCountryRepository;
     private final UserAndCookingClassRepository userAndClassRepository;
+    private final CookingClassRepository cookingClassRepository;
 
     @Autowired
     public UserProfileService(UserRepository userRepository, UserAndCountryRepository userAndCountryRepository,
-                              UserAndCookingClassRepository userAndClassRepository) {
+                              UserAndCookingClassRepository userAndClassRepository, CookingClassRepository cookingClassRepository) {
         this.userRepository = userRepository;
         this.userAndCountryRepository = userAndCountryRepository;
         this.userAndClassRepository = userAndClassRepository;
+        this.cookingClassRepository = cookingClassRepository;
     }
 
     @Transactional
@@ -60,5 +63,10 @@ public class UserProfileService {
     @Transactional
     public Page<CookingClassListDto> getReservedClasses(int userId, Pageable pageable) {
         return userAndClassRepository.findReservedClassesByUserId(userId, pageable);
+    }
+
+    @Transactional
+    public Page<CookingClassListDto> getHostingClasses(int hostId, Pageable pageable) {
+        return cookingClassRepository.searchClassByHostId(hostId, pageable);
     }
 }

@@ -104,4 +104,34 @@ public class CookingClassRepositoryImpl implements CookingClassCustomRepository 
                 .fetchOne();
     }
 
+    @Override
+    public Page<CookingClassListDto> searchClassByHostId(int hostId, Pageable pageable) {
+        List<CookingClassListDto> results = queryFactory
+                .select(new QCookingClassListDto(
+                        cookingClass.title,
+                        cookingClass.cookingClassStartTime.as("startTime"),
+                        cookingClass.cookingClassEndTime.as("endTime"),
+                        user.nickname.as("hostName"),
+                        cookingClass.uuid,
+                        new QCountryProfileDto(
+                                country.alpha2,
+                                country.countryImageUrl
+                        )
+                ))
+                .from(cookingClass)
+                .leftJoin(cookingClass.host, user)
+                .leftJoin(user.country, country)
+                .where(cookingClass.host.userId.eq(hostId))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        JPAQuery<Long> countQuery = queryFactory
+                .select(cookingClass.count())
+                .from(cookingClass)
+                .where(cookingClass.host.userId.eq(hostId));
+
+        return PageableExecutionUtils.getPage(results, pageable, countQuery::fetchOne);
+    }
+
 }
