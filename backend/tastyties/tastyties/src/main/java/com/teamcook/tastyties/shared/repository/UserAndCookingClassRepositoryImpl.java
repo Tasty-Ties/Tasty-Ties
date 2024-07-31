@@ -120,4 +120,18 @@ public class UserAndCookingClassRepositoryImpl implements UserAndCookingClassCus
 
         return PageableExecutionUtils.getPage(results, pageable, countQuery::fetchOne);
     }
+
+    // 예약정보 조회
+    @Override
+    public UserAndCookingClass findReservationByUsernameAndClassUuid(int userId, String uuid) {
+        return queryFactory
+                .selectFrom(userAndCookingClass)
+                .join(userAndCookingClass.user, user)
+                .join(userAndCookingClass.cookingClass, cookingClass)
+                .where(
+                        userAndCookingClass.user.userId.eq(userId),
+                        cookingClass.uuid.eq(uuid)
+                )
+                .fetchOne();
+    }
 }

@@ -4,6 +4,7 @@ import com.teamcook.tastyties.cooking_class.dto.*;
 import com.teamcook.tastyties.cooking_class.entity.*;
 import com.teamcook.tastyties.cooking_class.exception.ClassIsDeletedException;
 import com.teamcook.tastyties.cooking_class.exception.ClassNotFoundException;
+import com.teamcook.tastyties.cooking_class.exception.ReservationNotFoundException;
 import com.teamcook.tastyties.cooking_class.repository.*;
 import com.teamcook.tastyties.security.userdetails.CustomUserDetails;
 import com.teamcook.tastyties.shared.entity.CookingClassAndCookingClassTag;
@@ -248,5 +249,17 @@ public class CookingClassService {
 
     private void deleteUserAndCookingClassRelationship(User user, CookingClass cc) {
         userAndCookingClassRepository.deleteReservation(user, cc);
+    }
+
+    @Transactional
+    public void saveReview(CustomUserDetails userDetails, ReviewRequestDto reviewRequestDto) {
+        UserAndCookingClass reservation = userAndCookingClassRepository.findReservationByUsernameAndClassUuid(
+                userDetails.getUserId(), reviewRequestDto.getUuid());
+
+        if (reservation == null) {
+            throw new ReservationNotFoundException("예약 정보를 찾을 수 없습니다.");
+        }
+
+        reservation.setCookingClassReview(reviewRequestDto.getComment());
     }
 }

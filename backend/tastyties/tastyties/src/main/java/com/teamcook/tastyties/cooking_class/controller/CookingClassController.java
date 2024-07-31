@@ -132,7 +132,12 @@ public class CookingClassController {
     public ResponseEntity<CommonResponseDto> submitReview(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestBody ReviewRequestDto reviewRequestDto) {
-
-        return null;
+        cookingClassService.saveReview(userDetails, reviewRequestDto);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(CommonResponseDto.builder()
+                        .stateCode(201)
+                        .message("리뷰가 작성되었습니다.")
+                        .data(reviewRequestDto)
+                        .build());
     }
 }
