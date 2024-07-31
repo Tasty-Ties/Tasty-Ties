@@ -1,6 +1,7 @@
 package com.teamcook.tastytieschat.chat.service;
 
 import com.teamcook.tastytieschat.chat.dto.RabbitMQRequestDTO;
+import com.teamcook.tastytieschat.chat.dto.UserDTO;
 import com.teamcook.tastytieschat.chat.entity.ChatRoom;
 import com.teamcook.tastytieschat.chat.exception.ChatRoomNotExistException;
 import com.teamcook.tastytieschat.chat.repository.ChatRoomRepository;
@@ -72,6 +73,24 @@ public class RabbitMQConsumerImpl implements RabbitMQConsumer {
             chatRoomRepository.delete(chatRoom);
         } else {
             log.error("Error deleting chat room: chat room does not exist.");
+        }
+    }
+
+    @Override
+    public void enterChatRoom(RabbitMQRequestDTO rabbitMQRequestDto) {
+        String chatRoomId = rabbitMQRequestDto.getChatRoomId();
+        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId).orElse(null);
+
+        if (chatRoom != null) {
+            UserDTO userDto = rabbitMQRequestDto.getUser();
+            if (chatRoom.getUsers().contains(userDto)) {
+                log.error("Error entering chat room: user already exists.");
+            }
+
+            chatRoom.getUsers().add(userDto);
+            chatRoomRepository.save(chatRoom);
+        } else {
+            log.error("Error entering chat room: chat room does not exist.");
         }
     }
 
