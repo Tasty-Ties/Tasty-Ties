@@ -94,4 +94,21 @@ public class RabbitMQConsumerImpl implements RabbitMQConsumer {
         }
     }
 
+    @Override
+    public void leaveChatRoom(RabbitMQRequestDTO rabbitMQRequestDto) {
+        String chatRoomId = rabbitMQRequestDto.getChatRoomId();
+        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId).orElse(null);
+
+        if (chatRoom != null) {
+            int userId = rabbitMQRequestDto.getUser().getId();
+            if (chatRoom.isContainedUser(userId)) {
+                String removedUserNickname = chatRoom.removeUser(userId);
+
+                chatRoomRepository.save(chatRoom);
+            }
+        } else {
+            log.error("Error leaving chat room: chat room does not exist.");
+        }
+    }
+
 }

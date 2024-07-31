@@ -9,5 +9,6 @@ public interface RabbitMQConsumer {
     void createChatRoom(RabbitMQRequestDTO rabbitMQRequestDto, Message message);
     void deleteChatRoom(RabbitMQRequestDTO rabbitMQRequestDto);
     void enterChatRoom(RabbitMQRequestDTO rabbitMQRequestDto);
+    void leaveChatRoom(RabbitMQRequestDTO rabbitMQRequestDto);
 
 }
