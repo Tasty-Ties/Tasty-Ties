@@ -1,4 +1,5 @@
 import VideoComponent from "../components/LiveClass/VideoComponent";
+import ChatComponent from "../components/LiveClass/ChatComponent";
 import { useEffect } from "react";
 
 const LiveClass = () => {
@@ -21,6 +22,9 @@ const LiveClass = () => {
     <div style={flexbox}>
       <div style={vid}>
         <VideoComponent />
+      </div>
+      <div>
+        <ChatComponent />
       </div>
     </div>
   );
