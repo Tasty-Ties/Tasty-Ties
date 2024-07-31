@@ -1,9 +1,18 @@
 package com.teamcook.tastytieschat.chat.service;
 
+import com.teamcook.tastytieschat.chat.dto.ChatMessageResponseDTO;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.Base64;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+@Slf4j
 @Service
 public class VoiceChatServiceImpl implements VoiceChatService {
 
@@ -42,5 +51,19 @@ public class VoiceChatServiceImpl implements VoiceChatService {
             assembledData.append(chunk);
         }
         return assembledData.toString();
+    }
+
+    @Override
+    public String getConvertedString(String fullData) throws IOException {
+        // Base64 디코딩
+        byte[] decodedBytes = Base64.getDecoder().decode(fullData);
+        UUID uuid = UUID.randomUUID();
+        //mp3 파일 만들어서 저장하기
+        String filePath = "./" + uuid + ".mp3";
+
+        OutputStream os = new FileOutputStream(filePath);
+        os.write(decodedBytes);
+
+        return filePath;
     }
 }

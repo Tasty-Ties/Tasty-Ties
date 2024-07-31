@@ -16,6 +16,7 @@ import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
 
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Base64;
 import java.util.Map;
@@ -77,25 +78,15 @@ public class ChatMessageController {
 
     @MessageMapping("/chat/voice/rooms/{roomId}")
     @SendTo("/sub/chat/rooms/{roomId}")
-    public ChatMessageResponseDTO processVoice(@DestinationVariable String roomId, @Payload VoiceChatRequestDTO voiceChatRequestDTO) {
+    public ChatMessageResponseDTO processVoice(@DestinationVariable String roomId, @Payload VoiceChatRequestDTO voiceChatRequestDTO) throws IOException {
         voiceChatServiceImpl.storeChunk(roomId, voiceChatRequestDTO.getUserId(), voiceChatRequestDTO.getChunkIndex(), voiceChatRequestDTO.getTotalChunks(), voiceChatRequestDTO.getFileContent());
         if (voiceChatServiceImpl.isComplete(roomId, voiceChatRequestDTO.getUserId())) {
             //청크 재조립
             String fullData = voiceChatServiceImpl.assembleChunks(roomId, voiceChatRequestDTO.getUserId());
-            try {
-                // Base64 디코딩
-                byte[] decodedBytes = Base64.getDecoder().decode(fullData);
-                //mp3 파일 만들어서 저장하기
-                String filePath = "./" + roomId + "_" + voiceChatRequestDTO.getUserId() + ".mp3";
-                try (OutputStream os = new FileOutputStream(filePath)) {
-                    os.write(decodedBytes);
-                }
-                log.info("파일이 저장되었습니다: " + filePath);
-                return new ChatMessageResponseDTO();
-            } catch (Exception e) {
-                e.printStackTrace();
-                return new ChatMessageResponseDTO(); // 실패 시 빈 응답 또는 오류 응답 생성
-            }
+            String convertedString = voiceChatServiceImpl.getConvertedString(fullData);
+
+            //번역
+
         }
         return new ChatMessageResponseDTO();
     }
