@@ -3,7 +3,6 @@ package com.teamcook.tastytieschat.chat.service;
 import com.teamcook.tastytieschat.chat.dto.RabbitMQRequestDTO;
 import com.teamcook.tastytieschat.chat.dto.UserDTO;
 import com.teamcook.tastytieschat.chat.entity.ChatRoom;
-import com.teamcook.tastytieschat.chat.exception.ChatRoomNotExistException;
 import com.teamcook.tastytieschat.chat.repository.ChatRoomRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
