@@ -11,6 +11,7 @@ import com.teamcook.tastyties.common.entity.QCountry;
 import com.teamcook.tastyties.cooking_class.dto.*;
 import com.teamcook.tastyties.cooking_class.entity.CookingClass;
 import com.teamcook.tastyties.cooking_class.entity.CookingClassTag;
+import com.teamcook.tastyties.cooking_class.entity.QCookingClass;
 import com.teamcook.tastyties.shared.entity.QCookingClassAndCookingClassTag;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +27,7 @@ import java.util.Set;
 import static com.teamcook.tastyties.common.entity.QCountry.country;
 import static com.teamcook.tastyties.cooking_class.entity.QCookingClass.cookingClass;
 import static com.teamcook.tastyties.cooking_class.entity.QCookingClassTag.cookingClassTag;
+import static com.teamcook.tastyties.shared.entity.QUserAndCookingClass.userAndCookingClass;
 import static com.teamcook.tastyties.user.entity.QUser.user;
 import static org.springframework.util.StringUtils.hasText;
 
@@ -249,6 +251,27 @@ public class CookingClassRepositoryImpl implements CookingClassCustomRepository 
                 .set(cookingClass.sessionId, sessionId)
                 .where(cookingClass.uuid.eq(uuid))
                 .execute();
+    }
+
+    @Override
+    public boolean isCookingClassGuest(Integer userId, String uuid) {
+        Long count = queryFactory
+                .select(userAndCookingClass.count())
+                .from(userAndCookingClass)
+                .leftJoin(userAndCookingClass.cookingClass, cookingClass)
+                .where(cookingClass.uuid.eq(uuid)
+                        .and(userAndCookingClass.user.userId.eq(userId)))
+                .fetchOne();
+        return count != null && count > 0;
+    }
+
+    @Override
+    public String findSessionIdWidthUuid(String uuid) {
+        CookingClass cookingClass = queryFactory
+                .selectFrom(QCookingClass.cookingClass)
+                .where(QCookingClass.cookingClass.uuid.eq(uuid))
+                .fetchOne();
+        return cookingClass != null ? cookingClass.getSessionId() : null;
     }
 
 }

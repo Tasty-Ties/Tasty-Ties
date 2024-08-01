@@ -26,12 +26,24 @@ public class LiveCookingClassController {
     @PostMapping("/create/{uuid}")
     public ResponseEntity<CommonResponseDto> initializeSession(@AuthenticationPrincipal CustomUserDetails userDetails, @PathVariable String uuid)
             throws OpenViduJavaClientException, OpenViduHttpException, AccessDeniedException {
-        String sessionId = liveCookingClassService.getLiveSessionId(userDetails.getUserId(), uuid);
+        String sessionId = liveCookingClassService.createAndAssignLiveSession(userDetails.getUserId(), uuid);
         liveCookingClassService.updateSessionIdByCookingClassId(sessionId, uuid);
 
         return ResponseEntity.ok()
                 .body(CommonResponseDto.builder()
                         .stateCode(201)
+                        .message("정상적으로 조회되었습니다.")
+                        .data(sessionId)
+                        .build());
+    }
+
+    @GetMapping("/join/{uuid}")
+    public ResponseEntity<CommonResponseDto> joinSession(@AuthenticationPrincipal CustomUserDetails userDetails, @PathVariable String uuid) throws AccessDeniedException {
+        String sessionId = liveCookingClassService.getLiveSessionIdForGuest(userDetails.getUserId(), uuid);
+
+        return ResponseEntity.ok()
+                .body(CommonResponseDto.builder()
+                        .stateCode(200)
                         .message("정상적으로 조회되었습니다.")
                         .data(sessionId)
                         .build());
@@ -46,14 +58,15 @@ public class LiveCookingClassController {
     public ResponseEntity<String> createConnection(@PathVariable("sessionId") String sessionId,
                                                    @RequestBody(required = false) Map<String, Object> params)
             throws OpenViduJavaClientException, OpenViduHttpException {
-//        System.out.println("sessionId = " + sessionId);
-//        System.out.println("커넥션 생성");
 //        Session session = openvidu.getActiveSession(sessionId);
 //        if (session == null) {
 //            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 //        }
 //        ConnectionProperties properties = ConnectionProperties.fromJson(params).build();
 //        Connection connection = session.createConnection(properties);
+//
+//        String token = liveCookingClassService.getLiveToken();
+//
 //        return new ResponseEntity<>(connection.getToken(), HttpStatus.OK);
         return null;
     }

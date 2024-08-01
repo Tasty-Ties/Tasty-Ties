@@ -2,6 +2,7 @@ package com.teamcook.tastyties.cooking_class.service;
 
 import com.teamcook.tastyties.cooking_class.repository.*;
 import com.teamcook.tastyties.exception.CookingClassNotFoundException;
+import com.teamcook.tastyties.exception.LiveClassNotFoundException;
 import io.openvidu.java.client.*;
 import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
@@ -40,9 +41,9 @@ public class LiveCookingClassService {
         this.ccRepository = ccRepository;
     }
 
-    public String getLiveSessionId(Integer userId, String uuid)
+    public String createAndAssignLiveSession(Integer userId, String uuid)
             throws OpenViduJavaClientException, OpenViduHttpException, AccessDeniedException {
-        if (ccRepository.findWithUuid(uuid) == null) {
+        if (uuid != null && ccRepository.findWithUuid(uuid) == null) {
             throw new CookingClassNotFoundException("해당 쿠킹 클래스가 존재하지 않습니다.");
         }
         if (!ccRepository.isCookingClassHost(userId, uuid)) {
@@ -58,4 +59,29 @@ public class LiveCookingClassService {
     public void updateSessionIdByCookingClassId(String sessionId, String uuid) {
         ccRepository.updateSessionIdByCookingClassId(sessionId, uuid);
     }
+
+    public String getLiveSessionIdForGuest(Integer userId, String uuid) throws AccessDeniedException {
+        if (uuid != null && ccRepository.findWithUuid(uuid) == null) {
+            throw new CookingClassNotFoundException("해당 쿠킹 클래스가 존재하지 않습니다.");
+        }
+        if (!ccRepository.isCookingClassGuest(userId, uuid)) {
+            throw new AccessDeniedException("게스트가 아닙니다.");
+        }
+        String sessionId = ccRepository.findSessionIdWidthUuid(uuid);
+        if (sessionId == null) {
+            throw new LiveClassNotFoundException("아직 클래스가 생성되지 않았습니다.");
+        }
+        return sessionId;
+    }
+
+//    public String getLiveToken(String userId, String uuid, String sessionId) {
+//        Session session = openvidu.getActiveSession(sessionId);
+//        if (session == null) {
+//            return new LiveClassNotFoundException("아직 클래스가 생성되지 않았습니다.");
+//        }
+//        ConnectionProperties properties = ConnectionProperties.fromJson(params).build();
+//        Connection connection = session.createConnection(properties);
+//    }
+
+
 }
