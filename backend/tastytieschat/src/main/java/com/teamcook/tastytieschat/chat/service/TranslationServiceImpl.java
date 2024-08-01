@@ -1,12 +1,12 @@
-package com.teamcook.tastytieschat.translation.service;
+package com.teamcook.tastytieschat.chat.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.teamcook.tastytieschat.chat.entity.ChatMessage;
-import com.teamcook.tastytieschat.translation.config.ChatGPTConfig;
-import com.teamcook.tastytieschat.translation.dto.GptRequestDto;
-import com.teamcook.tastytieschat.translation.dto.GptRequestMessageDto;
+import com.teamcook.tastytieschat.common.config.ChatGPTConfig;
+import com.teamcook.tastytieschat.chat.dto.GptRequestDto;
+import com.teamcook.tastytieschat.chat.dto.GptRequestMessageDto;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
