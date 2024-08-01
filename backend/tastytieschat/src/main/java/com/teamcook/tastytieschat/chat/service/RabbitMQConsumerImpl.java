@@ -1,5 +1,6 @@
 package com.teamcook.tastytieschat.chat.service;
 
+import com.teamcook.tastytieschat.chat.constant.RabbitMQRequestType;
 import com.teamcook.tastytieschat.chat.dto.RabbitMQRequestDTO;
 import com.teamcook.tastytieschat.chat.dto.UserDTO;
 import com.teamcook.tastytieschat.chat.entity.ChatRoom;
@@ -40,6 +41,10 @@ public class RabbitMQConsumerImpl implements RabbitMQConsumer {
             key = "${rabbitmq.routing.key.create}"
     ))
     public void createChatRoom(RabbitMQRequestDTO rabbitMQRequestDto, Message message) {
+        if (rabbitMQRequestDto.getType() != RabbitMQRequestType.CREATE) {
+            return;
+        }
+
         ChatRoom chatRoom = new ChatRoom(rabbitMQRequestDto.getTitle(), rabbitMQRequestDto.getUser());
         chatRoomRepository.save(chatRoom);
 
@@ -65,6 +70,10 @@ public class RabbitMQConsumerImpl implements RabbitMQConsumer {
             key = "${rabbitmq.routing.key.delete}"
     ))
     public void deleteChatRoom(RabbitMQRequestDTO rabbitMQRequestDto) {
+        if (rabbitMQRequestDto.getType() != RabbitMQRequestType.DELETE) {
+            return;
+        }
+
         String chatRoomId = rabbitMQRequestDto.getChatRoomId();
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId).orElse(null);
 
@@ -77,6 +86,10 @@ public class RabbitMQConsumerImpl implements RabbitMQConsumer {
 
     @Override
     public void enterChatRoom(RabbitMQRequestDTO rabbitMQRequestDto) {
+        if (rabbitMQRequestDto.getType() != RabbitMQRequestType.JOIN) {
+            return;
+        }
+
         String chatRoomId = rabbitMQRequestDto.getChatRoomId();
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId).orElse(null);
 
@@ -95,6 +108,10 @@ public class RabbitMQConsumerImpl implements RabbitMQConsumer {
 
     @Override
     public void leaveChatRoom(RabbitMQRequestDTO rabbitMQRequestDto) {
+        if (rabbitMQRequestDto.getType() != RabbitMQRequestType.LEAVE) {
+            return;
+        }
+
         String chatRoomId = rabbitMQRequestDto.getChatRoomId();
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId).orElse(null);
 
