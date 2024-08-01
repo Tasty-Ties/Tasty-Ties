@@ -43,7 +43,7 @@ public class CookingClassRepositoryImpl implements CookingClassCustomRepository 
                 .fetchOne();
     }
 
-    // 제목, 호스트name을 통한 검색목록 반환
+    // 클래스 목록 검색
     // 동적 쿼리 사용
     @Override
     public Page<CookingClassListDto> searchClass(CookingClassSearchCondition condition, Pageable pageable) {
@@ -56,7 +56,8 @@ public class CookingClassRepositoryImpl implements CookingClassCustomRepository 
                         new QCountryProfileDto(
                                 country.alpha2,
                                 country.countryImageUrl
-                        )))
+                        ), cookingClass.countryCode.eq(country.alpha2)
+                ))
                 .from(cookingClass)
                 .leftJoin(cookingClass.host, user)
                 .leftJoin(user.country, country)
@@ -89,6 +90,7 @@ public class CookingClassRepositoryImpl implements CookingClassCustomRepository 
         return hasText(username) ?user.username.eq(username) : null;
     }
 
+    // 클래스 상세 조회
     @Override
     public CookingClass findWithUuid(String uuid) {
         QCookingClassAndCookingClassTag ccAndTag = QCookingClassAndCookingClassTag.cookingClassAndCookingClassTag;
@@ -117,7 +119,7 @@ public class CookingClassRepositoryImpl implements CookingClassCustomRepository 
                         new QCountryProfileDto(
                                 country.alpha2,
                                 country.countryImageUrl
-                        )
+                        ), cookingClass.countryCode.eq(country.alpha2)
                 ))
                 .from(cookingClass)
                 .leftJoin(cookingClass.host, user)

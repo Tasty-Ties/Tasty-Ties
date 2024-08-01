@@ -101,7 +101,8 @@ public class UserAndCookingClassRepositoryImpl implements UserAndCookingClassCus
                         new QCountryProfileDto(
                                 country.alpha2,
                                 country.countryImageUrl
-                        )))
+                        ), cookingClass.countryCode.eq(country.alpha2)
+                ))
                 .from(userAndCookingClass)
                 .join(userAndCookingClass.cookingClass, cookingClass)
                 .join(userAndCookingClass.user, user)

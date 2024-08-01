@@ -17,15 +17,18 @@ public class CookingClassListDto {
     private String hostName;
     private String uuid;
     private CountryProfileDto countryProfileDto;
+    private boolean isLocal;
 
     @QueryProjection
     public CookingClassListDto(String title, LocalDateTime startTime, LocalDateTime endTime,
-                               String hostName, String uuid, CountryProfileDto countryProfileDto) {
+                               String hostName, String uuid, CountryProfileDto countryProfileDto,
+                               boolean isLocal) {
         this.title = title;
         this.startTime = startTime;
         this.endTime = endTime;
         this.hostName = hostName;
         this.uuid = uuid;
         this.countryProfileDto = countryProfileDto;
+        this.isLocal = isLocal;
     }
 }
