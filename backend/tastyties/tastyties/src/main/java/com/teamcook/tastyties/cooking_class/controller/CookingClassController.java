@@ -9,6 +9,7 @@ import com.teamcook.tastyties.cooking_class.dto.CookingClassDto;
 import com.teamcook.tastyties.cooking_class.dto.CookingClassSearchCondition;
 import com.teamcook.tastyties.cooking_class.dto.ReviewRequestDto;
 import com.teamcook.tastyties.common.constant.RabbitMQRequestType;
+import com.teamcook.tastyties.cooking_class.entity.CookingClass;
 import com.teamcook.tastyties.cooking_class.service.CookingClassService;
 import com.teamcook.tastyties.cooking_class.service.RabbitMQProducer;
 import com.teamcook.tastyties.security.userdetails.CustomUserDetails;
@@ -56,9 +57,22 @@ public class CookingClassController {
         User user = userDetails.user();
         log.debug("userId= {}", user.getUserId());
 
-        CookingClassDto cookingClass = cookingClassService.registerClass(user, registerDto);
+        CookingClass cookingClass = cookingClassService.registerClass(user, registerDto);
 
-        ChatUserDto chatUser = userChatService.getUser(user.getUserId());
+        // TODO: 쿠킹 클래스에 채팅방 ID 저장하기
+        createChatRoom(cookingClass, user.getUserId());
+        registerDto.setChatRoomId(cookingClass.getChatRoomId());
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(CommonResponseDto.builder()
+                        .stateCode(201)
+                        .message("클래스가 정상적으로 등록됐습니다.")
+                        .data(registerDto)
+                        .build());
+    }
+
+    private void createChatRoom(CookingClass cookingClass, int userId) {
+        ChatUserDto chatUser = userChatService.getUser(userId);
 
         RabbitMQRequestDto rabbitMQRequestDto = RabbitMQRequestDto.builder()
                 .type(RabbitMQRequestType.CREATE)
@@ -71,15 +85,9 @@ public class CookingClassController {
                 .build();
         Map<String, String> response = rabbitMQProducer.sendAndReceive(rabbitMQRequestDto);
 
-        // TODO: 쿠킹 클래스에 채팅방 ID 저장하기
-        log.debug("Success creating chat room: " + response.get("chatRoomId"));
+        cookingClass.setChatRoomId(response.get("chatRoomId"));
 
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(CommonResponseDto.builder()
-                        .stateCode(201)
-                        .message("클래스가 정상적으로 등록됐습니다.")
-                        .data(cookingClass)
-                        .build());
+        cookingClassService.saveCookingClassWithChatRoomId(cookingClass);
     }
 
     // 클래스 목록 조회
