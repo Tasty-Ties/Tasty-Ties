@@ -1,10 +1,14 @@
-package com.teamcook.tastyties.common.dto;
+package com.teamcook.tastytieschat.common.dto;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-@Getter @Setter @AllArgsConstructor
+@Getter
+@Setter
+@Builder
+@AllArgsConstructor
 public class CommonResponseDTO {
     private int stateCode;
     private String message;
