@@ -57,6 +57,7 @@ public class CookingClassController {
                 .user(RabbitMQUserDTO.builder()
                         .id(user.getUserId())
                         .nickname(user.getNickname())
+                        .language(user.getLanguageCode())
                         .build())
                 .build();
         Map<String, String> response = rabbitMQProducer.sendAndReceive(rabbitMQRequestDto);
