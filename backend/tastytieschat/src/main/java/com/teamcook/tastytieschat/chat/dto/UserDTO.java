@@ -27,8 +27,4 @@ public class UserDTO {
         return false;
     }
 
-    public void convertToLanguage() {
-        this.language = Language.valueOf(this.language).getName();
-    }
-
 }
