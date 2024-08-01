@@ -3,7 +3,7 @@ package com.teamcook.tastyties.user.dto;
 import lombok.Data;
 
 @Data
-public class UserUpdateDTO {
+public class UserUpdateDto {
     private String nickname;
     private String emailId;
     private String emailDomain;

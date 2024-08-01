@@ -4,12 +4,14 @@ import com.teamcook.tastyties.cooking_class.dto.*;
 import com.teamcook.tastyties.cooking_class.entity.*;
 import com.teamcook.tastyties.cooking_class.exception.ClassIsDeletedException;
 import com.teamcook.tastyties.cooking_class.exception.ClassNotFoundException;
+import com.teamcook.tastyties.cooking_class.exception.ReservationNotFoundException;
 import com.teamcook.tastyties.cooking_class.repository.*;
 import com.teamcook.tastyties.security.userdetails.CustomUserDetails;
 import com.teamcook.tastyties.shared.entity.CookingClassAndCookingClassTag;
 import com.teamcook.tastyties.shared.entity.UserAndCookingClass;
 import com.teamcook.tastyties.shared.repository.CookingClassAndCookingClassTagRepository;
 import com.teamcook.tastyties.shared.repository.UserAndCookingClassRepository;
+import com.teamcook.tastyties.user.dto.UserProfileForClassDetailDto;
 import com.teamcook.tastyties.user.entity.User;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,7 +75,9 @@ public class CookingClassService {
         CookingClass cc = new CookingClass();
         cc.setHost(user);
         cc.setLanguageCode(registerDto.getLanguageCode());
+        cc.setLanguageName(registerDto.getLanguageName());
         cc.setCountryCode(registerDto.getCountryCode());
+        cc.setCountryName(registerDto.getCountryName());
         cc.setTitle(registerDto.getTitle());
         cc.setDescription(registerDto.getDescription());
         cc.setDishName(registerDto.getDishName());
@@ -146,11 +150,15 @@ public class CookingClassService {
         CookingClass cc = cookingClassRepository.findWithUuid(uuid);
 
         boolean isEnrolledClass = false;
-        long enrolledCount = 0;
+        boolean isHost = false;
+        long enrolledCount = uAndcRepository.countQuota(cc);
+        Set<UserProfileForClassDetailDto> userEnrolledInClass = null;
+
         if (userDetails != null) {
             User user = userDetails.user();
             isEnrolledClass = uAndcRepository.isUserEnrolledInClass(user, cc);
-            enrolledCount = uAndcRepository.countQuota(cc);
+            userEnrolledInClass = uAndcRepository.findUserEnrolledInClass(cc);
+            isHost = (user.getUsername().equals(cc.getHost().getUsername()));
         }
 
         Set<IngredientDto> ingredientDtos = mapToIngredientDtos(cc.getIngredients());
@@ -161,11 +169,12 @@ public class CookingClassService {
         return new CookingClassDto(
                 cc.getUuid(), cc.getHost().getNickname(),
                 cc.getTitle(), cc.getDishName(), cc.isLimitedAge(),
-                cc.getCountryCode(), tags, cc.getDescription(),
-                cc.getLanguageCode(), cc.getLevel(), cc.getCookingClassStartTime(),
+                cc.getCountryCode(), cc.getCountryName(), tags, cc.getDescription(),
+                cc.getLanguageCode(), cc.getLanguageName(), cc.getLevel(), cc.getCookingClassStartTime(),
                 cc.getCookingClassEndTime(), cc.getDishCookingTime(), ingredientDtos,
                 recipeDtos, cookingTools, cc.getQuota(),
-                cc.getReplayEndTime(), isEnrolledClass, enrolledCount
+                cc.getReplayEndTime(), isEnrolledClass, isHost,
+                enrolledCount, userEnrolledInClass
         );
     }
 
@@ -199,8 +208,28 @@ public class CookingClassService {
                 .collect(Collectors.toSet());
     }
 
+    // 클래스 삭제
+    @Transactional
+    public long deleteClass(int userId, String uuid) {
+        CookingClass cookingClass = cookingClassRepository.findClassForDelete(uuid);
+        if (cookingClass == null) {
+            throw new ClassNotFoundException("클래스를 찾을 수 없습니다.");
+        }
+
+        if (cookingClass.isDelete()) {
+            throw new ClassIsDeletedException("이미 삭제된 클래스입니다.");
+        }
+        if (cookingClass.getHost().getUserId() != userId) {
+            throw new IllegalArgumentException("본인의 클래스만 삭제할 수 있습니다.");
+        }
+        long row = userAndCookingClassRepository.deleteCookingClass(cookingClass);
+        cookingClass.delete();
+        return row;
+    }
+
 
     // 클래스 예약
+    @Transactional
     public void reserveClass(User user, String uuid) {
         CookingClass cc = cookingClassRepository.findWithUuid(uuid);
         if (cc == null) {
@@ -213,7 +242,6 @@ public class CookingClassService {
         if (cc.getHost().getUserId() == user.getUserId()) {
             throw new IllegalArgumentException("본인의 클래스에는 예약할 수 없습니다.");
         }
-
         createUserAndCookingClassRelationship(user, cc);
     }
 
@@ -228,6 +256,7 @@ public class CookingClassService {
         uAndcRepository.save(uAndc);
     }
 
+    // 예약 삭제
     @Transactional
     public void deleteReservation(User user, String uuid) {
         CookingClass cc = cookingClassRepository.findWithUuid(uuid);
@@ -240,5 +269,17 @@ public class CookingClassService {
 
     private void deleteUserAndCookingClassRelationship(User user, CookingClass cc) {
         userAndCookingClassRepository.deleteReservation(user, cc);
+    }
+
+    @Transactional
+    public void saveReview(CustomUserDetails userDetails, ReviewRequestDto reviewRequestDto) {
+        UserAndCookingClass reservation = userAndCookingClassRepository.findReservationByUsernameAndClassUuid(
+                userDetails.getUserId(), reviewRequestDto.getUuid());
+
+        if (reservation == null) {
+            throw new ReservationNotFoundException("예약 정보를 찾을 수 없습니다.");
+        }
+
+        reservation.setCookingClassReview(reviewRequestDto.getComment());
     }
 }

@@ -1,16 +1,12 @@
 package com.teamcook.tastyties.user.service;
 
-import com.teamcook.tastyties.common.dto.CountryResponseDTO;
-import com.teamcook.tastyties.common.entity.Country;
 import com.teamcook.tastyties.common.repository.CountryRepository;
 import com.teamcook.tastyties.common.repository.LanguageRepository;
-import com.teamcook.tastyties.shared.entity.UserAndCountry;
 import com.teamcook.tastyties.shared.repository.UserAndCookingClassRepository;
 import com.teamcook.tastyties.shared.repository.UserAndCountryRepository;
-import com.teamcook.tastyties.user.dto.UserRegistrationDTO;
-import com.teamcook.tastyties.user.dto.UserUpdateDTO;
+import com.teamcook.tastyties.user.dto.UserRegistrationDto;
+import com.teamcook.tastyties.user.dto.UserUpdateDto;
 import com.teamcook.tastyties.user.entity.User;
-import com.teamcook.tastyties.user.exception.CountryNotFoundException;
 import com.teamcook.tastyties.user.exception.UserIDAlreadyExistsException;
 import com.teamcook.tastyties.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,8 +15,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -45,7 +39,7 @@ public class UserService {
         this.userAndCookingClassRepository = userAndCookingClassRepository;
     }
 
-    public String registerUser(UserRegistrationDTO request) {
+    public String registerUser(UserRegistrationDto request) {
         String encodedPassword = passwordEncoder.encode(request.getPassword());
         if (userRepository.existsByUsername(request.getUsername())) {
             throw new UserIDAlreadyExistsException("이미 존재하는 사용자 ID입니다");
@@ -77,35 +71,7 @@ public class UserService {
         return !userRepository.existsByEmail(email);
     }
 
-
-    @Transactional
-    public Map<String, Object> collectFlag(User user, String countryCode) {
-        Map<String, Object> result = new HashMap<>();
-        Country country = countryRepository.findByAlpha2(countryCode);
-        if (country == null) {
-            // countrynotfoundexception
-            throw new CountryNotFoundException("지원하지 않는 국가입니다.");
-        }
-        boolean alreadyCollected = userAndCountryRepository.alreadyCollected(user, country);
-
-        if (alreadyCollected) {
-            result.put("message", "이미 수집한 국가의 국기입니다.");
-        } else {
-            assignFlagToUser(user, country);
-            result.put("message", "새롭게 수집한 국가의 국기입니다.");
-        }
-
-        result.put("country", new CountryResponseDTO(country.getAlpha2(), country.getEnglishName(),
-                country.getKoreanName()));
-        return result;
-    }
-
-    private void assignFlagToUser(User user, Country country) {
-        UserAndCountry userAndCountry = new UserAndCountry(user, country);
-        userAndCountryRepository.save(userAndCountry);
-    }
-
-    public UserUpdateDTO updateProfile(UserDetails userDetails, UserUpdateDTO request) {
+    public UserUpdateDto updateProfile(UserDetails userDetails, UserUpdateDto request) {
         Optional<User> findUser = userRepository.findByUsername(userDetails.getUsername());
         if (findUser.isEmpty()) {
             throw new IllegalArgumentException("유저의 정보를 찾을 수 없습니다.");

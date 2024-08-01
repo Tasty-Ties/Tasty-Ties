@@ -1,6 +1,6 @@
 package com.teamcook.tastyties.cooking_class.service;
 
-import com.teamcook.tastyties.common.dto.CommonResponseDTO;
+import com.teamcook.tastyties.common.dto.CommonResponseDto;
 import com.teamcook.tastyties.cooking_class.constant.RabbitMQRequestType;
 import com.teamcook.tastyties.cooking_class.dto.RabbitMQRequestDTO;
 import lombok.extern.slf4j.Slf4j;

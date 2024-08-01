@@ -6,5 +6,6 @@ import lombok.Data;
 public class CookingClassSearchCondition {
     private String title;
     private String username;
+    private boolean useLocalFilter;
     private String sort;
 }

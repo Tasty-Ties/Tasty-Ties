@@ -6,7 +6,7 @@ import lombok.Setter;
 import java.time.LocalDate;
 
 @Getter @Setter
-public class UserRegistrationDTO {
+public class UserRegistrationDto {
     private String username;
     private String password;
     private String nickname;

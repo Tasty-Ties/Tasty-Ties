@@ -1,12 +1,14 @@
 package com.teamcook.tastyties.common.dto;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter @Setter @AllArgsConstructor
-public class LanguageResponseDTO {
-    private String languageCode;
-    private String englishName;
-    private String koreanName;
+@Builder
+public class CommonResponseDto {
+    private int stateCode;
+    private String message;
+    private Object data;
 }
