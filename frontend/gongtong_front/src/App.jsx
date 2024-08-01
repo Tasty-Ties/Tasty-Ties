@@ -1,12 +1,16 @@
-import { Route, Routes } from "react-router-dom";
-import SignUp from "./pages/SignUp";
-import SignUpFirst from "./components/SignUp/SignUpFirst";
-import SignUpSecond from "./components/SignUp/SignUpSecond";
 import AppRoutes from "./Routes";
+
+import { LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import Header from "./components/Header";
+
 function App() {
   return (
     <>
-      <AppRoutes />
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <Header />
+        <AppRoutes />
+      </LocalizationProvider>
     </>
   );
 }
