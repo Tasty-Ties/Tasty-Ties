@@ -53,6 +53,8 @@ public class CookingClassService {
     // 클래스 생성
     @Transactional
     public CookingClass registerClass(User user, CookingClassDto registerDto) {
+        log.debug("mainimg: {}", registerDto.getMainImageUrl());
+        log.debug("urls: {}", registerDto.getImageUrls().toString());
         CookingClass cc = createCookingClass(user, registerDto);
         ccRepository.save(cc);
 
@@ -67,6 +69,8 @@ public class CookingClassService {
 
         List<CookingClassAndCookingClassTag> cookingClassTags = createCookingClassTags(registerDto.getCookingClassTags(), cc);
         ccAndcctRepository.saveAll(cookingClassTags);
+
+        List<CookingClassImage> cookingClassImages = createCookingClassImages(registerDto.getImageUrls(), cc);
         return cc;
     }
 
@@ -87,39 +91,37 @@ public class CookingClassService {
         cc.setCookingClassStartTime(registerDto.getCookingClassStartTime());
         cc.setCookingClassEndTime(registerDto.getCookingClassEndTime());
         cc.setReplayEndTime(registerDto.getReplayEndTime());
+        cc.setMainImage(registerDto.getMainImageUrl());
         return cc;
     }
 
     private Set<Ingredient> createIngredients(Set<IngredientDto> ingredientDtos, CookingClass cc) {
         return ingredientDtos.stream()
                 .map(dto -> {
-                    Ingredient ingredient = new Ingredient();
-                    ingredient.setIngredientName(dto.getIngredientName());
-                    ingredient.setQuantity(dto.getQuantity());
-                    ingredient.setQuantityUnit(dto.getQuantityUnit());
-                    ingredient.setCookingClass(cc);
-                    return ingredient;
+                    return new Ingredient(
+                            cc,
+                            dto.getIngredientName(),
+                            dto.getQuantity(),
+                            dto.getQuantityUnit(),
+                            dto.isRequired());
                 }).collect(Collectors.toSet());
     }
 
     private Set<Recipe> createRecipe(Set<RecipeDto> recipeDtos, CookingClass cc) {
         return recipeDtos.stream()
                 .map(dto -> {
-                    Recipe recipe = new Recipe();
-                    recipe.setStep(dto.getStep());
-                    recipe.setDescription(dto.getDescription());
-                    recipe.setCookingClass(cc);
-                    return recipe;
+                    return new Recipe(
+                            cc, dto.getStep(), dto.getDescription()
+                    );
                 }).collect(Collectors.toSet());
     }
 
     private Set<CookingTool> createCookingTools(Set<String> toolNames, CookingClass cc) {
         return toolNames.stream()
                 .map(toolName -> {
-                    CookingTool tool = new CookingTool();
-                    tool.setCookingToolName(toolName);
-                    tool.setCookingClass(cc);
-                    return tool;
+                    return new CookingTool(
+                            cc, toolName
+                    );
                 }).collect(Collectors.toSet());
     }
 
@@ -131,6 +133,15 @@ public class CookingClassService {
                     ccAndcct.setCookingClass(cc);
                     ccAndcct.setCookingClassTag(tag);
                     return ccAndcct;
+                }).collect(Collectors.toList());
+    }
+
+    private List<CookingClassImage> createCookingClassImages(List<String> imageUrls, CookingClass cc) {
+        return imageUrls.stream()
+                .map(imageUrl -> {
+                    return new CookingClassImage(
+                            cc, imageUrl
+                    );
                 }).collect(Collectors.toList());
     }
 
@@ -170,6 +181,9 @@ public class CookingClassService {
         Set<String> cookingTools = mapToCookingToolNames(cc.getCookingTools());
         Set<String> tags = mapToTagNames(cc.getCookingClassAndCookingClassTags());
 
+        // 이미지 관련 추가 필요
+        // List<String> imageUrls = 어쩌구
+
         return new CookingClassDto(
                 cc.getUuid(), cc.getHost().getNickname(),
                 cc.getTitle(), cc.getDishName(), cc.isLimitedAge(),
@@ -178,7 +192,9 @@ public class CookingClassService {
                 cc.getCookingClassEndTime(), cc.getDishCookingTime(), ingredientDtos,
                 recipeDtos, cookingTools, cc.getQuota(),
                 cc.getReplayEndTime(), isEnrolledClass, isHost,
-                enrolledCount, userEnrolledInClass, cc.getChatRoomId()
+                enrolledCount, userEnrolledInClass,
+                null, cc.getMainImage(),
+                cc.getChatRoomId()
         );
     }
 
@@ -284,7 +300,6 @@ public class CookingClassService {
         if (reservation == null) {
             throw new ReservationNotFoundException("예약 정보를 찾을 수 없습니다.");
         }
-
-        reservation.setCookingClassReview(reviewRequestDto.getComment());
+        reservation.writeReview(reviewRequestDto);
     }
 }

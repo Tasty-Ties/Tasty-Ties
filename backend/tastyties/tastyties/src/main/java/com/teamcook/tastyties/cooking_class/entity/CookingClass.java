@@ -77,8 +77,10 @@ public class CookingClass {
     @OneToMany(mappedBy = "cookingClass")
     private List<CookingClassAndCookingClassTag> cookingClassAndCookingClassTags;
 
+    @OneToMany
+    private List<CookingClassImage> cookingClassImages;
+    private String mainImage;
     private String chatRoomId;
-
 
     @PrePersist
     protected void onCreate() {

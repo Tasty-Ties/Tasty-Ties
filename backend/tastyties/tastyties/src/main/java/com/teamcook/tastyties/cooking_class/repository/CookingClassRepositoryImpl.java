@@ -57,7 +57,7 @@ public class CookingClassRepositoryImpl implements CookingClassCustomRepository 
     public Page<CookingClassListDto> searchClass(CookingClassSearchCondition condition, Pageable pageable) {
         QCountry countryByClass = new QCountry("countryByClass");
         List<CookingClassListDto> results = queryFactory
-                .select(new QCookingClassListDto(cookingClass.title,
+                .select(new QCookingClassListDto(cookingClass.title, cookingClass.mainImage,
                         cookingClass.cookingClassStartTime.as("startTime"),
                         cookingClass.cookingClassEndTime.as("endTime"),
                         user.nickname.as("hostName"),
@@ -167,7 +167,7 @@ public class CookingClassRepositoryImpl implements CookingClassCustomRepository 
         QCountry countryByClass = new QCountry("countryByClass");
         List<CookingClassListDto> results = queryFactory
                 .select(new QCookingClassListDto(
-                        cookingClass.title,
+                        cookingClass.title, cookingClass.mainImage,
                         cookingClass.cookingClassStartTime.as("startTime"),
                         cookingClass.cookingClassEndTime.as("endTime"),
                         user.nickname.as("hostName"),
@@ -207,7 +207,7 @@ public class CookingClassRepositoryImpl implements CookingClassCustomRepository 
         return new HashSet<>(
                 queryFactory
                         .select(new QCookingClassListDto(
-                                cookingClass.title,
+                                cookingClass.title, cookingClass.mainImage,
                                 cookingClass.cookingClassStartTime.as("startTime"),
                                 cookingClass.cookingClassEndTime.as("endTime"),
                                 user.nickname.as("hostName"),

@@ -103,7 +103,7 @@ public class UserAndCookingClassRepositoryImpl implements UserAndCookingClassCus
         List<CookingClassListDto> results = queryFactory
                 .select(
                         new QCookingClassListDto(
-                        cookingClass.title,
+                        cookingClass.title, cookingClass.mainImage,
                         cookingClass.cookingClassStartTime.as("startTime"),
                         cookingClass.cookingClassEndTime.as("endTime"),
                         host.nickname.as("hostName"),
@@ -145,7 +145,7 @@ public class UserAndCookingClassRepositoryImpl implements UserAndCookingClassCus
         return new HashSet<>(queryFactory
                 .select(
                         new QCookingClassListDto(
-                                cookingClass.title,
+                                cookingClass.title, cookingClass.mainImage,
                                 cookingClass.cookingClassStartTime.as("startTime"),
                                 cookingClass.cookingClassEndTime.as("endTime"),
                                 host.nickname.as("hostName"),

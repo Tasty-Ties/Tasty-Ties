@@ -1,29 +1,23 @@
 package com.teamcook.tastyties.cooking_class.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Getter @NoArgsConstructor
-public class Recipe {
-
+@NoArgsConstructor
+public class CookingClassImage {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int recipeId;
+    private int id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cooking_class_id", referencedColumnName = "cookingClassId")
     private CookingClass cookingClass;
 
-    private String step;
-    private String description;
+    private String cookingClassImageUrl;
 
-    public Recipe(CookingClass cookingClass, String step, String description) {
+    public CookingClassImage(CookingClass cookingClass, String cookingClassImageUrl) {
         this.cookingClass = cookingClass;
-        this.step = step;
-        this.description = description;
+        this.cookingClassImageUrl = cookingClassImageUrl;
     }
 }
