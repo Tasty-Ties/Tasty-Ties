@@ -17,7 +17,6 @@ import java.util.UUID;
 @Getter @Setter
 @AllArgsConstructor @NoArgsConstructor
 public class CookingClass {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int cookingClassId;

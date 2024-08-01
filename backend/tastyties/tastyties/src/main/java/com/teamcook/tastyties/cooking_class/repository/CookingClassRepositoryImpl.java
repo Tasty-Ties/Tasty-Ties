@@ -19,7 +19,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.support.PageableExecutionUtils;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static com.teamcook.tastyties.common.entity.QCountry.country;
 import static com.teamcook.tastyties.cooking_class.entity.QCookingClass.cookingClass;
@@ -173,12 +175,10 @@ public class CookingClassRepositoryImpl implements CookingClassCustomRepository 
                         new QCountryProfileDto(
                                 country.alpha2,
                                 country.countryImageUrl
-                        ).as("hostCountry"),
-                        new QCountryProfileDto(
+                        ), new QCountryProfileDto(
                                 countryByClass.alpha2,
                                 countryByClass.countryImageUrl
-                        ).as("classCountry"),
-                        cookingClass.countryCode.eq(country.alpha2)
+                        ), cookingClass.countryCode.eq(country.alpha2)
                 ))
                 .from(cookingClass)
                 .leftJoin(cookingClass.host, user)
@@ -198,6 +198,37 @@ public class CookingClassRepositoryImpl implements CookingClassCustomRepository 
                 .where(cookingClass.host.userId.eq(hostId));
 
         return PageableExecutionUtils.getPage(results, pageable, countQuery::fetchOne);
+    }
+
+    @Override
+    public Set<CookingClassListDto> searchClassByHostIdForProfile(int hostId) {
+        return new HashSet<>(
+                queryFactory
+                        .select(new QCookingClassListDto(
+                                cookingClass.title,
+                                cookingClass.cookingClassStartTime.as("startTime"),
+                                cookingClass.cookingClassEndTime.as("endTime"),
+                                user.nickname.as("hostName"),
+                                cookingClass.uuid,
+                                new QCountryProfileDto(
+                                        country.alpha2,
+                                        country.countryImageUrl
+                                ), new QCountryProfileDto(
+                                country.alpha2,
+                                country.countryImageUrl
+                        ),
+                        cookingClass.countryCode.eq(country.alpha2)
+                        ))
+                        .from(cookingClass)
+                        .leftJoin(cookingClass.host, user)
+                        .leftJoin(user.country, country)
+                        .where(
+                                cookingClass.isDelete.eq(false),
+                                cookingClass.host.userId.eq(hostId))
+                        .orderBy(cookingClass.cookingClassStartTime.asc())
+                        .limit(4)
+                        .fetch()
+        );
     }
 
 }

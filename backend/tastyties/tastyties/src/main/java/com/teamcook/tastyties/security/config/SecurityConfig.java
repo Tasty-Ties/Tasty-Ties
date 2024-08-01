@@ -45,7 +45,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/login", "/logout", "/public/**").permitAll()
                         .requestMatchers("/users/me").authenticated()  // 로그인한 사용자만 접근 가능
-                        .requestMatchers("/users/profile/**").authenticated()  // 로그인한 사용자만 접근 가능
+//                        .requestMatchers("/users/profile/**").authenticated()  // 로그인한 사용자만 접근 가능
                         .anyRequest().permitAll()
                 )
                 .exceptionHandling(exceptionHandling ->
