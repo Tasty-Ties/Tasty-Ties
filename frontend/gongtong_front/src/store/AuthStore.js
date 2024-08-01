@@ -1,10 +1,10 @@
 import { create } from "zustand";
+import Cookies from "js-cookie";
 
 const useAuthStore = create((set) => ({
   isAuthenticated: false,
   accessToken: null,
   refreshToken: null,
-  baseURL: "http://localhost:8080/api/v1", // 실제 API URL로 변경
   login: (accessToken, refreshToken) =>
     set({
       isAuthenticated: true,
@@ -14,8 +14,8 @@ const useAuthStore = create((set) => ({
   logout: () =>
     set({
       isAuthenticated: false,
-      accessToken: null,
-      refreshToken: null,
+      accessToken: Cookies.remove("accessToken"),
+      refreshToken: Cookies.remove("refreshToken"),
     }),
 }));
 

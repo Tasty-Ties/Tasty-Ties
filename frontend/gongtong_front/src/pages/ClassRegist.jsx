@@ -1,15 +1,16 @@
-import Ingredient from "@components/ClassRegist/Ingredient";
-import React, { useEffect, useState } from "react";
-import Recipe from "../components/ClassRegist/Recipe";
-import CookingTools from "../components/ClassRegist/CookingTools";
-import ClassImageFiles from "../components/ClassRegist/ClassImageFile";
-import CookingClassTags from "../components/ClassRegist/cookingClassTags";
 import axios from "axios";
+import React, { useEffect, useState } from "react";
+
+import Ingredient from "@components/ClassRegist/Ingredient";
+import Recipe from "./../components/ClassRegist/Recipe";
+import CookingTools from "./../components/ClassRegist/CookingTools";
+import ClassImageFiles from "./../components/ClassRegist/ClassImageFile";
+import CookingClassTags from "./../components/ClassRegist/CookingClassTags";
+import useClassRegistStore from "./../store/ClassRegistStore";
+import api from "../utils/Api";
 
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
-
 import dayjs from "dayjs";
-import useClassRegistStore from "../store/ClassRegistStore";
 
 import "@styles/ClassRegist/ClassRegist.css";
 
@@ -140,21 +141,18 @@ const ClassRegist = () => {
     // for (let i = 0; i < files.length; i++) {
     //   formData.append("files", files[i]);
     // }
-
-    const token =
-      "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzc2FmeSIsImlhdCI6MTcyMjMyNzc2MywiZXhwIjoxNzIyMzI4MTIzfQ.hJfWH8M5QSZP4Gwn3DnaCrmFo0gQCLxXiBDYXW7njHk";
     try {
-      await axios.post(
-        "http://localhost:8080/api/v1/classes",
+      const response = api.post(
+        "/classes",
         // formData,
         classInformation,
         {
           header: {
             // "Content-Type": "multipart/form-data",
-            Authorization: `Bearer ${token}`,
           },
         }
       );
+      console.log(response);
     } catch (error) {
       console.error("클래스 등록 실패:", error);
     }
@@ -217,18 +215,11 @@ const ClassRegist = () => {
             <select id="countryCode" name="countryCode" onChange={onChange}>
               <option>선택</option>
               {countries &&
-                countries
-                  .filter((country) =>
-                    /[ㄱ-ㅎㅏ-ㅣ가-힣]/.test(country.countryName)
-                  )
-                  .map((country) => (
-                    <option
-                      key={country.countryCode}
-                      value={country.countryCode}
-                    >
-                      {country.countryName}
-                    </option>
-                  ))}
+                countries.map((country) => (
+                  <option key={country.countryCode} value={country.countryCode}>
+                    {country.koreanName}
+                  </option>
+                ))}
             </select>
           </div>
         </div>

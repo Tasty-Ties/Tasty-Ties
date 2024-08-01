@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import userStore from "../../store/UserStore";
 import useApiStore from "../../store/ApiStore";
 import axios from "axios";
+import api from "../../utils/Api";
 
 const SignUpSecond = () => {
   const nav = useNavigate();
@@ -11,7 +12,7 @@ const SignUpSecond = () => {
   const userRegister = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post(`${baseURL}/users`, {
+      const response = await api.post("/users", {
         username: userForm.username,
         password: userForm.password,
         nickname: userForm.nickname,
@@ -65,10 +66,10 @@ const SignUpSecond = () => {
   useEffect(() => {
     const fetchCountries = async () => {
       try {
-        const response = await axios.get(`${baseURL}/countries`);
+        const response = await api.get("/countries");
         console.log(response.data.data);
         const sortedCountries = response.data.data.countries.sort((a, b) => {
-          return a.countryName.localeCompare(b.countryName, "KR", {
+          return a.koreanName.localeCompare(b.koreanName, "KR", {
             sensitivity: "base",
           });
         });
@@ -83,7 +84,7 @@ const SignUpSecond = () => {
         const response = await axios.get(`${baseURL}/languages`);
         console.log(response.data.data);
         const sortedLanguages = response.data.data.languages.sort((a, b) => {
-          return a.languageName.localeCompare(b.languageName, "kr", {
+          return a.koreanName.localeCompare(b.koreanName, "kr", {
             sensitivity: "base",
           });
         });
@@ -124,7 +125,7 @@ const SignUpSecond = () => {
         <option value="">국적을 선택하세요</option>
         {countries.map((country) => (
           <option key={country.countryCode} value={country.countryCode}>
-            {country.countryName}
+            {country.koreanName}
           </option>
         ))}
       </select>
@@ -138,7 +139,7 @@ const SignUpSecond = () => {
         <option value="">모국어를 선택하세요</option>
         {languages.map((language) => (
           <option key={language.languageCode} value={language.languageCode}>
-            {language.languageName}
+            {language.koreanName}
           </option>
         ))}
       </select>
