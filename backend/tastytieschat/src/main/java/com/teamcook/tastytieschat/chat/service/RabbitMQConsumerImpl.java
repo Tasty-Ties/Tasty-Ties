@@ -40,6 +40,7 @@ public class RabbitMQConsumerImpl implements RabbitMQConsumer {
             key = "${rabbitmq.routing.key.create}"
     ))
     public void createChatRoom(RabbitMQRequestDTO rabbitMQRequestDto, Message message) {
+        rabbitMQRequestDto.getUser().convertToLanguage();
         ChatRoom chatRoom = new ChatRoom(rabbitMQRequestDto.getTitle(), rabbitMQRequestDto.getUser());
         chatRoomRepository.save(chatRoom);
 
@@ -86,6 +87,7 @@ public class RabbitMQConsumerImpl implements RabbitMQConsumer {
                 log.error("Error entering chat room: user already exists.");
             }
 
+            userDto.convertToLanguage();
             chatRoom.getUsers().add(userDto);
             chatRoomRepository.save(chatRoom);
         } else {
