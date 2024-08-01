@@ -74,14 +74,14 @@ public class LiveCookingClassService {
         return sessionId;
     }
 
-//    public String getLiveToken(String userId, String uuid, String sessionId) {
-//        Session session = openvidu.getActiveSession(sessionId);
-//        if (session == null) {
-//            return new LiveClassNotFoundException("아직 클래스가 생성되지 않았습니다.");
-//        }
-//        ConnectionProperties properties = ConnectionProperties.fromJson(params).build();
-//        Connection connection = session.createConnection(properties);
-//    }
-
+    public String createConnectionToken(String sessionId, Map<String, Object> params) throws OpenViduJavaClientException, OpenViduHttpException {
+        Session session = openvidu.getActiveSession(sessionId);
+        if (session == null) {
+            throw new LiveClassNotFoundException("아직 클래스가 생성되지 않았습니다.");
+        }
+        ConnectionProperties properties = ConnectionProperties.fromJson(params).build();
+        Connection connection = session.createConnection(properties);
+        return connection.getToken();
+    }
 
 }
