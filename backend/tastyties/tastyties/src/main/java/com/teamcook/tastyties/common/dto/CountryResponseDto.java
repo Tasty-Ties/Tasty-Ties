@@ -7,7 +7,9 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class CountryCodeResponseDTO {
+public class CountryResponseDto {
     private String countryCode;
-    private String countryName;
+    private String englishName;
+    private String koreanName;
+    private String countryImageUrl;
 }
