@@ -269,13 +269,16 @@ public class CookingClassService {
 
     // 예약 삭제
     @Transactional
-    public void deleteReservation(User user, String uuid) {
+    public String deleteReservation(User user, String uuid) {
         CookingClass cc = cookingClassRepository.findWithUuid(uuid);
 
         if (cc.isDelete()) {
             throw new ClassIsDeletedException("삭제된 클래스입니다.");
         }
+        String chatRoomId = cc.getChatRoomId();
         deleteUserAndCookingClassRelationship(user, cc);
+
+        return chatRoomId;
     }
 
     private void deleteUserAndCookingClassRelationship(User user, CookingClass cc) {

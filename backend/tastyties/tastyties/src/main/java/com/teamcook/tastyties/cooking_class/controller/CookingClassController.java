@@ -155,7 +155,7 @@ public class CookingClassController {
 
         String chatRoomId = cookingClassService.reserveClass(userDetails.user(), uuid);
 
-        joinChatRoom(chatRoomId, userDetails.user().getUserId());
+        joinChatRoom(chatRoomId, userDetails.getUserId());
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(CommonResponseDto.builder()
@@ -193,13 +193,29 @@ public class CookingClassController {
                             .build());
         }
 
-        cookingClassService.deleteReservation(userDetails.user(), uuid);
+        String chatRoomId = cookingClassService.deleteReservation(userDetails.user(), uuid);
+
+        leaveChatRoom(chatRoomId, userDetails.getUserId());
+
         return ResponseEntity.status(HttpStatus.NO_CONTENT)
                 .body(CommonResponseDto.builder()
                         .stateCode(204)
                         .message("예약이 정상적으로 취소되었습니다.")
                         .data(null)
                         .build());
+    }
+
+    private void leaveChatRoom(String chatRoomId, int userId) {
+        ChatUserDto chatUser = userChatService.getUser(userId);
+
+        RabbitMQRequestDto rabbitMQRequestDto = RabbitMQRequestDto.builder()
+                .type(RabbitMQRequestType.LEAVE)
+                .chatRoomId(chatRoomId)
+                .user(RabbitMQUserDto.builder()
+                        .id(chatUser.getId())
+                        .build())
+                .build();
+        rabbitMQProducer.send(rabbitMQRequestDto);
     }
 
     // 클래스 리뷰 생성
