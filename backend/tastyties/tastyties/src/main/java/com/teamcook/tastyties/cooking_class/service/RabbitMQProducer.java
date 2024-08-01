@@ -1,8 +1,7 @@
 package com.teamcook.tastyties.cooking_class.service;
 
-import com.teamcook.tastyties.common.dto.CommonResponseDto;
-import com.teamcook.tastyties.cooking_class.constant.RabbitMQRequestType;
-import com.teamcook.tastyties.cooking_class.dto.RabbitMQRequestDTO;
+import com.teamcook.tastyties.common.constant.RabbitMQRequestType;
+import com.teamcook.tastyties.common.dto.RabbitMQRequestDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.MessagePostProcessor;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -37,12 +36,12 @@ public class RabbitMQProducer {
         );
     }
 
-    public void send(RabbitMQRequestDTO rabbitMQRequestDTO) {
+    public void send(RabbitMQRequestDto rabbitMQRequestDTO) {
         RabbitMQRequestType type = rabbitMQRequestDTO.getType();
         rabbitTemplate.convertAndSend(exchange, routingKeys.get(type.getType()), rabbitMQRequestDTO);
     }
 
-    public Map<String, String> sendAndReceive(RabbitMQRequestDTO rabbitMQRequestDto) {
+    public Map<String, String> sendAndReceive(RabbitMQRequestDto rabbitMQRequestDto) {
         RabbitMQRequestType type = rabbitMQRequestDto.getType();
 
         MessagePostProcessor messagePostProcessor = message -> {

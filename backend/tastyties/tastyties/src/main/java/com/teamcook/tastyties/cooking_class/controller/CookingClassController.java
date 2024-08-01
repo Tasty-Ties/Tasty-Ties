@@ -1,17 +1,20 @@
 package com.teamcook.tastyties.cooking_class.controller;
 
+import com.teamcook.tastyties.chat.dto.ChatUserDto;
 import com.teamcook.tastyties.common.dto.CommonResponseDto;
+import com.teamcook.tastyties.common.dto.RabbitMQRequestDto;
+import com.teamcook.tastyties.common.dto.RabbitMQUserDto;
 import com.teamcook.tastyties.cooking_class.dto.CookingClassListDto;
 import com.teamcook.tastyties.cooking_class.dto.CookingClassDto;
 import com.teamcook.tastyties.cooking_class.dto.CookingClassSearchCondition;
 import com.teamcook.tastyties.cooking_class.dto.ReviewRequestDto;
-import com.teamcook.tastyties.cooking_class.constant.RabbitMQRequestType;
-import com.teamcook.tastyties.cooking_class.dto.*;
+import com.teamcook.tastyties.common.constant.RabbitMQRequestType;
 import com.teamcook.tastyties.cooking_class.service.CookingClassService;
 import com.teamcook.tastyties.cooking_class.service.RabbitMQProducer;
 import com.teamcook.tastyties.security.userdetails.CustomUserDetails;
 import com.teamcook.tastyties.user.entity.User;
 import com.teamcook.tastyties.user.exception.UserDetailsNotFoundException;
+import com.teamcook.tastyties.user.service.UserChatService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -21,18 +24,22 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.UUID;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/classes")
 @Slf4j
 public class CookingClassController {
 
+    private final UserChatService userChatService;
     private final CookingClassService cookingClassService;
+    private final RabbitMQProducer rabbitMQProducer;
 
     @Autowired
-    public CookingClassController(CookingClassService cookingClassService) {
+    public CookingClassController(UserChatService userChatService, CookingClassService cookingClassService, RabbitMQProducer rabbitMQProducer) {
+        this.userChatService = userChatService;
         this.cookingClassService = cookingClassService;
+        this.rabbitMQProducer = rabbitMQProducer;
     }
 
     // 클래스 등록
@@ -51,7 +58,21 @@ public class CookingClassController {
 
         CookingClassDto cookingClass = cookingClassService.registerClass(user, registerDto);
 
+        ChatUserDto chatUser = userChatService.getUser(user.getUserId());
 
+        RabbitMQRequestDto rabbitMQRequestDto = RabbitMQRequestDto.builder()
+                .type(RabbitMQRequestType.CREATE)
+                .title(cookingClass.getTitle())
+                .user(RabbitMQUserDto.builder()
+                        .id(chatUser.getId())
+                        .nickname(chatUser.getNickname())
+                        .language(chatUser.getLanguage())
+                        .build())
+                .build();
+        Map<String, String> response = rabbitMQProducer.sendAndReceive(rabbitMQRequestDto);
+
+        // TODO: 쿠킹 클래스에 채팅방 ID 저장하기
+        log.debug("Success creating chat room: " + response.get("chatRoomId"));
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(CommonResponseDto.builder()
