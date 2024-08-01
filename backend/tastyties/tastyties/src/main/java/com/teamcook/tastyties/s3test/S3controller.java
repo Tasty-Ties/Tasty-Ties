@@ -1,6 +1,6 @@
 package com.teamcook.tastyties.s3test;
 
-import com.teamcook.tastyties.common.dto.CommonResponseDTO;
+import com.teamcook.tastyties.common.dto.CommonResponseDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -25,11 +25,11 @@ public class S3controller {
     }
 
     @PostMapping("/upload")
-    public ResponseEntity<CommonResponseDTO> fileUploadTest(
+    public ResponseEntity<CommonResponseDto> fileUploadTest(
             @RequestPart("file") MultipartFile file) throws SQLException, IOException {
         Image image =  s3Service.uploadImage(file);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(new CommonResponseDTO(201, "파일 업로드 성공",image));
+                .body(new CommonResponseDto(201, "파일 업로드 성공",image));
     }
 }

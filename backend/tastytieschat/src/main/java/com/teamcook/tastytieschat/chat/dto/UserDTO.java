@@ -1,5 +1,6 @@
 package com.teamcook.tastytieschat.chat.dto;
 
+import com.teamcook.tastytieschat.chat.constant.Language;
 import com.teamcook.tastytieschat.chat.constant.UserType;
 import lombok.Getter;
 import lombok.Setter;
@@ -24,6 +25,10 @@ public class UserDTO {
         }
 
         return false;
+    }
+
+    public void convertToLanguage() {
+        this.language = Language.valueOf(this.language).getName();
     }
 
 }

@@ -1,7 +1,11 @@
 package com.teamcook.tastyties.user.entity;
 
+import com.teamcook.tastyties.common.entity.Country;
+import com.teamcook.tastyties.common.entity.Language;
 import com.teamcook.tastyties.cooking_class.entity.CookingClass;
 import com.teamcook.tastyties.shared.entity.UserAndCookingClass;
+import com.teamcook.tastyties.shared.entity.UserAndCountry;
+import com.teamcook.tastyties.user.dto.UserUpdateDto;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -28,20 +32,24 @@ public class User {
     @OneToMany(mappedBy = "host")
     private Set<CookingClass> hostingClasses = new HashSet<>();
 
+    @OneToMany(mappedBy = "user")
+    private Set<UserAndCountry> userAndCountries = new HashSet<>();
 
-    @NotNull @Column(nullable = false)
-    private String countryCode;
-    @NotNull @Column(nullable = false)
-    private String languageCode;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "country_id")
+    private Country country;
 
-    @NotNull @Column(nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "language_id")
+    private Language language;
+
+    @NotNull @Column(nullable = false, unique = true)
     private String username;
     @NotNull @Column(nullable = false)
     private String password;
-    @NotNull @Column(nullable = false)
+    @NotNull @Column(nullable = false, unique = true)
     private String nickname;
 
-    private String profileImageUrl;
     @NotNull @Column(nullable = false)
     private LocalDate birth;
 
@@ -52,8 +60,31 @@ public class User {
     private boolean isDeleted = Boolean.FALSE;
     private boolean isAdult = Boolean.FALSE;
 
+    private String profileImageUrl;
+
     private String instagramUrl;
     private String instagramHandle;
     private String youtubeUrl;
     private String youtubeHandle;
+
+    public void updateUser(UserUpdateDto request, String encodedPassword, String instagramHandle, String youtubeHandle) {
+        this.nickname = request.getNickname();
+        if (encodedPassword != null) {
+            this.password = encodedPassword;
+        }
+        this.description = request.getDescription();
+        this.email = request.getEmailId() + "@" + request.getEmailDomain();
+        if (request.getInstagramUrl() != null && !request.getInstagramUrl().isEmpty()) {
+            this.instagramUrl = request.getInstagramUrl();
+            this.instagramHandle = instagramHandle;
+        }
+        if (request.getYoutubeUrl() != null && !request.getYoutubeUrl().isEmpty()) {
+            this.youtubeUrl = request.getYoutubeUrl();
+            this.youtubeHandle = youtubeHandle;
+        }
+    }
+
+    public void delete() {
+        this.isDeleted = true;
+    }
 }
