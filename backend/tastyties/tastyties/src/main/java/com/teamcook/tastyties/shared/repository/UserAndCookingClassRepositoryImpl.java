@@ -3,6 +3,7 @@ package com.teamcook.tastyties.shared.repository;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.teamcook.tastyties.common.dto.QCountryProfileDto;
+import com.teamcook.tastyties.common.entity.QCountry;
 import com.teamcook.tastyties.cooking_class.dto.CookingClassListDto;
 import com.teamcook.tastyties.cooking_class.dto.QCookingClassListDto;
 import com.teamcook.tastyties.cooking_class.entity.CookingClass;
@@ -98,9 +99,10 @@ public class UserAndCookingClassRepositoryImpl implements UserAndCookingClassCus
     @Override
     public Page<CookingClassListDto> findReservedClassesByUserId(int userId, Pageable pageable) {
         QUser host = new QUser("host");
-
+        QCountry countryByClass = new QCountry("countryByClass");
         List<CookingClassListDto> results = queryFactory
-                .select(new QCookingClassListDto(
+                .select(
+                        new QCookingClassListDto(
                         cookingClass.title,
                         cookingClass.cookingClassStartTime.as("startTime"),
                         cookingClass.cookingClassEndTime.as("endTime"),
@@ -109,13 +111,19 @@ public class UserAndCookingClassRepositoryImpl implements UserAndCookingClassCus
                         new QCountryProfileDto(
                                 country.alpha2,
                                 country.countryImageUrl
-                        ), cookingClass.countryCode.eq(country.alpha2)
+                        ).as("hostCountry"),
+                                new QCountryProfileDto(
+                                        countryByClass.alpha2,
+                                        countryByClass.countryImageUrl
+                                ).as("classCountry"),
+                                cookingClass.countryCode.eq(country.alpha2)
                 ))
                 .from(userAndCookingClass)
                 .join(userAndCookingClass.cookingClass, cookingClass)
                 .join(userAndCookingClass.user, user)
                 .join(cookingClass.host, host)
                 .leftJoin(host.country, country)
+                .leftJoin(countryByClass).on(cookingClass.countryCode.eq(countryByClass.alpha2))
                 .where(userAndCookingClass.user.userId.eq(userId))
                 .orderBy(cookingClass.cookingClassStartTime.asc())
                 .offset(pageable.getOffset())

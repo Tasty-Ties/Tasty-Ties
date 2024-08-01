@@ -53,6 +53,7 @@ public class CookingClassRepositoryImpl implements CookingClassCustomRepository 
     // 동적 쿼리 사용
     @Override
     public Page<CookingClassListDto> searchClass(CookingClassSearchCondition condition, Pageable pageable) {
+        QCountry countryByClass = new QCountry("countryByClass");
         List<CookingClassListDto> results = queryFactory
                 .select(new QCookingClassListDto(cookingClass.title,
                         cookingClass.cookingClassStartTime.as("startTime"),
@@ -62,11 +63,16 @@ public class CookingClassRepositoryImpl implements CookingClassCustomRepository 
                         new QCountryProfileDto(
                                 country.alpha2,
                                 country.countryImageUrl
-                        ), cookingClass.countryCode.eq(country.alpha2)
+                        ), new QCountryProfileDto(
+                                countryByClass.alpha2,
+                                countryByClass.countryImageUrl
+                        ),
+                        cookingClass.countryCode.eq(country.alpha2)
                 ))
                 .from(cookingClass)
                 .leftJoin(cookingClass.host, user)
                 .leftJoin(user.country, country)
+                .leftJoin(countryByClass).on(cookingClass.countryCode.eq(countryByClass.alpha2))
                 .where(
                         cookingClass.isDelete.eq(false),
                         titleLike(condition.getTitle()),
@@ -156,6 +162,7 @@ public class CookingClassRepositoryImpl implements CookingClassCustomRepository 
 
     @Override
     public Page<CookingClassListDto> searchClassByHostId(int hostId, Pageable pageable) {
+        QCountry countryByClass = new QCountry("countryByClass");
         List<CookingClassListDto> results = queryFactory
                 .select(new QCookingClassListDto(
                         cookingClass.title,
@@ -166,11 +173,17 @@ public class CookingClassRepositoryImpl implements CookingClassCustomRepository 
                         new QCountryProfileDto(
                                 country.alpha2,
                                 country.countryImageUrl
-                        ), cookingClass.countryCode.eq(country.alpha2)
+                        ).as("hostCountry"),
+                        new QCountryProfileDto(
+                                countryByClass.alpha2,
+                                countryByClass.countryImageUrl
+                        ).as("classCountry"),
+                        cookingClass.countryCode.eq(country.alpha2)
                 ))
                 .from(cookingClass)
                 .leftJoin(cookingClass.host, user)
                 .leftJoin(user.country, country)
+                .leftJoin(countryByClass).on(cookingClass.countryCode.eq(countryByClass.alpha2))
                 .where(
                         cookingClass.isDelete.eq(false),
                         cookingClass.host.userId.eq(hostId))
