@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import userStore from "../../store/UserStore";
 import useApiStore from "../../store/ApiStore";
 import axios from "axios";
-import api from "../../utils/Api";
+import api from "../../service/Api";
 
 const SignUpSecond = () => {
   const nav = useNavigate();
@@ -12,7 +12,7 @@ const SignUpSecond = () => {
   const userRegister = async (e) => {
     e.preventDefault();
     try {
-      const response = await api.post("/users", {
+      const response = await axios.post("/users", {
         username: userForm.username,
         password: userForm.password,
         nickname: userForm.nickname,

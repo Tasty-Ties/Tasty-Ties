@@ -4,7 +4,7 @@ import {
   getLanguages,
   getClassLists,
   getClassDetail,
-} from "./../Service/ClassRegistAPI";
+} from "../service/ClassRegistAPI";
 
 const useClassRegistStore = create((set) => ({
   contries: [],

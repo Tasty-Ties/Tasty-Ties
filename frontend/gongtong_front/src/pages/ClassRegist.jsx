@@ -5,9 +5,9 @@ import Ingredient from "@components/ClassRegist/Ingredient";
 import Recipe from "./../components/ClassRegist/Recipe";
 import CookingTools from "./../components/ClassRegist/CookingTools";
 import ClassImageFiles from "./../components/ClassRegist/ClassImageFile";
-import CookingClassTags from "./../components/ClassRegist/CookingClassTags";
+import CookingClassTags from "../components/ClassRegist/CookingClassTags";
 import useClassRegistStore from "./../store/ClassRegistStore";
-import api from "../utils/Api";
+import api from "../service/Api";
 
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import dayjs from "dayjs";

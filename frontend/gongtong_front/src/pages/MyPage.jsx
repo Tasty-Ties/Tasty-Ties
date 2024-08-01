@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import api from "../utils/Api"; // axios 인스턴스를 생성한 파일 경로
+import axios from "axios";
 
 const MyPage = () => {
   const [userData, setUserData] = useState(null);
@@ -7,7 +7,7 @@ const MyPage = () => {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const response = await api.get("/users/me");
+        const response = await axios.get("/users/me");
         console.log(response);
         setUserData(response.data);
       } catch (error) {
