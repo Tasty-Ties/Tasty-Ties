@@ -1,16 +1,14 @@
-package com.teamcook.tastyties.cooking_class.dto;
+package com.teamcook.tastyties.common.dto;
 
-import com.teamcook.tastyties.cooking_class.constant.RabbitMQUserType;
+import com.teamcook.tastyties.common.constant.RabbitMQUserType;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
 
 import java.time.Instant;
 
 @Getter
 @Builder
-public class RabbitMQUserDTO {
+public class RabbitMQUserDto {
     private int id;
     private RabbitMQUserType type;
     private String nickname;
@@ -19,8 +17,8 @@ public class RabbitMQUserDTO {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof RabbitMQUserDTO) {
-            return this.id == ((RabbitMQUserDTO) obj).id;
+        if (obj instanceof RabbitMQUserDto) {
+            return this.id == ((RabbitMQUserDto) obj).id;
         }
 
         return false;

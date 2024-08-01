@@ -5,4 +5,6 @@ import com.teamcook.tastyties.user.entity.User;
 public interface UserRepositoryCustom {
 
     public User findUserWithCollectedFlags(Integer userId);
+    public User findUserWithLanguage(Integer userId);
+
 }
