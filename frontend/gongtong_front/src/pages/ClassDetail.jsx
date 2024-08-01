@@ -1,7 +1,59 @@
-import { Link, Outlet } from "react-router-dom";
+import { useEffect } from "react";
+import { Link, Outlet, useParams } from "react-router-dom";
 import "@styles/ClassDetail/ClassDetail.css";
+import useClassRegistStore from "./../store/ClassRegistStore";
+import axios from "axios";
 
 const ClassDetail = () => {
+  const { id } = useParams();
+
+  const { classDetail, fetchClassDetail } = useClassRegistStore();
+  let startDate = new Date(classDetail.cookingClassStartTime);
+  console.log(startDate);
+
+  useEffect(() => {
+    fetchClassDetail(id);
+  }, [id, fetchClassDetail]);
+
+  const RatingComponent = ({ evaluateMain }) => {
+    // 전체 별의 개수
+    const totalStars = 5;
+
+    // 별을 생성하는 함수
+    const renderStars = () => {
+      return Array.from({ length: totalStars }, (_, index) => (
+        <span
+          key={index}
+          className="star"
+          style={{
+            color: index < evaluateMain ? "gold" : "#ccc",
+          }}
+        >
+          ★
+        </span>
+      ));
+    };
+
+    return <div>{renderStars()}</div>;
+  };
+  const setClassReservation = async (e) => {
+    const token =
+      "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzc2FmeSIsImlhdCI6MTcyMjQxMjk5OSwiZXhwIjoxNzIyNDEzMzU5fQ.72fxEidy7i90Q1AFzoMjTVGB8JvU9qKk8TWGPtzxjQM";
+    try {
+      await axios.post(
+        `http://localhost:8080/api/v1/classes/reservation/${id}`,
+        {
+          header: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      alert("예약 성공욤");
+    } catch (error) {
+      console.error("클래스 예약 실패:", error);
+    }
+  };
+
   return (
     <div className="detail-container">
       <img
@@ -10,9 +62,9 @@ const ClassDetail = () => {
         className="info-img"
       />
       <div className="class-info-box">
-        <div className="title">채소를 좋아하는 사람들은 모여라!</div>
+        <div className="title">{classDetail.title}</div>
         <div className="nickname-box">
-          <span>비빔밥</span>
+          <span>{classDetail.dishName}</span>
           <img
             src="http://localhost:5173/images/classImages/Korea.png"
             alt="국가 이미지"
@@ -21,18 +73,14 @@ const ClassDetail = () => {
         <div className="sub-box">
           <span className="content">
             <span className="content-rating-2${voReview.idx} content-rating-2">
-              ❤❤❤❤❤
-              <span>❤❤❤❤❤</span>
+              ⭐⭐⭐⭐⭐
+              <span>⭐⭐⭐⭐⭐</span>
               <input type="range" step="1" min="0" max="5" />
             </span>
+            <RatingComponent evaluateMain={classDetail.level} />
           </span>
-          {/* <script>
-            document.querySelector('.info-rating${voReview.idx}{" "}
-            span').style.width = `${5 * 20}%`; $('.info-rating${voReview.idx}{" "}
-            span').css("width", `${voReview.evaluateMain * 20}%`);
-          </script> */}
           <div className="btn-box">
-            <button>
+            <button onClick={setClassReservation}>
               <svg
                 width="14"
                 height="14"
@@ -52,7 +100,9 @@ const ClassDetail = () => {
                 src="http://localhost:5173/images/classImages/groups-img.png"
                 alt="인원 이미지"
               />
-              <span>2/6</span>
+              <span>
+                {classDetail.reservedCount}/{classDetail.quota}
+              </span>
             </div>
           </div>
         </div>
@@ -63,7 +113,7 @@ const ClassDetail = () => {
             src="http://localhost:5173/images/classImages/user-img.png"
             alt="유저 이미지"
           />
-          <span>이선생</span>
+          <span>{classDetail.hostName}</span>
         </div>
         <div>
           <div className="icon-box">
@@ -80,7 +130,7 @@ const ClassDetail = () => {
               />
             </svg>
             <span>실시간 클래스 시간 : </span>
-            <span>2024-03-05 17:00 ~ 17:40</span>
+            <span></span>
           </div>
           <div className="icon-box">
             <svg
@@ -115,20 +165,28 @@ const ClassDetail = () => {
 
             <div>
               <span>다시보기 기간 : </span>
-              <span>2024-05-05</span>
+              <span>{classDetail.replayEndTime}</span>
             </div>
           </div>
         </div>
         <div className="caution-box">
-          <span>채식주의</span>
-          <span>몰라</span>
+          {classDetail.cookingClassTags &&
+            classDetail.cookingClassTags.map((tag, index) => (
+              <span key={index}>{tag}</span>
+            ))}
         </div>
       </div>
       <hr />
       <div className="class-info-menu">
-        <Link to="">클래스 소개</Link>
-        <Link to="ingredient">식재료</Link>
-        <Link to="kitchentools">조리 도구</Link>
+        <Link to="" description={classDetail.description}>
+          클래스 소개
+        </Link>
+        <Link to="ingredient" ingredients={classDetail.ingredients}>
+          식재료
+        </Link>
+        <Link to="kitchentools" cookingTools={classDetail.cookingTools}>
+          조리 도구
+        </Link>
         <Link to="reviews">수강평</Link>
       </div>
       <Outlet />

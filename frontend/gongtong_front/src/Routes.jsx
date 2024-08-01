@@ -24,13 +24,12 @@ const AppRoutes = () => {
       <Route path="/signupcomplete" element={<SignUpComplete />} />
       <Route path="/login" element={<Login />} />
       <Route path="/mypage" element={<Mypage />} />
-      <Route path="/class" element={<ClassList />}>
-        <Route path=":id" element={<ClassDetail />}>
-          <Route path="" element={<ClassIntroduction />} />
-          <Route path="ingredient" element={<ClassIngredient />} />
-          <Route path="kitchentools" element={<ClassKitchenTools />} />
-          <Route path="reviews" element={<ClassReviews />} />
-        </Route>
+      <Route path="/class" element={<ClassList />} />
+      <Route path="/class/:id" element={<ClassDetail />}>
+        <Route path="" element={<ClassIntroduction />} />
+        <Route path="ingredient" element={<ClassIngredient />} />
+        <Route path="kitchentools" element={<ClassKitchenTools />} />
+        <Route path="reviews" element={<ClassReviews />} />
       </Route>
       <Route path="/classregist" element={<ClassRegist />} />
       <Route path="/classwaiting" element={<ClassWaiting />} />

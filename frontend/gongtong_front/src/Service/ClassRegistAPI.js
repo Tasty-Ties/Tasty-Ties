@@ -14,15 +14,33 @@ export const getCountries = async () => {
 export const getLanguages = async () => {
   try {
     const response = await axios.get(`${REST_CLASSREGIST_API}/languages`);
-    console.log(response.data.data.languages);
     return response.data.data.languages;
   } catch (error) {
     console.log("ClassRegistAPI - getLanguagesError : " + error);
   }
 };
 
-// export const setClassRegist = async () => {
-//   try {
-//     axios.post(`${REST_CLASSREGIST_API}/classes`);
-//   } catch (error) {}
-// };
+export const getClassLists = async (page) => {
+  try {
+    const response = await axios.get(`${REST_CLASSREGIST_API}/classes`, {
+      params: {
+        page: page,
+        size: 12,
+      },
+    });
+    return response.data.data.content;
+  } catch (error) {
+    console.log("ClassListsAPI - getClassListsError : " + error);
+  }
+};
+
+export const getClassDetail = async (classId) => {
+  try {
+    const response = await axios.get(
+      `${REST_CLASSREGIST_API}/classes/${classId}`
+    );
+    return response.data.data;
+  } catch (error) {
+    console.log("ClassDetailAPI - getClassDetailError : " + error);
+  }
+};
