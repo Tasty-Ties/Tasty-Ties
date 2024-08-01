@@ -52,7 +52,6 @@ public class CookingClassController {
         CookingClassDto cookingClass = cookingClassService.registerClass(user, registerDto);
 
 
-
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(CommonResponseDto.builder()
                         .stateCode(201)
