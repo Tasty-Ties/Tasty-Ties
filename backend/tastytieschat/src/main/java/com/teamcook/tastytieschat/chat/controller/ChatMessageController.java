@@ -39,7 +39,6 @@ public class ChatMessageController {
     @MessageMapping("/chat/text/rooms/{roomId}")
     @SendTo("/sub/chat/rooms/{roomId}")
     public ChatMessageResponseDTO sendMessage(@DestinationVariable String roomId, @Payload ChatMessageRequestDTO chatMessageRequestDto) {
-        System.out.println("텍스트 채팅");
         try {
             Map<String, Object> map = chatRoomService.getUserAndTranslatedLanguages(roomId, chatMessageRequestDto.getUserId());
 
@@ -53,7 +52,6 @@ public class ChatMessageController {
                     .chatMessageRequestDto(chatMessageRequestDto)
                     .build();
 
-            // TODO: 번역할 언어 가져오기
             Set<String> translatedLanguages = (Set<String>) map.get("translatedLanguages");
 
             try {
