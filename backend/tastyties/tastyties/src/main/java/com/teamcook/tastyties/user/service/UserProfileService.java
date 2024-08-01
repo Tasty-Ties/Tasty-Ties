@@ -52,11 +52,12 @@ public class UserProfileService {
     public UserInfoDto getProfileMain(String username) {
         log.debug("username: {}", username);
         User user = userRepository.findUserWithCollectedFlags(username);
+        int userId = user.getUserId();
         log.debug("userId: {}", user.getUserId());
         UserProfileDto userProfileDto = getUserProfileDto(user);
-        Set<CookingClassListDto> hostingClasses = cookingClassRepository.searchClassByHostIdForProfile(user.getUserId());
-
-        return new UserInfoDto(userProfileDto, hostingClasses);
+        Set<CookingClassListDto> hostingClasses = cookingClassRepository.searchClassByHostIdForProfile(userId);
+        Set<CookingClassListDto> reservedClasses = userAndClassRepository.findReservedClassesForProfile(userId);
+        return new UserInfoDto(userProfileDto, hostingClasses, reservedClasses);
     }
 
     private static UserProfileDto getUserProfileDto(User user) {

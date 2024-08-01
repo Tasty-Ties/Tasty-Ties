@@ -11,4 +11,5 @@ import java.util.Set;
 public class UserInfoDto {
     private UserProfileDto userProfileDto;
     private Set<CookingClassListDto> hostingClasses;
+    private Set<CookingClassListDto> reservedClasses;
 }

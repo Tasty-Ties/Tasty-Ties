@@ -200,8 +200,10 @@ public class CookingClassRepositoryImpl implements CookingClassCustomRepository 
         return PageableExecutionUtils.getPage(results, pageable, countQuery::fetchOne);
     }
 
+    // 남이 보는 프로필에 사용되는 진행한 클래스 정보
     @Override
     public Set<CookingClassListDto> searchClassByHostIdForProfile(int hostId) {
+        QCountry countryByClass = new QCountry("countryByClass");
         return new HashSet<>(
                 queryFactory
                         .select(new QCookingClassListDto(
@@ -214,16 +216,16 @@ public class CookingClassRepositoryImpl implements CookingClassCustomRepository 
                                         country.alpha2,
                                         country.countryImageUrl
                                 ), new QCountryProfileDto(
-                                country.alpha2,
-                                country.countryImageUrl
+                                countryByClass.alpha2,
+                                countryByClass.countryImageUrl
                         ),
-                        cookingClass.countryCode.eq(country.alpha2)
+                                cookingClass.countryCode.eq(country.alpha2)
                         ))
                         .from(cookingClass)
                         .leftJoin(cookingClass.host, user)
                         .leftJoin(user.country, country)
+                        .leftJoin(countryByClass).on(cookingClass.countryCode.eq(countryByClass.alpha2))
                         .where(
-                                cookingClass.isDelete.eq(false),
                                 cookingClass.host.userId.eq(hostId))
                         .orderBy(cookingClass.cookingClassStartTime.asc())
                         .limit(4)

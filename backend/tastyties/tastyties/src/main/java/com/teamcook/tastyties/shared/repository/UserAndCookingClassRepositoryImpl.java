@@ -111,11 +111,11 @@ public class UserAndCookingClassRepositoryImpl implements UserAndCookingClassCus
                         new QCountryProfileDto(
                                 country.alpha2,
                                 country.countryImageUrl
-                        ).as("hostCountry"),
+                        ),
                                 new QCountryProfileDto(
                                         countryByClass.alpha2,
                                         countryByClass.countryImageUrl
-                                ).as("classCountry"),
+                                ),
                                 cookingClass.countryCode.eq(country.alpha2)
                 ))
                 .from(userAndCookingClass)
@@ -136,6 +136,41 @@ public class UserAndCookingClassRepositoryImpl implements UserAndCookingClassCus
                 .where(userAndCookingClass.user.userId.eq(userId));
 
         return PageableExecutionUtils.getPage(results, pageable, countQuery::fetchOne);
+    }
+
+    @Override
+    public Set<CookingClassListDto> findReservedClassesForProfile(int userId) {
+        QUser host = new QUser("host");
+        QCountry countryByClass = new QCountry("countryByClass");
+        return new HashSet<>(queryFactory
+                .select(
+                        new QCookingClassListDto(
+                                cookingClass.title,
+                                cookingClass.cookingClassStartTime.as("startTime"),
+                                cookingClass.cookingClassEndTime.as("endTime"),
+                                host.nickname.as("hostName"),
+                                cookingClass.uuid,
+                                new QCountryProfileDto(
+                                        country.alpha2,
+                                        country.countryImageUrl
+                                ),
+                                new QCountryProfileDto(
+                                        countryByClass.alpha2,
+                                        countryByClass.countryImageUrl
+                                ),
+                                cookingClass.countryCode.eq(country.alpha2)
+                        ))
+                .from(userAndCookingClass)
+                .join(userAndCookingClass.cookingClass, cookingClass)
+                .join(userAndCookingClass.user, user)
+                .join(cookingClass.host, host)
+                .leftJoin(host.country, country)
+                .leftJoin(countryByClass).on(cookingClass.countryCode.eq(countryByClass.alpha2))
+                .where(userAndCookingClass.user.userId.eq(userId))
+                .orderBy(cookingClass.cookingClassStartTime.asc())
+                .limit(4)
+                .fetch()
+        );
     }
 
     // 예약정보 조회
