@@ -7,6 +7,8 @@ import com.teamcook.tastyties.common.entity.QCountry;
 import com.teamcook.tastyties.cooking_class.dto.CookingClassListDto;
 import com.teamcook.tastyties.cooking_class.dto.QCookingClassListDto;
 import com.teamcook.tastyties.cooking_class.entity.CookingClass;
+import com.teamcook.tastyties.shared.dto.QReviewResponseDto;
+import com.teamcook.tastyties.shared.dto.ReviewResponseDto;
 import com.teamcook.tastyties.shared.entity.UserAndCookingClass;
 import com.teamcook.tastyties.user.dto.QUserProfileForClassDetailDto;
 import com.teamcook.tastyties.user.dto.UserProfileForClassDetailDto;
@@ -171,6 +173,25 @@ public class UserAndCookingClassRepositoryImpl implements UserAndCookingClassCus
                 .limit(4)
                 .fetch()
         );
+    }
+
+    @Override
+    public List<ReviewResponseDto> findReviewsForCookingClass(int hostId) {
+        QUser host = new QUser("host");
+        return queryFactory
+                .select(new QReviewResponseDto(
+                        cookingClass.title, userAndCookingClass.cookingClassReview,
+                        userAndCookingClass.cookingClassReviewCreateTime,
+                        cookingClass.mainImage, country.countryImageUrl
+                )).from(userAndCookingClass)
+                .join(userAndCookingClass.user, user)
+                .join(userAndCookingClass.cookingClass, cookingClass)
+                .join(cookingClass.host, host)
+                .leftJoin(country).on(cookingClass.countryCode.eq(country.alpha2))
+                .where(host.userId.eq(hostId))
+                .orderBy(userAndCookingClass.cookingClassReviewCreateTime.desc())
+                .limit(3)
+                .fetch();
     }
 
     // 예약정보 조회

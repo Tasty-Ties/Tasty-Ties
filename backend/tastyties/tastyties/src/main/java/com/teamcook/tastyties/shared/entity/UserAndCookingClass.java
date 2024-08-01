@@ -1,6 +1,6 @@
 package com.teamcook.tastyties.shared.entity;
 
-import com.teamcook.tastyties.cooking_class.dto.ReviewRequestDto;
+import com.teamcook.tastyties.shared.dto.ReviewRequestDto;
 import com.teamcook.tastyties.cooking_class.entity.CookingClass;
 import com.teamcook.tastyties.user.entity.User;
 import jakarta.persistence.*;

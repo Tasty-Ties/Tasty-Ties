@@ -7,7 +7,7 @@ import com.teamcook.tastyties.common.dto.RabbitMQUserDto;
 import com.teamcook.tastyties.cooking_class.dto.CookingClassListDto;
 import com.teamcook.tastyties.cooking_class.dto.CookingClassDto;
 import com.teamcook.tastyties.cooking_class.dto.CookingClassSearchCondition;
-import com.teamcook.tastyties.cooking_class.dto.ReviewRequestDto;
+import com.teamcook.tastyties.shared.dto.ReviewRequestDto;
 import com.teamcook.tastyties.common.constant.RabbitMQRequestType;
 import com.teamcook.tastyties.cooking_class.entity.CookingClass;
 import com.teamcook.tastyties.cooking_class.service.CookingClassService;

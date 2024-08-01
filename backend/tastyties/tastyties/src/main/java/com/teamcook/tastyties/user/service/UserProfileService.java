@@ -6,6 +6,7 @@ import com.teamcook.tastyties.common.entity.Country;
 import com.teamcook.tastyties.common.entity.Language;
 import com.teamcook.tastyties.cooking_class.dto.CookingClassListDto;
 import com.teamcook.tastyties.cooking_class.repository.CookingClassRepository;
+import com.teamcook.tastyties.shared.dto.ReviewRequestDto;
 import com.teamcook.tastyties.shared.repository.UserAndCookingClassRepository;
 import com.teamcook.tastyties.shared.repository.UserAndCountryRepository;
 import com.teamcook.tastyties.user.dto.UserInfoDto;
@@ -57,6 +58,7 @@ public class UserProfileService {
         UserProfileDto userProfileDto = getUserProfileDto(user);
         Set<CookingClassListDto> hostingClasses = cookingClassRepository.searchClassByHostIdForProfile(userId);
         Set<CookingClassListDto> reservedClasses = userAndClassRepository.findReservedClassesForProfile(userId);
+//        List<ReviewRequestDto> reviewList = userAndClassRepository.
         return new UserInfoDto(userProfileDto, hostingClasses, reservedClasses);
     }
 
@@ -70,7 +72,7 @@ public class UserProfileService {
                 ,uc.getCountry().getCountryImageUrl()))
                 .toList();
 
-        return new UserProfileDto(null, user.getNickname(),
+        return new UserProfileDto(user.getProfileImageUrl(), user.getNickname(),
                 new CountryResponseDto(country.getAlpha2(), country.getEnglishName(),
                         country.getKoreanName(), country.getCountryImageUrl()),
                 collectedFlags,

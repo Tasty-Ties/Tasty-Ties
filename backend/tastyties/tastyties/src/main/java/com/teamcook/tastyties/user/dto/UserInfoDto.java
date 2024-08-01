@@ -6,6 +6,7 @@ import lombok.Data;
 
 import java.util.Set;
 
+// 남에게 보이는 프로필 조회를 위한 DTO입니다.
 @Data
 @AllArgsConstructor
 public class UserInfoDto {

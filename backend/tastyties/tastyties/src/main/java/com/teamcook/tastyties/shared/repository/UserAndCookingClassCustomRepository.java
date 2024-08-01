@@ -2,12 +2,15 @@ package com.teamcook.tastyties.shared.repository;
 
 import com.teamcook.tastyties.cooking_class.dto.CookingClassListDto;
 import com.teamcook.tastyties.cooking_class.entity.CookingClass;
+import com.teamcook.tastyties.shared.dto.ReviewResponseDto;
 import com.teamcook.tastyties.shared.entity.UserAndCookingClass;
 import com.teamcook.tastyties.user.dto.UserProfileForClassDetailDto;
 import com.teamcook.tastyties.user.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.w3c.dom.stylesheets.LinkStyle;
 
+import java.util.List;
 import java.util.Set;
 
 public interface UserAndCookingClassCustomRepository {
@@ -23,6 +26,8 @@ public interface UserAndCookingClassCustomRepository {
 
     Page<CookingClassListDto> findReservedClassesByUserId(int userId, Pageable pageable);
     Set<CookingClassListDto> findReservedClassesForProfile(int userId);
+
+    List<ReviewResponseDto> findReviewsForCookingClass(int userId);
 
     UserAndCookingClass findReservationByUsernameAndClassUuid(int userId, String uuid);
 }

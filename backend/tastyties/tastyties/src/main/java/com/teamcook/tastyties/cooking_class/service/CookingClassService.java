@@ -7,6 +7,7 @@ import com.teamcook.tastyties.cooking_class.exception.ClassNotFoundException;
 import com.teamcook.tastyties.cooking_class.exception.ReservationNotFoundException;
 import com.teamcook.tastyties.cooking_class.repository.*;
 import com.teamcook.tastyties.security.userdetails.CustomUserDetails;
+import com.teamcook.tastyties.shared.dto.ReviewRequestDto;
 import com.teamcook.tastyties.shared.entity.CookingClassAndCookingClassTag;
 import com.teamcook.tastyties.shared.entity.UserAndCookingClass;
 import com.teamcook.tastyties.shared.repository.CookingClassAndCookingClassTagRepository;
