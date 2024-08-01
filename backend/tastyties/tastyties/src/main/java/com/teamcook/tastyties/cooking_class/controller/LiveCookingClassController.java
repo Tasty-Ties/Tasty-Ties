@@ -27,7 +27,7 @@ public class LiveCookingClassController {
     public ResponseEntity<CommonResponseDto> initializeSession(@AuthenticationPrincipal CustomUserDetails userDetails, @PathVariable String uuid)
             throws OpenViduJavaClientException, OpenViduHttpException, AccessDeniedException {
         String sessionId = liveCookingClassService.getLiveSessionId(userDetails.getUserId(), uuid);
-        liveCookingClassService.updateCookingClassSessionId(userDetails.getUserId(), sessionId);
+        liveCookingClassService.updateSessionIdByCookingClassId(sessionId, uuid);
 
         return ResponseEntity.ok()
                 .body(CommonResponseDto.builder()

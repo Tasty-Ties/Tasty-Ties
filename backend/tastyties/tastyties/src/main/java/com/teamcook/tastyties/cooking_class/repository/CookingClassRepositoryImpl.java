@@ -11,8 +11,8 @@ import com.teamcook.tastyties.common.entity.QCountry;
 import com.teamcook.tastyties.cooking_class.dto.*;
 import com.teamcook.tastyties.cooking_class.entity.CookingClass;
 import com.teamcook.tastyties.cooking_class.entity.CookingClassTag;
-import com.teamcook.tastyties.cooking_class.entity.QCookingClassTag;
 import com.teamcook.tastyties.shared.entity.QCookingClassAndCookingClassTag;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -240,6 +240,15 @@ public class CookingClassRepositoryImpl implements CookingClassCustomRepository 
                         .and(cookingClass.host.userId.eq(hostId)))
                 .fetchOne();
         return count != null && count > 0;
+    }
+
+    @Override
+    @Transactional
+    public void updateSessionIdByCookingClassId(String sessionId, String uuid) {
+        queryFactory.update(cookingClass)
+                .set(cookingClass.sessionId, sessionId)
+                .where(cookingClass.uuid.eq(uuid))
+                .execute();
     }
 
 }

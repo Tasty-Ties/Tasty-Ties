@@ -4,6 +4,7 @@ import com.teamcook.tastyties.cooking_class.repository.*;
 import com.teamcook.tastyties.exception.CookingClassNotFoundException;
 import io.openvidu.java.client.*;
 import jakarta.annotation.PostConstruct;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -45,7 +46,7 @@ public class LiveCookingClassService {
             throw new CookingClassNotFoundException("해당 쿠킹 클래스가 존재하지 않습니다.");
         }
         if (!ccRepository.isCookingClassHost(userId, uuid)) {
-            throw new AccessDeniedException("호스트가 아님");
+            throw new AccessDeniedException("호스트가 아닙니다.");
         }
         Map<String, Object> params = Map.of(CREATE_KEY_NAME, uuid);
         SessionProperties properties = SessionProperties.fromJson(params).build();
@@ -53,7 +54,8 @@ public class LiveCookingClassService {
         return session.getSessionId();
     }
 
-    public void updateCookingClassSessionId(Integer userId, String sessionId) {
-
+    @Transactional
+    public void updateSessionIdByCookingClassId(String sessionId, String uuid) {
+        ccRepository.updateSessionIdByCookingClassId(sessionId, uuid);
     }
 }

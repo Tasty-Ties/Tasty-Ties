@@ -25,4 +25,6 @@ public interface CookingClassCustomRepository {
     Set<CookingClassListDto> searchClassByHostIdForProfile(int hostId);
 
     boolean isCookingClassHost(int hostId, String uuid);
+
+    void updateSessionIdByCookingClassId(String sessionId, String uuid);
 }
