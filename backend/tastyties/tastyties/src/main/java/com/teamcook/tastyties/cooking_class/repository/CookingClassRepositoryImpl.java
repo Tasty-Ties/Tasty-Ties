@@ -66,9 +66,9 @@ public class CookingClassRepositoryImpl implements CookingClassCustomRepository 
                                 country.alpha2,
                                 country.countryImageUrl
                         ), new QCountryProfileDto(
-                                countryByClass.alpha2,
-                                countryByClass.countryImageUrl
-                        ),
+                        countryByClass.alpha2,
+                        countryByClass.countryImageUrl
+                ),
                         cookingClass.countryCode.eq(country.alpha2)
                 ))
                 .from(cookingClass)
@@ -106,7 +106,7 @@ public class CookingClassRepositoryImpl implements CookingClassCustomRepository 
 
     // username equal 필터
     private BooleanExpression usernameEq(String username) {
-        return hasText(username) ?user.username.eq(username) : null;
+        return hasText(username) ? user.username.eq(username) : null;
     }
 
     // 현지인 필터
@@ -176,9 +176,9 @@ public class CookingClassRepositoryImpl implements CookingClassCustomRepository 
                                 country.alpha2,
                                 country.countryImageUrl
                         ), new QCountryProfileDto(
-                                countryByClass.alpha2,
-                                countryByClass.countryImageUrl
-                        ), cookingClass.countryCode.eq(country.alpha2)
+                        countryByClass.alpha2,
+                        countryByClass.countryImageUrl
+                ), cookingClass.countryCode.eq(country.alpha2)
                 ))
                 .from(cookingClass)
                 .leftJoin(cookingClass.host, user)
@@ -217,7 +217,7 @@ public class CookingClassRepositoryImpl implements CookingClassCustomRepository 
                                 country.alpha2,
                                 country.countryImageUrl
                         ),
-                        cookingClass.countryCode.eq(country.alpha2)
+                                cookingClass.countryCode.eq(country.alpha2)
                         ))
                         .from(cookingClass)
                         .leftJoin(cookingClass.host, user)
@@ -229,6 +229,17 @@ public class CookingClassRepositoryImpl implements CookingClassCustomRepository 
                         .limit(4)
                         .fetch()
         );
+    }
+
+    @Override
+    public boolean isCookingClassHost(int hostId, String uuid) {
+        Long count = queryFactory
+                .select(cookingClass.count())
+                .from(cookingClass)
+                .where(cookingClass.uuid.eq(uuid)
+                        .and(cookingClass.host.userId.eq(hostId)))
+                .fetchOne();
+        return count != null && count > 0;
     }
 
 }

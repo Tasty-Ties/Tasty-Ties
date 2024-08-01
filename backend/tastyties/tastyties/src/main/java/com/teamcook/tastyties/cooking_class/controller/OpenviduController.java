@@ -47,8 +47,6 @@ public class OpenviduController {
         System.out.println("params = " + params);
         SessionProperties properties = SessionProperties.fromJson(params).build();
         Session session = openvidu.createSession(properties);
-        System.out.println(session.toString());
-        System.out.println(session.getSessionId());
         return new ResponseEntity<>(session.getSessionId(), HttpStatus.OK);
     }
 

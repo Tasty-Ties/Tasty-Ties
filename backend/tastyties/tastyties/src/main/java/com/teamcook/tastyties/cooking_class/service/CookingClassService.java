@@ -2,9 +2,9 @@ package com.teamcook.tastyties.cooking_class.service;
 
 import com.teamcook.tastyties.cooking_class.dto.*;
 import com.teamcook.tastyties.cooking_class.entity.*;
-import com.teamcook.tastyties.cooking_class.exception.ClassIsDeletedException;
-import com.teamcook.tastyties.cooking_class.exception.ClassNotFoundException;
-import com.teamcook.tastyties.cooking_class.exception.ReservationNotFoundException;
+import com.teamcook.tastyties.exception.CookingClassIsDeletedException;
+import com.teamcook.tastyties.exception.CookingClassNotFoundException;
+import com.teamcook.tastyties.exception.ReservationNotFoundException;
 import com.teamcook.tastyties.cooking_class.repository.*;
 import com.teamcook.tastyties.security.userdetails.CustomUserDetails;
 import com.teamcook.tastyties.shared.entity.CookingClassAndCookingClassTag;
@@ -217,11 +217,11 @@ public class CookingClassService {
     public long deleteClass(int userId, String uuid) {
         CookingClass cookingClass = cookingClassRepository.findClassForDelete(uuid);
         if (cookingClass == null) {
-            throw new ClassNotFoundException("클래스를 찾을 수 없습니다.");
+            throw new CookingClassNotFoundException("클래스를 찾을 수 없습니다.");
         }
 
         if (cookingClass.isDelete()) {
-            throw new ClassIsDeletedException("이미 삭제된 클래스입니다.");
+            throw new CookingClassIsDeletedException("이미 삭제된 클래스입니다.");
         }
         if (cookingClass.getHost().getUserId() != userId) {
             throw new IllegalArgumentException("본인의 클래스만 삭제할 수 있습니다.");
@@ -238,11 +238,11 @@ public class CookingClassService {
     public void reserveClass(User user, String uuid) {
         CookingClass cc = cookingClassRepository.findWithUuid(uuid);
         if (cc == null) {
-            throw new ClassNotFoundException("존재하지 않는 클래스입니다.");
+            throw new CookingClassNotFoundException("존재하지 않는 클래스입니다.");
         }
 
         if (cc.isDelete()) {
-            throw new ClassIsDeletedException("삭제된 클래스입니다.");
+            throw new CookingClassIsDeletedException("삭제된 클래스입니다.");
         }
         if (cc.getHost().getUserId() == user.getUserId()) {
             throw new IllegalArgumentException("본인의 클래스에는 예약할 수 없습니다.");
@@ -267,7 +267,7 @@ public class CookingClassService {
         CookingClass cc = cookingClassRepository.findWithUuid(uuid);
 
         if (cc.isDelete()) {
-            throw new ClassIsDeletedException("삭제된 클래스입니다.");
+            throw new CookingClassIsDeletedException("삭제된 클래스입니다.");
         }
         deleteUserAndCookingClassRelationship(user, cc);
     }
@@ -287,4 +287,5 @@ public class CookingClassService {
 
         reservation.setCookingClassReview(reviewRequestDto.getComment());
     }
+
 }
