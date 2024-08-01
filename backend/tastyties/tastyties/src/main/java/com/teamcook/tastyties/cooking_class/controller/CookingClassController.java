@@ -65,6 +65,7 @@ public class CookingClassController {
     @GetMapping
     public ResponseEntity<CommonResponseDto> getClasses(@ModelAttribute CookingClassSearchCondition searchCondition, Pageable pageable) {
         log.debug("localfilter {} ", searchCondition.isUseLocalFilter());
+        log.debug("countryCode {} ", searchCondition.getCountryCode());
         Page<CookingClassListDto> classList = cookingClassService.searchCookingClassList(searchCondition, pageable);
         return ResponseEntity.ok()
                 .body(CommonResponseDto.builder()

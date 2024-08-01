@@ -1,6 +1,9 @@
 package com.teamcook.tastyties.cooking_class.repository;
 
+import com.querydsl.core.types.Order;
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.PathBuilder;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.teamcook.tastyties.common.dto.QCountryProfileDto;
@@ -10,8 +13,10 @@ import com.teamcook.tastyties.cooking_class.entity.CookingClass;
 import com.teamcook.tastyties.cooking_class.entity.CookingClassTag;
 import com.teamcook.tastyties.cooking_class.entity.QCookingClassTag;
 import com.teamcook.tastyties.shared.entity.QCookingClassAndCookingClassTag;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.support.PageableExecutionUtils;
 
 import java.util.List;
@@ -22,6 +27,7 @@ import static com.teamcook.tastyties.cooking_class.entity.QCookingClassTag.cooki
 import static com.teamcook.tastyties.user.entity.QUser.user;
 import static org.springframework.util.StringUtils.hasText;
 
+@Slf4j
 public class CookingClassRepositoryImpl implements CookingClassCustomRepository {
 
     private final JPAQueryFactory queryFactory;
@@ -65,9 +71,11 @@ public class CookingClassRepositoryImpl implements CookingClassCustomRepository 
                         cookingClass.isDelete.eq(false),
                         titleLike(condition.getTitle()),
                         usernameEq(condition.getUsername()),
-                        useLocalFilter(condition.isUseLocalFilter())
+                        useLocalFilter(condition.isUseLocalFilter()),
+                        countryCodeEq(condition.getCountryCode()),
+                        languageCodeEq(condition.getLanguageCode())
                 )
-                .orderBy(cookingClass.createTime.desc())
+                .orderBy(getOrderSpecifiers(pageable.getSort()))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
@@ -97,6 +105,28 @@ public class CookingClassRepositoryImpl implements CookingClassCustomRepository 
     private BooleanExpression useLocalFilter(Boolean useLocalFilter) {
         // 필터가 true이면 필터링 적용, 아니면 null 반환하여 조건에서 제외
         return Boolean.TRUE.equals(useLocalFilter) ? cookingClass.countryCode.eq(country.alpha2) : null;
+    }
+
+    // 나라 코드 필터
+    private BooleanExpression countryCodeEq(String countryCode) {
+        return hasText(countryCode) ? cookingClass.countryCode.eq(countryCode) : null;
+    }
+
+    // 언어 코드 필터
+    private BooleanExpression languageCodeEq(String languageCode) {
+        return hasText(languageCode) ? cookingClass.languageCode.eq(languageCode) : null;
+    }
+
+    private OrderSpecifier<?>[] getOrderSpecifiers(Sort sort) {
+        return sort.stream()
+                .map(order -> {
+                    PathBuilder pathBuilder = new PathBuilder(cookingClass.getType(), cookingClass.getMetadata());
+                    return new OrderSpecifier(
+                            order.isAscending() ? Order.ASC : Order.DESC,
+                            pathBuilder.get(order.getProperty())
+                    );
+                })
+                .toArray(OrderSpecifier[]::new);
     }
 
     // 클래스 상세 조회
