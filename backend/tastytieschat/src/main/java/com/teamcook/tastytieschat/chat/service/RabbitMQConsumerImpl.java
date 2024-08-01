@@ -37,14 +37,20 @@ public class RabbitMQConsumerImpl implements RabbitMQConsumer {
                     value = "${rabbitmq.queue.host}",
                     durable = "true"
             ),
-            exchange = @Exchange(value = "${rabbitmq.exchange}"),
-            key = "${rabbitmq.routing.key.create}"
+            exchange = @Exchange(value = "${rabbitmq.exchange")
     ))
-    public void createChatRoom(RabbitMQRequestDTO rabbitMQRequestDto, Message message) {
-        if (rabbitMQRequestDto.getType() != RabbitMQRequestType.CREATE) {
-            return;
+    public void hostChatRoom(RabbitMQRequestDTO rabbitMQRequestDto, Message message) {
+        switch (rabbitMQRequestDto.getType()) {
+            case CREATE:
+                createChatRoom(rabbitMQRequestDto, message);
+                break;
+            case DELETE:
+                deleteChatRoom(rabbitMQRequestDto);
+                break;
         }
+    }
 
+    private void createChatRoom(RabbitMQRequestDTO rabbitMQRequestDto, Message message) {
         ChatRoom chatRoom = new ChatRoom(rabbitMQRequestDto.getTitle(), rabbitMQRequestDto.getUser());
         chatRoomRepository.save(chatRoom);
 
@@ -60,20 +66,7 @@ public class RabbitMQConsumerImpl implements RabbitMQConsumer {
         });
     }
 
-    @Override
-    @RabbitListener(bindings = @QueueBinding(
-            value = @Queue(
-                    value = "${rabbitmq.queue.host}",
-                    durable = "true"
-            ),
-            exchange = @Exchange(value = "${rabbitmq.exchange"),
-            key = "${rabbitmq.routing.key.delete}"
-    ))
-    public void deleteChatRoom(RabbitMQRequestDTO rabbitMQRequestDto) {
-        if (rabbitMQRequestDto.getType() != RabbitMQRequestType.DELETE) {
-            return;
-        }
-
+    private void deleteChatRoom(RabbitMQRequestDTO rabbitMQRequestDto) {
         String chatRoomId = rabbitMQRequestDto.getChatRoomId();
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId).orElse(null);
 
@@ -90,14 +83,20 @@ public class RabbitMQConsumerImpl implements RabbitMQConsumer {
                     value = "${rabbitmq.queue.attendee}",
                     durable = "true"
             ),
-            exchange = @Exchange(value = "${rabbitmq.exchange"),
-            key = "${rabbitmq.routing.key.join}"
+            exchange = @Exchange(value = "${rabbitmq.exchange")
     ))
-    public void enterChatRoom(RabbitMQRequestDTO rabbitMQRequestDto) {
-        if (rabbitMQRequestDto.getType() != RabbitMQRequestType.JOIN) {
-            return;
+    public void attendeeChatRoom(RabbitMQRequestDTO rabbitMQRequestDto) {
+        switch (rabbitMQRequestDto.getType()) {
+            case JOIN:
+                enterChatRoom(rabbitMQRequestDto);
+                break;
+            case LEAVE:
+                leaveChatRoom(rabbitMQRequestDto);
+                break;
         }
+    }
 
+    private void enterChatRoom(RabbitMQRequestDTO rabbitMQRequestDto) {
         String chatRoomId = rabbitMQRequestDto.getChatRoomId();
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId).orElse(null);
 
@@ -114,20 +113,7 @@ public class RabbitMQConsumerImpl implements RabbitMQConsumer {
         }
     }
 
-    @Override
-    @RabbitListener(bindings = @QueueBinding(
-            value = @Queue(
-                    value = "${rabbitmq.queue.attendee}",
-                    durable = "true"
-            ),
-            exchange = @Exchange(value = "${rabbitmq.exchange"),
-            key = "${rabbitmq.routing.key.leave}"
-    ))
-    public void leaveChatRoom(RabbitMQRequestDTO rabbitMQRequestDto) {
-        if (rabbitMQRequestDto.getType() != RabbitMQRequestType.LEAVE) {
-            return;
-        }
-
+    private void leaveChatRoom(RabbitMQRequestDTO rabbitMQRequestDto) {
         String chatRoomId = rabbitMQRequestDto.getChatRoomId();
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId).orElse(null);
 
