@@ -10,6 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import java.util.Set;
 
 public interface CookingClassCustomRepository {
 
@@ -24,4 +25,5 @@ public interface CookingClassCustomRepository {
     CookingClass findClassForDelete(String uuid);
 
     Page<CookingClassListDto> searchClassByHostId(int hostId, Pageable pageable);
+    Set<CookingClassListDto> searchClassByHostIdForProfile(int hostId);
 }

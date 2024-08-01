@@ -1,6 +1,9 @@
 package com.teamcook.tastyties.cooking_class.repository;
 
+import com.querydsl.core.types.Order;
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.PathBuilder;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.teamcook.tastyties.common.dto.QCountryProfileDto;
@@ -10,11 +13,15 @@ import com.teamcook.tastyties.cooking_class.entity.CookingClass;
 import com.teamcook.tastyties.cooking_class.entity.CookingClassTag;
 import com.teamcook.tastyties.cooking_class.entity.QCookingClassTag;
 import com.teamcook.tastyties.shared.entity.QCookingClassAndCookingClassTag;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.support.PageableExecutionUtils;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static com.teamcook.tastyties.common.entity.QCountry.country;
 import static com.teamcook.tastyties.cooking_class.entity.QCookingClass.cookingClass;
@@ -22,6 +29,7 @@ import static com.teamcook.tastyties.cooking_class.entity.QCookingClassTag.cooki
 import static com.teamcook.tastyties.user.entity.QUser.user;
 import static org.springframework.util.StringUtils.hasText;
 
+@Slf4j
 public class CookingClassRepositoryImpl implements CookingClassCustomRepository {
 
     private final JPAQueryFactory queryFactory;
@@ -47,6 +55,7 @@ public class CookingClassRepositoryImpl implements CookingClassCustomRepository 
     // 동적 쿼리 사용
     @Override
     public Page<CookingClassListDto> searchClass(CookingClassSearchCondition condition, Pageable pageable) {
+        QCountry countryByClass = new QCountry("countryByClass");
         List<CookingClassListDto> results = queryFactory
                 .select(new QCookingClassListDto(cookingClass.title,
                         cookingClass.cookingClassStartTime.as("startTime"),
@@ -56,18 +65,25 @@ public class CookingClassRepositoryImpl implements CookingClassCustomRepository 
                         new QCountryProfileDto(
                                 country.alpha2,
                                 country.countryImageUrl
-                        ), cookingClass.countryCode.eq(country.alpha2)
+                        ), new QCountryProfileDto(
+                                countryByClass.alpha2,
+                                countryByClass.countryImageUrl
+                        ),
+                        cookingClass.countryCode.eq(country.alpha2)
                 ))
                 .from(cookingClass)
                 .leftJoin(cookingClass.host, user)
                 .leftJoin(user.country, country)
+                .leftJoin(countryByClass).on(cookingClass.countryCode.eq(countryByClass.alpha2))
                 .where(
                         cookingClass.isDelete.eq(false),
                         titleLike(condition.getTitle()),
                         usernameEq(condition.getUsername()),
-                        useLocalFilter(condition.isUseLocalFilter())
+                        useLocalFilter(condition.isUseLocalFilter()),
+                        countryCodeEq(condition.getCountryCode()),
+                        languageCodeEq(condition.getLanguageCode())
                 )
-                .orderBy(cookingClass.createTime.desc())
+                .orderBy(getOrderSpecifiers(pageable.getSort()))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
@@ -99,6 +115,28 @@ public class CookingClassRepositoryImpl implements CookingClassCustomRepository 
         return Boolean.TRUE.equals(useLocalFilter) ? cookingClass.countryCode.eq(country.alpha2) : null;
     }
 
+    // 나라 코드 필터
+    private BooleanExpression countryCodeEq(String countryCode) {
+        return hasText(countryCode) ? cookingClass.countryCode.eq(countryCode) : null;
+    }
+
+    // 언어 코드 필터
+    private BooleanExpression languageCodeEq(String languageCode) {
+        return hasText(languageCode) ? cookingClass.languageCode.eq(languageCode) : null;
+    }
+
+    private OrderSpecifier<?>[] getOrderSpecifiers(Sort sort) {
+        return sort.stream()
+                .map(order -> {
+                    PathBuilder pathBuilder = new PathBuilder(cookingClass.getType(), cookingClass.getMetadata());
+                    return new OrderSpecifier(
+                            order.isAscending() ? Order.ASC : Order.DESC,
+                            pathBuilder.get(order.getProperty())
+                    );
+                })
+                .toArray(OrderSpecifier[]::new);
+    }
+
     // 클래스 상세 조회
     @Override
     public CookingClass findWithUuid(String uuid) {
@@ -126,6 +164,7 @@ public class CookingClassRepositoryImpl implements CookingClassCustomRepository 
 
     @Override
     public Page<CookingClassListDto> searchClassByHostId(int hostId, Pageable pageable) {
+        QCountry countryByClass = new QCountry("countryByClass");
         List<CookingClassListDto> results = queryFactory
                 .select(new QCookingClassListDto(
                         cookingClass.title,
@@ -136,11 +175,15 @@ public class CookingClassRepositoryImpl implements CookingClassCustomRepository 
                         new QCountryProfileDto(
                                 country.alpha2,
                                 country.countryImageUrl
+                        ), new QCountryProfileDto(
+                                countryByClass.alpha2,
+                                countryByClass.countryImageUrl
                         ), cookingClass.countryCode.eq(country.alpha2)
                 ))
                 .from(cookingClass)
                 .leftJoin(cookingClass.host, user)
                 .leftJoin(user.country, country)
+                .leftJoin(countryByClass).on(cookingClass.countryCode.eq(countryByClass.alpha2))
                 .where(
                         cookingClass.isDelete.eq(false),
                         cookingClass.host.userId.eq(hostId))
@@ -155,6 +198,37 @@ public class CookingClassRepositoryImpl implements CookingClassCustomRepository 
                 .where(cookingClass.host.userId.eq(hostId));
 
         return PageableExecutionUtils.getPage(results, pageable, countQuery::fetchOne);
+    }
+
+    @Override
+    public Set<CookingClassListDto> searchClassByHostIdForProfile(int hostId) {
+        return new HashSet<>(
+                queryFactory
+                        .select(new QCookingClassListDto(
+                                cookingClass.title,
+                                cookingClass.cookingClassStartTime.as("startTime"),
+                                cookingClass.cookingClassEndTime.as("endTime"),
+                                user.nickname.as("hostName"),
+                                cookingClass.uuid,
+                                new QCountryProfileDto(
+                                        country.alpha2,
+                                        country.countryImageUrl
+                                ), new QCountryProfileDto(
+                                country.alpha2,
+                                country.countryImageUrl
+                        ),
+                        cookingClass.countryCode.eq(country.alpha2)
+                        ))
+                        .from(cookingClass)
+                        .leftJoin(cookingClass.host, user)
+                        .leftJoin(user.country, country)
+                        .where(
+                                cookingClass.isDelete.eq(false),
+                                cookingClass.host.userId.eq(hostId))
+                        .orderBy(cookingClass.cookingClassStartTime.asc())
+                        .limit(4)
+                        .fetch()
+        );
     }
 
 }

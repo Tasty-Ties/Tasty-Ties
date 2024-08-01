@@ -8,6 +8,7 @@ import com.teamcook.tastyties.cooking_class.dto.CookingClassListDto;
 import com.teamcook.tastyties.cooking_class.repository.CookingClassRepository;
 import com.teamcook.tastyties.shared.repository.UserAndCookingClassRepository;
 import com.teamcook.tastyties.shared.repository.UserAndCountryRepository;
+import com.teamcook.tastyties.user.dto.UserInfoDto;
 import com.teamcook.tastyties.user.dto.UserProfileDto;
 import com.teamcook.tastyties.user.entity.User;
 import com.teamcook.tastyties.user.repository.UserRepository;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Set;
 
 @Service
 @Slf4j
@@ -43,6 +45,21 @@ public class UserProfileService {
         log.debug("query before");
         User user = userRepository.findUserWithCollectedFlags(userId);
         log.debug("query after");
+        return getUserProfileDto(user);
+    }
+
+    @Transactional
+    public UserInfoDto getProfileMain(String username) {
+        log.debug("username: {}", username);
+        User user = userRepository.findUserWithCollectedFlags(username);
+        log.debug("userId: {}", user.getUserId());
+        UserProfileDto userProfileDto = getUserProfileDto(user);
+        Set<CookingClassListDto> hostingClasses = cookingClassRepository.searchClassByHostIdForProfile(user.getUserId());
+
+        return new UserInfoDto(userProfileDto, hostingClasses);
+    }
+
+    private static UserProfileDto getUserProfileDto(User user) {
         Country country = user.getCountry();
         Language language = user.getLanguage();
 

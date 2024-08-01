@@ -34,6 +34,19 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
     }
 
     @Override
+    public User findUserWithCollectedFlags(String username) {
+        QCountry collectedCountry = new QCountry("collectedCountry"); // 다른 별칭 사용
+        return queryFactory
+                .selectFrom(user)
+                .leftJoin(user.language, language).fetchJoin()            // User의 Language 페치 조인
+                .leftJoin(user.country, country).fetchJoin()              // User의 Country 페치 조인
+                .leftJoin(user.userAndCountries, userAndCountry).fetchJoin()
+                .leftJoin(userAndCountry.country, collectedCountry).fetchJoin() // UserAndCountry와 관련된 Country 페치 조인
+                .where(user.username.eq(username))
+                .fetchOne();
+    }
+
+    @Override
     public User findUserWithLanguage(Integer userId) {
         return queryFactory
                 .selectFrom(user)
