@@ -17,13 +17,4 @@ public class ChatExceptionHandler {
                         .build());
     }
 
-    @ExceptionHandler(UserAlreadyExistException.class)
-    public ResponseEntity<CommonResponseDTO> handleUserAlreadyExistException(UserAlreadyExistException e) {
-        return ResponseEntity.status(409)
-                .body(CommonResponseDTO.builder()
-                        .stateCode(409)
-                        .message(e.getMessage())
-                        .build());
-    }
-
 }

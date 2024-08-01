@@ -1,7 +1,6 @@
 package com.teamcook.tastyties.shared.entity;
 
 import com.teamcook.tastyties.cooking_class.entity.CookingClass;
-import com.teamcook.tastyties.shared.entity.UserAndCookingClass;
 import com.teamcook.tastyties.user.entity.User;
 import com.teamcook.tastyties.cooking_class.repository.CookingClassRepository;
 import com.teamcook.tastyties.shared.repository.UserAndCookingClassRepository;
@@ -10,7 +9,6 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,8 +40,8 @@ public class UserAndCookingClassTest {
         user.setUsername("ssafy");
         user.setPassword("password");
         user.setNickname("김싸피");
-        user.setCountryCode("KO");
-        user.setLanguageCode("ko");
+        user.setCountry("KO");
+        user.setLanguage("ko");
         user.setEmail("ssafy0718@gmail.com");
         user.setBirth(LocalDate.parse("2001-07-18"));
         User savedUser = userRepository.save(user);

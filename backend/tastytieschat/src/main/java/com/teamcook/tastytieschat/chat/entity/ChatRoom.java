@@ -30,12 +30,11 @@ public class ChatRoom {
     private Instant createdTime;
     private boolean isDeleted;
 
-    public ChatRoom(ChatRoomRequestDTO chatRoomRequestDto) {
-        this.title = chatRoomRequestDto.getTitle();
+    public ChatRoom(String title, UserDTO userDto) {
+        this.title = title;
         this.users = new ArrayList<>();
         this.isDeleted = false;
 
-        UserDTO userDto = chatRoomRequestDto.getUser();
         userDto.setEnteredTime(Instant.now());
 
         users.add(userDto);
