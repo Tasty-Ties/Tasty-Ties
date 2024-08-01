@@ -8,6 +8,7 @@ import com.teamcook.tastyties.cooking_class.dto.ReviewRequestDto;
 import com.teamcook.tastyties.cooking_class.service.CookingClassService;
 import com.teamcook.tastyties.security.userdetails.CustomUserDetails;
 import com.teamcook.tastyties.user.entity.User;
+import com.teamcook.tastyties.user.exception.UserDetailsNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -84,7 +85,16 @@ public class CookingClassController {
     // 클래스 삭제
     @DeleteMapping("/{uuid}")
     public ResponseEntity<CommonResponseDto> deleteClass(@AuthenticationPrincipal CustomUserDetails userDetails, @PathVariable String uuid) {
-        return null;
+        if (userDetails == null) {
+            throw new UserDetailsNotFoundException("인증 정보를 찾을 수 없습니다.");
+        }
+        long row = cookingClassService.deleteClass(userDetails.getUserId(), uuid);
+        return ResponseEntity.ok()
+                .body(CommonResponseDto.builder()
+                        .stateCode(200)
+                        .message("정상적으로 삭제되었습니다.")
+                        .data("연관된 예약 " + row + "개가 취소되었습니다.")
+                        .build());
     }
 
     // 클래스 예약

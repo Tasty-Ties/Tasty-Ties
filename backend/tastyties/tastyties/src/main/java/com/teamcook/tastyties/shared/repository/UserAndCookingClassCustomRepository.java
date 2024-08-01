@@ -18,6 +18,7 @@ public interface UserAndCookingClassCustomRepository {
     Long countQuota(CookingClass cookingClass);
     Set<UserProfileForClassDetailDto> findUserEnrolledInClass(CookingClass cookingClass);
 
+    long deleteCookingClass(CookingClass cookingClass);
     boolean deleteReservation(User user, CookingClass cookingClass);
 
     Page<CookingClassListDto> findReservedClassesByUserId(int userId, Pageable pageable);

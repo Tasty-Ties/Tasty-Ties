@@ -90,4 +90,8 @@ public class CookingClass {
     protected void onUpdate() {
         updateTime = LocalDateTime.now();
     }
+
+    public void delete() {
+        this.isDelete = true;
+    }
 }

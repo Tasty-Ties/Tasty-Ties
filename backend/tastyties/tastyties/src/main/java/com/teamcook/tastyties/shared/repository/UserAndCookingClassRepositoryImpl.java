@@ -74,6 +74,14 @@ public class UserAndCookingClassRepositoryImpl implements UserAndCookingClassCus
     }
 
     @Override
+    public long deleteCookingClass(CookingClass cookingClass) {
+        return queryFactory
+                .delete(userAndCookingClass)
+                .where(userAndCookingClass.cookingClass.eq(cookingClass))
+                .execute();
+    }
+
+    @Override
     public boolean deleteReservation(User user, CookingClass cookingClass) {
         long row = queryFactory
                 .delete(userAndCookingClass)

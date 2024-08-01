@@ -208,8 +208,28 @@ public class CookingClassService {
                 .collect(Collectors.toSet());
     }
 
+    // 클래스 삭제
+    @Transactional
+    public long deleteClass(int userId, String uuid) {
+        CookingClass cookingClass = cookingClassRepository.findClassForDelete(uuid);
+        if (cookingClass == null) {
+            throw new ClassNotFoundException("클래스를 찾을 수 없습니다.");
+        }
+
+        if (cookingClass.isDelete()) {
+            throw new ClassIsDeletedException("이미 삭제된 클래스입니다.");
+        }
+        if (cookingClass.getHost().getUserId() != userId) {
+            throw new IllegalArgumentException("본인의 클래스만 삭제할 수 있습니다.");
+        }
+        long row = userAndCookingClassRepository.deleteCookingClass(cookingClass);
+        cookingClass.delete();
+        return row;
+    }
+
 
     // 클래스 예약
+    @Transactional
     public void reserveClass(User user, String uuid) {
         CookingClass cc = cookingClassRepository.findWithUuid(uuid);
         if (cc == null) {
@@ -222,7 +242,6 @@ public class CookingClassService {
         if (cc.getHost().getUserId() == user.getUserId()) {
             throw new IllegalArgumentException("본인의 클래스에는 예약할 수 없습니다.");
         }
-
         createUserAndCookingClassRelationship(user, cc);
     }
 
@@ -237,6 +256,7 @@ public class CookingClassService {
         uAndcRepository.save(uAndc);
     }
 
+    // 예약 삭제
     @Transactional
     public void deleteReservation(User user, String uuid) {
         CookingClass cc = cookingClassRepository.findWithUuid(uuid);

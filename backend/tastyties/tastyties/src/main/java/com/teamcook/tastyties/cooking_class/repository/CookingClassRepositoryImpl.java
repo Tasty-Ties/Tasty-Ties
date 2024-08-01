@@ -62,6 +62,7 @@ public class CookingClassRepositoryImpl implements CookingClassCustomRepository 
                 .leftJoin(cookingClass.host, user)
                 .leftJoin(user.country, country)
                 .where(
+                        cookingClass.isDelete.eq(false),
                         titleLike(condition.getTitle()),
                         usernameEq(condition.getUsername()),
                         useLocalFilter(condition.isUseLocalFilter())
@@ -102,7 +103,6 @@ public class CookingClassRepositoryImpl implements CookingClassCustomRepository 
     @Override
     public CookingClass findWithUuid(String uuid) {
         QCookingClassAndCookingClassTag ccAndTag = QCookingClassAndCookingClassTag.cookingClassAndCookingClassTag;
-
         return queryFactory
                 .selectFrom(cookingClass)
                 .leftJoin(cookingClass.host).fetchJoin()
@@ -112,6 +112,15 @@ public class CookingClassRepositoryImpl implements CookingClassCustomRepository 
                 .leftJoin(cookingClass.cookingClassAndCookingClassTags, ccAndTag).fetchJoin()
                 .leftJoin(ccAndTag.cookingClassTag, cookingClassTag).fetchJoin()
                 .where(cookingClass.uuid.eq(uuid), cookingClass.isDelete.eq(false))
+                .fetchOne();
+    }
+
+    @Override
+    public CookingClass findClassForDelete(String uuid) {
+        return queryFactory
+                .selectFrom(cookingClass)
+                .leftJoin(cookingClass.host).fetchJoin()
+                .where(cookingClass.uuid.eq(uuid))
                 .fetchOne();
     }
 
@@ -132,7 +141,9 @@ public class CookingClassRepositoryImpl implements CookingClassCustomRepository 
                 .from(cookingClass)
                 .leftJoin(cookingClass.host, user)
                 .leftJoin(user.country, country)
-                .where(cookingClass.host.userId.eq(hostId))
+                .where(
+                        cookingClass.isDelete.eq(false),
+                        cookingClass.host.userId.eq(hostId))
                 .orderBy(cookingClass.cookingClassStartTime.asc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())

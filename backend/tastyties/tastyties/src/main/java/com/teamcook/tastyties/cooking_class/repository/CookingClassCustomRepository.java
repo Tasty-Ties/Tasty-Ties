@@ -21,5 +21,7 @@ public interface CookingClassCustomRepository {
 
     CookingClass findWithUuid(String uuid);
 
+    CookingClass findClassForDelete(String uuid);
+
     Page<CookingClassListDto> searchClassByHostId(int hostId, Pageable pageable);
 }
