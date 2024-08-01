@@ -6,4 +6,6 @@ public interface UserRepositoryCustom {
 
     public User findUserWithCollectedFlags(Integer userId);
     public User findUserWithCollectedFlags(String username);
+    public User findUserWithLanguage(Integer userId);
+
 }

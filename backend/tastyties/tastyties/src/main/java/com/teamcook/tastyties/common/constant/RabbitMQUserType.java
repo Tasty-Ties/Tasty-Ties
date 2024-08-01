@@ -1,4 +1,4 @@
-package com.teamcook.tastyties.cooking_class.constant;
+package com.teamcook.tastyties.common.constant;
 
 public enum RabbitMQUserType {
     HOST("host"),

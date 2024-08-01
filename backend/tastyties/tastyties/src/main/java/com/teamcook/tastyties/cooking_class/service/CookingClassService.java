@@ -52,7 +52,7 @@ public class CookingClassService {
 
     // 클래스 생성
     @Transactional
-    public CookingClassDto registerClass(User user, CookingClassDto registerDto) {
+    public CookingClass registerClass(User user, CookingClassDto registerDto) {
         CookingClass cc = createCookingClass(user, registerDto);
         ccRepository.save(cc);
 
@@ -67,9 +67,8 @@ public class CookingClassService {
 
         List<CookingClassAndCookingClassTag> cookingClassTags = createCookingClassTags(registerDto.getCookingClassTags(), cc);
         ccAndcctRepository.saveAll(cookingClassTags);
-        return registerDto;
+        return cc;
     }
-
 
     private CookingClass createCookingClass(User user, CookingClassDto registerDto) {
         CookingClass cc = new CookingClass();
@@ -140,6 +139,11 @@ public class CookingClassService {
                 .orElseGet(() -> cookingClassTagRepository.save(new CookingClassTag(tagName)));
     }
 
+    // 클래스 채팅방 정보 저장
+    public void saveCookingClassWithChatRoomId(CookingClass cookingClass) {
+        cookingClassRepository.save(cookingClass);
+    }
+
     public Page<CookingClassListDto> searchCookingClassList(CookingClassSearchCondition condition, Pageable pageable) {
         return cookingClassRepository.searchClass(condition, pageable);
     }
@@ -174,7 +178,7 @@ public class CookingClassService {
                 cc.getCookingClassEndTime(), cc.getDishCookingTime(), ingredientDtos,
                 recipeDtos, cookingTools, cc.getQuota(),
                 cc.getReplayEndTime(), isEnrolledClass, isHost,
-                enrolledCount, userEnrolledInClass
+                enrolledCount, userEnrolledInClass, cc.getChatRoomId()
         );
     }
 
@@ -222,6 +226,7 @@ public class CookingClassService {
         if (cookingClass.getHost().getUserId() != userId) {
             throw new IllegalArgumentException("본인의 클래스만 삭제할 수 있습니다.");
         }
+
         long row = userAndCookingClassRepository.deleteCookingClass(cookingClass);
         cookingClass.delete();
         return row;
