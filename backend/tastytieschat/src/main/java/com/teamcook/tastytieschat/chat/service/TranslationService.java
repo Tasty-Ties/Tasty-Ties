@@ -1,4 +1,4 @@
-package com.teamcook.tastytieschat.translation.service;
+package com.teamcook.tastytieschat.chat.service;
 
 import com.teamcook.tastytieschat.chat.entity.ChatMessage;
 
