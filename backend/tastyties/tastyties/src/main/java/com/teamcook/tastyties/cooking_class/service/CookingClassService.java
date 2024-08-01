@@ -239,7 +239,7 @@ public class CookingClassService {
 
     // 클래스 예약
     @Transactional
-    public void reserveClass(User user, String uuid) {
+    public String reserveClass(User user, String uuid) {
         CookingClass cc = cookingClassRepository.findWithUuid(uuid);
         if (cc == null) {
             throw new ClassNotFoundException("존재하지 않는 클래스입니다.");
@@ -252,6 +252,8 @@ public class CookingClassService {
             throw new IllegalArgumentException("본인의 클래스에는 예약할 수 없습니다.");
         }
         createUserAndCookingClassRelationship(user, cc);
+
+        return cc.getChatRoomId();
     }
 
     // user와 cookingclass 관계 생성

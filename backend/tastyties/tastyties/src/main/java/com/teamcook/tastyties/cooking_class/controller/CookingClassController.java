@@ -1,6 +1,7 @@
 package com.teamcook.tastyties.cooking_class.controller;
 
 import com.teamcook.tastyties.chat.dto.ChatUserDto;
+import com.teamcook.tastyties.common.constant.RabbitMQUserType;
 import com.teamcook.tastyties.common.dto.CommonResponseDto;
 import com.teamcook.tastyties.common.dto.RabbitMQRequestDto;
 import com.teamcook.tastyties.common.dto.RabbitMQUserDto;
@@ -75,6 +76,7 @@ public class CookingClassController {
                 .title(cookingClass.getTitle())
                 .user(RabbitMQUserDto.builder()
                         .id(chatUser.getId())
+                        .type(RabbitMQUserType.HOST)
                         .nickname(chatUser.getNickname())
                         .language(chatUser.getLanguage())
                         .build())
@@ -151,13 +153,32 @@ public class CookingClassController {
                             .build());
         }
 
-        cookingClassService.reserveClass(userDetails.user(), uuid);
+        String chatRoomId = cookingClassService.reserveClass(userDetails.user(), uuid);
+
+        joinChatRoom(chatRoomId, userDetails.user().getUserId());
+
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(CommonResponseDto.builder()
                         .stateCode(201)
                         .message("클래스가 예약되었습니다.")
                         .data(null)
                         .build());
+    }
+
+    private void joinChatRoom(String chatRoomId, int userId) {
+        ChatUserDto chatUser = userChatService.getUser(userId);
+
+        RabbitMQRequestDto rabbitMQRequestDto = RabbitMQRequestDto.builder()
+                .type(RabbitMQRequestType.JOIN)
+                .chatRoomId(chatRoomId)
+                .user(RabbitMQUserDto.builder()
+                        .id(chatUser.getId())
+                        .type(RabbitMQUserType.ATTENDEE)
+                        .nickname(chatUser.getNickname())
+                        .language(chatUser.getLanguage())
+                        .build())
+                .build();
+        rabbitMQProducer.send(rabbitMQRequestDto);
     }
 
     // 클래스 예약 취소
@@ -171,6 +192,7 @@ public class CookingClassController {
                             .data(null)
                             .build());
         }
+
         cookingClassService.deleteReservation(userDetails.user(), uuid);
         return ResponseEntity.status(HttpStatus.NO_CONTENT)
                 .body(CommonResponseDto.builder()
