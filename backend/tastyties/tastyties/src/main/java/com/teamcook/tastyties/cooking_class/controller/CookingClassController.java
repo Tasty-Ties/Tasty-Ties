@@ -4,10 +4,7 @@ import com.teamcook.tastyties.chat.dto.ChatUserDto;
 import com.teamcook.tastyties.common.dto.CommonResponseDto;
 import com.teamcook.tastyties.common.dto.RabbitMQRequestDto;
 import com.teamcook.tastyties.common.dto.RabbitMQUserDto;
-import com.teamcook.tastyties.cooking_class.dto.CookingClassListDto;
-import com.teamcook.tastyties.cooking_class.dto.CookingClassDto;
-import com.teamcook.tastyties.cooking_class.dto.CookingClassSearchCondition;
-import com.teamcook.tastyties.cooking_class.dto.ReviewRequestDto;
+import com.teamcook.tastyties.cooking_class.dto.*;
 import com.teamcook.tastyties.common.constant.RabbitMQRequestType;
 import com.teamcook.tastyties.cooking_class.entity.CookingClass;
 import com.teamcook.tastyties.cooking_class.service.CookingClassService;
@@ -59,7 +56,6 @@ public class CookingClassController {
 
         CookingClass cookingClass = cookingClassService.registerClass(user, registerDto);
 
-        // TODO: 쿠킹 클래스에 채팅방 ID 저장하기
         createChatRoom(cookingClass, user.getUserId());
         registerDto.setChatRoomId(cookingClass.getChatRoomId());
 
@@ -122,13 +118,25 @@ public class CookingClassController {
         if (userDetails == null) {
             throw new UserDetailsNotFoundException("인증 정보를 찾을 수 없습니다.");
         }
-        long row = cookingClassService.deleteClass(userDetails.getUserId(), uuid);
+
+        DeletedCookingClassDto deletedCookingClass = cookingClassService.deleteClass(userDetails.getUserId(), uuid);
+
+        deleteChatRoom(deletedCookingClass.getChatRoomId());
+
         return ResponseEntity.ok()
                 .body(CommonResponseDto.builder()
                         .stateCode(200)
                         .message("정상적으로 삭제되었습니다.")
-                        .data("연관된 예약 " + row + "개가 취소되었습니다.")
+                        .data("연관된 예약 " + deletedCookingClass.getDeletedReservationCount() + "개가 취소되었습니다.")
                         .build());
+    }
+
+    private void deleteChatRoom(String chatRoomId) {
+        RabbitMQRequestDto rabbitMQRequestDto = RabbitMQRequestDto.builder()
+                .type(RabbitMQRequestType.DELETE)
+                .chatRoomId(chatRoomId)
+                .build();
+        rabbitMQProducer.send(rabbitMQRequestDto);
     }
 
     // 클래스 예약

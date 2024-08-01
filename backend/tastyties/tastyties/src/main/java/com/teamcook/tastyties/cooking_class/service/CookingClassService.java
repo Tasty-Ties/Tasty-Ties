@@ -214,7 +214,7 @@ public class CookingClassService {
 
     // 클래스 삭제
     @Transactional
-    public long deleteClass(int userId, String uuid) {
+    public DeletedCookingClassDto deleteClass(int userId, String uuid) {
         CookingClass cookingClass = cookingClassRepository.findClassForDelete(uuid);
         if (cookingClass == null) {
             throw new ClassNotFoundException("클래스를 찾을 수 없습니다.");
@@ -229,7 +229,11 @@ public class CookingClassService {
 
         long row = userAndCookingClassRepository.deleteCookingClass(cookingClass);
         cookingClass.delete();
-        return row;
+
+        return DeletedCookingClassDto.builder()
+                .chatRoomId(cookingClass.getChatRoomId())
+                .deletedReservationCount(row)
+                .build();
     }
 
 

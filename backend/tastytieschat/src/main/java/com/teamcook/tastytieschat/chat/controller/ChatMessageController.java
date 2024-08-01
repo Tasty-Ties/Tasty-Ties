@@ -29,11 +29,11 @@ public class ChatMessageController {
     private final VoiceChatService voiceChatService;
 
     @Autowired
-    public ChatMessageController(ChatMessageService chatMessageService, TranslationService translationService, ChatRoomService chatRoomService, VoiceChatServiceImpl voiceChatServiceImpl) {
+    public ChatMessageController(ChatMessageService chatMessageService, TranslationService translationService, ChatRoomService chatRoomService, VoiceChatService voiceChatService) {
         this.chatMessageService = chatMessageService;
         this.translationService = translationService;
         this.chatRoomService = chatRoomService;
-        this.voiceChatService = voiceChatServiceImpl;
+        this.voiceChatService = voiceChatService;
     }
 
     @MessageMapping("/chat/text/rooms/{roomId}")
