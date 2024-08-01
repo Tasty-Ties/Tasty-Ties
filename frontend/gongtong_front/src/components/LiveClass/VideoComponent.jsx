@@ -8,6 +8,8 @@ import ToolbarComponent from "./ToolbarComponent";
 
 import UserModel from "./UserModel";
 
+//<
+
 const APPLICATION_SERVER_URL = "http://localhost:5000/";
 const localUserSetting = new UserModel();
 
