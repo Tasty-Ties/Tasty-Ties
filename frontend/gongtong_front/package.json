@@ -15,13 +15,16 @@
     "@mui/material": "^5.16.5",
     "@mui/styled-engine-sc": "^6.0.0-alpha.18",
     "@mui/x-date-pickers": "^7.11.1",
+    "@stomp/stompjs": "^7.0.0",
     "axios": "^1.7.2",
     "dayjs": "^1.11.12",
     "js-cookie": "^3.0.5",
+    "openvidu-browser": "^2.30.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.25.1",
     "styled-components": "^6.1.12",
+    "ws": "^8.18.0",
     "zustand": "^4.5.4"
   },
   "devDependencies": {

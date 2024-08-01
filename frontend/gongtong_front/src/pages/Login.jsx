@@ -6,7 +6,7 @@ import axios from "axios";
 
 const Login = () => {
   const { baseURL } = useApiStore();
-  const { login } = useAuthStore();
+  const { login, isAuthenticated } = useAuthStore();
   const nav = useNavigate();
 
   const [input, setInput] = useState({
@@ -28,12 +28,10 @@ const Login = () => {
       username: input.username,
       password: input.password,
     });
-    console.log(response);
+
     if (response.status === 200) {
       const accessToken = response.data.data.accessToken;
       const refreshToken = response.data.data.refreshToken;
-      console.log("Access Token:", accessToken);
-      console.log("Refresh Token:", refreshToken);
       document.cookie = `accessToken=${accessToken}; path=/; SameSite=Lax`;
       document.cookie = `refreshToken=${refreshToken}; path=/; SameSite=Lax`;
       login(accessToken, refreshToken);

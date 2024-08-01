@@ -1,4 +1,3 @@
-import { Routes, Route } from "react-router-dom";
 import MainPage from "./pages/MainPage";
 import SignUp from "./pages/SignUp";
 import SignUpSecond from "./components/SignUp/SignUpSecond";
@@ -12,6 +11,9 @@ import ClassIngredient from "@components/ClassDetail/ClassIngredient";
 import ClassKitchenTools from "@components/ClassDetail/ClassKitchenTools";
 import ClassReviews from "@components/ClassDetail/ClassReviews";
 import ClassRegist from "./pages/ClassRegist";
+import ClassWaiting from "./pages/ClassWaiting";
+import LiveClass from "./pages/LiveClass";
+import { Route, Routes } from "react-router-dom";
 
 const AppRoutes = () => {
   return (
@@ -22,15 +24,16 @@ const AppRoutes = () => {
       <Route path="/signupcomplete" element={<SignUpComplete />} />
       <Route path="/login" element={<Login />} />
       <Route path="/mypage" element={<Mypage />} />
-      <Route path="/class" element={<ClassList />}>
-        <Route path=":id" element={<ClassDetail />}>
-          <Route path="" element={<ClassIntroduction />} />
-          <Route path="ingredient" element={<ClassIngredient />} />
-          <Route path="kitchentools" element={<ClassKitchenTools />} />
-          <Route path="reviews" element={<ClassReviews />} />
-        </Route>
+      <Route path="/class" element={<ClassList />} />
+      <Route path="/class/:id" element={<ClassDetail />}>
+        <Route path="" element={<ClassIntroduction />} />
+        <Route path="ingredient" element={<ClassIngredient />} />
+        <Route path="kitchentools" element={<ClassKitchenTools />} />
+        <Route path="reviews" element={<ClassReviews />} />
       </Route>
       <Route path="/classregist" element={<ClassRegist />} />
+      <Route path="/classwaiting" element={<ClassWaiting />} />
+      <Route path="/liveclass" element={<LiveClass />} />
       {/* <Route path="/" element={< />} /> */}
     </Routes>
   );
