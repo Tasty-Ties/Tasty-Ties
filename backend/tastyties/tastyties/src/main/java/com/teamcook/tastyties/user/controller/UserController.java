@@ -3,6 +3,7 @@ package com.teamcook.tastyties.user.controller;
 import com.teamcook.tastyties.common.dto.CommonResponseDto;
 import com.teamcook.tastyties.cooking_class.dto.CookingClassListDto;
 import com.teamcook.tastyties.security.userdetails.CustomUserDetails;
+import com.teamcook.tastyties.user.dto.UserInfoDto;
 import com.teamcook.tastyties.user.dto.UserProfileDto;
 import com.teamcook.tastyties.user.dto.UserRegistrationDto;
 import com.teamcook.tastyties.user.dto.UserUpdateDto;
@@ -140,6 +141,17 @@ public class UserController {
                         .stateCode(200)
                         .message("수업할 클래스가 정상적으로 조회되었습니다.")
                         .data(hostingClasses)
+                        .build());
+    }
+
+    @GetMapping("/profile/{username}")
+    public ResponseEntity<CommonResponseDto> viewUserProfile(@PathVariable String username) {
+        UserInfoDto profile = userProfileService.getProfileMain(username);
+        return ResponseEntity.ok()
+                .body(CommonResponseDto.builder()
+                        .stateCode(200)
+                        .message(username + "님의 클래스를 정상적으로 조회했습니다.")
+                        .data(profile)
                         .build());
     }
 }
