@@ -15,10 +15,7 @@ import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.util.Base64;
 import java.util.Map;
 import java.util.Set;
 
@@ -78,10 +75,12 @@ public class ChatMessageController {
 
     @MessageMapping("/chat/voice/rooms/{roomId}")
     @SendTo("/sub/chat/rooms/{roomId}")
-    public ChatMessageResponseDTO processVoice(@DestinationVariable String roomId, @Payload VoiceChatRequestDTO voiceChatRequestDTO) throws IOException {
+    public ChatMessageResponseDTO processVoice(@DestinationVariable String roomId, @Payload VoiceChatRequestDTO voiceChatRequestDTO) throws IOException, InterruptedException {
+
         voiceChatServiceImpl.storeChunk(roomId, voiceChatRequestDTO.getUserId(), voiceChatRequestDTO.getChunkIndex(), voiceChatRequestDTO.getTotalChunks(), voiceChatRequestDTO.getFileContent());
         if (voiceChatServiceImpl.isComplete(roomId, voiceChatRequestDTO.getUserId())) {
             //청크 재조립
+            System.out.println("음성 인식");
             String fullData = voiceChatServiceImpl.assembleChunks(roomId, voiceChatRequestDTO.getUserId());
             String convertedString = voiceChatServiceImpl.getConvertedString(fullData);
 

@@ -10,5 +10,5 @@ public interface VoiceChatService {
 
     String assembleChunks(String roomId, int userId);
 
-    String getConvertedString(String fullData) throws IOException;
+    String getConvertedString(String fullData) throws IOException, InterruptedException;
 }

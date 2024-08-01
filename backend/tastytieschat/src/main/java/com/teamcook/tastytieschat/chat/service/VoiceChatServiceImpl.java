@@ -31,6 +31,9 @@ public class VoiceChatServiceImpl implements VoiceChatService {
     @Value("${speech-flow-key-secret}")
     private String keySecret;
 
+    @Value("${ffmpeg_path}")
+    private String ffmpegPath;
+
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
 
@@ -73,22 +76,35 @@ public class VoiceChatServiceImpl implements VoiceChatService {
         for (String chunk : chunks) {
             assembledData.append(chunk);
         }
+
         return assembledData.toString();
     }
 
+
     @Override
-    public String getConvertedString(String fullData) throws IOException {
+    public String getConvertedString(String fullData) throws IOException, InterruptedException {
         // Base64 디코딩
         byte[] decodedBytes = Base64.getDecoder().decode(fullData);
         UUID uuid = UUID.randomUUID();
-        //mp3 파일 만들어서 저장하기
-        String filePath = "./" + uuid + ".mp3";
+        String wavFilePath = "./" + uuid + ".wav";
+        String mp3FilePath = "./" + uuid + ".mp3";
 
-        OutputStream os = new FileOutputStream(filePath);
-        os.write(decodedBytes);
-        sendFileToSpeechFlow(filePath);
+        // 디코딩된 바이트를 WAV 파일로 저장
+        try (OutputStream os = new FileOutputStream(wavFilePath)) {
+            os.write(decodedBytes);
+        }
 
-        return filePath;
+        // ffmpeg를 사용하여 WAV 파일을 MP3로 변환
+        ProcessBuilder pb = new ProcessBuilder(ffmpegPath, "-i", wavFilePath, mp3FilePath);
+        Process process = pb.start();
+        int exitCode = process.waitFor();
+
+        if (exitCode != 0) {
+            throw new IOException("Error converting WAV to MP3");
+        }
+
+        sendFileToSpeechFlow(mp3FilePath);
+        return mp3FilePath;
     }
 
     /**
