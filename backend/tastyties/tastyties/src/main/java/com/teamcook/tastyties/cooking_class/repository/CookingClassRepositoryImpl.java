@@ -63,7 +63,8 @@ public class CookingClassRepositoryImpl implements CookingClassCustomRepository 
                 .leftJoin(user.country, country)
                 .where(
                         titleLike(condition.getTitle()),
-                        usernameEq(condition.getUsername())
+                        usernameEq(condition.getUsername()),
+                        useLocalFilter(condition.isUseLocalFilter())
                 )
                 .orderBy(cookingClass.createTime.desc())
                 .offset(pageable.getOffset())
@@ -81,13 +82,20 @@ public class CookingClassRepositoryImpl implements CookingClassCustomRepository 
         return PageableExecutionUtils.getPage(results, pageable, countQuery::fetchOne);
     }
 
-    // fetchjoin을 사용한 조회
+    // 제목 like 필터
     private BooleanExpression titleLike(String title) {
         return hasText(title) ? cookingClass.title.contains(title) : null;
     }
 
+    // username equal 필터
     private BooleanExpression usernameEq(String username) {
         return hasText(username) ?user.username.eq(username) : null;
+    }
+
+    // 현지인 필터
+    private BooleanExpression useLocalFilter(Boolean useLocalFilter) {
+        // 필터가 true이면 필터링 적용, 아니면 null 반환하여 조건에서 제외
+        return Boolean.TRUE.equals(useLocalFilter) ? cookingClass.countryCode.eq(country.alpha2) : null;
     }
 
     // 클래스 상세 조회
