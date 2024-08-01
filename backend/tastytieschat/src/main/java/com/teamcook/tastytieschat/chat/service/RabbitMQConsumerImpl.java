@@ -85,6 +85,14 @@ public class RabbitMQConsumerImpl implements RabbitMQConsumer {
     }
 
     @Override
+    @RabbitListener(bindings = @QueueBinding(
+            value = @Queue(
+                    value = "${rabbitmq.queue.attendee}",
+                    durable = "true"
+            ),
+            exchange = @Exchange(value = "${rabbitmq.exchange"),
+            key = "${rabbitmq.routing.key.join}"
+    ))
     public void enterChatRoom(RabbitMQRequestDTO rabbitMQRequestDto) {
         if (rabbitMQRequestDto.getType() != RabbitMQRequestType.JOIN) {
             return;
@@ -107,6 +115,14 @@ public class RabbitMQConsumerImpl implements RabbitMQConsumer {
     }
 
     @Override
+    @RabbitListener(bindings = @QueueBinding(
+            value = @Queue(
+                    value = "${rabbitmq.queue.attendee}",
+                    durable = "true"
+            ),
+            exchange = @Exchange(value = "${rabbitmq.exchange"),
+            key = "${rabbitmq.routing.key.leave}"
+    ))
     public void leaveChatRoom(RabbitMQRequestDTO rabbitMQRequestDto) {
         if (rabbitMQRequestDto.getType() != RabbitMQRequestType.LEAVE) {
             return;
