@@ -31,9 +31,10 @@ public class VoiceChatServiceImpl implements VoiceChatService {
     @Value("${speech-flow-key-secret}")
     private String keySecret;
 
-    @Value("${ffmpeg_path}")
+    @Value("${ffmpeg.path}")
     private String ffmpegPath;
 
+    private final int RETRY_CNT = 5;
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
 
@@ -82,12 +83,12 @@ public class VoiceChatServiceImpl implements VoiceChatService {
 
 
     @Override
-    public String getConvertedString(String fullData) throws IOException, InterruptedException {
+    public String getMp3filePath(String fullData) throws IOException, InterruptedException {
         // Base64 디코딩
         byte[] decodedBytes = Base64.getDecoder().decode(fullData);
         UUID uuid = UUID.randomUUID();
-        String wavFilePath = "./" + uuid + ".wav";
-        String mp3FilePath = "./" + uuid + ".mp3";
+        String wavFilePath = "./static/" + uuid + ".wav";
+        String mp3FilePath = "./static/" + uuid + ".mp3";
 
         // 디코딩된 바이트를 WAV 파일로 저장
         try (OutputStream os = new FileOutputStream(wavFilePath)) {
@@ -111,6 +112,7 @@ public class VoiceChatServiceImpl implements VoiceChatService {
      * @return : TaskId
      * SpeechFlow를 안 쓸수도 있을 것 같아서 예외처리를 자세하게 하지는 않았습니다
      */
+    @Override
     public String sendFileToSpeechFlow(String filePath) throws IOException {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
@@ -136,7 +138,8 @@ public class VoiceChatServiceImpl implements VoiceChatService {
         }
     }
 
-    public String queryTranscriptionResult(String taskId) throws IOException {
+    @Override
+    public String queryTranscriptionResult(String taskId) throws IOException, InterruptedException {
         // STT 결과를 얻기 위한 설정
         HttpHeaders headers = new HttpHeaders();
         headers.set("keyId", keyId);
@@ -144,20 +147,29 @@ public class VoiceChatServiceImpl implements VoiceChatService {
 
         String url = "https://api.speechflow.io/asr/file/v1/query?taskId=" + taskId;
         HttpEntity<?> requestEntity = new HttpEntity<>(headers);
-        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, requestEntity, String.class);
 
-        if (response.getStatusCode().is2xxSuccessful()) {
-            System.out.println("응답: " + response.getBody());
-
-            // JSON 응답을 SpeechFlowResult 객체로 변환
-            SpeechFlowQueryResponseDTO speechFlowQueryResponseDTO = objectMapper.readValue(response.getBody(), SpeechFlowQueryResponseDTO.class);
-            if (speechFlowQueryResponseDTO.getCode() != 11000) {
-                throw new IOException("실패");
+        // JSON 응답을 SpeechFlowResult 객체로 변환
+        int count = 0;
+        while (count < RETRY_CNT) {
+            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, requestEntity, String.class);
+            if (response.getStatusCode().is2xxSuccessful()) {
+                log.info("응답: {}", response.getBody());
+                SpeechFlowQueryResponseDTO speechFlowQueryResponseDTO =
+                        objectMapper.readValue(response.getBody(), SpeechFlowQueryResponseDTO.class);
+                if (speechFlowQueryResponseDTO.getCode() == 11000) {
+                    return speechFlowQueryResponseDTO.getResult();
+                } else if (speechFlowQueryResponseDTO.getCode() == 11001) {
+                    //처리가 아직 되지 않았음
+                    log.info("5초 대기");
+                    count++;
+                    Thread.sleep(5000); // 5초 대기
+                } else {
+                    break;
+                }
             }
-            return speechFlowQueryResponseDTO.getResult();
-        } else {
-            throw new IOException("Failed to query transcription result from SpeechFlow: " + response.getStatusCode());
         }
+
+        throw new IOException("실패");
     }
 
 }

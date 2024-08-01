@@ -1,6 +1,5 @@
 package com.teamcook.tastytieschat.chat.service;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 public interface VoiceChatService {
@@ -10,5 +9,9 @@ public interface VoiceChatService {
 
     String assembleChunks(String roomId, int userId);
 
-    String getConvertedString(String fullData) throws IOException, InterruptedException;
+    String getMp3filePath(String fullData) throws IOException, InterruptedException;
+
+    String sendFileToSpeechFlow(String filePath) throws IOException;
+
+    String queryTranscriptionResult(String taskId) throws IOException, InterruptedException;
 }

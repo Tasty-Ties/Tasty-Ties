@@ -26,14 +26,14 @@ public class ChatMessageController {
     private final ChatMessageService chatMessageService;
     private final TranslationService translationService;
     private final ChatRoomService chatRoomService;
-    private final VoiceChatServiceImpl voiceChatServiceImpl;
+    private final VoiceChatService voiceChatService;
 
     @Autowired
     public ChatMessageController(ChatMessageService chatMessageService, TranslationService translationService, ChatRoomService chatRoomService, VoiceChatServiceImpl voiceChatServiceImpl) {
         this.chatMessageService = chatMessageService;
         this.translationService = translationService;
         this.chatRoomService = chatRoomService;
-        this.voiceChatServiceImpl = voiceChatServiceImpl;
+        this.voiceChatService = voiceChatServiceImpl;
     }
 
     @MessageMapping("/chat/text/rooms/{roomId}")
@@ -77,15 +77,17 @@ public class ChatMessageController {
     @SendTo("/sub/chat/rooms/{roomId}")
     public ChatMessageResponseDTO processVoice(@DestinationVariable String roomId, @Payload VoiceChatRequestDTO voiceChatRequestDTO) throws IOException, InterruptedException {
 
-        voiceChatServiceImpl.storeChunk(roomId, voiceChatRequestDTO.getUserId(), voiceChatRequestDTO.getChunkIndex(), voiceChatRequestDTO.getTotalChunks(), voiceChatRequestDTO.getFileContent());
-        if (voiceChatServiceImpl.isComplete(roomId, voiceChatRequestDTO.getUserId())) {
+        voiceChatService.storeChunk(roomId, voiceChatRequestDTO.getUserId(), voiceChatRequestDTO.getChunkIndex(), voiceChatRequestDTO.getTotalChunks(), voiceChatRequestDTO.getFileContent());
+        if (voiceChatService.isComplete(roomId, voiceChatRequestDTO.getUserId())) {
             //청크 재조립
             System.out.println("음성 인식");
-            String fullData = voiceChatServiceImpl.assembleChunks(roomId, voiceChatRequestDTO.getUserId());
-            String convertedString = voiceChatServiceImpl.getConvertedString(fullData);
+            String fullData = voiceChatService.assembleChunks(roomId, voiceChatRequestDTO.getUserId());
+            String convertedString = voiceChatService.getMp3filePath(fullData);
+            String taskId = voiceChatService.sendFileToSpeechFlow(convertedString);
+            String result = voiceChatService.queryTranscriptionResult(taskId);
 
+            System.out.println(result);
             //번역
-
         }
         return new ChatMessageResponseDTO();
     }
