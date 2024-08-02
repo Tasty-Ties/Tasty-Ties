@@ -16,11 +16,15 @@ import java.util.UUID;
 @Entity
 @Getter @Setter
 @AllArgsConstructor @NoArgsConstructor
+@Table(indexes = {
+        @Index(name = "idx_uuid", columnList = "uuid"),
+})
 public class CookingClass {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int cookingClassId;
+
+    @Column(nullable = false)
     private String uuid;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -58,6 +62,8 @@ public class CookingClass {
     private LocalDateTime cookingClassStartTime;
     @NotNull @Column(nullable = false)
     private LocalDateTime cookingClassEndTime;
+
+    private String sessionId;
 
     private LocalDateTime replayEndTime;
 
