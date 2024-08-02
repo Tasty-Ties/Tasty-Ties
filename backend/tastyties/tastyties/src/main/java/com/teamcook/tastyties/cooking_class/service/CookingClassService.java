@@ -57,8 +57,6 @@ public class CookingClassService {
     // 클래스 생성
     @Transactional
     public CookingClass registerClass(User user, CookingClassDto registerDto) {
-        log.debug("mainimg: {}", registerDto.getMainImageUrl());
-        log.debug("urls: {}", registerDto.getImageUrls().toString());
         CookingClass cc = createCookingClass(user, registerDto);
         cookingClassRepository.save(cc);
 
