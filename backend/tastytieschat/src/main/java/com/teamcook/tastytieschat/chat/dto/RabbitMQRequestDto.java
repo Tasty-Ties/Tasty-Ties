@@ -10,4 +10,8 @@ public class RabbitMQRequestDto {
     private String title;
     private String imageUrl;
     private UserDto user;
+
+    public int getUserId() {
+        return user.getId();
+    }
 }

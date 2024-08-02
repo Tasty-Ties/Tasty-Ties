@@ -3,7 +3,10 @@ package com.teamcook.tastytieschat.chat.service;
 import com.teamcook.tastytieschat.chat.dto.RabbitMQRequestDto;
 import com.teamcook.tastytieschat.chat.dto.UserDto;
 import com.teamcook.tastytieschat.chat.entity.ChatRoom;
+import com.teamcook.tastytieschat.chat.entity.ChatUser;
+import com.teamcook.tastytieschat.chat.exception.UserHasNoChatRoomException;
 import com.teamcook.tastytieschat.chat.repository.ChatRoomRepository;
+import com.teamcook.tastytieschat.chat.repository.ChatUserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.Exchange;
@@ -14,7 +17,9 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Slf4j
@@ -23,11 +28,13 @@ public class RabbitMQConsumerImpl implements RabbitMQConsumer {
 
     private final ChatRoomRepository chatRoomRepository;
     private final RabbitTemplate rabbitTemplate;
+    private final ChatUserRepository chatUserRepository;
 
     @Autowired
-    public RabbitMQConsumerImpl(ChatRoomRepository chatRoomRepository, RabbitTemplate rabbitTemplate) {
+    public RabbitMQConsumerImpl(ChatRoomRepository chatRoomRepository, RabbitTemplate rabbitTemplate, ChatUserRepository chatUserRepository) {
         this.chatRoomRepository = chatRoomRepository;
         this.rabbitTemplate = rabbitTemplate;
+        this.chatUserRepository = chatUserRepository;
     }
 
     @Override
@@ -53,6 +60,8 @@ public class RabbitMQConsumerImpl implements RabbitMQConsumer {
         ChatRoom chatRoom = new ChatRoom(rabbitMQRequestDto.getTitle(), rabbitMQRequestDto.getImageUrl(), rabbitMQRequestDto.getUser());
         chatRoomRepository.save(chatRoom);
 
+        addChatRoomOfChatUser(rabbitMQRequestDto.getUserId(), chatRoom.getId());
+
         Map<String, String> responseData = new HashMap<>();
         responseData.put("chatRoomId", chatRoom.getId());
 
@@ -71,8 +80,24 @@ public class RabbitMQConsumerImpl implements RabbitMQConsumer {
 
         if (chatRoom != null) {
             chatRoomRepository.delete(chatRoom);
+            removeChatRoomOfChatUsers(chatRoom);
         } else {
             log.error("Error deleting chat room: chat room does not exist.");
+        }
+    }
+
+    private void removeChatRoomOfChatUsers(ChatRoom chatRoom) {
+        if (chatRoom != null) {
+            List<ChatUser> chatUsers = new ArrayList<>();
+            for (UserDto user : chatRoom.getUsers()) {
+                ChatUser chatUser = chatUserRepository.findByUserId(user.getId());
+                chatUser.removeChatRoomId(chatRoom.getId());
+                chatUsers.add(chatUser);
+            }
+
+            if (!chatUsers.isEmpty()) {
+                chatUserRepository.saveAll(chatUsers);
+            }
         }
     }
 
@@ -107,6 +132,8 @@ public class RabbitMQConsumerImpl implements RabbitMQConsumer {
 
             chatRoom.getUsers().add(userDto);
             chatRoomRepository.save(chatRoom);
+
+            addChatRoomOfChatUser(rabbitMQRequestDto.getUserId(), rabbitMQRequestDto.getChatRoomId());
         } else {
             log.error("Error entering chat room: chat room does not exist.");
         }
@@ -117,14 +144,39 @@ public class RabbitMQConsumerImpl implements RabbitMQConsumer {
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId).orElse(null);
 
         if (chatRoom != null) {
-            int userId = rabbitMQRequestDto.getUser().getId();
+            int userId = rabbitMQRequestDto.getUserId();
             if (chatRoom.isContainedUser(userId)) {
                 String removedUserNickname = chatRoom.removeUser(userId);
 
                 chatRoomRepository.save(chatRoom);
+
+                removeChatRoomOfChatUser(userId, chatRoomId);
             }
         } else {
             log.error("Error leaving chat room: chat room does not exist.");
+        }
+    }
+
+    private void addChatRoomOfChatUser(int userId, String chatRoomId) {
+        ChatUser chatUser = chatUserRepository.findByUserId(userId);
+
+        if (chatUser != null) {
+            chatUser.addChatRoomId(chatRoomId);
+            chatUserRepository.save(chatUser);
+        } else {
+            ChatUser newChatUser = new ChatUser(userId, chatRoomId);
+            chatUserRepository.save(newChatUser);
+        }
+    }
+
+    private void removeChatRoomOfChatUser(int userId, String chatRoomId) {
+        ChatUser chatUser = chatUserRepository.findByUserId(userId);
+
+        if (chatUser != null) {
+            chatUser.removeChatRoomId(chatRoomId);
+            chatUserRepository.save(chatUser);
+        } else {
+            throw new UserHasNoChatRoomException(userId);
         }
     }
 
