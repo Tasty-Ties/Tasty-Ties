@@ -82,7 +82,7 @@ public class UserProfileService {
                         country.getKoreanName(), country.getCountryImageUrl()),
                 collectedFlags,
                 new LanguageResponseDto(language.getAlpha2(), language.getEnglish(), language.getKorean()),
-                user.getEmail(), user.getBirth(), 0,
+                user.getEmail(), user.getBirth(), user.getActivityPoint(),
                 user.getInstagramUrl(), user.getInstagramHandle(),
                 user.getYoutubeUrl(), user.getYoutubeHandle());
     }

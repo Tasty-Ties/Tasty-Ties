@@ -176,6 +176,31 @@ public class UserAndCookingClassRepositoryImpl implements UserAndCookingClassCus
     }
 
     @Override
+    public Page<ReviewResponseDto> findReviewsForCookingClass(String uuid, Pageable pageable) {
+        List<ReviewResponseDto> results = queryFactory
+                .select(new QReviewResponseDto(
+                        cookingClass.title, userAndCookingClass.cookingClassReview,
+                        userAndCookingClass.cookingClassReviewCreateTime,
+                        cookingClass.mainImage, country.countryImageUrl, user.nickname
+                )).from(userAndCookingClass)
+                .join(userAndCookingClass.user, user)
+                .join(userAndCookingClass.cookingClass, cookingClass)
+                .leftJoin(country).on(cookingClass.countryCode.eq(country.alpha2))
+                .where(cookingClass.uuid.eq(uuid))
+                .orderBy(userAndCookingClass.cookingClassReviewCreateTime.desc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        JPAQuery<Long> countQuery = queryFactory.select(userAndCookingClass.count())
+                .from(userAndCookingClass)
+                .leftJoin(userAndCookingClass.cookingClass, cookingClass)
+                .where(cookingClass.uuid.eq(uuid));
+
+        return PageableExecutionUtils.getPage(results, pageable, countQuery::fetchOne);
+    }
+
+    @Override
     public List<ReviewResponseDto> findReviewsForCookingClass(int hostId) {
         QUser host = new QUser("host");
         return queryFactory

@@ -13,6 +13,7 @@ import com.teamcook.tastyties.cooking_class.entity.CookingClass;
 import com.teamcook.tastyties.cooking_class.service.CookingClassService;
 import com.teamcook.tastyties.cooking_class.service.RabbitMQProducer;
 import com.teamcook.tastyties.security.userdetails.CustomUserDetails;
+import com.teamcook.tastyties.shared.dto.ReviewResponseDto;
 import com.teamcook.tastyties.user.entity.User;
 import com.teamcook.tastyties.user.exception.UserDetailsNotFoundException;
 import com.teamcook.tastyties.user.service.UserChatService;
@@ -107,13 +108,23 @@ public class CookingClassController {
     // 클래스 상세 조회
     @GetMapping("/{uuid}")
     public ResponseEntity<CommonResponseDto> getClassDetail(@AuthenticationPrincipal CustomUserDetails userDetails, @PathVariable String uuid) {
-
         CookingClassDto cookingClassDetail = cookingClassService.getCookingClassDetail(userDetails, uuid);
         return ResponseEntity.ok()
                 .body(CommonResponseDto.builder()
                         .stateCode(200)
                         .message("정상적으로 조회되었습니다.")
                         .data(cookingClassDetail)
+                        .build());
+    }
+
+    @GetMapping("/{uuid}/reviews")
+    public ResponseEntity<CommonResponseDto> getClassDetailReviews(@PathVariable String uuid, Pageable pageable) {
+        Page<ReviewResponseDto> reviewResponseDto = cookingClassService.getReviewResponseDto(uuid, pageable);
+        return ResponseEntity.ok()
+                .body(CommonResponseDto.builder()
+                        .stateCode(200)
+                        .message("정상적으로 리뷰가 조회되었습니다.")
+                        .data(reviewResponseDto)
                         .build());
     }
 

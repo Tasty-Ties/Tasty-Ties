@@ -3,11 +3,12 @@ package com.teamcook.tastyties.cooking_class.service;
 import com.teamcook.tastyties.cooking_class.dto.*;
 import com.teamcook.tastyties.cooking_class.entity.*;
 import com.teamcook.tastyties.cooking_class.exception.ClassIsDeletedException;
-import com.teamcook.tastyties.cooking_class.exception.ClassNotFoundException;
+import com.teamcook.tastyties.cooking_class.exception.CookingClassNotFoundException;
 import com.teamcook.tastyties.cooking_class.exception.ReservationNotFoundException;
 import com.teamcook.tastyties.cooking_class.repository.*;
 import com.teamcook.tastyties.security.userdetails.CustomUserDetails;
 import com.teamcook.tastyties.shared.dto.ReviewRequestDto;
+import com.teamcook.tastyties.shared.dto.ReviewResponseDto;
 import com.teamcook.tastyties.shared.entity.CookingClassAndCookingClassTag;
 import com.teamcook.tastyties.shared.entity.UserAndCookingClass;
 import com.teamcook.tastyties.shared.repository.CookingClassAndCookingClassTagRepository;
@@ -167,7 +168,9 @@ public class CookingClassService {
     @Transactional
     public CookingClassDto getCookingClassDetail(CustomUserDetails userDetails, String uuid) {
         CookingClass cc = cookingClassRepository.findWithUuid(uuid);
-
+        if (cc == null) {
+            throw new CookingClassNotFoundException("해당 클래스를 찾을 수 없습니다.");
+        }
         boolean isEnrolledClass = false;
         boolean isHost = false;
         long enrolledCount = userAndCookingClassRepository.countQuota(cc);
@@ -232,12 +235,17 @@ public class CookingClassService {
                 .collect(Collectors.toSet());
     }
 
+    // 쿠킹 클래스 상세 리뷰 조회
+    public Page<ReviewResponseDto> getReviewResponseDto(String uuid, Pageable pageable) {
+        return userAndCookingClassRepository.findReviewsForCookingClass(uuid, pageable);
+    }
+
     // 클래스 삭제
     @Transactional
     public long deleteClass(int userId, String uuid) {
         CookingClass cookingClass = cookingClassRepository.findClassForDelete(uuid);
         if (cookingClass == null) {
-            throw new ClassNotFoundException("클래스를 찾을 수 없습니다.");
+            throw new CookingClassNotFoundException("클래스를 찾을 수 없습니다.");
         }
 
         if (cookingClass.isDelete()) {
@@ -258,7 +266,7 @@ public class CookingClassService {
     public void reserveClass(User user, String uuid) {
         CookingClass cc = cookingClassRepository.findWithUuid(uuid);
         if (cc == null) {
-            throw new ClassNotFoundException("존재하지 않는 클래스입니다.");
+            throw new CookingClassNotFoundException("존재하지 않는 클래스입니다.");
         }
 
         if (cc.isDelete()) {

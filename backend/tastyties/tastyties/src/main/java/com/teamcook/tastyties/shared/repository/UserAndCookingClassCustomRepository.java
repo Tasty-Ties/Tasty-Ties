@@ -27,7 +27,9 @@ public interface UserAndCookingClassCustomRepository {
     Page<CookingClassListDto> findReservedClassesByUserId(int userId, Pageable pageable);
     Set<CookingClassListDto> findReservedClassesForProfile(int userId);
 
+    Page<ReviewResponseDto> findReviewsForCookingClass(String uuid, Pageable pageable);
     List<ReviewResponseDto> findReviewsForCookingClass(int userId);
+
 
     UserAndCookingClass findReservationByUsernameAndClassUuid(int userId, String uuid);
 }
