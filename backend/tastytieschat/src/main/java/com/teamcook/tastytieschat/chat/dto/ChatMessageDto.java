@@ -4,6 +4,7 @@ import com.teamcook.tastytieschat.chat.constant.MessageType;
 import com.teamcook.tastytieschat.chat.entity.ChatMessage;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -11,6 +12,7 @@ import java.util.Map;
 
 @AllArgsConstructor
 @Builder
+@Getter
 public class ChatMessageDto {
     private MessageType type;
     private int userId;

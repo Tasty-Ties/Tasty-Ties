@@ -10,5 +10,6 @@ public class RabbitMQRequestDto {
     private RabbitMQRequestType type;
     private String chatRoomId;
     private String title;
+    private String imageUrl;
     private RabbitMQUserDto user;
 }
