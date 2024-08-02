@@ -18,6 +18,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.net.URI;
 
 @RestController
 @RequestMapping("/users")
@@ -106,6 +109,19 @@ public class UserController {
                         .stateCode(200)
                         .message("프로필이 정상적으로 수정됐습니다.")
                         .data(userUpdateDTO)
+                        .build());
+    }
+
+    // 프로필 이미지 업로드
+    @PatchMapping("/me/profile-image")
+    public ResponseEntity<CommonResponseDto> uploadProfileImage(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                                                @RequestPart MultipartFile profileImage) {
+        String imageUrl = userService.uploadImage(userDetails, profileImage);
+        return ResponseEntity.created(URI.create(imageUrl))
+                .body(CommonResponseDto.builder()
+                        .stateCode(201)
+                        .message("프로필이 정상적으로 수정됐습니다.")
+                        .data(imageUrl)
                         .build());
     }
 
