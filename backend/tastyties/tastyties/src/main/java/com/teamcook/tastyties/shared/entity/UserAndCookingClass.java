@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @Getter @Setter
@@ -15,6 +16,8 @@ public class UserAndCookingClass {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int userCookingClassId;
+
+    private String uuid;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "userId")
@@ -25,5 +28,13 @@ public class UserAndCookingClass {
     private CookingClass cookingClass;
 
     private String cookingClassReview;
-    private LocalDateTime cookingClassReviewCreateTime = LocalDateTime.now();
+
+    private LocalDateTime reservationTime;
+    private LocalDateTime cookingClassReviewCreateTime;
+
+    @PrePersist
+    protected void onCreate() {
+        uuid = UUID.randomUUID().toString();
+        reservationTime = LocalDateTime.now();
+    }
 }

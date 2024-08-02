@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.teamcook.tastytieschat.chat.entity.ChatMessage;
-import com.teamcook.tastytieschat.chat.config.ChatGPTConfig;
+import com.teamcook.tastytieschat.common.config.ChatGPTConfig;
 import com.teamcook.tastytieschat.chat.dto.GptRequestDto;
 import com.teamcook.tastytieschat.chat.dto.GptRequestMessageDto;
 import org.springframework.beans.factory.annotation.Value;
