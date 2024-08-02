@@ -1,6 +1,5 @@
 package com.teamcook.tastyties.cooking_class.controller;
 
-import com.teamcook.tastyties.chat.dto.ChatUserDto;
 import com.teamcook.tastyties.common.constant.RabbitMQUserType;
 import com.teamcook.tastyties.common.dto.CommonResponseDto;
 import com.teamcook.tastyties.common.dto.RabbitMQRequestDto;

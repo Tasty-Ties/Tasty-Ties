@@ -1,6 +1,6 @@
 package com.teamcook.tastyties.user.service;
 
-import com.teamcook.tastyties.chat.dto.ChatUserDto;
+import com.teamcook.tastyties.cooking_class.dto.ChatUserDto;
 import com.teamcook.tastyties.user.entity.User;
 import com.teamcook.tastyties.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;

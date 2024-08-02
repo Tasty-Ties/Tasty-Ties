@@ -53,6 +53,8 @@ public class ChatMessageController {
                     .build();
 
             Set<String> translatedLanguages = (Set<String>) map.get("translatedLanguages");
+            // 사용자 언어 제외
+            translatedLanguages.remove(chatMessage.getOriginLanguage());
 
             try {
                 translationService.translationChatMessage(chatMessage, translatedLanguages);
