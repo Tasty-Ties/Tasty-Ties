@@ -26,10 +26,17 @@ public class VoiceChatServiceImpl implements VoiceChatService {
 
 
     @Value("${speech-flow-key-id}")
-    private String keyId;
+    private String speechFlowKeyId;
 
     @Value("${speech-flow-key-secret}")
-    private String keySecret;
+    private String speechFlowKeySecret;
+
+    @Value("${clova-api-id}")
+    private String ClovaApiId;
+
+    @Value("${clova-api-key}")
+    private String ClovaApiKey;
+
 
     @Value("${ffmpeg.path}")
     private String ffmpegPath;
@@ -81,7 +88,15 @@ public class VoiceChatServiceImpl implements VoiceChatService {
         return assembledData.toString();
     }
 
+    public String translateVoiceToTextByClova(){
+        return null;
+    }
 
+
+    /**
+     * @param fullData : 인코딩된 문자열
+     * @return : mp3 파일이 저장된 경로 full path
+     * */
     @Override
     public String getMp3filePath(String fullData) throws IOException, InterruptedException {
         // Base64 디코딩
@@ -116,8 +131,8 @@ public class VoiceChatServiceImpl implements VoiceChatService {
     public String sendFileToSpeechFlow(String filePath) throws IOException {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
-        headers.set("keyId", keyId);
-        headers.set("keySecret", keySecret);
+        headers.set("keyId", speechFlowKeyId);
+        headers.set("keySecret", speechFlowKeySecret);
 
         MultipartBodyBuilder builder = new MultipartBodyBuilder();
         builder.part("lang", "ko");
@@ -142,8 +157,8 @@ public class VoiceChatServiceImpl implements VoiceChatService {
     public String queryTranscriptionResult(String taskId) throws IOException, InterruptedException {
         // STT 결과를 얻기 위한 설정
         HttpHeaders headers = new HttpHeaders();
-        headers.set("keyId", keyId);
-        headers.set("keySecret", keySecret);
+        headers.set("keyId", speechFlowKeyId);
+        headers.set("keySecret", speechFlowKeySecret);
 
         String url = "https://api.speechflow.io/asr/file/v1/query?taskId=" + taskId;
         HttpEntity<?> requestEntity = new HttpEntity<>(headers);
