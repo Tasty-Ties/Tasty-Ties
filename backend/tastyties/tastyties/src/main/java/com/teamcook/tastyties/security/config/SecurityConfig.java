@@ -48,6 +48,9 @@ public class SecurityConfig {
                         .requestMatchers("/users/profile/**").authenticated()  // 로그인한 사용자만 접근 가능
                         .anyRequest().permitAll()
                 )
+                .exceptionHandling(exceptionHandling ->
+                        exceptionHandling.authenticationEntryPoint(jwtAuthenticationEntryPoint)
+                )
                 .formLogin(formLogin ->
                         formLogin
                                 .loginPage("/login")
@@ -72,7 +75,11 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
+        configuration.addAllowedOrigin("http://localhost:5173");
+        configuration.addAllowedOrigin("http://127.0.0.1:5173");
         configuration.addAllowedOrigin("http://localhost:3000");
+        configuration.addAllowedOrigin("http://127.0.0.1:3000");
+
         //configuration.addAllowedOrigin("*");
         configuration.addAllowedMethod("*");
         configuration.addAllowedHeader("*");

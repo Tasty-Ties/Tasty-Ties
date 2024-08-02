@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import userStore from "../../store/UserStore";
 import useApiStore from "../../store/ApiStore";
 import axios from "axios";
-import api from "../../utils/Api";
+import api from "../../service/Api";
 
 const SignUpSecond = () => {
   const nav = useNavigate();
