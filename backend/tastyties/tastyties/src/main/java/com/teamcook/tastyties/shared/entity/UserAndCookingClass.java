@@ -1,5 +1,6 @@
 package com.teamcook.tastyties.shared.entity;
 
+import com.teamcook.tastyties.shared.dto.ReviewRequestDto;
 import com.teamcook.tastyties.cooking_class.entity.CookingClass;
 import com.teamcook.tastyties.user.entity.User;
 import jakarta.persistence.*;
@@ -36,5 +37,11 @@ public class UserAndCookingClass {
     protected void onCreate() {
         uuid = UUID.randomUUID().toString();
         reservationTime = LocalDateTime.now();
+    }
+
+    // review 작성
+    public void writeReview(ReviewRequestDto reviewRequestDto) {
+        this.cookingClassReview = reviewRequestDto.getComment();
+        this.cookingClassReviewCreateTime = LocalDateTime.now();
     }
 }

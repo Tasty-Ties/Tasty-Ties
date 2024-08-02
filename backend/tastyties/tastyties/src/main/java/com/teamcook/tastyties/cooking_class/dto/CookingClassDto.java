@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 
 @Data
@@ -41,6 +42,8 @@ public class CookingClassDto {
     private long reservedCount;
 
     private Set<UserProfileForClassDetailDto> userProfiles;
+    private List<String> imageUrls;
+    private String mainImageUrl;
 
     private String chatRoomId;
 }

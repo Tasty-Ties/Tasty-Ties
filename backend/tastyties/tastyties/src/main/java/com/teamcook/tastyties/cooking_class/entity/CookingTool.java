@@ -2,10 +2,11 @@ package com.teamcook.tastyties.cooking_class.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Data
+@Getter @NoArgsConstructor
 public class CookingTool {
 
     @Id
@@ -17,4 +18,9 @@ public class CookingTool {
     private CookingClass cookingClass;
 
     private String cookingToolName;
+
+    public CookingTool(CookingClass cookingClass, String cookingToolName) {
+        this.cookingClass = cookingClass;
+        this.cookingToolName = cookingToolName;
+    }
 }

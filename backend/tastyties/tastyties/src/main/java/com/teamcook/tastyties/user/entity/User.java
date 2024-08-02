@@ -67,6 +67,8 @@ public class User {
     private String youtubeUrl;
     private String youtubeHandle;
 
+    private int activityPoint = 0;
+
     public void updateUser(UserUpdateDto request, String encodedPassword, String instagramHandle, String youtubeHandle) {
         this.nickname = request.getNickname();
         if (encodedPassword != null) {

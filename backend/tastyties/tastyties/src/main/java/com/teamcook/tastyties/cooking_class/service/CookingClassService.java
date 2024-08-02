@@ -2,11 +2,16 @@ package com.teamcook.tastyties.cooking_class.service;
 
 import com.teamcook.tastyties.cooking_class.dto.*;
 import com.teamcook.tastyties.cooking_class.entity.*;
+import com.teamcook.tastyties.cooking_class.exception.ClassIsDeletedException;
+import com.teamcook.tastyties.cooking_class.exception.CookingClassNotFoundException;
+import com.teamcook.tastyties.cooking_class.exception.ReservationNotFoundException;
 import com.teamcook.tastyties.exception.CookingClassIsDeletedException;
 import com.teamcook.tastyties.exception.CookingClassNotFoundException;
 import com.teamcook.tastyties.exception.ReservationNotFoundException;
 import com.teamcook.tastyties.cooking_class.repository.*;
 import com.teamcook.tastyties.security.userdetails.CustomUserDetails;
+import com.teamcook.tastyties.shared.dto.ReviewRequestDto;
+import com.teamcook.tastyties.shared.dto.ReviewResponseDto;
 import com.teamcook.tastyties.shared.entity.CookingClassAndCookingClassTag;
 import com.teamcook.tastyties.shared.entity.UserAndCookingClass;
 import com.teamcook.tastyties.shared.repository.CookingClassAndCookingClassTagRepository;
@@ -27,34 +32,38 @@ import java.util.stream.Collectors;
 @Service
 @Slf4j
 public class CookingClassService {
-    private final CookingClassRepository ccRepository;
+    private final CookingClassRepository cookingClassRepository;
     private final IngredientRepository ingredientRepository;
     private final RecipeRepository recipeRepository;
     private final CookingToolRepository cookingToolRepository;
     private final CookingClassAndCookingClassTagRepository ccAndcctRepository;
-    private final UserAndCookingClassRepository uAndcRepository;
-    private final CookingClassTagRepository cookingClassTagRepository;
-    private final CookingClassRepository cookingClassRepository;
     private final UserAndCookingClassRepository userAndCookingClassRepository;
+    private final CookingClassTagRepository cookingClassTagRepository;
+    private final CookingClassImageRepository cookingClassImageRepository;
 
     @Autowired
-    public CookingClassService(CookingClassRepository ccRepository, IngredientRepository ingredientRepository, RecipeRepository recipeRepository, CookingToolRepository cookingToolRepository, CookingClassAndCookingClassTagRepository ccAndcctRepository, UserAndCookingClassRepository uAndcRepository, CookingClassTagRepository cookingClassTagRepository, CookingClassRepository cookingClassRepository, UserAndCookingClassRepository userAndCookingClassRepository) {
-        this.ccRepository = ccRepository;
+    public CookingClassService(CookingClassRepository cookingClassRepository, IngredientRepository ingredientRepository,
+                               RecipeRepository recipeRepository, CookingToolRepository cookingToolRepository,
+                               CookingClassAndCookingClassTagRepository ccAndcctRepository,
+                               UserAndCookingClassRepository userAndCookingClassRepository,
+                               CookingClassTagRepository cookingClassTagRepository,
+                               CookingClassImageRepository cookingClassImageRepository) {
+        this.cookingClassRepository = cookingClassRepository;
         this.ingredientRepository = ingredientRepository;
         this.recipeRepository = recipeRepository;
         this.cookingToolRepository = cookingToolRepository;
         this.ccAndcctRepository = ccAndcctRepository;
-        this.uAndcRepository = uAndcRepository;
-        this.cookingClassTagRepository = cookingClassTagRepository;
-        this.cookingClassRepository = cookingClassRepository;
         this.userAndCookingClassRepository = userAndCookingClassRepository;
+        this.cookingClassTagRepository = cookingClassTagRepository;
+        this.cookingClassImageRepository = cookingClassImageRepository;
     }
-
     // 클래스 생성
     @Transactional
     public CookingClass registerClass(User user, CookingClassDto registerDto) {
+        log.debug("mainimg: {}", registerDto.getMainImageUrl());
+        log.debug("urls: {}", registerDto.getImageUrls().toString());
         CookingClass cc = createCookingClass(user, registerDto);
-        ccRepository.save(cc);
+        cookingClassRepository.save(cc);
 
         Set<Ingredient> ingredients = createIngredients(registerDto.getIngredients(), cc);
         ingredientRepository.saveAll(ingredients);
@@ -67,6 +76,9 @@ public class CookingClassService {
 
         List<CookingClassAndCookingClassTag> cookingClassTags = createCookingClassTags(registerDto.getCookingClassTags(), cc);
         ccAndcctRepository.saveAll(cookingClassTags);
+
+        List<CookingClassImage> cookingClassImages = createCookingClassImages(registerDto.getImageUrls(), cc);
+        cookingClassImageRepository.saveAll(cookingClassImages);
         return cc;
     }
 
@@ -87,39 +99,37 @@ public class CookingClassService {
         cc.setCookingClassStartTime(registerDto.getCookingClassStartTime());
         cc.setCookingClassEndTime(registerDto.getCookingClassEndTime());
         cc.setReplayEndTime(registerDto.getReplayEndTime());
+        cc.setMainImage(registerDto.getMainImageUrl());
         return cc;
     }
 
     private Set<Ingredient> createIngredients(Set<IngredientDto> ingredientDtos, CookingClass cc) {
         return ingredientDtos.stream()
                 .map(dto -> {
-                    Ingredient ingredient = new Ingredient();
-                    ingredient.setIngredientName(dto.getIngredientName());
-                    ingredient.setQuantity(dto.getQuantity());
-                    ingredient.setQuantityUnit(dto.getQuantityUnit());
-                    ingredient.setCookingClass(cc);
-                    return ingredient;
+                    return new Ingredient(
+                            cc,
+                            dto.getIngredientName(),
+                            dto.getQuantity(),
+                            dto.getQuantityUnit(),
+                            dto.isRequired());
                 }).collect(Collectors.toSet());
     }
 
     private Set<Recipe> createRecipe(Set<RecipeDto> recipeDtos, CookingClass cc) {
         return recipeDtos.stream()
                 .map(dto -> {
-                    Recipe recipe = new Recipe();
-                    recipe.setStep(dto.getStep());
-                    recipe.setDescription(dto.getDescription());
-                    recipe.setCookingClass(cc);
-                    return recipe;
+                    return new Recipe(
+                            cc, dto.getStep(), dto.getDescription()
+                    );
                 }).collect(Collectors.toSet());
     }
 
     private Set<CookingTool> createCookingTools(Set<String> toolNames, CookingClass cc) {
         return toolNames.stream()
                 .map(toolName -> {
-                    CookingTool tool = new CookingTool();
-                    tool.setCookingToolName(toolName);
-                    tool.setCookingClass(cc);
-                    return tool;
+                    return new CookingTool(
+                            cc, toolName
+                    );
                 }).collect(Collectors.toSet());
     }
 
@@ -131,6 +141,15 @@ public class CookingClassService {
                     ccAndcct.setCookingClass(cc);
                     ccAndcct.setCookingClassTag(tag);
                     return ccAndcct;
+                }).collect(Collectors.toList());
+    }
+
+    private List<CookingClassImage> createCookingClassImages(List<String> imageUrls, CookingClass cc) {
+        return imageUrls.stream()
+                .map(imageUrl -> {
+                    return new CookingClassImage(
+                            cc, imageUrl
+                    );
                 }).collect(Collectors.toList());
     }
 
@@ -152,16 +171,18 @@ public class CookingClassService {
     @Transactional
     public CookingClassDto getCookingClassDetail(CustomUserDetails userDetails, String uuid) {
         CookingClass cc = cookingClassRepository.findWithUuid(uuid);
-
+        if (cc == null) {
+            throw new CookingClassNotFoundException("해당 클래스를 찾을 수 없습니다.");
+        }
         boolean isEnrolledClass = false;
         boolean isHost = false;
-        long enrolledCount = uAndcRepository.countQuota(cc);
+        long enrolledCount = userAndCookingClassRepository.countQuota(cc);
         Set<UserProfileForClassDetailDto> userEnrolledInClass = null;
 
         if (userDetails != null) {
             User user = userDetails.user();
-            isEnrolledClass = uAndcRepository.isUserEnrolledInClass(user, cc);
-            userEnrolledInClass = uAndcRepository.findUserEnrolledInClass(cc);
+            isEnrolledClass = userAndCookingClassRepository.isUserEnrolledInClass(user, cc);
+            userEnrolledInClass = userAndCookingClassRepository.findUserEnrolledInClass(cc);
             isHost = (user.getUsername().equals(cc.getHost().getUsername()));
         }
 
@@ -169,6 +190,9 @@ public class CookingClassService {
         Set<RecipeDto> recipeDtos = mapToRecipeDtos(cc.getRecipes());
         Set<String> cookingTools = mapToCookingToolNames(cc.getCookingTools());
         Set<String> tags = mapToTagNames(cc.getCookingClassAndCookingClassTags());
+
+        // 이미지 관련 추가 필요
+        // List<String> imageUrls = 어쩌구
 
         return new CookingClassDto(
                 cc.getUuid(), cc.getHost().getNickname(),
@@ -178,7 +202,9 @@ public class CookingClassService {
                 cc.getCookingClassEndTime(), cc.getDishCookingTime(), ingredientDtos,
                 recipeDtos, cookingTools, cc.getQuota(),
                 cc.getReplayEndTime(), isEnrolledClass, isHost,
-                enrolledCount, userEnrolledInClass, cc.getChatRoomId()
+                enrolledCount, userEnrolledInClass,
+                null, cc.getMainImage(),
+                cc.getChatRoomId()
         );
     }
 
@@ -210,6 +236,11 @@ public class CookingClassService {
         return cookingTools.stream()
                 .map(CookingTool::getCookingToolName)
                 .collect(Collectors.toSet());
+    }
+
+    // 쿠킹 클래스 상세 리뷰 조회
+    public Page<ReviewResponseDto> getReviewResponseDto(String uuid, Pageable pageable) {
+        return userAndCookingClassRepository.findReviewsForCookingClass(uuid, pageable);
     }
 
     // 클래스 삭제
@@ -264,7 +295,7 @@ public class CookingClassService {
         UserAndCookingClass uAndc = new UserAndCookingClass();
         uAndc.setUser(user);
         uAndc.setCookingClass(cc);
-        uAndcRepository.save(uAndc);
+        userAndCookingClassRepository.save(uAndc);
     }
 
     // 예약 삭제
@@ -293,8 +324,7 @@ public class CookingClassService {
         if (reservation == null) {
             throw new ReservationNotFoundException("예약 정보를 찾을 수 없습니다.");
         }
-
-        reservation.setCookingClassReview(reviewRequestDto.getComment());
+        reservation.writeReview(reviewRequestDto);
     }
 
 }

@@ -6,11 +6,16 @@ import com.teamcook.tastyties.common.dto.CommonResponseDto;
 import com.teamcook.tastyties.common.dto.RabbitMQRequestDto;
 import com.teamcook.tastyties.common.dto.RabbitMQUserDto;
 import com.teamcook.tastyties.cooking_class.dto.*;
+import com.teamcook.tastyties.cooking_class.dto.CookingClassListDto;
+import com.teamcook.tastyties.cooking_class.dto.CookingClassDto;
+import com.teamcook.tastyties.cooking_class.dto.CookingClassSearchCondition;
+import com.teamcook.tastyties.shared.dto.ReviewRequestDto;
 import com.teamcook.tastyties.common.constant.RabbitMQRequestType;
 import com.teamcook.tastyties.cooking_class.entity.CookingClass;
 import com.teamcook.tastyties.cooking_class.service.CookingClassService;
 import com.teamcook.tastyties.cooking_class.service.RabbitMQProducer;
 import com.teamcook.tastyties.security.userdetails.CustomUserDetails;
+import com.teamcook.tastyties.shared.dto.ReviewResponseDto;
 import com.teamcook.tastyties.user.entity.User;
 import com.teamcook.tastyties.user.exception.UserDetailsNotFoundException;
 import com.teamcook.tastyties.user.service.UserChatService;
@@ -57,6 +62,7 @@ public class CookingClassController {
 
         CookingClass cookingClass = cookingClassService.registerClass(user, registerDto);
 
+        // TODO: 쿠킹 클래스에 채팅방 ID 저장하기
         createChatRoom(cookingClass, user.getUserId());
         registerDto.setChatRoomId(cookingClass.getChatRoomId());
 
@@ -112,6 +118,17 @@ public class CookingClassController {
                         .stateCode(200)
                         .message("정상적으로 조회되었습니다.")
                         .data(cookingClassDetail)
+                        .build());
+    }
+
+    @GetMapping("/{uuid}/reviews")
+    public ResponseEntity<CommonResponseDto> getClassDetailReviews(@PathVariable String uuid, Pageable pageable) {
+        Page<ReviewResponseDto> reviewResponseDto = cookingClassService.getReviewResponseDto(uuid, pageable);
+        return ResponseEntity.ok()
+                .body(CommonResponseDto.builder()
+                        .stateCode(200)
+                        .message("정상적으로 리뷰가 조회되었습니다.")
+                        .data(reviewResponseDto)
                         .build());
     }
 

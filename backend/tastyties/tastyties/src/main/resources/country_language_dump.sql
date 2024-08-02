@@ -1,13 +1,5 @@
 -- MySQL dump for Language table
 
--- Create the table
-CREATE TABLE Language (
-                          id INT AUTO_INCREMENT PRIMARY KEY,
-                          alpha2 CHAR(2) NOT NULL,
-                          english VARCHAR(50) NOT NULL,
-                          korean VARCHAR(50) NOT NULL
-);
-
 -- Insert initial data
 INSERT INTO Language (alpha2, english, korean) VALUES ('EN', 'English', '영어');
 INSERT INTO Language (alpha2, english, korean) VALUES ('KO', 'Korean', '한국어');
@@ -25,14 +17,6 @@ INSERT INTO Language (alpha2, english, korean) VALUES ('VI', 'Vietnamese', '베�
 INSERT INTO Language (alpha2, english, korean) VALUES ('TH', 'Thai', '타이어');
 INSERT INTO Language (alpha2, english, korean) VALUES ('TR', 'Turkish', '터키어');
 
--- Create the Country table
-CREATE TABLE Country (
-                         id INT AUTO_INCREMENT PRIMARY KEY,
-                         alpha2 CHAR(2) NOT NULL,
-                         english_name VARCHAR(100) NOT NULL,
-                         korean_name VARCHAR(100) NOT NULL
-);
-
 -- Insert initial data into Country table
 INSERT INTO Country (alpha2, english_name, korean_name) VALUES ('US', 'United States', '미국');
 INSERT INTO Country (alpha2, english_name, korean_name) VALUES ('KR', 'South Korea', '대한민국');
@@ -49,3 +33,19 @@ INSERT INTO Country (alpha2, english_name, korean_name) VALUES ('IN', 'India', '
 INSERT INTO Country (alpha2, english_name, korean_name) VALUES ('VN', 'Vietnam', '베트남');
 INSERT INTO Country (alpha2, english_name, korean_name) VALUES ('TH', 'Thailand', '태국');
 INSERT INTO Country (alpha2, english_name, korean_name) VALUES ('TR', 'Turkey', '터키');
+
+-- Insert sample data into User table
+INSERT INTO User (username, password, nickname, birth, email, is_deleted, is_adult, country_id, language_id)
+VALUES ('thai', 'thai', '폼폼푸린', '2001-02-18', 'maithai071823@gmail.com', FALSE, FALSE, 14, 14);
+
+INSERT INTO User (username, password, nickname, birth, email, is_deleted, is_adult, country_id, language_id)
+VALUES ('john_doe', 'password123', 'John', '1990-06-15', 'john_doe@example.com', FALSE, FALSE, 1, 1);
+
+INSERT INTO User (username, password, nickname, birth, email, is_deleted, is_adult, country_id, language_id)
+VALUES ('jane_smith', 'securepass', 'Jane', '1985-09-23', 'jane_smith@example.com', FALSE, FALSE, 2, 2);
+
+INSERT INTO User (username, password, nickname, birth, email, is_deleted, is_adult, country_id, language_id)
+VALUES ('maria_garcia', 'mypass', 'Maria', '1992-11-30', 'maria_garcia@example.com', FALSE, FALSE, 5, 5);
+
+INSERT INTO User (username, password, nickname, birth, email, is_deleted, is_adult, country_id, language_id)
+VALUES ('chen_wei', 'pass123', 'Chen', '1988-03-12', 'chen_wei@example.com', FALSE, FALSE, 3, 3);
