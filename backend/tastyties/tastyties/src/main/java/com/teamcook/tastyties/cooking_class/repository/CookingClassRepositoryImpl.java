@@ -11,8 +11,9 @@ import com.teamcook.tastyties.common.entity.QCountry;
 import com.teamcook.tastyties.cooking_class.dto.*;
 import com.teamcook.tastyties.cooking_class.entity.CookingClass;
 import com.teamcook.tastyties.cooking_class.entity.CookingClassTag;
-import com.teamcook.tastyties.cooking_class.entity.QCookingClassTag;
+import com.teamcook.tastyties.cooking_class.entity.QCookingClass;
 import com.teamcook.tastyties.shared.entity.QCookingClassAndCookingClassTag;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,6 +27,7 @@ import java.util.Set;
 import static com.teamcook.tastyties.common.entity.QCountry.country;
 import static com.teamcook.tastyties.cooking_class.entity.QCookingClass.cookingClass;
 import static com.teamcook.tastyties.cooking_class.entity.QCookingClassTag.cookingClassTag;
+import static com.teamcook.tastyties.shared.entity.QUserAndCookingClass.userAndCookingClass;
 import static com.teamcook.tastyties.user.entity.QUser.user;
 import static org.springframework.util.StringUtils.hasText;
 
@@ -66,9 +68,9 @@ public class CookingClassRepositoryImpl implements CookingClassCustomRepository 
                                 country.alpha2,
                                 country.countryImageUrl
                         ), new QCountryProfileDto(
-                                countryByClass.alpha2,
-                                countryByClass.countryImageUrl
-                        ),
+                        countryByClass.alpha2,
+                        countryByClass.countryImageUrl
+                ),
                         cookingClass.countryCode.eq(country.alpha2)
                 ))
                 .from(cookingClass)
@@ -106,7 +108,7 @@ public class CookingClassRepositoryImpl implements CookingClassCustomRepository 
 
     // username equal 필터
     private BooleanExpression usernameEq(String username) {
-        return hasText(username) ?user.username.eq(username) : null;
+        return hasText(username) ? user.username.eq(username) : null;
     }
 
     // 현지인 필터
@@ -176,9 +178,9 @@ public class CookingClassRepositoryImpl implements CookingClassCustomRepository 
                                 country.alpha2,
                                 country.countryImageUrl
                         ), new QCountryProfileDto(
-                                countryByClass.alpha2,
-                                countryByClass.countryImageUrl
-                        ), cookingClass.countryCode.eq(country.alpha2)
+                        countryByClass.alpha2,
+                        countryByClass.countryImageUrl
+                ), cookingClass.countryCode.eq(country.alpha2)
                 ))
                 .from(cookingClass)
                 .leftJoin(cookingClass.host, user)
@@ -217,7 +219,7 @@ public class CookingClassRepositoryImpl implements CookingClassCustomRepository 
                                 country.alpha2,
                                 country.countryImageUrl
                         ),
-                        cookingClass.countryCode.eq(country.alpha2)
+                                cookingClass.countryCode.eq(country.alpha2)
                         ))
                         .from(cookingClass)
                         .leftJoin(cookingClass.host, user)
@@ -229,6 +231,47 @@ public class CookingClassRepositoryImpl implements CookingClassCustomRepository 
                         .limit(4)
                         .fetch()
         );
+    }
+
+    @Override
+    public boolean isCookingClassHost(int hostId, String uuid) {
+        Long count = queryFactory
+                .select(cookingClass.count())
+                .from(cookingClass)
+                .where(cookingClass.uuid.eq(uuid)
+                        .and(cookingClass.host.userId.eq(hostId)))
+                .fetchOne();
+        return count != null && count > 0;
+    }
+
+    @Override
+    @Transactional
+    public void updateSessionIdByCookingClassId(String sessionId, String uuid) {
+        queryFactory.update(cookingClass)
+                .set(cookingClass.sessionId, sessionId)
+                .where(cookingClass.uuid.eq(uuid))
+                .execute();
+    }
+
+    @Override
+    public boolean isCookingClassGuest(Integer userId, String uuid) {
+        Long count = queryFactory
+                .select(userAndCookingClass.count())
+                .from(userAndCookingClass)
+                .leftJoin(userAndCookingClass.cookingClass, cookingClass)
+                .where(cookingClass.uuid.eq(uuid)
+                        .and(userAndCookingClass.user.userId.eq(userId)))
+                .fetchOne();
+        return count != null && count > 0;
+    }
+
+    @Override
+    public String findSessionIdWidthUuid(String uuid) {
+        CookingClass cookingClass = queryFactory
+                .selectFrom(QCookingClass.cookingClass)
+                .where(QCookingClass.cookingClass.uuid.eq(uuid))
+                .fetchOne();
+        return cookingClass != null ? cookingClass.getSessionId() : null;
     }
 
 }
