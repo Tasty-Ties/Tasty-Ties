@@ -1,16 +1,10 @@
 package com.teamcook.tastyties.cooking_class.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 @Entity
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@ToString
+@Getter @NoArgsConstructor
 public class Ingredient {
 
     @Id
@@ -25,4 +19,12 @@ public class Ingredient {
     private int quantity;
     private String quantityUnit;
     private boolean isRequired;
+
+    public Ingredient(CookingClass cookingClass, String ingredientName, int quantity, String quantityUnit, boolean isRequired) {
+        this.cookingClass = cookingClass;
+        this.ingredientName = ingredientName;
+        this.quantity = quantity;
+        this.quantityUnit = quantityUnit;
+        this.isRequired = isRequired;
+    }
 }

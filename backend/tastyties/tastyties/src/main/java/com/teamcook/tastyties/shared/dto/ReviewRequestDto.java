@@ -1,4 +1,4 @@
-package com.teamcook.tastyties.cooking_class.dto;
+package com.teamcook.tastyties.shared.dto;
 
 import lombok.Data;
 

@@ -1,18 +1,21 @@
 package com.teamcook.tastyties.cooking_class.controller;
 
 import com.teamcook.tastyties.chat.dto.ChatUserDto;
+import com.teamcook.tastyties.common.constant.RabbitMQUserType;
 import com.teamcook.tastyties.common.dto.CommonResponseDto;
 import com.teamcook.tastyties.common.dto.RabbitMQRequestDto;
 import com.teamcook.tastyties.common.dto.RabbitMQUserDto;
+import com.teamcook.tastyties.cooking_class.dto.*;
 import com.teamcook.tastyties.cooking_class.dto.CookingClassListDto;
 import com.teamcook.tastyties.cooking_class.dto.CookingClassDto;
 import com.teamcook.tastyties.cooking_class.dto.CookingClassSearchCondition;
-import com.teamcook.tastyties.cooking_class.dto.ReviewRequestDto;
+import com.teamcook.tastyties.shared.dto.ReviewRequestDto;
 import com.teamcook.tastyties.common.constant.RabbitMQRequestType;
 import com.teamcook.tastyties.cooking_class.entity.CookingClass;
 import com.teamcook.tastyties.cooking_class.service.CookingClassService;
 import com.teamcook.tastyties.cooking_class.service.RabbitMQProducer;
 import com.teamcook.tastyties.security.userdetails.CustomUserDetails;
+import com.teamcook.tastyties.shared.dto.ReviewResponseDto;
 import com.teamcook.tastyties.user.entity.User;
 import com.teamcook.tastyties.user.exception.UserDetailsNotFoundException;
 import com.teamcook.tastyties.user.service.UserChatService;
@@ -79,6 +82,7 @@ public class CookingClassController {
                 .title(cookingClass.getTitle())
                 .user(RabbitMQUserDto.builder()
                         .id(chatUser.getId())
+                        .type(RabbitMQUserType.HOST)
                         .nickname(chatUser.getNickname())
                         .language(chatUser.getLanguage())
                         .build())
@@ -117,19 +121,42 @@ public class CookingClassController {
                         .build());
     }
 
+    @GetMapping("/{uuid}/reviews")
+    public ResponseEntity<CommonResponseDto> getClassDetailReviews(@PathVariable String uuid, Pageable pageable) {
+        Page<ReviewResponseDto> reviewResponseDto = cookingClassService.getReviewResponseDto(uuid, pageable);
+        return ResponseEntity.ok()
+                .body(CommonResponseDto.builder()
+                        .stateCode(200)
+                        .message("정상적으로 리뷰가 조회되었습니다.")
+                        .data(reviewResponseDto)
+                        .build());
+    }
+
     // 클래스 삭제
     @DeleteMapping("/{uuid}")
     public ResponseEntity<CommonResponseDto> deleteClass(@AuthenticationPrincipal CustomUserDetails userDetails, @PathVariable String uuid) {
         if (userDetails == null) {
             throw new UserDetailsNotFoundException("인증 정보를 찾을 수 없습니다.");
         }
-        long row = cookingClassService.deleteClass(userDetails.getUserId(), uuid);
+
+        DeletedCookingClassDto deletedCookingClass = cookingClassService.deleteClass(userDetails.getUserId(), uuid);
+
+        deleteChatRoom(deletedCookingClass.getChatRoomId());
+
         return ResponseEntity.ok()
                 .body(CommonResponseDto.builder()
                         .stateCode(200)
                         .message("정상적으로 삭제되었습니다.")
-                        .data("연관된 예약 " + row + "개가 취소되었습니다.")
+                        .data("연관된 예약 " + deletedCookingClass.getDeletedReservationCount() + "개가 취소되었습니다.")
                         .build());
+    }
+
+    private void deleteChatRoom(String chatRoomId) {
+        RabbitMQRequestDto rabbitMQRequestDto = RabbitMQRequestDto.builder()
+                .type(RabbitMQRequestType.DELETE)
+                .chatRoomId(chatRoomId)
+                .build();
+        rabbitMQProducer.send(rabbitMQRequestDto);
     }
 
     // 클래스 예약
@@ -144,13 +171,32 @@ public class CookingClassController {
                             .build());
         }
 
-        cookingClassService.reserveClass(userDetails.user(), uuid);
+        String chatRoomId = cookingClassService.reserveClass(userDetails.user(), uuid);
+
+        joinChatRoom(chatRoomId, userDetails.getUserId());
+
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(CommonResponseDto.builder()
                         .stateCode(201)
                         .message("클래스가 예약되었습니다.")
                         .data(null)
                         .build());
+    }
+
+    private void joinChatRoom(String chatRoomId, int userId) {
+        ChatUserDto chatUser = userChatService.getUser(userId);
+
+        RabbitMQRequestDto rabbitMQRequestDto = RabbitMQRequestDto.builder()
+                .type(RabbitMQRequestType.JOIN)
+                .chatRoomId(chatRoomId)
+                .user(RabbitMQUserDto.builder()
+                        .id(chatUser.getId())
+                        .type(RabbitMQUserType.ATTENDEE)
+                        .nickname(chatUser.getNickname())
+                        .language(chatUser.getLanguage())
+                        .build())
+                .build();
+        rabbitMQProducer.send(rabbitMQRequestDto);
     }
 
     // 클래스 예약 취소
@@ -164,13 +210,30 @@ public class CookingClassController {
                             .data(null)
                             .build());
         }
-        cookingClassService.deleteReservation(userDetails.user(), uuid);
+
+        String chatRoomId = cookingClassService.deleteReservation(userDetails.user(), uuid);
+
+        leaveChatRoom(chatRoomId, userDetails.getUserId());
+
         return ResponseEntity.status(HttpStatus.NO_CONTENT)
                 .body(CommonResponseDto.builder()
                         .stateCode(204)
                         .message("예약이 정상적으로 취소되었습니다.")
                         .data(null)
                         .build());
+    }
+
+    private void leaveChatRoom(String chatRoomId, int userId) {
+        ChatUserDto chatUser = userChatService.getUser(userId);
+
+        RabbitMQRequestDto rabbitMQRequestDto = RabbitMQRequestDto.builder()
+                .type(RabbitMQRequestType.LEAVE)
+                .chatRoomId(chatRoomId)
+                .user(RabbitMQUserDto.builder()
+                        .id(chatUser.getId())
+                        .build())
+                .build();
+        rabbitMQProducer.send(rabbitMQRequestDto);
     }
 
     // 클래스 리뷰 생성

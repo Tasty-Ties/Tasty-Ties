@@ -84,8 +84,12 @@ public class CookingClass {
     @OneToMany(mappedBy = "cookingClass")
     private List<CookingClassAndCookingClassTag> cookingClassAndCookingClassTags;
 
+    // 쿠킹클래스에 사용되는 이미지
+    @OneToMany(mappedBy = "cookingClass")
+    private List<CookingClassImage> cookingClassImages;
+    // 대표 이미지
+    private String mainImage;
     private String chatRoomId;
-
 
     @PrePersist
     protected void onCreate() {
