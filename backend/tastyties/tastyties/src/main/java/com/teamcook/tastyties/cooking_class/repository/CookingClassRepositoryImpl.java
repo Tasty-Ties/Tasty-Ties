@@ -9,9 +9,8 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.teamcook.tastyties.common.dto.QCountryProfileDto;
 import com.teamcook.tastyties.common.entity.QCountry;
 import com.teamcook.tastyties.cooking_class.dto.*;
-import com.teamcook.tastyties.cooking_class.entity.CookingClass;
-import com.teamcook.tastyties.cooking_class.entity.CookingClassTag;
-import com.teamcook.tastyties.cooking_class.entity.QCookingClass;
+import com.teamcook.tastyties.cooking_class.entity.*;
+import com.teamcook.tastyties.shared.entity.CookingClassAndCookingClassTag;
 import com.teamcook.tastyties.shared.entity.QCookingClassAndCookingClassTag;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +25,11 @@ import java.util.Set;
 
 import static com.teamcook.tastyties.common.entity.QCountry.country;
 import static com.teamcook.tastyties.cooking_class.entity.QCookingClass.cookingClass;
+import static com.teamcook.tastyties.cooking_class.entity.QCookingClassImage.cookingClassImage;
 import static com.teamcook.tastyties.cooking_class.entity.QCookingClassTag.cookingClassTag;
+import static com.teamcook.tastyties.cooking_class.entity.QCookingTool.cookingTool;
+import static com.teamcook.tastyties.cooking_class.entity.QIngredient.ingredient;
+import static com.teamcook.tastyties.cooking_class.entity.QRecipe.recipe;
 import static com.teamcook.tastyties.shared.entity.QUserAndCookingClass.userAndCookingClass;
 import static com.teamcook.tastyties.user.entity.QUser.user;
 import static org.springframework.util.StringUtils.hasText;
@@ -142,18 +145,92 @@ public class CookingClassRepositoryImpl implements CookingClassCustomRepository 
     // 클래스 상세 조회
     @Override
     public CookingClass findWithUuid(String uuid) {
-        QCookingClassAndCookingClassTag ccAndTag = QCookingClassAndCookingClassTag.cookingClassAndCookingClassTag;
-        return queryFactory
+        CookingClass result = queryFactory
                 .selectFrom(cookingClass)
-                .leftJoin(cookingClass.host).fetchJoin()
-                .leftJoin(cookingClass.recipes).fetchJoin()
-                .leftJoin(cookingClass.ingredients).fetchJoin()
-                .leftJoin(cookingClass.cookingTools).fetchJoin()
-                .leftJoin(cookingClass.cookingClassAndCookingClassTags, ccAndTag).fetchJoin()
-                .leftJoin(ccAndTag.cookingClassTag, cookingClassTag).fetchJoin()
+                .leftJoin(cookingClass.host, user).fetchJoin()
+                .leftJoin(cookingClass.recipes, recipe).fetchJoin()
+                .leftJoin(cookingClass.ingredients, ingredient).fetchJoin()
+                .leftJoin(cookingClass.cookingTools, cookingTool).fetchJoin()
+                .leftJoin(cookingClass.cookingClassImages, cookingClassImage).fetchJoin()
                 .where(cookingClass.uuid.eq(uuid), cookingClass.isDelete.eq(false))
                 .fetchOne();
+        if (result != null) {
+            // 다대다 관계는 별도의 쿼리로 로드하여 엔티티에 추가
+            List<CookingClassAndCookingClassTag> tags = fetchCookingClassTags(result.getCookingClassId());
+            result.setCookingClassAndCookingClassTags(tags);
+        }
+        return result;
     }
+
+    private List<CookingClassAndCookingClassTag> fetchCookingClassTags(int cookingClassId) {
+        QCookingClassAndCookingClassTag ccAndTag = QCookingClassAndCookingClassTag.cookingClassAndCookingClassTag;
+
+        return queryFactory
+                .selectFrom(ccAndTag)
+                .leftJoin(ccAndTag.cookingClassTag, cookingClassTag).fetchJoin()
+                .where(ccAndTag.cookingClass.cookingClassId.eq(cookingClassId))
+                .fetch();
+    }
+
+    @Override
+    public CookingClassDto findCookingClassDtoWithUuid(String uuid) {
+        return null;
+    }
+
+//    @Override
+//    public CookingClassDto findCookingClassDtoWithUuid(String uuid) {
+//        QCookingClassAndCookingClassTag ccAndTag = QCookingClassAndCookingClassTag.cookingClassAndCookingClassTag;
+//        Set<RecipeDto> recipeNames = new HashSet<>(queryFactory
+//                .select(new QRecipeDto(
+//                        recipe.step, recipe.description
+//                )).from(recipe)
+//                .where(recipe.cookingClass.cookingClassId.eq(cookingClass.cookingClassId))
+//                .fetch());
+//
+//        Set<IngredientDto> ingredientNames = new HashSet<>(queryFactory
+//                .select(new QIngredientDto(
+//                        ingredient.ingredientName, ingredient.quantity,
+//                        ingredient.quantityUnit, ingredient.isRequired
+//                ))
+//                .from(ingredient)
+//                .where(ingredient.cookingClass.cookingClassId.eq(cookingClass.cookingClassId))
+//                .fetch());
+//
+//        Set<String> cookingToolNames = new HashSet<>(queryFactory
+//                .select(cookingTool.cookingToolName)
+//                .from(cookingTool)
+//                .where(cookingTool.cookingClass.cookingClassId.eq(cookingClass.cookingClassId))
+//                .fetch());
+//
+//        List<String> imageUrls = queryFactory
+//                .select(cookingClassImage.cookingClassImageUrl)
+//                .from(cookingClassImage)
+//                .where(cookingClassImage.cookingClass.cookingClassId.eq(cookingClass.cookingClassId))
+//                .fetch();
+//
+//        List<String> tagNames = queryFactory
+//                .select(cookingClassTag.cookingClassTagName)
+//                .from(ccAndTag)
+//                .leftJoin(ccAndTag.cookingClassTag, cookingClassTag)
+//                .where(ccAndTag.cookingClass.cookingClassId.eq(cookingClass.cookingClassId))
+//                .fetch();
+//
+//        return queryFactory
+//                .select(new QCookingClass.class,
+//        cookingClass.cookingClassId,
+//                cookingClass.uuid,
+//                cookingClass.title,
+//                user.username,
+//                recipeNames,
+//                ingredientNames,
+//                cookingToolNames,
+//                imageUrls,
+//                tagNames))
+//                .from(cookingClass)
+//                .leftJoin(cookingClass.host, user)
+//                .where(cookingClass.uuid.eq(uuid), cookingClass.isDelete.eq(false))
+//                .fetchOne()
+//    }
 
     @Override
     public CookingClass findClassForDelete(String uuid) {

@@ -42,8 +42,10 @@ public class CookingClassDto {
     private long reservedCount;
 
     private Set<UserProfileForClassDetailDto> userProfiles;
-    private List<String> imageUrls;
+    private Set<String> imageUrls;
     private String mainImageUrl;
 
     private String chatRoomId;
+
+
 }
