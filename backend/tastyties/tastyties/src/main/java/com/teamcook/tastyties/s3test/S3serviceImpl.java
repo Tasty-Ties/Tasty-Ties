@@ -10,7 +10,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class S3serviceImpl implements S3Service {
@@ -28,13 +31,25 @@ public class S3serviceImpl implements S3Service {
     public Image uploadImage(MultipartFile image) throws IOException {
         String originName = image.getOriginalFilename();
         String storedImagePath = uploadImageToS3(image);
-
         Image newImage = Image.builder() //이미지에 대한 정보를 담아서 반환
                 .originName(originName)
                 .storedImagePath(storedImagePath)
                 .build();
 
         return newImage;
+    }
+
+    @Override
+    public List<Image> uploadImages(List<MultipartFile> images) throws IOException {
+        return images.stream()
+                .map(image -> {
+                    try {
+                        return uploadImage(image);
+                    } catch (IOException e) {
+                        throw new RuntimeException("이미지 업로드 실패", e);
+                    }
+                })
+                .collect(Collectors.toList());
     }
 
     private String uploadImageToS3(MultipartFile image) throws IOException {

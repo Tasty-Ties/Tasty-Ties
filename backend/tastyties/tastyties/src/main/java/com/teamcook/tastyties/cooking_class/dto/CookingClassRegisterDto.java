@@ -5,16 +5,18 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
+// 등록에 필요한 Dto
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CookingClassDto {
+public class CookingClassRegisterDto {
     private String uuid;
     private String hostName;
     private String title;
@@ -42,10 +44,6 @@ public class CookingClassDto {
     private long reservedCount;
 
     private Set<UserProfileForClassDetailDto> userProfiles;
-    private Set<String> imageUrls;
-    private String mainImageUrl;
 
     private String chatRoomId;
-
-
 }

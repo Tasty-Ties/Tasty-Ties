@@ -1,5 +1,6 @@
 package com.teamcook.tastyties.cooking_class.repository;
 
+import com.teamcook.tastyties.cooking_class.dto.CookingClassDto;
 import com.teamcook.tastyties.cooking_class.dto.CookingClassListDto;
 import com.teamcook.tastyties.cooking_class.dto.CookingClassSearchCondition;
 import com.teamcook.tastyties.cooking_class.entity.CookingClass;
@@ -19,6 +20,7 @@ public interface CookingClassCustomRepository {
 
     CookingClass findWithUuid(String uuid);
 
+    CookingClassDto findCookingClassDtoWithUuid(String uuid);
     CookingClass findClassForDelete(String uuid);
 
     Page<CookingClassListDto> searchClassByHostId(int hostId, Pageable pageable);
