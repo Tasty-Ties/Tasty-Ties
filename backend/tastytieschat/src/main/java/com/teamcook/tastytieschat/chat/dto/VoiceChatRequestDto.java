@@ -7,7 +7,7 @@ import lombok.ToString;
 @Getter
 @AllArgsConstructor
 @ToString
-public class VoiceChatRequestDTO {
+public class VoiceChatRequestDto {
     private int userId;
     private String fileContent;
     private int chunkIndex;

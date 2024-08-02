@@ -1,8 +1,7 @@
 package com.teamcook.tastytieschat.chat.service;
 
-import com.teamcook.tastytieschat.chat.constant.RabbitMQRequestType;
-import com.teamcook.tastytieschat.chat.dto.RabbitMQRequestDTO;
-import com.teamcook.tastytieschat.chat.dto.UserDTO;
+import com.teamcook.tastytieschat.chat.dto.RabbitMQRequestDto;
+import com.teamcook.tastytieschat.chat.dto.UserDto;
 import com.teamcook.tastytieschat.chat.entity.ChatRoom;
 import com.teamcook.tastytieschat.chat.repository.ChatRoomRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -39,7 +38,7 @@ public class RabbitMQConsumerImpl implements RabbitMQConsumer {
             ),
             exchange = @Exchange(value = "${rabbitmq.exchange")
     ))
-    public void hostChatRoom(RabbitMQRequestDTO rabbitMQRequestDto, Message message) {
+    public void hostChatRoom(RabbitMQRequestDto rabbitMQRequestDto, Message message) {
         switch (rabbitMQRequestDto.getType()) {
             case CREATE:
                 createChatRoom(rabbitMQRequestDto, message);
@@ -50,8 +49,8 @@ public class RabbitMQConsumerImpl implements RabbitMQConsumer {
         }
     }
 
-    private void createChatRoom(RabbitMQRequestDTO rabbitMQRequestDto, Message message) {
-        ChatRoom chatRoom = new ChatRoom(rabbitMQRequestDto.getTitle(), rabbitMQRequestDto.getUser());
+    private void createChatRoom(RabbitMQRequestDto rabbitMQRequestDto, Message message) {
+        ChatRoom chatRoom = new ChatRoom(rabbitMQRequestDto.getTitle(), rabbitMQRequestDto.getImageUrl(), rabbitMQRequestDto.getUser());
         chatRoomRepository.save(chatRoom);
 
         Map<String, String> responseData = new HashMap<>();
@@ -66,7 +65,7 @@ public class RabbitMQConsumerImpl implements RabbitMQConsumer {
         });
     }
 
-    private void deleteChatRoom(RabbitMQRequestDTO rabbitMQRequestDto) {
+    private void deleteChatRoom(RabbitMQRequestDto rabbitMQRequestDto) {
         String chatRoomId = rabbitMQRequestDto.getChatRoomId();
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId).orElse(null);
 
@@ -85,7 +84,7 @@ public class RabbitMQConsumerImpl implements RabbitMQConsumer {
             ),
             exchange = @Exchange(value = "${rabbitmq.exchange")
     ))
-    public void attendeeChatRoom(RabbitMQRequestDTO rabbitMQRequestDto) {
+    public void attendeeChatRoom(RabbitMQRequestDto rabbitMQRequestDto) {
         switch (rabbitMQRequestDto.getType()) {
             case JOIN:
                 enterChatRoom(rabbitMQRequestDto);
@@ -96,12 +95,12 @@ public class RabbitMQConsumerImpl implements RabbitMQConsumer {
         }
     }
 
-    private void enterChatRoom(RabbitMQRequestDTO rabbitMQRequestDto) {
+    private void enterChatRoom(RabbitMQRequestDto rabbitMQRequestDto) {
         String chatRoomId = rabbitMQRequestDto.getChatRoomId();
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId).orElse(null);
 
         if (chatRoom != null) {
-            UserDTO userDto = rabbitMQRequestDto.getUser();
+            UserDto userDto = rabbitMQRequestDto.getUser();
             if (chatRoom.getUsers().contains(userDto)) {
                 log.error("Error entering chat room: user already exists.");
             }
@@ -113,7 +112,7 @@ public class RabbitMQConsumerImpl implements RabbitMQConsumer {
         }
     }
 
-    private void leaveChatRoom(RabbitMQRequestDTO rabbitMQRequestDto) {
+    private void leaveChatRoom(RabbitMQRequestDto rabbitMQRequestDto) {
         String chatRoomId = rabbitMQRequestDto.getChatRoomId();
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId).orElse(null);
 

@@ -1,6 +1,5 @@
 package com.teamcook.tastytieschat.chat.dto;
 
-import com.teamcook.tastytieschat.chat.constant.Language;
 import com.teamcook.tastytieschat.chat.constant.UserType;
 import lombok.Getter;
 import lombok.Setter;
@@ -11,7 +10,7 @@ import java.time.Instant;
 @Getter
 @Setter
 @ToString
-public class UserDTO {
+public class UserDto {
     private int id;
     private UserType type;
     private String nickname;
@@ -20,8 +19,8 @@ public class UserDTO {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof UserDTO) {
-            return this.id == ((UserDTO) obj).id;
+        if (obj instanceof UserDto) {
+            return this.id == ((UserDto) obj).id;
         }
 
         return false;

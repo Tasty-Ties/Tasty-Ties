@@ -1,8 +1,8 @@
 package com.teamcook.tastytieschat.chat.service;
 
 import com.teamcook.tastytieschat.chat.constant.MessageType;
-import com.teamcook.tastytieschat.chat.dto.ChatMessageRequestDTO;
-import com.teamcook.tastytieschat.chat.dto.UserDTO;
+import com.teamcook.tastytieschat.chat.dto.ChatMessageRequestDto;
+import com.teamcook.tastytieschat.chat.dto.UserDto;
 import com.teamcook.tastytieschat.chat.entity.ChatMessage;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,13 +24,13 @@ class TranslationServiceImplTest {
     ChatRoomService chatRoomService;
 
     private String roomId;
-    private ChatMessageRequestDTO chatMessageRequestDTO;
+    private ChatMessageRequestDto chatMessageRequestDTO;
     private final String shortSentence = "안녕 나는 오늘 인도 카레를 만들거야";
     private final String longSentence = "안녕하세요 여러분, 오늘의 쿠킹 클래스에 오신 것을 환영합니다. 오늘은 맛있는 인도 카레를 만들어보겠습니다. 먼저, 강황, 큐민, 고수 같은 향신료를 포함한 모든 재료를 준비해 주세요. 다음으로, 팬에 기름을 두르고 양파를 황금빛 갈색이 될 때까지 볶아주세요. 그런 다음, 향신료를 추가하고 몇분 동안 요리한 후 잘게 썬 토마토를 넣어주세요.";
 
     @BeforeEach
     void setUp() {
-        chatMessageRequestDTO = new ChatMessageRequestDTO(1, longSentence);
+        chatMessageRequestDTO = new ChatMessageRequestDto(1, longSentence);
         roomId = "66a9c5dd498fe728acb763f8";
     }
 
@@ -40,7 +40,7 @@ class TranslationServiceImplTest {
         long startTime = System.currentTimeMillis();
 
         Map<String, Object> map = chatRoomService.getUserAndTranslatedLanguages(roomId, chatMessageRequestDTO.getUserId());
-        UserDTO userDto = (UserDTO) map.get("user");
+        UserDto userDto = (UserDto) map.get("user");
 
         ChatMessage chatMessage = ChatMessage.builder().type(MessageType.USER).chatRoomId(roomId).userNickname(userDto.getNickname()).originLanguage(userDto.getLanguage()).chatMessageRequestDto(chatMessageRequestDTO).build();
 

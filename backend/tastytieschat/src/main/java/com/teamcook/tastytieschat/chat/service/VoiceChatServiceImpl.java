@@ -1,8 +1,8 @@
 package com.teamcook.tastytieschat.chat.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.teamcook.tastytieschat.chat.dto.SpeechFlowCreateResponseDTO;
-import com.teamcook.tastytieschat.chat.dto.SpeechFlowQueryResponseDTO;
+import com.teamcook.tastytieschat.chat.dto.SpeechFlowCreateResponseDto;
+import com.teamcook.tastytieschat.chat.dto.SpeechFlowQueryResponseDto;
 import org.springframework.beans.factory.annotation.Value;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.FileSystemResource;
@@ -128,7 +128,7 @@ public class VoiceChatServiceImpl implements VoiceChatService {
         ResponseEntity<String> response = restTemplate.postForEntity(url, requestEntity, String.class);
 
         if (response.getStatusCode().is2xxSuccessful()) {
-            SpeechFlowCreateResponseDTO speechFlowCreateResponseDTO = objectMapper.readValue(response.getBody(), SpeechFlowCreateResponseDTO.class);
+            SpeechFlowCreateResponseDto speechFlowCreateResponseDTO = objectMapper.readValue(response.getBody(), SpeechFlowCreateResponseDto.class);
             if (speechFlowCreateResponseDTO.getCode() != 10000) {
                 throw new IOException("실패");
             }
@@ -154,8 +154,8 @@ public class VoiceChatServiceImpl implements VoiceChatService {
             ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, requestEntity, String.class);
             if (response.getStatusCode().is2xxSuccessful()) {
                 log.info("응답: {}", response.getBody());
-                SpeechFlowQueryResponseDTO speechFlowQueryResponseDTO =
-                        objectMapper.readValue(response.getBody(), SpeechFlowQueryResponseDTO.class);
+                SpeechFlowQueryResponseDto speechFlowQueryResponseDTO =
+                        objectMapper.readValue(response.getBody(), SpeechFlowQueryResponseDto.class);
                 if (speechFlowQueryResponseDTO.getCode() == 11000) {
                     return speechFlowQueryResponseDTO.getResult();
                 } else if (speechFlowQueryResponseDTO.getCode() == 11001) {
