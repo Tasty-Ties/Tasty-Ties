@@ -13,9 +13,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.Base64;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -24,18 +24,17 @@ import java.util.concurrent.ConcurrentHashMap;
 @Service
 public class VoiceChatServiceImpl implements VoiceChatService {
 
-
     @Value("${speech-flow-key-id}")
     private String speechFlowKeyId;
 
     @Value("${speech-flow-key-secret}")
     private String speechFlowKeySecret;
 
-    @Value("${clova-api-id}")
-    private String ClovaApiId;
+    @Value("${clova-client-id}")
+    private String clovaClientId;
 
-    @Value("${clova-api-key}")
-    private String ClovaApiKey;
+    @Value("${clova-client-secret}")
+    private String clovaClientSecret;
 
 
     @Value("${ffmpeg.path}")
@@ -88,15 +87,83 @@ public class VoiceChatServiceImpl implements VoiceChatService {
         return assembledData.toString();
     }
 
-    public String translateVoiceToTextByClova(){
-        return null;
+    public String translateVoiceToTextByClova(String filePath) throws IOException {
+        File voiceFile = new File(filePath);
+        if (!voiceFile.exists()) {
+            throw new FileNotFoundException("File not found: " + filePath);
+        }
+
+        String language = "Kor"; // 언어 코드 (Kor, Jpn, Eng, Chn)
+        String apiURL = "https://naveropenapi.apigw.ntruss.com/recog/v1/stt?lang=" + language;
+        URL url = new URL(apiURL);
+
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setUseCaches(false);
+        conn.setDoOutput(true);
+        conn.setDoInput(true);
+        conn.setRequestProperty("Content-Type", "application/octet-stream");
+        conn.setRequestProperty("X-NCP-APIGW-API-KEY-ID", clovaClientId);
+        conn.setRequestProperty("X-NCP-APIGW-API-KEY", clovaClientSecret);
+
+        OutputStream outputStream = null;
+        FileInputStream inputStream = null;
+        BufferedReader br = null;
+
+        try {
+            outputStream = conn.getOutputStream();
+            inputStream = new FileInputStream(voiceFile);
+            byte[] buffer = new byte[4096];
+            int bytesRead;
+            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                outputStream.write(buffer, 0, bytesRead);
+            }
+            outputStream.flush();
+
+            int responseCode = conn.getResponseCode();
+            InputStream responseStream = (responseCode == 200)
+                    ? conn.getInputStream()
+                    : conn.getErrorStream();
+
+            br = new BufferedReader(new InputStreamReader(responseStream, "UTF-8")); // 인코딩 설정
+            String inputLine;
+            StringBuffer response = new StringBuffer();
+            while ((inputLine = br.readLine()) != null) {
+                response.append(inputLine);
+            }
+            return response.toString();
+
+        } catch (IOException e) {
+            throw new IOException("Error processing the voice file: " + e.getMessage(), e);
+        } finally {
+            if (inputStream != null) {
+                try {
+                    inputStream.close();
+                } catch (IOException e) {
+                    // Log error or handle it
+                }
+            }
+            if (outputStream != null) {
+                try {
+                    outputStream.close();
+                } catch (IOException e) {
+                    // Log error or handle it
+                }
+            }
+            if (br != null) {
+                try {
+                    br.close();
+                } catch (IOException e) {
+                    // Log error or handle it
+                }
+            }
+        }
     }
 
 
     /**
      * @param fullData : 인코딩된 문자열
      * @return : mp3 파일이 저장된 경로 full path
-     * */
+     */
     @Override
     public String getMp3filePath(String fullData) throws IOException, InterruptedException {
         // Base64 디코딩
@@ -154,7 +221,7 @@ public class VoiceChatServiceImpl implements VoiceChatService {
 
     /**
      * @return : 변환된 문자열
-     * */
+     */
     @Override
     public String queryTranscriptionResult(String taskId) throws IOException, InterruptedException {
         // STT 결과를 얻기 위한 설정

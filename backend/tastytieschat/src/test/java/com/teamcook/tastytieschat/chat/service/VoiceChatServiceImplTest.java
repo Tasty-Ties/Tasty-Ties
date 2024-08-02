@@ -29,7 +29,7 @@ class VoiceChatServiceImplTest {
 
         long endTime = System.currentTimeMillis();
         long duration = endTime - startTime;
-        System.out.println("sendShortFileToSpeechFlowTest duration: " + duration + " ms");
+        System.out.println("sendShortFileToSpeechFlowTest 소요시간: " + duration + " ms");
 
         System.out.println(taskId);
         Assertions.assertNotNull(taskId);
@@ -45,7 +45,7 @@ class VoiceChatServiceImplTest {
 
         long endTime = System.currentTimeMillis();
         long duration = endTime - startTime;
-        System.out.println("queryShortFileTranscriptionTest duration: " + duration + " ms");
+        System.out.println("queryShortFileTranscriptionTest 소요시간: " + duration + " ms");
 
         Assertions.assertNotNull(result);
     }
@@ -59,7 +59,7 @@ class VoiceChatServiceImplTest {
 
         long endTime = System.currentTimeMillis();
         long duration = endTime - startTime;
-        System.out.println("sendLongFileToSpeechFlowTest duration: " + duration + " ms");
+        System.out.println("sendLongFileToSpeechFlowTest 소요시간: " + duration + " ms");
 
         System.out.println(taskId);
         Assertions.assertNotNull(taskId);
@@ -75,9 +75,36 @@ class VoiceChatServiceImplTest {
 
         long endTime = System.currentTimeMillis();
         long duration = endTime - startTime;
-        System.out.println("queryLongFileTranscriptionTest duration: " + duration + " ms");
+        System.out.println("queryLongFileTranscriptionTest 소요시간: " + duration + " ms");
 
         Assertions.assertNotNull(result);
+    }
+
+    @Test
+    @DisplayName("짧은 문장, 네이버 클로바를 이용한 테스트")
+    void translateShortVoiceToTextByClovaTest() throws IOException {
+        long startTime = System.currentTimeMillis();
+
+        String result = voiceChatService.translateVoiceToTextByClova(SHORT_FILE_PATH);
+
+        long endTime = System.currentTimeMillis();
+        long duration = endTime - startTime;
+        System.out.println("translateShortVoiceToTextByClovaTest 소요시간: " + duration + " ms");
+
+        System.out.println(result);
+    }
+
+    @Test
+    @DisplayName("긴 문장, 네이버 클로바를 이용한 테스트")
+    void translateLongVoiceToTextByClovaTest() throws IOException {
+        long startTime = System.currentTimeMillis();
+        String result = voiceChatService.translateVoiceToTextByClova(LONG_FILE_PATH);
+
+        long endTime = System.currentTimeMillis();
+        long duration = endTime - startTime;
+        System.out.println("translateLongVoiceToTextByClovaTest 소요시간: " + duration + " ms");
+
+        System.out.println(result);
     }
 
 }
