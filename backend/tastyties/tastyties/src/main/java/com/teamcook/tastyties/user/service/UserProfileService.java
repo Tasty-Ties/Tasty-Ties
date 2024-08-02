@@ -18,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -54,6 +55,9 @@ public class UserProfileService {
     public UserInfoDto getProfileMain(String username) {
         log.debug("username: {}", username);
         User user = userRepository.findUserWithCollectedFlags(username);
+        if (user == null) {
+            throw new UsernameNotFoundException("존재하지 않는 유저입니다.");
+        }
         int userId = user.getUserId();
         log.debug("userId: {}", user.getUserId());
         UserProfileDto userProfileDto = getUserProfileDto(user);

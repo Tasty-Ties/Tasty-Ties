@@ -182,7 +182,7 @@ public class UserAndCookingClassRepositoryImpl implements UserAndCookingClassCus
                 .select(new QReviewResponseDto(
                         cookingClass.title, userAndCookingClass.cookingClassReview,
                         userAndCookingClass.cookingClassReviewCreateTime,
-                        cookingClass.mainImage, country.countryImageUrl
+                        cookingClass.mainImage, country.countryImageUrl, user.nickname
                 )).from(userAndCookingClass)
                 .join(userAndCookingClass.user, user)
                 .join(userAndCookingClass.cookingClass, cookingClass)
