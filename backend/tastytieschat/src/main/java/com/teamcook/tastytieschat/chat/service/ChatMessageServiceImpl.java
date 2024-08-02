@@ -27,7 +27,11 @@ public class ChatMessageServiceImpl implements ChatMessageService {
     public ChatMessageDto getLastChatMessageByChatRoomId(String chatRoomId) {
         Optional<ChatMessage> chatMessage = chatMessageRepository.findLastUserMessage(chatRoomId);
 
-        return new ChatMessageDto(chatMessage.orElse(null));
+        if (chatMessage.isPresent()) {
+            return new ChatMessageDto(chatMessage.get());
+        } else {
+            return null;
+        }
     }
 
 }
