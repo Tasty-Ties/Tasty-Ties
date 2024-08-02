@@ -6,6 +6,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -15,7 +16,8 @@ public class UserDto {
     private UserType type;
     private String nickname;
     private String language;
-    private Instant enteredTime;
+    private String imageUrl;
+    private LocalDateTime enteredTime;
 
     @Override
     public boolean equals(Object obj) {

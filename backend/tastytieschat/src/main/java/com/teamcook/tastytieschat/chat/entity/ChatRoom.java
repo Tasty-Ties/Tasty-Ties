@@ -36,7 +36,7 @@ public class ChatRoom {
         this.users = new ArrayList<>();
         this.isDeleted = false;
 
-        userDto.setEnteredTime(Instant.now());
+        userDto.setEnteredTime(LocalDateTime.now());
 
         users.add(userDto);
     }

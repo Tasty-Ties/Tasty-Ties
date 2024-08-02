@@ -85,7 +85,9 @@ public class CookingClassController {
                         .type(RabbitMQUserType.HOST)
                         .nickname(chatUser.getNickname())
                         .language(chatUser.getLanguage())
+                        .imageUrl(chatUser.getProfileImageUrl())
                         .build())
+                .imageUrl(cookingClass.getMainImage())
                 .build();
         Map<String, String> response = rabbitMQProducer.sendAndReceive(rabbitMQRequestDto);
 
@@ -194,6 +196,7 @@ public class CookingClassController {
                         .type(RabbitMQUserType.ATTENDEE)
                         .nickname(chatUser.getNickname())
                         .language(chatUser.getLanguage())
+                        .imageUrl(chatUser.getProfileImageUrl())
                         .build())
                 .build();
         rabbitMQProducer.send(rabbitMQRequestDto);
