@@ -5,21 +5,21 @@ import com.teamcook.tastytieschat.chat.entity.ChatMessage;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
 @NoArgsConstructor
 @Getter
-public class ChatMessageResponseDTO {
+public class ChatMessageResponseDto {
 
     private MessageType type;
     private int userId;
     private String userNickname;
     private Map<String, String> messages;
-    private Instant createdTime;
+    private LocalDateTime createdTime;
 
-    public ChatMessageResponseDTO(ChatMessage chatMessage) {
+    public ChatMessageResponseDto(ChatMessage chatMessage) {
         this.type = chatMessage.getType();
         this.userId = chatMessage.getUserId();
         this.userNickname = chatMessage.getUserNickname();

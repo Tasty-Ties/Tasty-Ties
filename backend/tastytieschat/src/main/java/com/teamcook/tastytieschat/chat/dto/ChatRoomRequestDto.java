@@ -5,7 +5,7 @@ import lombok.ToString;
 
 @Getter
 @ToString
-public class ChatRoomRequestDTO {
+public class ChatRoomRequestDto {
     private String title;
-    private UserDTO user;
+    private UserDto user;
 }

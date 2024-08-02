@@ -43,10 +43,11 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 // 이곳 코드에 수정 필요
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/login", "/logout", "/public/**").permitAll()
-                        .requestMatchers("/users/me").authenticated()  // 로그인한 사용자만 접근 가능
+                                .requestMatchers("/login", "/logout", "/public/**").permitAll()
+                                .requestMatchers("/users/me").authenticated()  // 로그인한 사용자만 접근 가능
+                                .requestMatchers("/classes/live/**").authenticated()
 //                        .requestMatchers("/users/profile/**").authenticated()  // 로그인한 사용자만 접근 가능
-                        .anyRequest().permitAll()
+                                .anyRequest().permitAll()
                 )
                 .exceptionHandling(exceptionHandling ->
                         exceptionHandling.authenticationEntryPoint(jwtAuthenticationEntryPoint)
