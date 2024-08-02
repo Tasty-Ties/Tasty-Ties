@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import { useLocation } from "react-router-dom";
 import axios from "axios";
+import Cookies from "js-cookie";
 
 import useVideoStore from "./../../store/useVideoStore";
 import StreamComponent from "./StreamComponent";
@@ -16,11 +17,11 @@ const localUserSetting = new UserModel();
 
 //채팅 관련
 // const CHAT_SERVER_URL = "ws://192.168.31.83:8081/chat"; // 교육장
-const CHAT_SERVER_URL="ws://192.168.0.105:8081/chat" //집
+const CHAT_SERVER_URL = "ws://localhost:8081/chat"; //집
 const roomId = "66a9c5dd498fe728acb763f8";
 const userId = 1;
 const userLang = "Japanese";
-const CHUNK_SIZE=16000;
+const CHUNK_SIZE = 16000;
 
 const VideoComponent = () => {
   const location = useLocation();
@@ -34,14 +35,14 @@ const VideoComponent = () => {
   );
   const { audioActive, videoActive } = location.state;
   const [localUser, setLocalUser] = useState(null);
+
   const [session, setSession] = useState(undefined);
   const [subscribers, setSubscribers] = useState([]);
   const remotes = useRef([]);
   const localUserAccessAllowed = useRef(false);
-  const [mySessionId, setMySessionId] = useState("SessionA");
-  const [myUserName, setMyUserName] = useState(
-    "OpenVidu_User" + Math.floor(Math.random() * 100)
-  );
+
+  const sessionId = useVideoStore((state) => state.sessionId);
+  const setSessionId = useVideoStore((state) => state.setSessionId);
 
   //미디어 파이프 및 영상 녹화 관련
   const mediaRecorder = useRef(null);
@@ -86,6 +87,11 @@ const VideoComponent = () => {
     };
   }, []);
 
+  const [mySessionId, setMySessionId] = useState("SessionA");
+  const [myUserName, setMyUserName] = useState(
+    "OpenVidu_User" + Math.floor(Math.random() * 100)
+  );
+
   const joinSession = async () => {
     const newSession = OV.initSession();
     setSession(newSession);
@@ -97,6 +103,7 @@ const VideoComponent = () => {
   const connectToSession = async (session) => {
     try {
       const token = await getToken();
+      console.log("토큰토큰토큰토큰토큰토큰토큰토큰토큰토큰", token);
       connect(session, token);
     } catch (error) {
       console.error(
@@ -256,30 +263,36 @@ const VideoComponent = () => {
   };
 
   const getToken = useCallback(async () => {
-    const sessionId = await createSession(mySessionId);
+    // const sessionId = await createSession(mySessionId);
     return await createToken(sessionId);
   }, []);
 
-  const createSession = useCallback(async (sessionId) => {
-    const response = await axios.post(
-      APPLICATION_SERVER_URL + "sessions",
-      { customSessionId: sessionId },
-      {
-        headers: { "Content-Type": "application/json" },
-      }
-    );
-    return response.data;
-  }, []);
+  // const createSession = useCallback(async (sessionId) => {
+  //   const response = await axios.post(
+  //     APPLICATION_SERVER_URL + "api/sessions",
+  //     { customSessionId: sessionId },
+  //     {
+  //       headers: { "Content-Type": "application/json" },
+  //     }
+  //   );
+  //   return response.data;
+  // }, []);
 
   const createToken = useCallback(async (sessionId) => {
+    console.log(sessionId);
     const response = await axios.post(
-      APPLICATION_SERVER_URL + "sessions/" + sessionId + "/connections",
+      "http://localhost:8080/api/v1/classes/live/sessions/" +
+        sessionId +
+        "/connections",
       {},
       {
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          Authorization: `Bearer ${Cookies.get("accessToken")}`,
+        },
       }
     );
-    return response.data;
+    console.log(response.data);
+    return response.data.data;
   }, []);
 
   const videolistcss = {
@@ -436,11 +449,11 @@ const VideoComponent = () => {
   //서버로 오디오 보내기
   const sendRecordingToServer = (audioBlob) => {
     const reader = new FileReader();
-    
+
     reader.onload = () => {
       const base64Data = reader.result.split(",")[1];
       const totalChunks = Math.ceil(base64Data.length / CHUNK_SIZE);
-  
+
       for (let i = 0; i < totalChunks; i++) {
         const chunk = base64Data.slice(i * CHUNK_SIZE, (i + 1) * CHUNK_SIZE);
         const chatMessage = {
@@ -449,7 +462,7 @@ const VideoComponent = () => {
           chunkIndex: i,
           totalChunks: totalChunks,
         };
-  
+
         console.log(`Sending chunk ${i + 1} of ${totalChunks}`);
         stompClient.current.publish({
           destination: `/pub/chat/voice/rooms/${roomId}`,
@@ -457,10 +470,9 @@ const VideoComponent = () => {
         });
       }
     };
-  
+
     reader.readAsDataURL(audioBlob);
   };
-  
 
   const stopRecording = () => {
     isRecording.current = false;
@@ -487,7 +499,6 @@ const VideoComponent = () => {
   const connectStompClient = () => {
     stompClient.current.activate();
   };
-
 
   return (
     <>
