@@ -23,7 +23,7 @@ const Header = () => {
         <Link to="/login">로그인 |</Link>
       )}
       {Cookies.get("accessToken") && <Link to="">알람 |</Link>}
-      {Cookies.get("accessToken") && <Link to="">마이페이지 |</Link>}
+      {Cookies.get("accessToken") && <Link to="/mypage">마이페이지 |</Link>}
     </div>
   );
 };

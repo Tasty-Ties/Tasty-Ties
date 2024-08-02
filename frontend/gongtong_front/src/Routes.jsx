@@ -3,7 +3,7 @@ import SignUp from "./pages/SignUp";
 import SignUpSecond from "./components/SignUp/SignUpSecond";
 import SignUpComplete from "./components/SignUp/SignUpComplete";
 import Login from "./pages/Login";
-import Mypage from "./pages/MyPage";
+import MyPage from "./pages/MyPage";
 import ClassList from "@pages/ClassList";
 import ClassDetail from "@pages/ClassDetail";
 import ClassIntroduction from "@components/ClassDetail/ClassIntroduction";
@@ -23,7 +23,7 @@ const AppRoutes = () => {
       <Route path="/signupfin" element={<SignUpSecond />} />
       <Route path="/signupcomplete" element={<SignUpComplete />} />
       <Route path="/login" element={<Login />} />
-      <Route path="/mypage" element={<Mypage />} />
+      <Route path="/mypage" element={<MyPage />} />
       <Route path="/class" element={<ClassList />} />
       <Route path="/class/:id" element={<ClassDetail />}>
         <Route path="" element={<ClassIntroduction />} />

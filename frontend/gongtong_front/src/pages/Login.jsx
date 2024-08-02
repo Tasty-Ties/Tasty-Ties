@@ -6,7 +6,7 @@ import axios from "axios";
 
 const Login = () => {
   const { baseURL } = useApiStore();
-  const { login, isAuthenticated } = useAuthStore();
+  const { login } = useAuthStore();
   const nav = useNavigate();
 
   const [input, setInput] = useState({
