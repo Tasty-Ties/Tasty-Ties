@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import userStore from "../../store/UserStore";
 import useApiStore from "../../store/ApiStore";
-import axios from "axios";
+import axios from "../../service/Axios";
 
 const SignUpFirst = () => {
   const nav = useNavigate();
@@ -82,9 +82,11 @@ const SignUpFirst = () => {
       const emailDomain = userForm.email.substring(
         userForm.email.indexOf("@") + 1
       );
-      const requestUrl = `${baseURL}/users/check-email?email_id=${emailId}&email_domain=${emailDomain}`;
+      // const requestUrl = `${baseURL}/users/check-email?email_id=${emailId}&email_domain=${emailDomain}`;
 
-      const response = await axios.get(requestUrl);
+      const response = await axios.get(
+        `/users/check-email?email_id=${emailId}&email_domain=${emailDomain}`
+      );
       if (response.data.stateCode === 200) {
         setIsEmailAvailable(true);
       } else {
@@ -102,9 +104,11 @@ const SignUpFirst = () => {
 
   const checkUsername = async () => {
     try {
-      const requestUrl = `${baseURL}/users/check-username?username=${userForm.username}`;
+      // const requestUrl = `${baseURL}/users/check-username?username=${userForm.username}`;
 
-      const response = await axios.get(requestUrl);
+      const response = await axios.get(
+        `/users/check-username?username=${userForm.username}`
+      );
       if (response.data.stateCode === 200) {
         setIsUsernameAvailable(true);
       } else {

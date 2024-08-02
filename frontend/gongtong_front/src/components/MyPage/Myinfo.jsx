@@ -1,21 +1,23 @@
 import React, { useEffect, useState } from "react";
 import axios from "../../service/Axios";
-import useApiStore from "../../store/ApiStore";
+// import useApiStore from "../../store/ApiStore";
 import Cookies from "js-cookie";
 
 const MyInfo = () => {
-  const { baseURL } = useApiStore();
+  // const { baseURL } = useApiStore();
   const [userData, setUserData] = useState(null);
 
   useEffect(() => {
+    console.log(Cookies.get("accessToken"));
     const fetchUserData = async () => {
       try {
         const response = await axios.get("/users/me", {
-          headers: {
-            Authorization: `Bearer ${Cookies.get("accessToken")}`,
-          },
+          // headers: {
+          //   Authorization: `Bearer ${Cookies.get("accessToken")}`,
+          // },
         });
         console.log(response);
+        console.log(Cookies.get("accessToken"));
         setUserData(response.data);
       } catch (error) {
         console.error("Failed to fetch user data:", error);

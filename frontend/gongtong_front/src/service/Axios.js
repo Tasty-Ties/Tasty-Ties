@@ -2,6 +2,7 @@ import axios from "axios";
 import Cookies from "js-cookie";
 
 axios.defaults.withCredentials = true;
+axios.defaults.baseURL = "http://localhost:8080/api/v1";
 
 // 요청 인터셉터: 모든 요청에 `accessToken` 추가
 axios.interceptors.request.use(
@@ -20,20 +21,19 @@ axios.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
-    if (error.response.status === 403 && !originalRequest._retry) {
+    if (error.response.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
       try {
         const response = await axios.post(
           "http://localhost:8080/api/v1/auth/refresh",
-          {},
+          { refreshToken: Cookies.get("refreshToken") },
           { withCredentials: true }
         );
-        console.log(response);
+        console.log("새로운 엑세스 토큰 발급 성공:", response.data);
+
         const accessToken = response.data.data.accessToken;
-        console.log("에세스토큰 :", accessToken);
 
         Cookies.set("accessToken", accessToken);
-        // localStorage.setItem('accessTokenExpiration', expirationTimeAccessKST);
 
         axios.defaults.headers.common[
           "Authorization"

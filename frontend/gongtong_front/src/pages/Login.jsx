@@ -1,11 +1,11 @@
 import { useState } from "react";
-import useApiStore from "../store/ApiStore";
+// import useApiStore from "../store/ApiStore";
 import useAuthStore from "../store/AuthStore";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import axios from "../service/Axios";
 
 const Login = () => {
-  const { baseURL } = useApiStore();
+  // const { baseURL } = useApiStore();
   const { login } = useAuthStore();
   const nav = useNavigate();
 
@@ -24,7 +24,7 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const response = await axios.post(`${baseURL}/auth/login`, {
+    const response = await axios.post("/auth/login", {
       username: input.username,
       password: input.password,
     });
