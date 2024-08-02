@@ -1,7 +1,7 @@
-const SERVER_URL = "";
-const roomId = "66a89d8a4819521ed7d55ff4";
+const SERVER_URL = "ws://192.168.31.83:8081/chat";
+const roomId = "66a9c5dd498fe728acb763f8";
 const userId = 1;
-const userLang = "English";
+const userLang = "Japanese";
 import { Client } from "@stomp/stompjs";
 import { useEffect, useRef, useState } from "react";
 
@@ -68,7 +68,7 @@ const ChatComponent = () => {
     console.log(JSON.stringify(chatMessage));
 
     stompClient.current.publish({
-      destination: `/pub/chat/rooms/${roomId}`,
+      destination: `/pub/chat/text/rooms/${roomId}`,
       body: JSON.stringify(chatMessage),
     });
 
