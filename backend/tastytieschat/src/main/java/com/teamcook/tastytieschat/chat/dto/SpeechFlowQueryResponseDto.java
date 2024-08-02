@@ -5,8 +5,8 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class SpeechFlowCreateResponseDTO {
+public class SpeechFlowQueryResponseDto {
     private int code;
-    private String taskId;
+    private String result;
     private String msg;
 }

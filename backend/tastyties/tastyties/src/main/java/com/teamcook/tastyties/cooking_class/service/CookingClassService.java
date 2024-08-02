@@ -214,7 +214,7 @@ public class CookingClassService {
 
     // 클래스 삭제
     @Transactional
-    public long deleteClass(int userId, String uuid) {
+    public DeletedCookingClassDto deleteClass(int userId, String uuid) {
         CookingClass cookingClass = cookingClassRepository.findClassForDelete(uuid);
         if (cookingClass == null) {
             throw new CookingClassNotFoundException("클래스를 찾을 수 없습니다.");
@@ -229,13 +229,17 @@ public class CookingClassService {
 
         long row = userAndCookingClassRepository.deleteCookingClass(cookingClass);
         cookingClass.delete();
-        return row;
+
+        return DeletedCookingClassDto.builder()
+                .chatRoomId(cookingClass.getChatRoomId())
+                .deletedReservationCount(row)
+                .build();
     }
 
 
     // 클래스 예약
     @Transactional
-    public void reserveClass(User user, String uuid) {
+    public String reserveClass(User user, String uuid) {
         CookingClass cc = cookingClassRepository.findWithUuid(uuid);
         if (cc == null) {
             throw new CookingClassNotFoundException("존재하지 않는 클래스입니다.");
@@ -248,6 +252,8 @@ public class CookingClassService {
             throw new IllegalArgumentException("본인의 클래스에는 예약할 수 없습니다.");
         }
         createUserAndCookingClassRelationship(user, cc);
+
+        return cc.getChatRoomId();
     }
 
     // user와 cookingclass 관계 생성
@@ -263,13 +269,16 @@ public class CookingClassService {
 
     // 예약 삭제
     @Transactional
-    public void deleteReservation(User user, String uuid) {
+    public String deleteReservation(User user, String uuid) {
         CookingClass cc = cookingClassRepository.findWithUuid(uuid);
 
         if (cc.isDelete()) {
             throw new CookingClassIsDeletedException("삭제된 클래스입니다.");
         }
+        String chatRoomId = cc.getChatRoomId();
         deleteUserAndCookingClassRelationship(user, cc);
+
+        return chatRoomId;
     }
 
     private void deleteUserAndCookingClassRelationship(User user, CookingClass cc) {

@@ -1,10 +1,10 @@
 package com.teamcook.tastytieschat.chat.controller;
 
 import com.teamcook.tastytieschat.chat.constant.MessageType;
-import com.teamcook.tastytieschat.chat.dto.ChatMessageRequestDTO;
-import com.teamcook.tastytieschat.chat.dto.ChatMessageResponseDTO;
-import com.teamcook.tastytieschat.chat.dto.UserDTO;
-import com.teamcook.tastytieschat.chat.dto.VoiceChatRequestDTO;
+import com.teamcook.tastytieschat.chat.dto.ChatMessageRequestDto;
+import com.teamcook.tastytieschat.chat.dto.ChatMessageResponseDto;
+import com.teamcook.tastytieschat.chat.dto.UserDto;
+import com.teamcook.tastytieschat.chat.dto.VoiceChatRequestDto;
 import com.teamcook.tastytieschat.chat.entity.ChatMessage;
 import com.teamcook.tastytieschat.chat.service.*;
 import lombok.extern.slf4j.Slf4j;
@@ -29,20 +29,20 @@ public class ChatMessageController {
     private final VoiceChatService voiceChatService;
 
     @Autowired
-    public ChatMessageController(ChatMessageService chatMessageService, TranslationService translationService, ChatRoomService chatRoomService, VoiceChatServiceImpl voiceChatServiceImpl) {
+    public ChatMessageController(ChatMessageService chatMessageService, TranslationService translationService, ChatRoomService chatRoomService, VoiceChatService voiceChatService) {
         this.chatMessageService = chatMessageService;
         this.translationService = translationService;
         this.chatRoomService = chatRoomService;
-        this.voiceChatService = voiceChatServiceImpl;
+        this.voiceChatService = voiceChatService;
     }
 
     @MessageMapping("/chat/text/rooms/{roomId}")
     @SendTo("/sub/chat/rooms/{roomId}")
-    public ChatMessageResponseDTO sendMessage(@DestinationVariable String roomId, @Payload ChatMessageRequestDTO chatMessageRequestDto) {
+    public ChatMessageResponseDto sendMessage(@DestinationVariable String roomId, @Payload ChatMessageRequestDto chatMessageRequestDto) {
         try {
             Map<String, Object> map = chatRoomService.getUserAndTranslatedLanguages(roomId, chatMessageRequestDto.getUserId());
 
-            UserDTO userDto = (UserDTO) map.get("user");
+            UserDto userDto = (UserDto) map.get("user");
 
             ChatMessage chatMessage = ChatMessage.builder()
                     .type(MessageType.USER)
@@ -64,7 +64,7 @@ public class ChatMessageController {
             // 채팅 메시지 저장하기
             chatMessageService.createChatMessage(chatMessage);
 
-            return new ChatMessageResponseDTO(chatMessage);
+            return new ChatMessageResponseDto(chatMessage);
         } catch (Exception e) {
             log.error("채팅방 권한 실패: " + e.getMessage());
             return null;
@@ -73,7 +73,7 @@ public class ChatMessageController {
 
     @MessageMapping("/chat/voice/rooms/{roomId}")
     @SendTo("/sub/chat/rooms/{roomId}")
-    public ChatMessageResponseDTO processVoice(@DestinationVariable String roomId, @Payload VoiceChatRequestDTO voiceChatRequestDTO) throws IOException, InterruptedException {
+    public ChatMessageResponseDto processVoice(@DestinationVariable String roomId, @Payload VoiceChatRequestDto voiceChatRequestDTO) throws IOException, InterruptedException {
 
         voiceChatService.storeChunk(roomId, voiceChatRequestDTO.getUserId(), voiceChatRequestDTO.getChunkIndex(), voiceChatRequestDTO.getTotalChunks(), voiceChatRequestDTO.getFileContent());
         if (voiceChatService.isComplete(roomId, voiceChatRequestDTO.getUserId())) {
@@ -87,7 +87,7 @@ public class ChatMessageController {
             System.out.println(result);
             //번역
         }
-        return new ChatMessageResponseDTO();
+        return new ChatMessageResponseDto();
     }
 
 }
