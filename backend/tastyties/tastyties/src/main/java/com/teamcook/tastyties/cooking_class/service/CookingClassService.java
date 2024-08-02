@@ -28,36 +28,38 @@ import java.util.stream.Collectors;
 @Service
 @Slf4j
 public class CookingClassService {
-    private final CookingClassRepository ccRepository;
+    private final CookingClassRepository cookingClassRepository;
     private final IngredientRepository ingredientRepository;
     private final RecipeRepository recipeRepository;
     private final CookingToolRepository cookingToolRepository;
     private final CookingClassAndCookingClassTagRepository ccAndcctRepository;
-    private final UserAndCookingClassRepository uAndcRepository;
-    private final CookingClassTagRepository cookingClassTagRepository;
-    private final CookingClassRepository cookingClassRepository;
     private final UserAndCookingClassRepository userAndCookingClassRepository;
+    private final CookingClassTagRepository cookingClassTagRepository;
+    private final CookingClassImageRepository cookingClassImageRepository;
 
     @Autowired
-    public CookingClassService(CookingClassRepository ccRepository, IngredientRepository ingredientRepository, RecipeRepository recipeRepository, CookingToolRepository cookingToolRepository, CookingClassAndCookingClassTagRepository ccAndcctRepository, UserAndCookingClassRepository uAndcRepository, CookingClassTagRepository cookingClassTagRepository, CookingClassRepository cookingClassRepository, UserAndCookingClassRepository userAndCookingClassRepository) {
-        this.ccRepository = ccRepository;
+    public CookingClassService(CookingClassRepository cookingClassRepository, IngredientRepository ingredientRepository,
+                               RecipeRepository recipeRepository, CookingToolRepository cookingToolRepository,
+                               CookingClassAndCookingClassTagRepository ccAndcctRepository,
+                               UserAndCookingClassRepository userAndCookingClassRepository,
+                               CookingClassTagRepository cookingClassTagRepository,
+                               CookingClassImageRepository cookingClassImageRepository) {
+        this.cookingClassRepository = cookingClassRepository;
         this.ingredientRepository = ingredientRepository;
         this.recipeRepository = recipeRepository;
         this.cookingToolRepository = cookingToolRepository;
         this.ccAndcctRepository = ccAndcctRepository;
-        this.uAndcRepository = uAndcRepository;
-        this.cookingClassTagRepository = cookingClassTagRepository;
-        this.cookingClassRepository = cookingClassRepository;
         this.userAndCookingClassRepository = userAndCookingClassRepository;
+        this.cookingClassTagRepository = cookingClassTagRepository;
+        this.cookingClassImageRepository = cookingClassImageRepository;
     }
-
     // 클래스 생성
     @Transactional
     public CookingClass registerClass(User user, CookingClassDto registerDto) {
         log.debug("mainimg: {}", registerDto.getMainImageUrl());
         log.debug("urls: {}", registerDto.getImageUrls().toString());
         CookingClass cc = createCookingClass(user, registerDto);
-        ccRepository.save(cc);
+        cookingClassRepository.save(cc);
 
         Set<Ingredient> ingredients = createIngredients(registerDto.getIngredients(), cc);
         ingredientRepository.saveAll(ingredients);
@@ -72,6 +74,7 @@ public class CookingClassService {
         ccAndcctRepository.saveAll(cookingClassTags);
 
         List<CookingClassImage> cookingClassImages = createCookingClassImages(registerDto.getImageUrls(), cc);
+        cookingClassImageRepository.saveAll(cookingClassImages);
         return cc;
     }
 
@@ -167,13 +170,13 @@ public class CookingClassService {
 
         boolean isEnrolledClass = false;
         boolean isHost = false;
-        long enrolledCount = uAndcRepository.countQuota(cc);
+        long enrolledCount = userAndCookingClassRepository.countQuota(cc);
         Set<UserProfileForClassDetailDto> userEnrolledInClass = null;
 
         if (userDetails != null) {
             User user = userDetails.user();
-            isEnrolledClass = uAndcRepository.isUserEnrolledInClass(user, cc);
-            userEnrolledInClass = uAndcRepository.findUserEnrolledInClass(cc);
+            isEnrolledClass = userAndCookingClassRepository.isUserEnrolledInClass(user, cc);
+            userEnrolledInClass = userAndCookingClassRepository.findUserEnrolledInClass(cc);
             isHost = (user.getUsername().equals(cc.getHost().getUsername()));
         }
 
@@ -275,7 +278,7 @@ public class CookingClassService {
         UserAndCookingClass uAndc = new UserAndCookingClass();
         uAndc.setUser(user);
         uAndc.setCookingClass(cc);
-        uAndcRepository.save(uAndc);
+        userAndCookingClassRepository.save(uAndc);
     }
 
     // 예약 삭제

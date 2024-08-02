@@ -78,7 +78,7 @@ public class CookingClass {
     private List<CookingClassAndCookingClassTag> cookingClassAndCookingClassTags;
 
     // 쿠킹클래스에 사용되는 이미지
-    @OneToMany
+    @OneToMany(mappedBy = "cookingClass")
     private List<CookingClassImage> cookingClassImages;
     // 대표 이미지
     private String mainImage;
