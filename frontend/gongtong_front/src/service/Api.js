@@ -40,7 +40,7 @@ api.interceptors.response.use(
       } catch (refreshError) {
         console.error("토큰 갱신 실패:", refreshError);
         // 필요 시 로그아웃 처리
-        logout;
+        logout();
       }
     }
 

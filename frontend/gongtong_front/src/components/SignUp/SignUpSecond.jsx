@@ -12,7 +12,7 @@ const SignUpSecond = () => {
   const userRegister = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post("/users", {
+      const response = await api.post("/users", {
         username: userForm.username,
         password: userForm.password,
         nickname: userForm.nickname,
