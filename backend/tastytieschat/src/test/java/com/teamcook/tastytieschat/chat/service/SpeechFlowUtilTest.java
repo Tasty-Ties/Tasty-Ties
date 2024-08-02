@@ -1,5 +1,6 @@
 package com.teamcook.tastytieschat.chat.service;
 
+import com.teamcook.tastytieschat.chat.service.uil.SpeechFlowUtil;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -9,7 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.io.IOException;
 
 @SpringBootTest
-class VoiceChatServiceImplTest {
+class SpeechFlowUtilTest {
 
     private final String SHORT_FILE_PATH = "./static/short-sentence.mp3";
     private final String LONG_FILE_PATH = "./static/long-sentence.mp3";
@@ -17,7 +18,7 @@ class VoiceChatServiceImplTest {
     private String LONG_TASK_KEY = "323f43e0f5014085bc79c6aa476e071e";
 
     @Autowired
-    VoiceChatServiceImpl voiceChatService;
+    SpeechFlowUtil speechFlowUtil;
 
 
     @Test
@@ -25,7 +26,7 @@ class VoiceChatServiceImplTest {
     void sendShortFileToSpeechFlowTest() throws IOException {
         long startTime = System.currentTimeMillis();
 
-        String taskId = voiceChatService.sendFileToSpeechFlow(SHORT_FILE_PATH);
+        String taskId = speechFlowUtil.sendFileToSpeechFlow(SHORT_FILE_PATH);
 
         long endTime = System.currentTimeMillis();
         long duration = endTime - startTime;
@@ -41,7 +42,7 @@ class VoiceChatServiceImplTest {
     void queryShortFileTranscriptionTest() throws IOException, InterruptedException {
         long startTime = System.currentTimeMillis();
 
-        String result = voiceChatService.queryTranscriptionResult(SHORT_TASK_KEY);
+        String result = speechFlowUtil.queryTranscriptionResult(SHORT_TASK_KEY);
 
         long endTime = System.currentTimeMillis();
         long duration = endTime - startTime;
@@ -55,7 +56,7 @@ class VoiceChatServiceImplTest {
     void sendLongFileToSpeechFlowTest() throws IOException {
         long startTime = System.currentTimeMillis();
 
-        String taskId = voiceChatService.sendFileToSpeechFlow(LONG_FILE_PATH);
+        String taskId = speechFlowUtil.sendFileToSpeechFlow(LONG_FILE_PATH);
 
         long endTime = System.currentTimeMillis();
         long duration = endTime - startTime;
@@ -71,7 +72,7 @@ class VoiceChatServiceImplTest {
     void queryLongFileTranscriptionTest() throws IOException, InterruptedException {
         long startTime = System.currentTimeMillis();
 
-        String result = voiceChatService.queryTranscriptionResult(LONG_TASK_KEY);
+        String result = speechFlowUtil.queryTranscriptionResult(LONG_TASK_KEY);
 
         long endTime = System.currentTimeMillis();
         long duration = endTime - startTime;
@@ -80,31 +81,6 @@ class VoiceChatServiceImplTest {
         Assertions.assertNotNull(result);
     }
 
-    @Test
-    @DisplayName("짧은 문장, 네이버 클로바를 이용한 테스트")
-    void translateShortVoiceToTextByClovaTest() throws IOException {
-        long startTime = System.currentTimeMillis();
 
-        String result = voiceChatService.translateVoiceToTextByClova(SHORT_FILE_PATH);
-
-        long endTime = System.currentTimeMillis();
-        long duration = endTime - startTime;
-        System.out.println("translateShortVoiceToTextByClovaTest 소요시간: " + duration + " ms");
-
-        System.out.println(result);
-    }
-
-    @Test
-    @DisplayName("긴 문장, 네이버 클로바를 이용한 테스트")
-    void translateLongVoiceToTextByClovaTest() throws IOException {
-        long startTime = System.currentTimeMillis();
-        String result = voiceChatService.translateVoiceToTextByClova(LONG_FILE_PATH);
-
-        long endTime = System.currentTimeMillis();
-        long duration = endTime - startTime;
-        System.out.println("translateLongVoiceToTextByClovaTest 소요시간: " + duration + " ms");
-
-        System.out.println(result);
-    }
 
 }

@@ -9,9 +9,5 @@ public interface VoiceChatService {
 
     String assembleChunks(String roomId, int userId);
 
-    String getMp3filePath(String fullData) throws IOException, InterruptedException;
-
-    String sendFileToSpeechFlow(String filePath) throws IOException;
-
-    String queryTranscriptionResult(String taskId) throws IOException, InterruptedException;
+    String translateVoiceToText(String filePath) throws IOException, InterruptedException;
 }

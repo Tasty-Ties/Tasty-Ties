@@ -78,13 +78,10 @@ public class ChatMessageController {
         voiceChatService.storeChunk(roomId, voiceChatRequestDTO.getUserId(), voiceChatRequestDTO.getChunkIndex(), voiceChatRequestDTO.getTotalChunks(), voiceChatRequestDTO.getFileContent());
         if (voiceChatService.isComplete(roomId, voiceChatRequestDTO.getUserId())) {
             //청크 재조립
-            System.out.println("음성 인식");
+            log.info("음성 인식");
             String fullData = voiceChatService.assembleChunks(roomId, voiceChatRequestDTO.getUserId());
-            String convertedString = voiceChatService.getMp3filePath(fullData);
-            String taskId = voiceChatService.sendFileToSpeechFlow(convertedString);
-            String result = voiceChatService.queryTranscriptionResult(taskId);
+            String result = voiceChatService.translateVoiceToText(fullData);
 
-            System.out.println(result);
             //번역
         }
         return new ChatMessageResponseDto();
