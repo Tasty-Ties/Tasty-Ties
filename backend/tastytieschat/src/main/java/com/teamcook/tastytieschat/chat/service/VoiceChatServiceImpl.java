@@ -125,7 +125,6 @@ public class VoiceChatServiceImpl implements VoiceChatService {
 
     /**
      * @return : TaskId
-     * SpeechFlow를 안 쓸수도 있을 것 같아서 예외처리를 자세하게 하지는 않았습니다
      */
     @Override
     public String sendFileToSpeechFlow(String filePath) throws IOException {
@@ -153,6 +152,9 @@ public class VoiceChatServiceImpl implements VoiceChatService {
         }
     }
 
+    /**
+     * @return : 변환된 문자열
+     * */
     @Override
     public String queryTranscriptionResult(String taskId) throws IOException, InterruptedException {
         // STT 결과를 얻기 위한 설정
