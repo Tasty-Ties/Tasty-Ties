@@ -5,6 +5,7 @@ import com.teamcook.tastyties.common.entity.Language;
 import com.teamcook.tastyties.cooking_class.entity.CookingClass;
 import com.teamcook.tastyties.shared.entity.UserAndCookingClass;
 import com.teamcook.tastyties.shared.entity.UserAndCountry;
+import com.teamcook.tastyties.short_form.entity.ShortForm;
 import com.teamcook.tastyties.user.dto.UserUpdateDto;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -14,6 +15,7 @@ import lombok.ToString;
 
 import java.time.LocalDate;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -36,11 +38,11 @@ public class User {
     private Set<UserAndCountry> userAndCountries = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "country_id")
+    @JoinColumn(name = "country_id", nullable = false)
     private Country country;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "language_id")
+    @JoinColumn(name = "language_id", nullable = false)
     private Language language;
 
     @NotNull @Column(nullable = false, unique = true)
@@ -68,6 +70,10 @@ public class User {
     private String youtubeHandle;
 
     private int activityPoint = 0;
+
+    // short-form
+    @OneToMany(mappedBy = "user")
+    private List<ShortForm> shortForm;
 
     public void updateUser(UserUpdateDto request, String encodedPassword, String instagramHandle, String youtubeHandle) {
         this.nickname = request.getNickname();
