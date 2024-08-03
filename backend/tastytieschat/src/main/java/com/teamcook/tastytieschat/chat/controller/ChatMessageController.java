@@ -18,6 +18,7 @@ import org.springframework.stereotype.Controller;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 
 @Controller
 @Slf4j
@@ -77,11 +78,13 @@ public class ChatMessageController {
 
         voiceChatService.storeChunk(roomId, voiceChatRequestDTO.getUserId(), voiceChatRequestDTO.getChunkIndex(), voiceChatRequestDTO.getTotalChunks(), voiceChatRequestDTO.getFileContent());
         if (voiceChatService.isComplete(roomId, voiceChatRequestDTO.getUserId())) {
-            //청크 재조립
             log.info("음성 인식");
             String fullData = voiceChatService.assembleChunks(roomId, voiceChatRequestDTO.getUserId());
             System.out.println(fullData);
-            String result = String.valueOf(voiceChatService.translateVoiceToTextByFileSystem(fullData));
+//            String result = String.valueOf(voiceChatService.translateVoiceToTextByFileSystem(fullData));
+            CompletableFuture<String> resultFuture = voiceChatService.translateVoiceToTextByMemory(fullData);
+            resultFuture.thenAccept(result -> System.out.println("Result from Memory: " + result));
+            resultFuture.join();
 
             //번역
         }

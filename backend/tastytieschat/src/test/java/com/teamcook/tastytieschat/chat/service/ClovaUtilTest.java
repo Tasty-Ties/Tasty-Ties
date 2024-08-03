@@ -1,46 +1,84 @@
 package com.teamcook.tastytieschat.chat.service;
 
 import com.teamcook.tastytieschat.chat.service.uil.ClovaUtil;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
+import java.util.concurrent.CompletableFuture;
 
 @SpringBootTest
 public class ClovaUtilTest {
 
-    private final String SHORT_FILE_PATH = "./static/short-sentence.mp3";
-    private final String LONG_FILE_PATH = "./static/long-sentence.mp3";
+    private String fullData = "";
+    private String SHORT_DECODE_FLEE_PATH = "./log/short_sentence.txt";
+    private String LONG_DECODE_FLEE_PATH = "./log/long_sentence.txt";
 
     @Autowired
     ClovaUtil clovaUtil;
+    @Autowired
+    private VoiceChatServiceImpl voiceChatServiceImpl;
 
-    @Test
-    @DisplayName("짧은 문장, 네이버 클로바를 이용한 테스트")
-    void translateShortVoiceToTextByClovaTest() throws IOException {
-        long startTime = System.currentTimeMillis();
+    @BeforeEach
+    void setUp() {
+        fullData = readLogData(LONG_DECODE_FLEE_PATH);
+    }
 
-        String result = clovaUtil.translateVoiceToTextByFile(SHORT_FILE_PATH);
-
-        long endTime = System.currentTimeMillis();
-        long duration = endTime - startTime;
-        System.out.println("translateShortVoiceToTextByClovaTest 소요시간: " + duration + " ms");
-
-        System.out.println(result);
+    private String readLogData(String filePath) {
+        StringBuilder content = new StringBuilder();
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                content.append(line);
+            }
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return content.toString();
     }
 
     @Test
-    @DisplayName("긴 문장, 네이버 클로바를 이용한 테스트")
-    void translateLongVoiceToTextByClovaTest() throws IOException {
+    @DisplayName("파일 시스템에 쓰고 읽어와 STT")
+    void translateVoiceToTextByFileSystemTest() throws IOException, InterruptedException {
         long startTime = System.currentTimeMillis();
-        String result = clovaUtil.translateVoiceToTextByFile(LONG_FILE_PATH);
 
-        long endTime = System.currentTimeMillis();
-        long duration = endTime - startTime;
-        System.out.println("translateLongVoiceToTextByClovaTest 소요시간: " + duration + " ms");
+        String filePath = voiceChatServiceImpl.saveAndGetFilePath(fullData);
+        CompletableFuture<String> resultFuture = clovaUtil.translateVoiceToTextByFile(filePath);
 
-        System.out.println(result);
+        resultFuture.thenAccept(response -> {
+            long endTime = System.currentTimeMillis();
+            long duration = endTime - startTime;
+            System.out.println(response);
+            System.out.println("translateVoiceToTextByFileSystemTest 소요시간: " + duration + " ms");
+        });
+
+        resultFuture.join();
     }
+
+    @Test
+    @DisplayName("디코딩된 문자열을 바로 바이트로 변환해 STT")
+    void translateVoiceToTextByFileMemoryTest() throws IOException {
+        long startTime = System.currentTimeMillis();
+
+        byte[] wavBytes = voiceChatServiceImpl.getWavBytes(fullData);
+        CompletableFuture<String> resultFuture = clovaUtil.translateVoiceToTextByByte(wavBytes);
+
+        resultFuture.thenAccept(response -> {
+            long endTime = System.currentTimeMillis();
+            long duration = endTime - startTime;
+            System.out.println(response);
+            System.out.println("translateVoiceToTextByFileMemoryTest 소요시간: " + duration + " ms");
+        });
+
+        resultFuture.join();
+    }
+
 }

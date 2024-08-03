@@ -62,90 +62,67 @@ public class VoiceChatServiceImpl implements VoiceChatService {
         for (String chunk : chunks) {
             assembledData.append(chunk);
         }
+        String fullData = assembledData.toString();
+        logFullDataToFile(roomId, userId, fullData);
 
-        return assembledData.toString();
-    }
-
-    @Async
-    @Override
-    public CompletableFuture<String> translateVoiceToTextByFileSystem(String fullData) throws IOException, InterruptedException {
-        String filePath = getMp3filePath(fullData);
-        return CompletableFuture.completedFuture(clovaUtil.translateVoiceToTextByFile(filePath));
+        return fullData;
     }
 
     @Async
     @Override
     public CompletableFuture<String> translateVoiceToTextByMemory(String fullData) throws IOException, InterruptedException {
-        byte[] mp3Bytes = getMp3Bytes(fullData);
-        return CompletableFuture.completedFuture(clovaUtil.translateVoiceToTextByByte(mp3Bytes));
+        byte[] wavBytes = getWavBytes(fullData);
+        saveAndGetFilePath(fullData);
+        return clovaUtil.translateVoiceToTextByByte(wavBytes)
+                .thenApply(response -> response);
     }
 
-    private byte[] getMp3Bytes(String fullData) throws IOException, InterruptedException {
-
-        // Base64 디코딩
-        byte[] decodedBytes = Base64.getDecoder().decode(fullData);
-        UUID uuid = UUID.randomUUID();
-
-        // 디코딩된 바이트를 WAV 파일로 저장 (메모리 내)
-        try (ByteArrayOutputStream wavOutputStream = new ByteArrayOutputStream()) {
-            wavOutputStream.write(decodedBytes);
-            wavOutputStream.flush();
-
-            // WAV 파일을 MP3로 변환 (메모리 내) TODO: mp3로 변환하지 않아도 되는지 확인 필요
-            ByteArrayOutputStream mp3OutputStream = new ByteArrayOutputStream();
-            ProcessBuilder pb = new ProcessBuilder("ffmpeg", "-i", "pipe:0", "-f", "mp3", "pipe:1");
-            Process process = pb.start();
-
-            try (OutputStream processInput = process.getOutputStream();
-                 InputStream processOutput = process.getInputStream()) {
-
-                processInput.write(wavOutputStream.toByteArray());
-                processInput.flush();
-                processInput.close();
-
-                byte[] buffer = new byte[4096];
-                int bytesRead;
-                while ((bytesRead = processOutput.read(buffer)) != -1) {
-                    mp3OutputStream.write(buffer, 0, bytesRead);
-                }
-
-                int exitCode = process.waitFor();
-                if (exitCode != 0) {
-                    throw new IOException("Error converting WAV to MP3");
-                }
-
-                return mp3OutputStream.toByteArray();
-            }
-        }
+    byte[] getWavBytes(String fullData) {
+        return Base64.getDecoder().decode(fullData);
     }
 
+    // speechFlow 사용할 때는 mp3 file로 변환해서 저장해야 함.
+    @Async
+    @Override
+    public CompletableFuture<String> translateVoiceToTextByFileSystem(String fullData) throws IOException, InterruptedException {
+        String mp3FilePath = saveAndGetFilePath(fullData);
+        return clovaUtil.translateVoiceToTextByFile(mp3FilePath)
+                .thenApply(response -> response);
+    }
 
     /**
      * @param fullData : 인코딩된 문자열
      * @return : mp3 파일이 저장된 경로 full path
      */
-    private String getMp3filePath(String fullData) throws IOException, InterruptedException {
-        // Base64 디코딩
+    String saveAndGetFilePath(String fullData) throws IOException, InterruptedException {
         byte[] decodedBytes = Base64.getDecoder().decode(fullData);
         UUID uuid = UUID.randomUUID();
         String wavFilePath = "./dump/" + uuid + ".wav";
         String mp3FilePath = "./dump/" + uuid + ".mp3";
 
-        // 디코딩된 바이트를 WAV 파일로 저장
         try (OutputStream os = new FileOutputStream(wavFilePath)) {
             os.write(decodedBytes);
         }
 
-        // ffmpeg를 사용하여 WAV 파일을 MP3로 변환
-        ProcessBuilder pb = new ProcessBuilder(ffmpegPath, "-i", wavFilePath, mp3FilePath);
-        Process process = pb.start();
-        int exitCode = process.waitFor();
+//        ProcessBuilder pb = new ProcessBuilder(ffmpegPath, "-i", wavFilePath, mp3FilePath);
+//        Process process = pb.start();
+//        int exitCode = process.waitFor();
+//
+//        if (exitCode != 0) {
+//            throw new IOException("Error converting WAV to MP3");
+//        }
+//        return mp3FilePath;
+        return wavFilePath;
+    }
 
-        if (exitCode != 0) {
-            throw new IOException("Error converting WAV to MP3");
+    //청크 파일 로그로 남기기 (테스트용)
+    private void logFullDataToFile(String roomId, int userId, String fullData) {
+        String logFileName = String.format("./log/long_sentence.txt", roomId, userId);
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(logFileName))) {
+            writer.write(fullData);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-
-        return mp3FilePath;
     }
 
 }

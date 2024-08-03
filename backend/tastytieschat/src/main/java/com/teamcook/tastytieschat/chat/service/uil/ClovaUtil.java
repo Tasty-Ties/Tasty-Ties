@@ -6,9 +6,11 @@ import org.springframework.stereotype.Service;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 public class ClovaUtil {
+
     @Value("${clova-client-id}")
     private String clovaClientId;
 
@@ -16,17 +18,29 @@ public class ClovaUtil {
     private String clovaClientSecret;
 
 
-    public String translateVoiceToTextByFile(String filePath) throws IOException {
-        File voiceFile = getFile(filePath);
-        HttpURLConnection connection = createConnection();
-        sendFile(connection, voiceFile);
-        return getResponse(connection);
+    public CompletableFuture<String> translateVoiceToTextByFile(String filePath) throws IOException {
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                File voiceFile = getFile(filePath);
+                HttpURLConnection connection = createConnection();
+                sendFile(connection, voiceFile);
+                return getResponse(connection);
+            } catch (IOException e) {
+                throw new RuntimeException("Error translating voice to text: " + e.getMessage(), e);
+            }
+        });
     }
 
-    public String translateVoiceToTextByByte(byte[] mp3Bytes) throws IOException {
-        HttpURLConnection connection = createConnection();
-        sendFile(connection, mp3Bytes);
-        return getResponse(connection);
+    public CompletableFuture<String> translateVoiceToTextByByte(byte[] bytes) throws IOException {
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                HttpURLConnection connection = createConnection();
+                sendFile(connection, bytes);
+                return getResponse(connection);
+            } catch (IOException e) {
+                throw new RuntimeException("Error translating voice to text: " + e.getMessage(), e);
+            }
+        });
     }
 
     private File getFile(String filePath) throws FileNotFoundException {
@@ -68,9 +82,9 @@ public class ClovaUtil {
         }
     }
 
-    private void sendFile(HttpURLConnection connection, byte[] mp3Bytes) throws IOException {
+    private void sendFile(HttpURLConnection connection, byte[] bytes) throws IOException {
         try (OutputStream outputStream = connection.getOutputStream()) {
-            outputStream.write(mp3Bytes);
+            outputStream.write(bytes);
             outputStream.flush();
         } catch (IOException e) {
             throw new IOException("Error sending the voice file: " + e.getMessage(), e);
