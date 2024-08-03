@@ -2,8 +2,10 @@ package com.teamcook.tastytieschat.chat.service;
 
 import com.teamcook.tastytieschat.chat.service.uil.ClovaUtil;
 import com.teamcook.tastytieschat.chat.service.uil.SpeechFlowUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -12,6 +14,7 @@ import java.util.Base64;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Service
@@ -19,11 +22,15 @@ public class VoiceChatServiceImpl implements VoiceChatService {
 
     @Value("${ffmpeg.path}")
     private String ffmpegPath;
+    private final String REDIS_KEY_PREFIX = "voiceData:";
 
+    @Autowired
+    private RedisTemplate<String, byte[]> redisTemplate;
     private ConcurrentHashMap<String, ConcurrentHashMap<Integer, String[]>> voiceDataMap = new ConcurrentHashMap<>();
 
     private ClovaUtil clovaUtil;
     private SpeechFlowUtil speechFlowUtil;
+
 
     public VoiceChatServiceImpl(ClovaUtil clovaUtill, SpeechFlowUtil speechFlowUtil) {
         this.clovaUtil = clovaUtill;
@@ -68,13 +75,31 @@ public class VoiceChatServiceImpl implements VoiceChatService {
         return fullData;
     }
 
+
     @Async
     @Override
     public CompletableFuture<String> translateVoiceToTextByMemory(String fullData) throws IOException, InterruptedException {
-        byte[] wavBytes = getWavBytes(fullData);
-        saveAndGetFilePath(fullData);
+        byte[] wavBytes = getWavBytesAtRedis(fullData);
         return clovaUtil.translateVoiceToTextByByte(wavBytes)
                 .thenApply(response -> response);
+    }
+
+    public byte[] getWavBytesAtRedis(String fullData) {
+        String redisKey = REDIS_KEY_PREFIX + fullData.hashCode();
+
+        // Redis 캐시에서 데이터 검색
+        byte[] cachedBytes = redisTemplate.opsForValue().get(redisKey);
+        if (cachedBytes != null) {
+            return cachedBytes;
+        }
+
+        // Base64 디코딩
+        byte[] decodedBytes = Base64.getDecoder().decode(fullData);
+
+        // Redis에 캐시 저장 (예: 5분 동안 유지)
+        redisTemplate.opsForValue().set(redisKey, decodedBytes, 5, TimeUnit.MINUTES);
+
+        return decodedBytes;
     }
 
     byte[] getWavBytes(String fullData) {

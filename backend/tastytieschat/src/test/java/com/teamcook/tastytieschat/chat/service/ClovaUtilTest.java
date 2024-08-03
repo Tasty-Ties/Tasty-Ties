@@ -65,10 +65,28 @@ public class ClovaUtilTest {
 
     @Test
     @DisplayName("디코딩된 문자열을 바로 바이트로 변환해 STT")
-    void translateVoiceToTextByFileMemoryTest() throws IOException {
+    void translateVoiceToTextByMemoryTest() throws IOException {
         long startTime = System.currentTimeMillis();
 
         byte[] wavBytes = voiceChatServiceImpl.getWavBytes(fullData);
+        CompletableFuture<String> resultFuture = clovaUtil.translateVoiceToTextByByte(wavBytes);
+
+        resultFuture.thenAccept(response -> {
+            long endTime = System.currentTimeMillis();
+            long duration = endTime - startTime;
+            System.out.println(response);
+            System.out.println("translateVoiceToTextByFileMemoryTest 소요시간: " + duration + " ms");
+        });
+
+        resultFuture.join();
+    }
+
+    @Test
+    @DisplayName("디코딩된 문자열을 레디스에서 바이트로 변환해 STT")
+    void translateVoiceToTextByRedisTest() throws IOException {
+        long startTime = System.currentTimeMillis();
+
+        byte[] wavBytes = voiceChatServiceImpl.getWavBytesAtRedis(fullData);
         CompletableFuture<String> resultFuture = clovaUtil.translateVoiceToTextByByte(wavBytes);
 
         resultFuture.thenAccept(response -> {
