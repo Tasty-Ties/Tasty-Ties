@@ -117,7 +117,7 @@ public class UserController {
     public ResponseEntity<CommonResponseDto> uploadProfileImage(@AuthenticationPrincipal CustomUserDetails userDetails,
                                                                 @RequestPart MultipartFile profileImage) {
         String imageUrl = userService.uploadImage(userDetails, profileImage);
-        return ResponseEntity.created(URI.create(imageUrl))
+        return ResponseEntity.ok()
                 .body(CommonResponseDto.builder()
                         .stateCode(201)
                         .message("프로필이 정상적으로 수정됐습니다.")

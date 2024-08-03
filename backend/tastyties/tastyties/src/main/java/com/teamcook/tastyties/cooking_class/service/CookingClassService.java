@@ -20,6 +20,7 @@ import com.teamcook.tastyties.user.dto.UserProfileForClassDetailDto;
 import com.teamcook.tastyties.user.entity.User;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -51,7 +52,7 @@ public class CookingClassService {
                                UserAndCookingClassRepository userAndCookingClassRepository,
                                CookingClassTagRepository cookingClassTagRepository,
                                CookingClassImageRepository cookingClassImageRepository,
-                               S3Service s3Service) {
+                               @Qualifier("Local") S3Service s3Service) {
         this.cookingClassRepository = cookingClassRepository;
         this.ingredientRepository = ingredientRepository;
         this.recipeRepository = recipeRepository;
