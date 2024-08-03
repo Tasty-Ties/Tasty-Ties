@@ -13,6 +13,7 @@ import java.util.List;
 public class UserProfileDto {
     private String profileImageUrl;
     private String nickname;
+    private String description;
     private CountryResponseDto country;
     private List<CountryResponseDto> collectedFlags;
     private LanguageResponseDto language;
