@@ -37,7 +37,7 @@ const VideoComponent = () => {
   const isAudioActive = useVideoStore((state) => state.isAudioActive);
 
   const [localUser, setLocalUser] = useState(null);
-  const [session, setSession] = useState(undefined);
+  const session = useRef(null);
   const [subscribers, setSubscribers] = useState([]);
   const remotes = useRef([]);
   const localUserAccessAllowed = useRef(false);
@@ -95,7 +95,7 @@ const VideoComponent = () => {
 
   const joinSession = async () => {
     const newSession = OV.initSession();
-    setSession(newSession);
+    session.current = newSession;
     await connectToSession(newSession);
     subscribeToStreamCreated(newSession);
     console.log(newSession);
@@ -186,7 +186,6 @@ const VideoComponent = () => {
   };
 
   const deleteSubscriber = (stream) => {
-    console.log(remotes.current);
     const userStream = remotes.current.filter(
       (user) => user.getStreamManager().stream === stream
     )[0];
@@ -247,11 +246,11 @@ const VideoComponent = () => {
   };
 
   const leaveSession = () => {
-    if (session) {
-      session.disconnect();
+    if (session.current) {
+      session.current.disconnect();
     }
     setOV(null);
-    setSession(undefined);
+    session.current = null;
     setSubscribers([]);
     setMySessionId("SessionA");
     setLocalUser(undefined);
