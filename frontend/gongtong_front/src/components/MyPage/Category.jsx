@@ -1,16 +1,9 @@
 import { Link } from "react-router-dom";
-import useMyPageStore from "../../store/MyPageStore";
-import { useEffect } from "react";
 import instalogo from "../../assets/MyPage/insta.png";
 import youtubelogo from "../../assets/MyPage/Youtube.png";
 
-const Category = () => {
-  const { informations, fetchInformations } = useMyPageStore();
-
-  useEffect(() => {
-    fetchInformations();
-  }, [fetchInformations]);
-
+const Category = ({ informations }) => {
+  // console.log("카테고리", informations);
   return (
     <>
       <div>

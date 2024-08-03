@@ -1,15 +1,4 @@
-import React, { useEffect, useState } from "react";
-import useMyPageStore from "../../store/MyPageStore";
-import axios from "../../service/Axios";
-
-const MyInfo = () => {
-  const { informations, fetchInformations } = useMyPageStore();
-
-  useEffect(() => {
-    fetchInformations();
-  }, [fetchInformations]);
-  console.log(informations);
-
+const MyInfo = ({ informations }) => {
   if (!informations) {
     return <div>정보가 없습니다.</div>;
   }
