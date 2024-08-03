@@ -11,7 +11,6 @@ import Cookies from "js-cookie";
 const ClassWaiting = () => {
   const nav = useNavigate();
   const classId = useParams().id;
-  console.log(classId);
 
   const location = useLocation();
   // const { isHost } = location.state;

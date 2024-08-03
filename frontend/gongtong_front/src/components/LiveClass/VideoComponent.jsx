@@ -25,7 +25,6 @@ const userLang = "Japanese";
 const CHUNK_SIZE = 16000;
 
 const VideoComponent = () => {
-  const location = useLocation();
   const OV = useVideoStore((state) => state.OV);
   const setOV = useVideoStore((state) => state.setOV);
   const selectedAudioDevice = useVideoStore(
@@ -34,9 +33,10 @@ const VideoComponent = () => {
   const selectedVideoDevice = useVideoStore(
     (state) => state.selectedVideoDevice
   );
-  const { audioActive, videoActive } = location.state;
-  const [localUser, setLocalUser] = useState(null);
+  const isVideoActive = useVideoStore((state) => state.isVideoActive);
+  const isAudioActive = useVideoStore((state) => state.isAudioActive);
 
+  const [localUser, setLocalUser] = useState(null);
   const [session, setSession] = useState(undefined);
   const [subscribers, setSubscribers] = useState([]);
   const remotes = useRef([]);
@@ -135,9 +135,9 @@ const VideoComponent = () => {
   const connectWebCam = async (session) => {
     const publisher = OV.initPublisher(undefined, {
       audioSource: selectedAudioDevice,
-      videoDevice: selectedVideoDevice,
-      publishAudio: audioActive,
-      publishVideo: videoActive,
+      videoSource: selectedVideoDevice.deviceId,
+      publishAudio: isAudioActive,
+      publishVideo: isVideoActive,
       resolution: "640x480",
       frameRate: 30,
       insertMode: "APPEND",
