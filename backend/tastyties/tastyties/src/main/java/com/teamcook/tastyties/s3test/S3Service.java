@@ -8,4 +8,7 @@ import java.util.List;
 public interface S3Service {
     Image uploadImage(MultipartFile image) throws IOException;
     List<Image> uploadImages(List<MultipartFile> images) throws IOException;
+
+    boolean isAllowedTypes(MultipartFile file);
 }
+

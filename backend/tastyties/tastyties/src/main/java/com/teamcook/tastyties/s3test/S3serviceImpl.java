@@ -11,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -29,14 +30,16 @@ public class S3serviceImpl implements S3Service {
 
     @Override
     public Image uploadImage(MultipartFile image) throws IOException {
+        if (!isAllowedTypes(image)) {
+            throw new IOException("지원하지 않는 이미지 타입입니다: " + image.getOriginalFilename());
+        }
         String originName = image.getOriginalFilename();
         String storedImagePath = uploadImageToS3(image);
-        Image newImage = Image.builder() //이미지에 대한 정보를 담아서 반환
+
+        return Image.builder() //이미지에 대한 정보를 담아서 반환
                 .originName(originName)
                 .storedImagePath(storedImagePath)
                 .build();
-
-        return newImage;
     }
 
     @Override
@@ -50,6 +53,13 @@ public class S3serviceImpl implements S3Service {
                     }
                 })
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public boolean isAllowedTypes(MultipartFile file) {
+        String fileType = file.getContentType();
+        List<String> allowedTypes = Arrays.asList("image/jpeg", "image/png", "image/jpg");
+        return allowedTypes.contains(fileType);
     }
 
     private String uploadImageToS3(MultipartFile image) throws IOException {
