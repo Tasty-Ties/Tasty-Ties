@@ -1,41 +1,31 @@
 import React, { useEffect, useState } from "react";
+import useMyPageStore from "../../store/MyPageStore";
 import axios from "../../service/Axios";
-// import useApiStore from "../../store/ApiStore";
-import Cookies from "js-cookie";
 
 const MyInfo = () => {
-  // const { baseURL } = useApiStore();
-  const [userData, setUserData] = useState(null);
+  const { informations, fetchInformations } = useMyPageStore();
 
   useEffect(() => {
-    console.log(Cookies.get("accessToken"));
-    const fetchUserData = async () => {
-      try {
-        const response = await axios.get("/users/me", {
-          // headers: {
-          //   Authorization: `Bearer ${Cookies.get("accessToken")}`,
-          // },
-        });
-        console.log(response);
-        console.log(Cookies.get("accessToken"));
-        setUserData(response.data);
-      } catch (error) {
-        console.error("Failed to fetch user data:", error);
-      }
-    };
+    fetchInformations();
+  }, [fetchInformations]);
+  console.log(informations);
 
-    fetchUserData();
-  }, []);
-
-  if (!userData) {
-    return <div>Loading...</div>;
+  if (!informations) {
+    return <div>정보가 없습니다.</div>;
   }
 
   return (
     <div>
-      <h1>My Page</h1>
-      <p>Username: {userData.username}</p>
-      <p>Email: {userData.email}</p>
+      <h1>내 정보</h1>
+      <p>닉네임: {informations.nickname}</p>
+      <p>국적: {informations.country?.koreanName || "국적 정보 없음"}</p>
+      <p>모국어: {informations.language?.koreanName || "국적 정보 없음"}</p>
+      <p>마일리지: {informations.activityPoint}</p>
+      <p>이메일: {informations.email}</p>
+      <p>생년월일: {informations.birth}</p>
+      <p>수집한 국기: {informations.colletedFlags}</p>
+      <p>SNS 연동 현황: {informations.youtubeHandle}</p>
+      <p>SNS 연동 현황: {informations.instagramHandle}</p>
     </div>
   );
 };
