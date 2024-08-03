@@ -1,13 +1,10 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import userStore from "../../store/UserStore";
-// import useApiStore from "../../store/ApiStore";
-// import axios from "axios";
 import axios from "../../service/Axios";
 
 const SignUpSecond = () => {
   const nav = useNavigate();
-  // const { baseURL } = useApiStore();
 
   const userRegister = async (e) => {
     e.preventDefault();

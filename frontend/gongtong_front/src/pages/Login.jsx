@@ -1,11 +1,9 @@
 import { useState } from "react";
-// import useApiStore from "../store/ApiStore";
 import useAuthStore from "../store/AuthStore";
 import { useNavigate } from "react-router-dom";
 import axios from "../service/Axios";
 
 const Login = () => {
-  // const { baseURL } = useApiStore();
   const { login } = useAuthStore();
   const nav = useNavigate();
 

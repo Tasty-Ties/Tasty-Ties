@@ -10,7 +10,7 @@ const MyPage = () => {
     fetchInformations();
   }, [fetchInformations]);
   console.log(fetchInformations);
-  console.log("마이페이지", informations);
+  console.log(informations);
 
   return (
     <>

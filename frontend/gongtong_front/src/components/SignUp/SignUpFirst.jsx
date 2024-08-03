@@ -1,13 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import userStore from "../../store/UserStore";
-import useApiStore from "../../store/ApiStore";
 import axios from "../../service/Axios";
 
 const SignUpFirst = () => {
   const nav = useNavigate();
   const { userForm, setForm } = userStore();
-  const { baseURL } = useApiStore();
 
   const [lengthValid, setLengthValid] = useState(null);
   const [charValid, setCharValid] = useState(null);
@@ -82,7 +80,6 @@ const SignUpFirst = () => {
       const emailDomain = userForm.email.substring(
         userForm.email.indexOf("@") + 1
       );
-      // const requestUrl = `${baseURL}/users/check-email?email_id=${emailId}&email_domain=${emailDomain}`;
 
       const response = await axios.get(
         `/users/check-email?email_id=${emailId}&email_domain=${emailDomain}`
@@ -104,8 +101,6 @@ const SignUpFirst = () => {
 
   const checkUsername = async () => {
     try {
-      // const requestUrl = `${baseURL}/users/check-username?username=${userForm.username}`;
-
       const response = await axios.get(
         `/users/check-username?username=${userForm.username}`
       );
