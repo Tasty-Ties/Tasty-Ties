@@ -15,7 +15,7 @@ const ClassWaiting = () => {
 
   const location = useLocation();
   // const { isHost } = location.state;
-  const isHost = false;
+  const isHost = true;
   console.log("호스트 여부 : ", isHost);
   console.log("클래스 ID: ", classId);
 
@@ -31,8 +31,8 @@ const ClassWaiting = () => {
     (state) => state.selectedVideoDevice
   );
 
-  const [audioActive, setAudioActive] = useState(true);
-  const [videoActive, setVideoActive] = useState(true);
+  const isAudioActive = useVideoStore((state) => state.isAudioActive);
+  const isVideoActive = useVideoStore((state) => state.isVideoActive);
 
   const videoPreviewRef = useRef(null);
 
@@ -44,13 +44,13 @@ const ClassWaiting = () => {
     if (selectedVideoDevice) {
       startPreview();
     }
-  }, [selectedAudioDevice, selectedVideoDevice]);
+  }, [selectedAudioDevice, selectedVideoDevice, isAudioActive, isVideoActive]);
 
   const startPreview = async () => {
     if (selectedVideoDevice) {
       const stream = await OV.getUserMedia({
-        audioSource: selectedAudioDevice,
-        videoSource: selectedVideoDevice.deviceId,
+        audioSource: isAudioActive ? selectedAudioDevice : false,
+        videoSource: isVideoActive ? selectedVideoDevice.deviceId : false,
       });
       videoPreviewRef.current.srcObject = stream;
     }
@@ -108,7 +108,7 @@ const ClassWaiting = () => {
         {"호스트 이름"}님의 {"클래스 제목"} 클래스 시작을 기다리는 중...
       </h2>
 
-      <MediaDeviceSetting />
+      <MediaDeviceSetting currentPublisher={null} />
 
       <div>
         <video

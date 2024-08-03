@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import useVideoStore from "../../store/useVideoStore";
+import Button from "./../../common/components/Button";
 
-const MediaDeviceSetting = () => {
+const MediaDeviceSetting = ({ currentPublisher }) => {
   const [videoDevices, setVideoDevices] = useState([]);
   const [audioDevices, setAudioDevices] = useState([]);
 
@@ -12,6 +13,11 @@ const MediaDeviceSetting = () => {
   const setSelectedVideoDevice = useVideoStore(
     (state) => state.setSelectedVideoDevice
   );
+
+  const isAudioActive = useVideoStore((state) => state.isAudioActive);
+  const isVideoActive = useVideoStore((state) => state.isVideoActive);
+  const setIsVideoActive = useVideoStore((state) => state.setIsVideoActive);
+  const setIsAudioActive = useVideoStore((state) => state.setIsAudioActive);
 
   useEffect(() => {
     const getMediaDevices = async () => {
@@ -42,9 +48,33 @@ const MediaDeviceSetting = () => {
     }
   }, [videoDevices, audioDevices]);
 
+  const videoOnOff = () => {
+    if (currentPublisher) {
+      currentPublisher.current.publishVideo(!isVideoActive);
+    }
+    setIsVideoActive();
+  };
+
+  const audioOnOff = () => {
+    if (currentPublisher) {
+      currentPublisher.current.publishAudio(!isAudioActive);
+    }
+    setIsAudioActive();
+  };
+
   return (
     <>
       <div>
+        <Button
+          text={isVideoActive ? "비디오 중지" : "비디오 시작"}
+          type="green-border-short"
+          onClick={videoOnOff}
+        />
+        <Button
+          text={isAudioActive ? "오디오 중지" : "오디오 시작"}
+          type="green-border-short"
+          onClick={audioOnOff}
+        />
         <label>Video Devices: </label>
         <select
           onChange={(e) =>

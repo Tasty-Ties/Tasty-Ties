@@ -11,6 +11,7 @@ import UserModel from "./UserModel";
 import { Hands } from "@mediapipe/hands";
 import { Camera } from "@mediapipe/camera_utils";
 import { Client } from "@stomp/stompjs";
+import MediaDeviceSetting from "./MediaDeviceSetting";
 
 const APPLICATION_SERVER_URL = "http://192.168.0.105:8080/api/v1/";
 const localUserSetting = new UserModel();
@@ -42,7 +43,7 @@ const VideoComponent = () => {
   const localUserAccessAllowed = useRef(false);
 
   const sessionId = useVideoStore((state) => state.sessionId);
-  const setSessionId = useVideoStore((state) => state.setSessionId);
+  const currentPublisher = useRef();
 
   //미디어 파이프 및 영상 녹화 관련
   const mediaRecorder = useRef(null);
@@ -131,12 +132,6 @@ const VideoComponent = () => {
       });
   };
 
-  const nicknameChanged = (nickname) => {
-    localUser.setNickname(nickname);
-    setLocalUser(localUser);
-    sendSignalUserChanged(session, { nickname: localUser.getNickname() });
-  };
-
   const connectWebCam = async (session) => {
     const publisher = OV.initPublisher(undefined, {
       audioSource: selectedAudioDevice,
@@ -147,6 +142,7 @@ const VideoComponent = () => {
       frameRate: 30,
       insertMode: "APPEND",
     });
+    currentPublisher.current = publisher;
     if (session.capabilities.publish) {
       publisher.on("accessAllowed", () => {
         session.publish(publisher).then(() => {
@@ -503,6 +499,7 @@ const VideoComponent = () => {
   return (
     <>
       <h1>라이브클래스</h1>
+
       <div id="layout" className="bounds" style={videolistcss}>
         {localUser && localUser.getStreamManager() && (
           <div id="localUser" style={localcss}>
@@ -523,7 +520,10 @@ const VideoComponent = () => {
           ))}
         </div>
       </div>
-      <ToolbarComponent leaveSession={leaveSession} style={toolcss} />
+      <div>
+        <MediaDeviceSetting currentPublisher={currentPublisher} />
+        <ToolbarComponent leaveSession={leaveSession} style={toolcss} />
+      </div>
       <video className="input_video" style={{ display: "none" }}></video>
     </>
   );
