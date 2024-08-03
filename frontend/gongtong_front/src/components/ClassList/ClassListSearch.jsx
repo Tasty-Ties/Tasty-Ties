@@ -4,9 +4,9 @@ const ClassListSearch = () => {
   return (
     <form className="ClassListSearch">
       <div className="sub-box">
-        <select name="" id="" className="select-box">
-          <option value="">클래스명</option>
-          <option value="">닉네임</option>
+        <select name="" className="select-box">
+          <option value="title">클래스명</option>
+          <option value="hostName">닉네임</option>
         </select>
         <div className="input-box">
           <input type="text" placeholder="검색" className="search-input" />
@@ -28,7 +28,6 @@ const ClassListSearch = () => {
           </select>
           <select name="" id="" className="select-box">
             <option value="">최신순</option>
-            <option value="">조회순</option>
             <option value="">클래스 시간순</option>
             <option value="">예약 마감순</option>
           </select>

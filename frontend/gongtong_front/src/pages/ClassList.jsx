@@ -9,6 +9,11 @@ import "@styles/ClassList/ClassList.css";
 
 const ClassList = () => {
   const { classLists, fetchClassLists, hasMoreContent } = useClassRegistStore();
+  // (state) => ({
+  //   classLists: state.classList,
+  //   fetchClassLists: state.fetchClassLists,
+  //   hasMoreContent: state.hasMoreContent,
+  // })
   const [page, setPage] = useState(0);
   const observerRef = useRef(null);
 
@@ -19,7 +24,6 @@ const ClassList = () => {
       }
     };
     fetchClassListData();
-    console.log(page);
   }, [page, hasMoreContent]);
 
   useEffect(() => {
@@ -56,7 +60,6 @@ const ClassList = () => {
           {classLists &&
             classLists.map((content, index) => (
               <div key={index}>
-                {content.uuid}
                 <Link to={`/class/${content.uuid}`}>
                   <ClassItem content={content} />
                 </Link>

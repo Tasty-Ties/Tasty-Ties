@@ -1,4 +1,4 @@
-import axios from "../service/Axios";
+import axios from "axios";
 import React, { useEffect, useState } from "react";
 
 import Ingredient from "@components/ClassRegist/Ingredient";
@@ -7,21 +7,27 @@ import CookingTools from "./../components/ClassRegist/CookingTools";
 import ClassImageFiles from "./../components/ClassRegist/ClassImageFile";
 import CookingClassTags from "./../components/ClassRegist/CookingClassTags";
 import useClassRegistStore from "./../store/ClassRegistStore";
-// import api from "../service/Api";
-import Cookies from "js-cookie";
-import { useNavigate } from "react-router-dom";
+import ClassValidate from "./../components/ClassRegist/ClassValidate";
 
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import dayjs from "dayjs";
 
 import "@styles/ClassRegist/ClassRegist.css";
+import { useNavigate } from "react-router-dom";
+import { setClassRegist } from "../service/ClassRegistAPI";
 
 const ClassRegist = () => {
-  const nav = useNavigate();
-  const { countries, fetchCountries } = useClassRegistStore();
-  const { languages, fetchLanguages } = useClassRegistStore();
+  const navigate = useNavigate();
+  const { countries, fetchCountries, languages, fetchLanguages } =
+    useClassRegistStore((state) => ({
+      countries: state.countries,
+      fetchCountries: state.fetchCountries,
+      languages: state.languages,
+      fetchLanguages: state.fetchLanguages,
+    }));
   const [replayDays, setReplayDays] = useState(0);
   const [files, setFiles] = useState([]);
+  const [errors, setErrors] = useState({});
   const [classInformation, setClassInformation] = useState({
     title: "",
     dishName: "",
@@ -43,6 +49,7 @@ const ClassRegist = () => {
     replayEndTime: "",
     isDelete: false,
   });
+
   const onChange = (e) => {
     // 주류 체크박스
     if (e.target.name === "isLimitedAge") {
@@ -85,6 +92,7 @@ const ClassRegist = () => {
       ...classInformation,
       recipe: recipe,
     });
+    console.log(recipe);
   };
   // 재료 관리
   const handleIngredientsChange = (ingredients) => {
@@ -136,8 +144,8 @@ const ClassRegist = () => {
   useEffect(() => {
     fetchCountries();
     fetchLanguages();
-    console.log("classRegist useEffect : ", { classInformation });
-  }, [classInformation, fetchCountries, fetchLanguages]);
+    console.log("classRegist useEffect : ", classInformation);
+  }, [classInformation]);
 
   const ratings = [5, 4, 3, 2, 1];
   const setLevelValue = (e) => {
@@ -149,32 +157,19 @@ const ClassRegist = () => {
     }
   };
 
-  const setClassRegist = async (e) => {
-    e.preventDefault(); // 폼 제출 기본 동작 방지
-    // const formData = new FormData();
-    // formData.append(
-    //   "classInformation",
-    //   new Blob([JSON.stringify(classInformation)], { type: "application/json" })
-    // );
-    // for (let i = 0; i < files.length; i++) {
-    //   formData.append("files", files[i]);
-    // }
+  const handleClassRegist = async (e) => {
+    e.preventDefault();
+    const errors = ClassValidate({ classInformation });
+    if (Object.keys(errors).length > 0) {
+      // 에러 메시지를 사용자에게 표시
+      alert(Object.values(errors).join("\n"));
+      setErrors(errors); // Optional: store errors in state for detailed display
+      return;
+    }
     try {
-      // const token =
-      //   "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzb2plb25nMzIiLCJpYXQiOjE3MjI1NTkyODQsImV4cCI6MTcyMjU1OTY0NH0.XDGNTu0bOX0ne5xc0ZdPo2q_YEOBgisXdiZyvqnDXyg";
-      const response = await axios.post(
-        "/classes",
-        // formData,
-        classInformation,
-        {
-          headers: {
-            // "Content-Type": "multipart/form-data",
-            Authorization: `Bearer ${Cookies.get("accessToken")}`,
-          },
-        }
-      );
-      console.log(response);
-      nav("/");
+      await setClassRegist(classInformation, files);
+      alert("성공");
+      location.replace("/class");
     } catch (error) {
       console.error("클래스 등록 실패:", error);
     }
@@ -197,6 +192,9 @@ const ClassRegist = () => {
               onChange={onChange}
               placeholder="클래스명을 입력해주세요"
             />
+            {errors.title && (
+              <div className="error-message">{errors.title}</div>
+            )}
           </div>
         </div>
         <div className="regist-component-box">
@@ -357,7 +355,7 @@ const ClassRegist = () => {
             />
           </div>
         </div>
-        <ClassImageFiles />
+        <ClassImageFiles setFiles={setFiles} />
         <div className="regist-component-box">
           <div className="title-box">
             <label htmlFor="dishCookingTime">조리 시간</label>
@@ -403,7 +401,7 @@ const ClassRegist = () => {
         </div>
         <div className="button-box">
           <button className="cancel-box">취소</button>
-          <button className="regist-box" onClick={setClassRegist}>
+          <button className="regist-box" onClick={handleClassRegist}>
             등록
           </button>
         </div>

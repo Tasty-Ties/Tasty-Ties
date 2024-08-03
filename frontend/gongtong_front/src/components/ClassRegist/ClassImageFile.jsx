@@ -1,22 +1,40 @@
 import React, { useState } from "react";
 import "@styles/ClassRegist/ClassImageFile.css";
 
-const ClassImageFiles = () => {
+const ClassImageFiles = ({ setFiles }) => {
   const [classImages, setClassImages] = useState([]);
 
-  const handleAddImages = (e) => {
-    const imagesLists = event.target.files;
-    let imageUrlLists = [...classImages];
+  const validExtensions = ["jpg", "jpeg", "png", "gif"];
+  const maxFileSize = 10 * 1024 * 1024; // 5MB
 
-    for (let i = 0; i < imagesLists.length; i++) {
-      const currentImageUrl = URL.createObjectURL(imagesLists[i]);
+  const handleAddImages = (e) => {
+    const imagesLists = Array.from(e.target.files);
+    let imageUrlLists = [...classImages];
+    let validFiles = [];
+
+    imagesLists.forEach((file) => {
+      const fileExtension = file.name.split(".").pop().toLowerCase();
+      if (!validExtensions.includes(fileExtension)) {
+        alert(`파일 타입을 확인해주세요 ${file.name}`);
+        return;
+      }
+      if (file.size > maxFileSize) {
+        alert(`파일 사이즈를 확인해주세요 ${file.name}`);
+        return;
+      }
+      validFiles.push(file);
+      const currentImageUrl = URL.createObjectURL(file);
       imageUrlLists.push(currentImageUrl);
-    }
+    });
+
     if (imageUrlLists.length > 5) {
       imageUrlLists = imageUrlLists.slice(0, 5);
+      validFiles = validFiles.slice(0, 5);
     }
     setClassImages(imageUrlLists);
+    setFiles(validFiles);
   };
+
   const handleDeleteImage = (id) => {
     const imageUrl = classImages[id];
     setClassImages(classImages.filter((_, index) => index !== id));
