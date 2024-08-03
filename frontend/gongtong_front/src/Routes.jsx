@@ -45,7 +45,7 @@ const AppRoutes = () => {
         <Route path="reviews" element={<ClassReviews />} />
       </Route>
       <Route path="/classregist" element={<ClassRegist />} />
-      <Route path="/classwaiting" element={<ClassWaiting />} />
+      <Route path="/classwaiting/:id" element={<ClassWaiting />} />
       <Route path="/liveclass" element={<LiveClass />} />
       {/* <Route path="/" element={< />} /> */}
     </Routes>

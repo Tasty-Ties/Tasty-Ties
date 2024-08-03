@@ -14,7 +14,9 @@ const ReserveList = ({ data }) => {
           text="참가자로 클래스 입장"
           type={"green-short"}
           onClick={() =>
-            nav("/classwaiting", { state: { classData: data, isHost: false } })
+            nav(`/classwaiting/${data.uuid}`, {
+              state: { classData: data, isHost: false },
+            })
           }
         />
       </div>

@@ -14,7 +14,9 @@ const TeachList = ({ data }) => {
           text="호스트로 클래스 입장"
           type={"green-short"}
           onClick={() =>
-            nav("/classwaiting", { state: { classData: data, isHost: true } })
+            nav(`/classwaiting/${data.uuid}`, {
+              state: { classData: data, isHost: true },
+            })
           }
         />
       </div>

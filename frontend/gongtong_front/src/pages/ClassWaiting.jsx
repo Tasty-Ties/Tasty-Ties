@@ -84,8 +84,12 @@ const ClassWaiting = () => {
         console.log(response);
         setSessionId(response.data.data);
       } catch (error) {
-        console.log(error);
-        alert("오류 발생으로 리턴");
+        console.log(error.response.data.stateCode);
+        if (error.response.data.stateCode === 404) {
+          alert("아직 클래스가 생성되지 않았습니다.");
+        } else {
+          alert("오류 발생으로 리턴");
+        }
         return;
       }
     }
