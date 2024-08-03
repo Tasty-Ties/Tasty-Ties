@@ -1,15 +1,28 @@
 import { OpenVidu } from "openvidu-browser";
 import { useRef, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation, useParams } from "react-router-dom";
 
 import useVideoStore from "./../store/useVideoStore";
 import MediaDeviceSetting from "./../components/LiveClass/MediaDeviceSetting";
 
+import axios from "axios";
+import Cookies from "js-cookie";
+
 const ClassWaiting = () => {
   const nav = useNavigate();
+  const classId = useParams().id;
+  console.log(classId);
+
+  const location = useLocation();
+  // const { isHost } = location.state;
+  const isHost = false;
+  console.log("호스트 여부 : ", isHost);
+  console.log("클래스 ID: ", classId);
 
   const OV = useVideoStore((state) => state.OV);
   const setOV = useVideoStore((state) => state.setOV);
+
+  const setSessionId = useVideoStore((state) => state.setSessionId);
 
   const selectedAudioDevice = useVideoStore(
     (state) => state.selectedAudioDevice
@@ -43,6 +56,52 @@ const ClassWaiting = () => {
     }
   };
 
+  const EntryTry = async () => {
+    if (isHost) {
+      try {
+        const response = await axios.post(
+          `http://localhost:8080/api/v1/classes/live/sessions/${classId}`,
+          null,
+          {
+            headers: {
+              Authorization: `Bearer ${Cookies.get("accessToken")}`,
+            },
+          }
+        );
+        console.log(response.data.data);
+        setSessionId(response.data.data);
+      } catch (error) {
+        console.log(error);
+        alert("오류 발생으로 리턴");
+        return;
+      }
+    } else {
+      try {
+        console.log(classId);
+        const response = await axios.get(
+          `http://localhost:8080/api/v1/classes/live/sessions/${classId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${Cookies.get("accessToken")}`,
+            },
+          }
+        );
+        console.log(response);
+        setSessionId(response.data.data);
+      } catch (error) {
+        console.log(error);
+        alert("오류 발생으로 리턴");
+        return;
+      }
+    }
+
+    nav("/liveclass", {
+      state: {
+        isHost: isHost,
+      },
+    });
+  };
+
   return (
     <div>
       <h2>
@@ -60,18 +119,7 @@ const ClassWaiting = () => {
         ></video>
       </div>
 
-      <button
-        onClick={() =>
-          nav("/liveclass", {
-            state: {
-              audioActive: audioActive,
-              videoActive: videoActive,
-            },
-          })
-        }
-      >
-        클래스 입장
-      </button>
+      <button onClick={EntryTry}>클래스 입장</button>
     </div>
   );
 };

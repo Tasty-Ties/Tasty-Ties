@@ -1,12 +1,29 @@
+import React from "react";
 import { Link } from "react-router-dom";
+import useAuthStore from "../store/AuthStore";
+import logo from "../assets/맛잇다로고.png";
+import Cookies from "js-cookie";
 
 const Header = () => {
+  const { logout } = useAuthStore();
+
   return (
-    <div style={{ height: "50px" }}>
-      <Link to="/classregist">등록</Link> | <Link to="/class">리스트</Link> |
-      <Link to="/">홈</Link> |<Link to="/signup">회원가입</Link> |
-      <Link to="/login">로그인</Link> |
-      {/* <Link to="/classdetail">상세</Link> */}
+    <div style={{ height: "50px", display: "flex" }}>
+      <Link to="/">
+        <img src={logo} alt="맛잇다로고" />
+      </Link>
+      {Cookies.get("accessToken") && <Link to="">앨범 |</Link>}
+      <Link to="">숏폼 |</Link> <Link to="">랭킹 |</Link>
+      <Link to="/class">쿠킹클래스 |</Link>
+      {!Cookies.get("accessToken") && <Link to="/signup">회원가입 |</Link>}
+      {Cookies.get("accessToken") && <Link to="">메신저 |</Link>}
+      {Cookies.get("accessToken") ? (
+        <Link onClick={logout}>로그아웃 |</Link>
+      ) : (
+        <Link to="/login">로그인 |</Link>
+      )}
+      {Cookies.get("accessToken") && <Link to="">알람 |</Link>}
+      {Cookies.get("accessToken") && <Link to="">마이페이지 |</Link>}
     </div>
   );
 };

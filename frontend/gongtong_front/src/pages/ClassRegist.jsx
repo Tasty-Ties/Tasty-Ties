@@ -1,19 +1,23 @@
-import Ingredient from "@components/ClassRegist/Ingredient";
-import React, { useEffect, useState } from "react";
-import Recipe from "../components/ClassRegist/Recipe";
-import CookingTools from "../components/ClassRegist/CookingTools";
-import ClassImageFiles from "../components/ClassRegist/ClassImageFile";
-import CookingClassTags from "../components/ClassRegist/cookingClassTags";
 import axios from "axios";
+import React, { useEffect, useState } from "react";
+
+import Ingredient from "@components/ClassRegist/Ingredient";
+import Recipe from "./../components/ClassRegist/Recipe";
+import CookingTools from "./../components/ClassRegist/CookingTools";
+import ClassImageFiles from "./../components/ClassRegist/ClassImageFile";
+import CookingClassTags from "./../components/ClassRegist/CookingClassTags";
+import useClassRegistStore from "./../store/ClassRegistStore";
+import api from "../service/Api";
+import Cookies from "js-cookie";
+import { useNavigate } from "react-router-dom";
 
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
-
 import dayjs from "dayjs";
-import useClassRegistStore from "../store/ClassRegistStore";
 
 import "@styles/ClassRegist/ClassRegist.css";
 
 const ClassRegist = () => {
+  const nav = useNavigate();
   const { countries, fetchCountries } = useClassRegistStore();
   const { languages, fetchLanguages } = useClassRegistStore();
   const [replayDays, setReplayDays] = useState(0);
@@ -23,9 +27,11 @@ const ClassRegist = () => {
     dishName: "",
     isLimitedAge: false,
     countryCode: "",
+    countryName: "",
     cookingClassTags: [],
     description: "",
     languageCode: "",
+    languageName: "",
     level: 0,
     cookingClassStartTime: new Date().toISOString(),
     cookingClassEndTime: "",
@@ -52,6 +58,19 @@ const ClassRegist = () => {
         [e.target.name]: newStartTime,
       });
       handleReplayEndTime(replayDays);
+    } else if (
+      e.target.name === "countryCode" ||
+      e.target.name === "languageCode"
+    ) {
+      const selectedOption = e.target.options[e.target.selectedIndex];
+      const dataset = selectedOption.dataset;
+      console.log(dataset);
+      console.log(selectedOption);
+      setClassInformation({
+        ...classInformation,
+        [e.target.name]: e.target.value,
+        [dataset.id]: dataset.value,
+      });
     } else {
       setClassInformation({
         ...classInformation,
@@ -118,7 +137,7 @@ const ClassRegist = () => {
     fetchCountries();
     fetchLanguages();
     console.log("classRegist useEffect : ", { classInformation });
-  }, [classInformation]);
+  }, [classInformation, fetchCountries, fetchLanguages]);
 
   const ratings = [5, 4, 3, 2, 1];
   const setLevelValue = (e) => {
@@ -140,21 +159,22 @@ const ClassRegist = () => {
     // for (let i = 0; i < files.length; i++) {
     //   formData.append("files", files[i]);
     // }
-
-    const token =
-      "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzc2FmeSIsImlhdCI6MTcyMjMyNzc2MywiZXhwIjoxNzIyMzI4MTIzfQ.hJfWH8M5QSZP4Gwn3DnaCrmFo0gQCLxXiBDYXW7njHk";
     try {
-      await axios.post(
-        "http://localhost:8080/api/v1/classes",
+      // const token =
+      //   "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzb2plb25nMzIiLCJpYXQiOjE3MjI1NTkyODQsImV4cCI6MTcyMjU1OTY0NH0.XDGNTu0bOX0ne5xc0ZdPo2q_YEOBgisXdiZyvqnDXyg";
+      const response = await api.post(
+        "/classes",
         // formData,
         classInformation,
         {
-          header: {
+          headers: {
             // "Content-Type": "multipart/form-data",
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${Cookies.get("accessToken")}`,
           },
         }
       );
+      console.log(response);
+      nav("/");
     } catch (error) {
       console.error("클래스 등록 실패:", error);
     }
@@ -217,18 +237,16 @@ const ClassRegist = () => {
             <select id="countryCode" name="countryCode" onChange={onChange}>
               <option>선택</option>
               {countries &&
-                countries
-                  .filter((country) =>
-                    /[ㄱ-ㅎㅏ-ㅣ가-힣]/.test(country.countryName)
-                  )
-                  .map((country) => (
-                    <option
-                      key={country.countryCode}
-                      value={country.countryCode}
-                    >
-                      {country.countryName}
-                    </option>
-                  ))}
+                countries.map((country) => (
+                  <option
+                    key={country.countryCode}
+                    value={country.countryCode}
+                    data-value={country.koreanName}
+                    data-id={"countryName"}
+                  >
+                    {country.koreanName}
+                  </option>
+                ))}
             </select>
           </div>
         </div>
@@ -263,18 +281,16 @@ const ClassRegist = () => {
             <select id="languageCode" name="languageCode" onChange={onChange}>
               <option>선택</option>
               {languages &&
-                languages
-                  .filter((country) =>
-                    /[ㄱ-ㅎㅏ-ㅣ가-힣]/.test(country.languageName)
-                  )
-                  .map((language) => (
-                    <option
-                      key={language.languageCode}
-                      value={language.languageCode}
-                    >
-                      {language.languageName}
-                    </option>
-                  ))}
+                languages.map((language) => (
+                  <option
+                    key={language.languageCode}
+                    value={language.languageCode}
+                    data-value={language.koreanName}
+                    data-id={"languageName"}
+                  >
+                    {language.koreanName}
+                  </option>
+                ))}
             </select>
           </div>
         </div>
@@ -286,8 +302,8 @@ const ClassRegist = () => {
             <div className="review-rating-box">
               <div className="rating">
                 <div className="rating-status">
-                  {ratings.map((rating) => (
-                    <>
+                  {ratings.map((rating, index) => (
+                    <React.Fragment key={`rating-${index}`}>
                       <input
                         type="radio"
                         className="rating"
@@ -297,7 +313,7 @@ const ClassRegist = () => {
                         onClick={setLevelValue}
                       />
                       <label htmlFor={`rate1-${rating}`}>⭐</label>
-                    </>
+                    </React.Fragment>
                   ))}
                 </div>
               </div>
