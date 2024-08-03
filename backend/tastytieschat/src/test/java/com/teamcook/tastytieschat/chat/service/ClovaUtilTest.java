@@ -27,7 +27,7 @@ public class ClovaUtilTest {
 
     @BeforeEach
     void setUp() {
-        fullData = readLogData(LONG_DECODE_FLEE_PATH);
+        fullData = readLogData(SHORT_DECODE_FLEE_PATH);
     }
 
     private String readLogData(String filePath) {

@@ -1,5 +1,7 @@
 package com.teamcook.tastytieschat.chat.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.teamcook.tastytieschat.chat.service.uil.ClovaUtilByRestTemplate;
 import com.teamcook.tastytieschat.chat.service.uil.SpeechFlowUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +32,7 @@ public class VoiceChatServiceImpl implements VoiceChatService {
 
     private ClovaUtilByRestTemplate clovaUtil;
     private SpeechFlowUtil speechFlowUtil;
-
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     public VoiceChatServiceImpl(ClovaUtilByRestTemplate clovaUtill, SpeechFlowUtil speechFlowUtil) {
         this.clovaUtil = clovaUtill;
@@ -75,15 +77,25 @@ public class VoiceChatServiceImpl implements VoiceChatService {
         return fullData;
     }
 
-
     @Async
     @Override
     public CompletableFuture<String> translateVoiceToTextByMemory(String fullData) throws IOException, InterruptedException {
         byte[] wavBytes = getWavBytesAtRedis(fullData);
         return clovaUtil.translateVoiceToTextByByte(wavBytes)
-                .thenApply(response -> response);
+                .thenApply(response -> extractTextFromResponse(response));
     }
 
+    private String extractTextFromResponse(String response) {
+        try {
+            JsonNode root = objectMapper.readTree(response);
+            return root.path("text").asText();
+        } catch (IOException e) {
+            log.error("Failed to parse response JSON", e);
+            return "";
+        }
+    }
+
+    //레디스에 캐싱해두는 로직 추가
     public byte[] getWavBytesAtRedis(String fullData) {
         String redisKey = REDIS_KEY_PREFIX + fullData.hashCode();
 

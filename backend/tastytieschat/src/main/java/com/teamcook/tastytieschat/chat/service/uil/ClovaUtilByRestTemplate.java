@@ -50,7 +50,7 @@ public class ClovaUtilByRestTemplate {
 
             HttpEntity<byte[]> requestEntity = new HttpEntity<>(bytes, headers);
 
-            String apiUrl = "https://naveropenapi.apigw.ntruss.com/recog/v1/stt?lang=Kor";
+            String apiUrl = "https://naveropenapi.apigw.ntruss.com/recog/v1/stt?lang=Kor"; //TODO: lang 파라미터로 받아 넣기
 
             return restTemplate.exchange(apiUrl, HttpMethod.POST, requestEntity, String.class).getBody();
         });
