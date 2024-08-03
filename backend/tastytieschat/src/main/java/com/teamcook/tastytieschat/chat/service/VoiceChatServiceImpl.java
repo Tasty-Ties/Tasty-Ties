@@ -1,6 +1,6 @@
 package com.teamcook.tastytieschat.chat.service;
 
-import com.teamcook.tastytieschat.chat.service.uil.ClovaUtil;
+import com.teamcook.tastytieschat.chat.service.uil.ClovaUtilByRestTemplate;
 import com.teamcook.tastytieschat.chat.service.uil.SpeechFlowUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,11 +28,11 @@ public class VoiceChatServiceImpl implements VoiceChatService {
     private RedisTemplate<String, byte[]> redisTemplate;
     private ConcurrentHashMap<String, ConcurrentHashMap<Integer, String[]>> voiceDataMap = new ConcurrentHashMap<>();
 
-    private ClovaUtil clovaUtil;
+    private ClovaUtilByRestTemplate clovaUtil;
     private SpeechFlowUtil speechFlowUtil;
 
 
-    public VoiceChatServiceImpl(ClovaUtil clovaUtill, SpeechFlowUtil speechFlowUtil) {
+    public VoiceChatServiceImpl(ClovaUtilByRestTemplate clovaUtill, SpeechFlowUtil speechFlowUtil) {
         this.clovaUtil = clovaUtill;
         this.speechFlowUtil = speechFlowUtil;
     }

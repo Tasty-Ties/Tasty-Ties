@@ -9,7 +9,7 @@ import java.net.URL;
 import java.util.concurrent.CompletableFuture;
 
 @Service
-public class ClovaUtil {
+public class ClovaUtilByHttpConnection {
 
     @Value("${clova-client-id}")
     private String clovaClientId;
@@ -17,8 +17,7 @@ public class ClovaUtil {
     @Value("${clova-client-secret}")
     private String clovaClientSecret;
 
-
-    public CompletableFuture<String> translateVoiceToTextByFile(String filePath) throws IOException {
+    public CompletableFuture<String> translateVoiceToTextByFile(String filePath) {
         return CompletableFuture.supplyAsync(() -> {
             try {
                 File voiceFile = getFile(filePath);
@@ -31,7 +30,7 @@ public class ClovaUtil {
         });
     }
 
-    public CompletableFuture<String> translateVoiceToTextByByte(byte[] bytes) throws IOException {
+    public CompletableFuture<String> translateVoiceToTextByByte(byte[] bytes) {
         return CompletableFuture.supplyAsync(() -> {
             try {
                 HttpURLConnection connection = createConnection();
@@ -41,14 +40,6 @@ public class ClovaUtil {
                 throw new RuntimeException("Error translating voice to text: " + e.getMessage(), e);
             }
         });
-    }
-
-    private File getFile(String filePath) throws FileNotFoundException {
-        File voiceFile = new File(filePath);
-        if (!voiceFile.exists()) {
-            throw new FileNotFoundException("File not found: " + filePath);
-        }
-        return voiceFile;
     }
 
     private HttpURLConnection createConnection() throws IOException {
@@ -71,7 +62,7 @@ public class ClovaUtil {
         try (OutputStream outputStream = connection.getOutputStream();
              FileInputStream inputStream = new FileInputStream(voiceFile)) {
 
-            byte[] buffer = new byte[4096];
+            byte[] buffer = new byte[8192]; // 버퍼 크기 증가
             int bytesRead;
             while ((bytesRead = inputStream.read(buffer)) != -1) {
                 outputStream.write(buffer, 0, bytesRead);
@@ -84,7 +75,11 @@ public class ClovaUtil {
 
     private void sendFile(HttpURLConnection connection, byte[] bytes) throws IOException {
         try (OutputStream outputStream = connection.getOutputStream()) {
-            outputStream.write(bytes);
+            int bufferSize = 8192; // 버퍼 크기 증가
+            for (int i = 0; i < bytes.length; i += bufferSize) {
+                int length = Math.min(bufferSize, bytes.length - i);
+                outputStream.write(bytes, i, length);
+            }
             outputStream.flush();
         } catch (IOException e) {
             throw new IOException("Error sending the voice file: " + e.getMessage(), e);
@@ -111,4 +106,13 @@ public class ClovaUtil {
             throw new IOException("Error reading the response: " + e.getMessage(), e);
         }
     }
+
+    private File getFile(String filePath) throws FileNotFoundException {
+        File voiceFile = new File(filePath);
+        if (!voiceFile.exists()) {
+            throw new FileNotFoundException("File not found: " + filePath);
+        }
+        return voiceFile;
+    }
 }
+
