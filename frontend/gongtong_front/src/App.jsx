@@ -10,7 +10,6 @@ function App() {
     <>
       <LocalizationProvider dateAdapter={AdapterDayjs}>
         <Header />
-        <Button text="하이" type={"gray-sqr"} />
         <AppRoutes />
       </LocalizationProvider>
     </>
