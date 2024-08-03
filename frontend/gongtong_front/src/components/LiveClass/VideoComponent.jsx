@@ -11,12 +11,12 @@ import { Hands } from "@mediapipe/hands";
 import { Camera } from "@mediapipe/camera_utils";
 import { Client } from "@stomp/stompjs";
 
-const APPLICATION_SERVER_URL = "http://192.168.0.105:8080/api/v1/";
+const APPLICATION_SERVER_URL = "http://localhost:8080/api/v1/";
 const localUserSetting = new UserModel();
 
 //채팅 관련
 // const CHAT_SERVER_URL = "ws://192.168.31.83:8081/chat"; // 교육장
-const CHAT_SERVER_URL="ws://192.168.0.105:8081/chat" //집
+const CHAT_SERVER_URL="ws://localhost:8081/chat" //집
 const roomId = "66a9c5dd498fe728acb763f8";
 const userId = 1;
 const userLang = "Japanese";

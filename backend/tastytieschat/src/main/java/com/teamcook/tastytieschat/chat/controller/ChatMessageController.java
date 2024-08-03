@@ -80,7 +80,8 @@ public class ChatMessageController {
             //청크 재조립
             log.info("음성 인식");
             String fullData = voiceChatService.assembleChunks(roomId, voiceChatRequestDTO.getUserId());
-            String result = voiceChatService.translateVoiceToText(fullData);
+            System.out.println(fullData);
+            String result = String.valueOf(voiceChatService.translateVoiceToTextByFileSystem(fullData));
 
             //번역
         }

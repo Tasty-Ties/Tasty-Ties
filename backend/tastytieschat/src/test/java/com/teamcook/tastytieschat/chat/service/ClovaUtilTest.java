@@ -22,7 +22,7 @@ public class ClovaUtilTest {
     void translateShortVoiceToTextByClovaTest() throws IOException {
         long startTime = System.currentTimeMillis();
 
-        String result = clovaUtil.translateVoiceToText(SHORT_FILE_PATH);
+        String result = clovaUtil.translateVoiceToTextByFile(SHORT_FILE_PATH);
 
         long endTime = System.currentTimeMillis();
         long duration = endTime - startTime;
@@ -35,7 +35,7 @@ public class ClovaUtilTest {
     @DisplayName("긴 문장, 네이버 클로바를 이용한 테스트")
     void translateLongVoiceToTextByClovaTest() throws IOException {
         long startTime = System.currentTimeMillis();
-        String result = clovaUtil.translateVoiceToText(LONG_FILE_PATH);
+        String result = clovaUtil.translateVoiceToTextByFile(LONG_FILE_PATH);
 
         long endTime = System.currentTimeMillis();
         long duration = endTime - startTime;

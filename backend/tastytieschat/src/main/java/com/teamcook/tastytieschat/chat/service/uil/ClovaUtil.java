@@ -15,10 +15,17 @@ public class ClovaUtil {
     @Value("${clova-client-secret}")
     private String clovaClientSecret;
 
-    public String translateVoiceToText(String filePath) throws IOException {
+
+    public String translateVoiceToTextByFile(String filePath) throws IOException {
         File voiceFile = getFile(filePath);
         HttpURLConnection connection = createConnection();
         sendFile(connection, voiceFile);
+        return getResponse(connection);
+    }
+
+    public String translateVoiceToTextByByte(byte[] mp3Bytes) throws IOException {
+        HttpURLConnection connection = createConnection();
+        sendFile(connection, mp3Bytes);
         return getResponse(connection);
     }
 
@@ -55,6 +62,15 @@ public class ClovaUtil {
             while ((bytesRead = inputStream.read(buffer)) != -1) {
                 outputStream.write(buffer, 0, bytesRead);
             }
+            outputStream.flush();
+        } catch (IOException e) {
+            throw new IOException("Error sending the voice file: " + e.getMessage(), e);
+        }
+    }
+
+    private void sendFile(HttpURLConnection connection, byte[] mp3Bytes) throws IOException {
+        try (OutputStream outputStream = connection.getOutputStream()) {
+            outputStream.write(mp3Bytes);
             outputStream.flush();
         } catch (IOException e) {
             throw new IOException("Error sending the voice file: " + e.getMessage(), e);
