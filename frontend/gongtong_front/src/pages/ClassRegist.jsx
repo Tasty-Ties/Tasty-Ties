@@ -137,7 +137,7 @@ const ClassRegist = () => {
     fetchCountries();
     fetchLanguages();
     console.log("classRegist useEffect : ", { classInformation });
-  }, [classInformation, fetchCountries, fetchLanguages]);
+  }, [classInformation]);
 
   const ratings = [5, 4, 3, 2, 1];
   const setLevelValue = (e) => {
