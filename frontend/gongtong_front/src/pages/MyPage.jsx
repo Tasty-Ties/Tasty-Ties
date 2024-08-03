@@ -1,33 +1,25 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
+import { useEffect } from "react";
+import Category from "../components/MyPage/Category";
+import Myinfo from "../components/MyPage/Myinfo";
+import useMyPageStore from "../store/MyPageStore";
 
 const MyPage = () => {
-  const [userData, setUserData] = useState(null);
-
+  const fetchInformations = useMyPageStore((state) => state.fetchInformations);
+  const informations = useMyPageStore((state) => state.informations);
   useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const response = await axios.get("/users/me");
-        console.log(response);
-        setUserData(response.data);
-      } catch (error) {
-        console.error("Failed to fetch user data:", error);
-      }
-    };
-
-    fetchUserData();
-  }, []);
-
-  if (!userData) {
-    return <div>Loading...</div>;
-  }
+    fetchInformations();
+  }, [fetchInformations]);
+  console.log(fetchInformations);
+  console.log(informations);
 
   return (
-    <div>
-      <h1>My Page</h1>
-      <p>Username: {userData.username}</p>
-      <p>Email: {userData.email}</p>
-    </div>
+    <>
+      마이페이지
+      <div>
+        <Category informations={informations} />
+        <Myinfo informations={informations} />
+      </div>
+    </>
   );
 };
 

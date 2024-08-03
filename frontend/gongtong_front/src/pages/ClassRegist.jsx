@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios from "../service/Axios";
 import React, { useEffect, useState } from "react";
 
 import Ingredient from "@components/ClassRegist/Ingredient";
@@ -7,7 +7,7 @@ import CookingTools from "./../components/ClassRegist/CookingTools";
 import ClassImageFiles from "./../components/ClassRegist/ClassImageFile";
 import CookingClassTags from "./../components/ClassRegist/CookingClassTags";
 import useClassRegistStore from "./../store/ClassRegistStore";
-import api from "../service/Api";
+// import api from "../service/Api";
 import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
 
@@ -162,7 +162,7 @@ const ClassRegist = () => {
     try {
       // const token =
       //   "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzb2plb25nMzIiLCJpYXQiOjE3MjI1NTkyODQsImV4cCI6MTcyMjU1OTY0NH0.XDGNTu0bOX0ne5xc0ZdPo2q_YEOBgisXdiZyvqnDXyg";
-      const response = await api.post(
+      const response = await axios.post(
         "/classes",
         // formData,
         classInformation,
