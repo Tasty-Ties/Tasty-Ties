@@ -10,13 +10,10 @@ import Cookies from "js-cookie";
 
 const ClassWaiting = () => {
   const nav = useNavigate();
-  const classId = useParams().id;
-
   const location = useLocation();
-  // const { isHost } = location.state;
-  const isHost = true;
-  console.log("호스트 여부 : ", isHost);
-  console.log("클래스 ID: ", classId);
+  const { classData, isHost } = location.state;
+  console.log(classData);
+  console.log(isHost);
 
   const OV = useVideoStore((state) => state.OV);
   const setOV = useVideoStore((state) => state.setOV);
@@ -59,7 +56,7 @@ const ClassWaiting = () => {
     if (isHost) {
       try {
         const response = await axios.post(
-          `http://localhost:8080/api/v1/classes/live/sessions/${classId}`,
+          `http://localhost:8080/api/v1/classes/live/sessions/${classData.uuid}`,
           null,
           {
             headers: {
@@ -76,9 +73,8 @@ const ClassWaiting = () => {
       }
     } else {
       try {
-        console.log(classId);
         const response = await axios.get(
-          `http://localhost:8080/api/v1/classes/live/sessions/${classId}`,
+          `http://localhost:8080/api/v1/classes/live/sessions/${classData.uuid}`,
           {
             headers: {
               Authorization: `Bearer ${Cookies.get("accessToken")}`,
@@ -104,10 +100,8 @@ const ClassWaiting = () => {
   return (
     <div>
       <h2>
-        {"호스트 이름"}님의 {"클래스 제목"} 클래스 시작을 기다리는 중...
+        {classData.hostName}님의 {classData.title} 클래스 시작을 기다리는 중...
       </h2>
-
-      <MediaDeviceSetting currentPublisher={null} />
 
       <div>
         <video
@@ -117,8 +111,10 @@ const ClassWaiting = () => {
           style={{ width: "640px" }}
         ></video>
       </div>
-
-      <button onClick={EntryTry}>클래스 입장</button>
+      <div className="flex">
+        <MediaDeviceSetting currentPublisher={null} />
+        <button onClick={EntryTry}>클래스 입장</button>
+      </div>
     </div>
   );
 };
