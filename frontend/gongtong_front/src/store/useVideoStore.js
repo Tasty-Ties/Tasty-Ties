@@ -24,6 +24,15 @@ const useVideoStore = create((set) => ({
     set((state) => ({
       isAudioActive: !state.isAudioActive,
     })),
+
+  liveClassImage: [null, null, null, null],
+  setLiveClassImage: (index, value) =>
+    set((state) => {
+      console.log(state.liveClassImage);
+      const newImage = [...state.liveClassImage];
+      newImage[index] = value;
+      return { liveClassImage: newImage };
+    }),
 }));
 
 export default useVideoStore;

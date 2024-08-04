@@ -1,14 +1,17 @@
 import React, { useRef, useEffect, useState } from "react";
+import useVideoStore from "../../store/useVideoStore";
+import useMyPageStore from "../../store/MyPageStore";
 
 const OvVideoComponent = ({ user }) => {
   const videoRef = useRef(null);
-  const [isUserAvailable, setIsUserAvailable] = useState(true);
 
   useEffect(() => {
-    if (user && user.streamManager && videoRef.current) {
+    if (user && user.streamManager && videoRef && videoRef.current) {
       user.getStreamManager().addVideoElement(videoRef.current);
     }
   }, [user]);
+
+  console.log(videoRef);
 
   return (
     <div>
