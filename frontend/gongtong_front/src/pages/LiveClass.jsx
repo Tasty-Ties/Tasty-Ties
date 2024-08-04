@@ -14,24 +14,7 @@ const LiveClass = () => {
     };
   }, []);
 
-  const flexbox = {
-    display: "flex",
-  };
-  const vid = {
-    width: "75%",
-    height: "device-height",
-  };
-
-  return (
-    <div style={flexbox}>
-      <div style={vid}>
-        <VideoComponent isHost={isHost} title={title} hostName={hostName} />
-      </div>
-      <div>
-        <ChatComponent isHost={isHost} />
-      </div>
-    </div>
-  );
+  return <VideoComponent isHost={isHost} title={title} hostName={hostName} />;
 };
 
 export default LiveClass;

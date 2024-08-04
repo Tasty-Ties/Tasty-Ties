@@ -7,6 +7,7 @@ import MediaDeviceSetting from "./../components/LiveClass/MediaDeviceSetting";
 
 import axios from "axios";
 import Cookies from "js-cookie";
+import Button from "../common/components/Button";
 
 const ClassWaiting = () => {
   const nav = useNavigate();
@@ -45,6 +46,7 @@ const ClassWaiting = () => {
       const stream = await OV.getUserMedia({
         audioSource: isAudioActive ? selectedAudioDevice : false,
         videoSource: isVideoActive ? selectedVideoDevice.deviceId : false,
+        resolution: "1280x720",
       });
       videoPreviewRef.current.srcObject = stream;
     }
@@ -99,29 +101,34 @@ const ClassWaiting = () => {
   };
 
   return (
-    <div>
+    <div className="h-5/6 flex flex-col items-center">
       {isHost ? (
-        <h2>클래스 시작 버튼을 눌러 {classData.title} 클래스를 시작해주세요</h2>
+        <div className="h-10  text-2xl">
+          클래스 시작 버튼을 눌러 {classData.title} 클래스를 시작해주세요
+        </div>
       ) : (
-        <h2>
+        <div>
           {classData.hostName}님의 {classData.title} 클래스 시작을 기다리는
           중...
-        </h2>
+        </div>
       )}
 
-      <div>
+      <div className="flex-auto">
         <video
           ref={videoPreviewRef}
           autoPlay
           playsInline
-          style={{ width: "640px" }}
+          className="aspect-video h-96"
         ></video>
       </div>
-      <div className="flex">
+      <div className="flex h-10">
         <MediaDeviceSetting currentPublisher={null} />
-        <button onClick={EntryTry}>
-          {isHost ? "클래스 시작" : "클래스 입장"}
-        </button>
+        <Button
+          text={isHost ? "클래스 시작" : "클래스 입장"}
+          type="green-short"
+          onClick={EntryTry}
+          className="self-center"
+        />
       </div>
     </div>
   );

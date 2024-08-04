@@ -13,6 +13,10 @@ import { Camera } from "@mediapipe/camera_utils";
 import { Client } from "@stomp/stompjs";
 import MediaDeviceSetting from "./MediaDeviceSetting";
 import useMyPageStore from "../../store/MyPageStore";
+import ChatComponent from "./ChatComponent";
+import PeopleListComponent from "./PeopleListComponent";
+
+import "./../../styles/LiveClass/LiveClass.css";
 
 const localUserSetting = new UserModel();
 
@@ -173,7 +177,7 @@ const VideoComponent = ({ isHost, title, hostName }) => {
       videoSource: selectedVideoDevice.deviceId,
       publishAudio: isAudioActive,
       publishVideo: isVideoActive,
-      resolution: "640x480",
+      resolution: "1280x720",
       frameRate: 30,
       insertMode: "APPEND",
     });
@@ -313,19 +317,6 @@ const VideoComponent = ({ isHost, title, hostName }) => {
     console.log(response.data);
     return response.data.data;
   }, []);
-
-  const videolistcss = {
-    display: "flex",
-    flexWrap: "wrap",
-  };
-
-  const localcss = {
-    height: "50%",
-  };
-
-  const toolcss = {
-    float: "bottom",
-  };
 
   //미디어파이프 관련
   const initializeMediapipe = () => {
@@ -519,35 +510,148 @@ const VideoComponent = ({ isHost, title, hostName }) => {
     stompClient.current.activate();
   };
 
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [isHostOnly, setIsHostOnly] = useState(false);
+  const [isPeopleListOpen, setIsPeopleListOpen] = useState(false);
+  const [isSliderOn, setIsSliderOn] = useState(true);
+  const [displayMode, setDisplayMode] = useState(0);
+
+  const displaySetting = (modeNumber) => {
+    switch (modeNumber) {
+      case 0: // HostOnly
+        setIsSliderOn(false);
+        setIsHostOnly(true);
+        return "w-2/3 mx-8";
+      case 1: // Spread
+        setIsHostOnly(false);
+        if (isChatOpen || isPeopleListOpen) {
+          return "w-2/3 grid grid-cols-2 gap-1 mx-36";
+        } else {
+          return "w-full grid grid-cols-3 gap-1 mx-36";
+        }
+      case 2: // SliderOn
+        setIsSliderOn(true);
+        if (isChatOpen || isPeopleListOpen) {
+          return "w-2/3 grid grid-cols-4 gap-1 mx-24";
+        } else {
+          return "w-2/3 grid grid-cols-4 gap-1 mx-36";
+        }
+    }
+  };
+
+  useEffect(() => {
+    setVideoClassName(displaySetting(displayMode));
+  }, [isChatOpen, isPeopleListOpen]);
+
+  const displayChange = () => {
+    const newMode = (displayMode + 1) % 3;
+    console.log(newMode);
+    setDisplayMode(newMode);
+    setVideoClassName(displaySetting(newMode));
+    console.log(displaySetting(newMode));
+  };
+
+  const takePhoto = () => {};
+
+  const peopleListOpen = () => {
+    if (isChatOpen) {
+      chatOpen();
+    }
+    setIsPeopleListOpen(!isPeopleListOpen);
+  };
+
+  const chatOpen = () => {
+    if (isPeopleListOpen) {
+      peopleListOpen();
+    }
+    setIsChatOpen(!isChatOpen);
+  };
+
+  const ref = useRef(null);
+
+  const prevButton = () => {
+    if (ref.current) ref.current.scrollLeft -= 200;
+  };
+  const nextButton = () => {
+    if (ref.current) ref.current.scrollLeft += 200;
+  };
+
+  const [bodyClassName, setBodyClassName] = useState("");
+  const [videoClassName, setVideoClassName] = useState("");
+
   return (
     <>
-      <h1>라이브클래스</h1>
-
-      <div id="layout" className="bounds" style={videolistcss}>
-        {hostUser && hostUser.getStreamManager() && (
-          <div id="localUser" style={localcss}>
-            <h4>hostUser의 스트림</h4>
-            <StreamComponent user={hostUser} />
-          </div>
-        )}
-        <div style={videolistcss}>
-          {partUser &&
-            partUser.map((sub, i) => (
-              <div
-                key={i}
-                className="OT_root OT_publisher custom-class"
-                id="remoteUsers"
-              >
-                <h4>remoteUser의 스트림</h4>
-                <StreamComponent user={sub} />
+      <div className="min-h-screen min-w-screen flex flex-col items-center justify-center">
+        <div className="h-20 w-full flex justify-center items-center">
+          <div className="text-2xl">{title}</div>
+        </div>
+        <div className="h-2/3 w-full items-center justify-center flex-auto flex flex-row">
+          {isSliderOn ? (
+            <div id="layout" className={videoClassName}>
+              {hostUser && hostUser.getStreamManager() && (
+                <div
+                  id="hostUser"
+                  className="aspect-video col-start-1 col-end-5 row-start-1 row-end-2 mx-32"
+                >
+                  <StreamComponent user={hostUser} />
+                </div>
+              )}
+              <div className="flex flex-row w-full col-start-1 col-end-5">
+                <button onClick={prevButton} className="">
+                  &lt;
+                </button>
+                <div
+                  ref={ref}
+                  className="flex min-h-32 flex-row overflow-x-scroll flex-auto"
+                  id="scroll"
+                >
+                  {partUser &&
+                    partUser.map((sub, i) => (
+                      <div
+                        key={i}
+                        className="flex-shrink-0 w-1/4 aspect-video object-fill p-1"
+                      >
+                        <StreamComponent user={sub} className="" />
+                      </div>
+                    ))}
+                </div>
+                <button onClick={nextButton} className="">
+                  &gt;
+                </button>
               </div>
-            ))}
+            </div>
+          ) : (
+            <div id="layout" className={videoClassName}>
+              {hostUser && hostUser.getStreamManager() && (
+                <div id="hostUser">
+                  <StreamComponent user={hostUser} />
+                </div>
+              )}
+              {!isHostOnly &&
+                partUser &&
+                partUser.map((sub, i) => (
+                  <div key={i} id="partUser">
+                    <StreamComponent user={sub} />
+                  </div>
+                ))}
+            </div>
+          )}
+          {isChatOpen && <ChatComponent />}
+          {isPeopleListOpen && <PeopleListComponent />}
+        </div>
+
+        <div className="h-20 flex">
+          <MediaDeviceSetting currentPublisher={currentPublisher} />
+          <ToolbarComponent
+            displayMode={displayChange}
+            takePhoto={takePhoto}
+            peopleListOpen={peopleListOpen}
+            chatOpen={chatOpen}
+            leaveSession={leaveSession}
+          />
         </div>
       </div>
-      <div>
-        <MediaDeviceSetting currentPublisher={currentPublisher} />
-        <ToolbarComponent leaveSession={leaveSession} style={toolcss} />
-      </div>
+
       <video className="input_video" style={{ display: "none" }}></video>
     </>
   );

@@ -75,7 +75,7 @@ const MediaDeviceSetting = ({ currentPublisher }) => {
           type="green-border-short"
           onClick={audioOnOff}
         />
-        <label>Video Devices: </label>
+        {/* <label>Video Devices: </label>
         <select
           onChange={(e) =>
             setSelectedVideoDevice(
@@ -104,7 +104,7 @@ const MediaDeviceSetting = ({ currentPublisher }) => {
               {device.label}
             </option>
           ))}
-        </select>
+        </select> */}
       </div>
     </>
   );
