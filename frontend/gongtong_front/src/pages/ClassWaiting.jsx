@@ -12,8 +12,6 @@ const ClassWaiting = () => {
   const nav = useNavigate();
   const location = useLocation();
   const { classData, isHost } = location.state;
-  console.log(classData);
-  console.log(isHost);
 
   const OV = useVideoStore((state) => state.OV);
   const setOV = useVideoStore((state) => state.setOV);
@@ -64,7 +62,6 @@ const ClassWaiting = () => {
             },
           }
         );
-        console.log(response.data.data);
         setSessionId(response.data.data);
       } catch (error) {
         console.log(error);
@@ -81,10 +78,8 @@ const ClassWaiting = () => {
             },
           }
         );
-        console.log(response);
         setSessionId(response.data.data);
       } catch (error) {
-        console.log(error.response.data.stateCode);
         if (error.response.data.stateCode === 404) {
           alert("아직 클래스가 생성되지 않았습니다.");
         } else {
@@ -97,15 +92,22 @@ const ClassWaiting = () => {
     nav("/liveclass", {
       state: {
         isHost: isHost,
+        title: classData.title,
+        hostName: classData.hostName,
       },
     });
   };
 
   return (
     <div>
-      <h2>
-        {classData.hostName}님의 {classData.title} 클래스 시작을 기다리는 중...
-      </h2>
+      {isHost ? (
+        <h2>클래스 시작 버튼을 눌러 {classData.title} 클래스를 시작해주세요</h2>
+      ) : (
+        <h2>
+          {classData.hostName}님의 {classData.title} 클래스 시작을 기다리는
+          중...
+        </h2>
+      )}
 
       <div>
         <video
@@ -117,7 +119,9 @@ const ClassWaiting = () => {
       </div>
       <div className="flex">
         <MediaDeviceSetting currentPublisher={null} />
-        <button onClick={EntryTry}>클래스 입장</button>
+        <button onClick={EntryTry}>
+          {isHost ? "클래스 시작" : "클래스 입장"}
+        </button>
       </div>
     </div>
   );

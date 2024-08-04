@@ -6,7 +6,7 @@ const StreamComponent = ({ user }) => {
   const OV = useVideoStore((state) => state.OV);
 
   useEffect(() => {
-    console.log(user, user.getStreamManager());
+    if (user) console.log(user, user.getStreamManager());
   }, []);
 
   return (

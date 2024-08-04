@@ -12,6 +12,7 @@ import { Hands } from "@mediapipe/hands";
 import { Camera } from "@mediapipe/camera_utils";
 import { Client } from "@stomp/stompjs";
 import MediaDeviceSetting from "./MediaDeviceSetting";
+import useMyPageStore from "../../store/MyPageStore";
 
 const localUserSetting = new UserModel();
 
@@ -22,7 +23,7 @@ const userId = 1;
 const userLang = "Japanese";
 const CHUNK_SIZE = 16000;
 
-const VideoComponent = () => {
+const VideoComponent = ({ isHost, title, hostName }) => {
   const OV = useVideoStore((state) => state.OV);
   const setOV = useVideoStore((state) => state.setOV);
   const selectedAudioDevice = useVideoStore(
@@ -34,9 +35,45 @@ const VideoComponent = () => {
   const isVideoActive = useVideoStore((state) => state.isVideoActive);
   const isAudioActive = useVideoStore((state) => state.isAudioActive);
 
+  const userInfo = useMyPageStore((state) => state.informations);
+
   const [localUser, setLocalUser] = useState(null);
   const session = useRef(null);
   const [subscribers, setSubscribers] = useState([]);
+
+  const [hostUser, setHostUser] = useState(null);
+  const [partUser, setPartUser] = useState();
+  // const hostUser = useRef(null);
+  // const partUser = useRef([]);
+
+  useEffect(() => {
+    console.log(subscribers);
+    if (!subscribers) {
+      return;
+    }
+    setHostUser(null);
+    setPartUser([]);
+    if (isHost) {
+      setHostUser(localUser);
+      setPartUser(subscribers);
+    } else {
+      setPartUser((prev) =>
+        prev && prev.length > 0 ? [...prev, localUser] : [localUser]
+      );
+      subscribers.map((data) => {
+        if (data.nickname === hostName) {
+          console.log("호스트와 닉네임이 일치함");
+          setHostUser(data);
+        } else {
+          setPartUser((prev) => [...prev, data]);
+        }
+      });
+    }
+
+    console.log("호스트유저출력: ", hostUser);
+    console.log("참가자유저출력: ", partUser);
+  }, [subscribers, localUser]);
+
   const remotes = useRef([]);
   const localUserAccessAllowed = useRef(false);
 
@@ -59,7 +96,7 @@ const VideoComponent = () => {
   useEffect(() => {
     window.addEventListener("beforeunload", onbeforeunload);
     joinSession();
-    initializeMediapipe();
+    // initializeMediapipe();
 
     stompClient.current = new Client({
       brokerURL: CHAT_SERVER_URL,
@@ -78,7 +115,7 @@ const VideoComponent = () => {
       },
     });
 
-    connectStompClient();
+    // connectStompClient();
 
     return () => {
       window.removeEventListener("beforeunload", onbeforeunload);
@@ -86,10 +123,10 @@ const VideoComponent = () => {
     };
   }, []);
 
-  const [mySessionId, setMySessionId] = useState("SessionA");
-  const [myUserName, setMyUserName] = useState(
-    "OpenVidu_User" + Math.floor(Math.random() * 100)
-  );
+  // const [mySessionId, setMySessionId] = useState("SessionA");
+  // const [myUserName, setMyUserName] = useState(
+  //   "OpenVidu_User" + Math.floor(Math.random() * 100)
+  // );
 
   const joinSession = async () => {
     const newSession = OV.initSession();
@@ -116,7 +153,7 @@ const VideoComponent = () => {
 
   const connect = (session, token) => {
     session
-      .connect(token, { clientData: myUserName })
+      .connect(token, { clientData: userInfo.nickname })
       .then(() => {
         connectWebCam(session);
       })
@@ -150,7 +187,7 @@ const VideoComponent = () => {
       });
     }
 
-    localUserSetting.setNickname("myNickName");
+    localUserSetting.setNickname(userInfo.nickname);
     localUserSetting.setConnectionId(session.connection.connectionId);
     localUserSetting.setScreenShareActive(false);
     localUserSetting.setStreamManager(publisher);
@@ -250,7 +287,7 @@ const VideoComponent = () => {
     setOV(null);
     session.current = null;
     setSubscribers([]);
-    setMySessionId("SessionA");
+    // setMySessionId("SessionA");
     setLocalUser(undefined);
     remotes.current.length = 0;
   };
@@ -487,23 +524,24 @@ const VideoComponent = () => {
       <h1>라이브클래스</h1>
 
       <div id="layout" className="bounds" style={videolistcss}>
-        {localUser && localUser.getStreamManager() && (
+        {hostUser && hostUser.getStreamManager() && (
           <div id="localUser" style={localcss}>
-            <h4>localUser의 스트림</h4>
-            <StreamComponent user={localUser} />
+            <h4>hostUser의 스트림</h4>
+            <StreamComponent user={hostUser} />
           </div>
         )}
         <div style={videolistcss}>
-          {subscribers.map((sub, i) => (
-            <div
-              key={i}
-              className="OT_root OT_publisher custom-class"
-              id="remoteUsers"
-            >
-              <h4>remoteUser의 스트림</h4>
-              <StreamComponent user={sub} />
-            </div>
-          ))}
+          {partUser &&
+            partUser.map((sub, i) => (
+              <div
+                key={i}
+                className="OT_root OT_publisher custom-class"
+                id="remoteUsers"
+              >
+                <h4>remoteUser의 스트림</h4>
+                <StreamComponent user={sub} />
+              </div>
+            ))}
         </div>
       </div>
       <div>

@@ -39,9 +39,9 @@ const ChatComponent = () => {
       },
     });
 
-    connect();
+    // connect();
 
-    return () => disconnect();
+    // return () => disconnect();
   }, []);
 
   const connect = () => {

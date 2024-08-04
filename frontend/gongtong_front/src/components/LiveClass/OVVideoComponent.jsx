@@ -34,7 +34,7 @@ const OvVideoComponent = ({ user }) => {
     <div>
       {isUserAvailable ? (
         <div style={boxcss}>
-          <label style={nicknamecss}>{user.connectionId}</label>
+          <label style={nicknamecss}>{user.nickname}</label>
           <video
             style={vidcss}
             autoPlay={true}
