@@ -64,17 +64,49 @@ const MediaDeviceSetting = ({ currentPublisher }) => {
 
   return (
     <>
-      <div>
-        <Button
-          text={isVideoActive ? "비디오 중지" : "비디오 시작"}
-          type="green-border-short"
-          onClick={videoOnOff}
-        />
-        <Button
-          text={isAudioActive ? "오디오 중지" : "오디오 시작"}
-          type="green-border-short"
-          onClick={audioOnOff}
-        />
+      <div className="flex flex-row">
+        <div className="bg-transparent hover:bg-transparent text-first font-semibold hover:text-first-600 py-2 px-4 border border-first hover:border-first-600 rounded items-center flex flex-row space-x-2">
+          <div onClick={videoOnOff}>
+            {isVideoActive ? "비디오 중지" : "비디오 시작"}
+          </div>
+          <div onClick={() => alert("alsd;jf;kl")}>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+              stroke="currentColor"
+              className="size-5"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="m19.5 8.25-7.5 7.5-7.5-7.5"
+              />
+            </svg>
+          </div>
+        </div>
+        <div className="bg-transparent hover:bg-transparent text-first font-semibold hover:text-first-600 py-2 px-4 border border-first hover:border-first-600 rounded items-center flex flex-row space-x-2">
+          <div onClick={audioOnOff}>
+            {isAudioActive ? "오디오 중지" : "오디오 시작"}
+          </div>
+          <div onClick={() => alert("a;lksdjf;lkajs;ldfkj")}>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+              stroke="currentColor"
+              className="size-5"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="m19.5 8.25-7.5 7.5-7.5-7.5"
+              />
+            </svg>
+          </div>
+        </div>
         {/* <label>Video Devices: </label>
         <select
           onChange={(e) =>
