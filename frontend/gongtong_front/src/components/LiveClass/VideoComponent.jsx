@@ -11,20 +11,35 @@ import UserModel from "./UserModel";
 import { Hands } from "@mediapipe/hands";
 import { Camera } from "@mediapipe/camera_utils";
 import { Client } from "@stomp/stompjs";
+import MediaDeviceSetting from "./MediaDeviceSetting";
+import useMyPageStore from "../../store/MyPageStore";
+import ChatComponent from "./ChatComponent";
+import PeopleListComponent from "./PeopleListComponent";
+
+import {
+  Dialog,
+  DialogBackdrop,
+  DialogPanel,
+  DialogTitle,
+} from "@headlessui/react";
+import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
+
+import "./../../styles/LiveClass/LiveClass.css";
+import { Stream } from "openvidu-browser";
+import Button from "../../common/components/Button";
+import IconButton from "../../common/components/IconButton";
 
 const APPLICATION_SERVER_URL = "http://localhost:8080/api/v1/";
 const localUserSetting = new UserModel();
 
 //채팅 관련
-// const CHAT_SERVER_URL = "ws://192.168.31.83:8081/chat"; // 교육장
-const CHAT_SERVER_URL = "ws://localhost:8081/chat"; //집
+const CHAT_SERVER_URL = import.meta.env.VITE_CHAT_SERVER;
 const roomId = "66a9c5dd498fe728acb763f8";
 const userId = 1;
 const userLang = "Japanese";
 const CHUNK_SIZE = 16000;
 
-const VideoComponent = () => {
-  const location = useLocation();
+const VideoComponent = ({ isHost, title, hostName }) => {
   const OV = useVideoStore((state) => state.OV);
   const setOV = useVideoStore((state) => state.setOV);
   const selectedAudioDevice = useVideoStore(
@@ -33,16 +48,47 @@ const VideoComponent = () => {
   const selectedVideoDevice = useVideoStore(
     (state) => state.selectedVideoDevice
   );
-  const { audioActive, videoActive } = location.state;
-  const [localUser, setLocalUser] = useState(null);
+  const isVideoActive = useVideoStore((state) => state.isVideoActive);
+  const isAudioActive = useVideoStore((state) => state.isAudioActive);
 
-  const [session, setSession] = useState(undefined);
+  const userInfo = useMyPageStore((state) => state.informations);
+
+  const [localUser, setLocalUser] = useState(null);
+  const session = useRef(null);
   const [subscribers, setSubscribers] = useState([]);
+
+  const [hostUser, setHostUser] = useState(null);
+  const [partUser, setPartUser] = useState();
+
+  useEffect(() => {
+    console.log(subscribers);
+    if (!subscribers) {
+      return;
+    }
+    setHostUser(null);
+    setPartUser([]);
+    if (isHost) {
+      setHostUser(localUser);
+      setPartUser(subscribers);
+    } else {
+      setPartUser((prev) =>
+        prev && prev.length > 0 ? [...prev, localUser] : [localUser]
+      );
+      subscribers.map((data) => {
+        if (data.nickname === hostName) {
+          setHostUser(data);
+        } else {
+          setPartUser((prev) => [...prev, data]);
+        }
+      });
+    }
+  }, [subscribers, localUser]);
+
   const remotes = useRef([]);
   const localUserAccessAllowed = useRef(false);
 
   const sessionId = useVideoStore((state) => state.sessionId);
-  const setSessionId = useVideoStore((state) => state.setSessionId);
+  const currentPublisher = useRef();
 
   //미디어 파이프 및 영상 녹화 관련
   const mediaRecorder = useRef(null);
@@ -87,14 +133,9 @@ const VideoComponent = () => {
     };
   }, []);
 
-  const [mySessionId, setMySessionId] = useState("SessionA");
-  const [myUserName, setMyUserName] = useState(
-    "OpenVidu_User" + Math.floor(Math.random() * 100)
-  );
-
   const joinSession = async () => {
     const newSession = OV.initSession();
-    setSession(newSession);
+    session.current = newSession;
     await connectToSession(newSession);
     subscribeToStreamCreated(newSession);
     console.log(newSession);
@@ -103,7 +144,6 @@ const VideoComponent = () => {
   const connectToSession = async (session) => {
     try {
       const token = await getToken();
-      console.log("토큰토큰토큰토큰토큰토큰토큰토큰토큰토큰", token);
       connect(session, token);
     } catch (error) {
       console.error(
@@ -117,7 +157,7 @@ const VideoComponent = () => {
 
   const connect = (session, token) => {
     session
-      .connect(token, { clientData: myUserName })
+      .connect(token, { clientData: userInfo.nickname })
       .then(() => {
         connectWebCam(session);
       })
@@ -131,22 +171,17 @@ const VideoComponent = () => {
       });
   };
 
-  const nicknameChanged = (nickname) => {
-    localUser.setNickname(nickname);
-    setLocalUser(localUser);
-    sendSignalUserChanged(session, { nickname: localUser.getNickname() });
-  };
-
   const connectWebCam = async (session) => {
     const publisher = OV.initPublisher(undefined, {
       audioSource: selectedAudioDevice,
-      videoDevice: selectedVideoDevice,
-      publishAudio: audioActive,
-      publishVideo: videoActive,
-      resolution: "640x480",
+      videoSource: selectedVideoDevice.deviceId,
+      publishAudio: isAudioActive,
+      publishVideo: isVideoActive,
+      resolution: "1280x720",
       frameRate: 30,
       insertMode: "APPEND",
     });
+    currentPublisher.current = publisher;
     if (session.capabilities.publish) {
       publisher.on("accessAllowed", () => {
         session.publish(publisher).then(() => {
@@ -156,7 +191,7 @@ const VideoComponent = () => {
       });
     }
 
-    localUserSetting.setNickname("myNickName");
+    localUserSetting.setNickname(userInfo.nickname);
     localUserSetting.setConnectionId(session.connection.connectionId);
     localUserSetting.setScreenShareActive(false);
     localUserSetting.setStreamManager(publisher);
@@ -190,7 +225,6 @@ const VideoComponent = () => {
   };
 
   const deleteSubscriber = (stream) => {
-    console.log(remotes.current);
     const userStream = remotes.current.filter(
       (user) => user.getStreamManager().stream === stream
     )[0];
@@ -251,32 +285,19 @@ const VideoComponent = () => {
   };
 
   const leaveSession = () => {
-    if (session) {
-      session.disconnect();
+    if (session.current) {
+      session.current.disconnect();
     }
     setOV(null);
-    setSession(undefined);
+    session.current = null;
     setSubscribers([]);
-    setMySessionId("SessionA");
     setLocalUser(undefined);
     remotes.current.length = 0;
   };
 
   const getToken = useCallback(async () => {
-    // const sessionId = await createSession(mySessionId);
     return await createToken(sessionId);
   }, []);
-
-  // const createSession = useCallback(async (sessionId) => {
-  //   const response = await axios.post(
-  //     APPLICATION_SERVER_URL + "api/sessions",
-  //     { customSessionId: sessionId },
-  //     {
-  //       headers: { "Content-Type": "application/json" },
-  //     }
-  //   );
-  //   return response.data;
-  // }, []);
 
   const createToken = useCallback(async (sessionId) => {
     console.log(sessionId);
@@ -294,19 +315,6 @@ const VideoComponent = () => {
     console.log(response.data);
     return response.data.data;
   }, []);
-
-  const videolistcss = {
-    display: "flex",
-    flexWrap: "wrap",
-  };
-
-  const localcss = {
-    height: "50%",
-  };
-
-  const toolcss = {
-    float: "bottom",
-  };
 
   //미디어파이프 관련
   const initializeMediapipe = () => {
@@ -500,31 +508,288 @@ const VideoComponent = () => {
     stompClient.current.activate();
   };
 
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [isHostOnly, setIsHostOnly] = useState(false);
+  const [isCaptureOpen, setIsCaptureOpen] = useState(false);
+  const [isPeopleListOpen, setIsPeopleListOpen] = useState(false);
+  const [isSliderOn, setIsSliderOn] = useState(true);
+  const [displayMode, setDisplayMode] = useState(0);
+
+  const displaySetting = (modeNumber) => {
+    switch (modeNumber) {
+      case 0: // HostOnly
+        setIsSliderOn(false);
+        setIsHostOnly(true);
+        return "w-2/3 mx-8";
+      case 1: // Spread
+        setIsHostOnly(false);
+        if (isChatOpen || isPeopleListOpen) {
+          return "w-2/3 grid grid-cols-2 gap-1 mx-36";
+        } else {
+          return "w-full grid grid-cols-3 gap-1 mx-36";
+        }
+      case 2: // SliderOn
+        setIsSliderOn(true);
+        if (isChatOpen || isPeopleListOpen) {
+          return "w-2/3 grid grid-cols-4 gap-1 mx-24";
+        } else {
+          return "w-2/3 grid grid-cols-4 gap-1 mx-36";
+        }
+    }
+  };
+
+  useEffect(() => {
+    setVideoClassName(displaySetting(displayMode));
+  }, [isChatOpen, isPeopleListOpen]);
+
+  const displayChange = () => {
+    const newMode = (displayMode + 1) % 3;
+    console.log(newMode);
+    setDisplayMode(newMode);
+    setVideoClassName(displaySetting(newMode));
+    console.log(displaySetting(newMode));
+  };
+
+  const captureOpen = () => {
+    if (localUser) {
+      setIsCaptureOpen(!isCaptureOpen);
+    }
+  };
+
+  const liveClassImage = useVideoStore((state) => state.liveClassImage);
+  const setLiveClassImage = useVideoStore((state) => state.setLiveClassImage);
+
+  const canvasRef = useRef();
+
+  const takePhoto = (e) => {
+    if (
+      isCaptureOpen &&
+      document.getElementById(
+        "video-" + localUser.getStreamManager().stream.streamId
+      )
+    ) {
+      console.log(
+        document.getElementById(
+          "video-" + localUser.getStreamManager().stream.streamId
+        )
+      );
+      const canvas = canvasRef.current;
+      const video = document.getElementById(
+        "video-" + localUser.getStreamManager().stream.streamId
+      );
+      const context = canvas.getContext("2d");
+
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+      const dataUrl = canvas.toDataURL("image/jpeg");
+      setLiveClassImage(e.target.value, dataUrl);
+
+      const link = document.createElement("a");
+      link.href = dataUrl;
+      link.download = "screenshot.jpg";
+      link.click();
+    }
+  };
+
+  const peopleListOpen = () => {
+    if (isChatOpen) {
+      chatOpen();
+    }
+    setIsPeopleListOpen(!isPeopleListOpen);
+  };
+
+  const chatOpen = () => {
+    if (isPeopleListOpen) {
+      peopleListOpen();
+    }
+    setIsChatOpen(!isChatOpen);
+  };
+
+  const ref = useRef(null);
+
+  const prevButton = () => {
+    if (ref.current) ref.current.scrollLeft -= 200;
+  };
+  const nextButton = () => {
+    if (ref.current) ref.current.scrollLeft += 200;
+  };
+
+  const [videoClassName, setVideoClassName] = useState("");
+
   return (
     <>
-      <h1>라이브클래스</h1>
-      <div id="layout" className="bounds" style={videolistcss}>
-        {localUser && localUser.getStreamManager() && (
-          <div id="localUser" style={localcss}>
-            <h4>localUser의 스트림</h4>
-            <StreamComponent user={localUser} />
-          </div>
-        )}
-        <div style={videolistcss}>
-          {subscribers.map((sub, i) => (
-            <div
-              key={i}
-              className="OT_root OT_publisher custom-class"
-              id="remoteUsers"
+      <Dialog
+        open={isCaptureOpen}
+        onClose={captureOpen}
+        className="relative z-50"
+      >
+        <DialogBackdrop
+          transition
+          className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity data-[closed]:opacity-0 data-[enter]:duration-300 data-[leave]:duration-200 data-[enter]:ease-out data-[leave]:ease-in"
+        />
+
+        <div className="fixed inset-0 z-50 w-4/6 overflow-y-auto place-self-center">
+          <div className="flex min-h-full items-center justify-center p-4 text-center sm:items-center sm:p-0">
+            <DialogPanel
+              transition
+              className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all data-[closed]:translate-y-4 data-[closed]:opacity-0 data-[enter]:duration-300 data-[leave]:duration-200 data-[enter]:ease-out data-[leave]:ease-in sm:my-8 sm:w-full sm:max-w-lg data-[closed]:sm:translate-y-0 data-[closed]:sm:scale-95"
             >
-              <h4>remoteUser의 스트림</h4>
-              <StreamComponent user={sub} />
+              <div className="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
+                <div className="sm:flex sm:items-start">
+                  <div className="mt-3 text-left sm:ml-4 sm:mt-0 sm:text-left">
+                    <DialogTitle
+                      as="h3"
+                      className="text-base font-semibold leading-6 text-gray-900"
+                    >
+                      현재 사진이 마음에 드신다면, 버튼을 클릭하여 저장해보세요!
+                      <br />
+                      사진은 자유롭게 변경이 가능하며, 최대 4장의 사진까지 저장
+                      가능합니다.
+                    </DialogTitle>
+
+                    <div className="mt-2 grid grid-cols-4 grid-rows-2 gap-2">
+                      {liveClassImage[0] ? (
+                        <img src={liveClassImage[0]} />
+                      ) : (
+                        <IconButton
+                          type="screen-capture"
+                          icon="screen-capture"
+                          onClick={takePhoto}
+                          value="0"
+                        />
+                      )}
+                      {liveClassImage[1] ? (
+                        <img src={liveClassImage[1]} />
+                      ) : (
+                        <IconButton
+                          type="screen-capture"
+                          icon="screen-capture"
+                          onClick={takePhoto}
+                          value="1"
+                        />
+                      )}
+                      <div className="col-start-3 col-span-2 row-start-1 row-span-2">
+                        <StreamComponent user={localUser} />
+                      </div>
+                      {liveClassImage[2] ? (
+                        <img src={liveClassImage[2]} />
+                      ) : (
+                        <IconButton
+                          type="screen-capture"
+                          icon="screen-capture"
+                          onClick={takePhoto}
+                          value="2"
+                        />
+                      )}
+                      {liveClassImage[3] ? (
+                        <img src={liveClassImage[3]} />
+                      ) : (
+                        <IconButton
+                          type="screen-capture"
+                          icon="screen-capture"
+                          onClick={takePhoto}
+                          value="3"
+                        />
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6 flex justify-end">
+                <IconButton
+                  text="다시 촬영하기"
+                  icon="take-photo"
+                  type="green-border-short"
+                />
+                <IconButton
+                  text="임시저장"
+                  icon="take-photo"
+                  type="green-border-short"
+                />
+                <IconButton
+                  text="저장하기"
+                  icon="download-photo"
+                  type="green-border-short"
+                />
+              </div>
+            </DialogPanel>
+          </div>
+        </div>
+      </Dialog>
+      <div className="min-h-screen min-w-screen flex flex-col items-center justify-center">
+        <div className="h-20 w-full flex justify-center items-center">
+          <div className="text-2xl">{title}</div>
+        </div>
+        <div className="h-2/3 w-full items-center justify-center flex-auto flex flex-row">
+          {isSliderOn ? (
+            <div id="layout" className={videoClassName}>
+              {hostUser && hostUser.getStreamManager() && (
+                <div
+                  id="hostUser"
+                  className="aspect-video col-start-1 col-end-5 row-start-1 row-end-2 mx-32"
+                >
+                  <StreamComponent user={hostUser} />
+                </div>
+              )}
+              <div className="flex flex-row w-full col-start-1 col-end-5">
+                <button onClick={prevButton} className="">
+                  &lt;
+                </button>
+                <div
+                  ref={ref}
+                  className="flex min-h-32 flex-row overflow-x-scroll flex-auto"
+                  id="scroll"
+                >
+                  {partUser &&
+                    partUser.map((sub, i) => (
+                      <div
+                        key={i}
+                        className="flex-shrink-0 w-1/4 aspect-video object-fill p-1"
+                      >
+                        <StreamComponent user={sub} className="" />
+                      </div>
+                    ))}
+                </div>
+                <button onClick={nextButton} className="">
+                  &gt;
+                </button>
+              </div>
             </div>
-          ))}
+          ) : (
+            <div id="layout" className={videoClassName}>
+              {hostUser && hostUser.getStreamManager() && (
+                <div id="hostUser">
+                  <StreamComponent user={hostUser} />
+                </div>
+              )}
+              {!isHostOnly &&
+                partUser &&
+                partUser.map((sub, i) => (
+                  <div key={i} id="partUser">
+                    <StreamComponent user={sub} />
+                  </div>
+                ))}
+            </div>
+          )}
+          {isChatOpen && <ChatComponent />}
+          {isPeopleListOpen && <PeopleListComponent />}
+        </div>
+
+        <div className="h-20 flex">
+          <MediaDeviceSetting currentPublisher={currentPublisher} />
+          <ToolbarComponent
+            displayMode={displayChange}
+            captureOpen={captureOpen}
+            peopleListOpen={peopleListOpen}
+            chatOpen={chatOpen}
+            leaveSession={leaveSession}
+          />
         </div>
       </div>
-      <ToolbarComponent leaveSession={leaveSession} style={toolcss} />
       <video className="input_video" style={{ display: "none" }}></video>
+      <canvas ref={canvasRef} style={{ display: "none" }}></canvas>
     </>
   );
 };

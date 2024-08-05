@@ -19,7 +19,6 @@ const ClassList = () => {
       }
     };
     fetchClassListData();
-    console.log(page);
   }, [page, hasMoreContent]);
 
   useEffect(() => {
@@ -56,7 +55,6 @@ const ClassList = () => {
           {classLists &&
             classLists.map((content, index) => (
               <div key={index}>
-                {content.uuid}
                 <Link to={`/class/${content.uuid}`}>
                   <ClassItem content={content} />
                 </Link>
