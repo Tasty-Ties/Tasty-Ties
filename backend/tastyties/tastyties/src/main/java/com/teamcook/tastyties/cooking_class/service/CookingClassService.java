@@ -5,7 +5,7 @@ import com.teamcook.tastyties.cooking_class.entity.*;
 import com.teamcook.tastyties.cooking_class.exception.CookingClassNotFoundException;
 import com.teamcook.tastyties.cooking_class.repository.*;
 import com.teamcook.tastyties.exception.CookingClassIsDeletedException;
-import com.teamcook.tastyties.exception.ImageUploadException;
+import com.teamcook.tastyties.exception.FileUploadException;
 import com.teamcook.tastyties.exception.ReservationNotFoundException;
 import com.teamcook.tastyties.s3test.Image;
 import com.teamcook.tastyties.s3test.S3Service;
@@ -20,6 +20,7 @@ import com.teamcook.tastyties.user.dto.UserProfileForClassDetailDto;
 import com.teamcook.tastyties.user.entity.User;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -51,7 +52,7 @@ public class CookingClassService {
                                UserAndCookingClassRepository userAndCookingClassRepository,
                                CookingClassTagRepository cookingClassTagRepository,
                                CookingClassImageRepository cookingClassImageRepository,
-                               S3Service s3Service) {
+                               @Qualifier("Local") S3Service s3Service) {
         this.cookingClassRepository = cookingClassRepository;
         this.ingredientRepository = ingredientRepository;
         this.recipeRepository = recipeRepository;
@@ -136,10 +137,7 @@ public class CookingClassService {
         return tagNames.stream()
                 .map(tagName -> {
                     CookingClassTag tag = findOrCreateTag(tagName);
-                    CookingClassAndCookingClassTag ccAndcct = new CookingClassAndCookingClassTag();
-                    ccAndcct.setCookingClass(cc);
-                    ccAndcct.setCookingClassTag(tag);
-                    return ccAndcct;
+                    return new CookingClassAndCookingClassTag(cc, tag);
                 }).collect(Collectors.toList());
     }
 
@@ -149,7 +147,7 @@ public class CookingClassService {
             imageUrls = s3Service.uploadImages(images);
         } catch (IOException e) {
             e.printStackTrace();
-            throw new ImageUploadException("이미지 업로드 중 문제가 생겼습니다.");
+            throw new FileUploadException("이미지 업로드 중 문제가 생겼습니다.");
         }
         return imageUrls.stream()
                 .map(imageUrl -> {

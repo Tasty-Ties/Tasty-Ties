@@ -13,6 +13,7 @@ import com.teamcook.tastyties.user.entity.User;
 import com.teamcook.tastyties.user.exception.UserIDAlreadyExistsException;
 import com.teamcook.tastyties.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -33,7 +34,10 @@ public class UserService {
     private final S3Service s3Service;
 
     @Autowired
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, CountryRepository countryRepository, LanguageRepository languageRepository, UserAndCookingClassRepository userAndCookingClassRepository, S3Service s3Service) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder,
+                       CountryRepository countryRepository, LanguageRepository languageRepository,
+                       UserAndCookingClassRepository userAndCookingClassRepository,
+                       @Qualifier("Local") S3Service s3Service) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.countryRepository = countryRepository;
