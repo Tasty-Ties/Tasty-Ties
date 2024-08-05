@@ -32,7 +32,7 @@ import IconButton from "../../common/components/IconButton";
 const localUserSetting = new UserModel();
 
 //채팅 관련
-const CHAT_SERVER_URL = "ws://localhost:8081/chat";
+const CHAT_SERVER_URL = import.meta.env.VITE_CHAT_SERVER;
 const roomId = "66a9c5dd498fe728acb763f8";
 const userId = 1;
 const userLang = "Japanese";
@@ -58,8 +58,6 @@ const VideoComponent = ({ isHost, title, hostName }) => {
 
   const [hostUser, setHostUser] = useState(null);
   const [partUser, setPartUser] = useState();
-  // const hostUser = useRef(null);
-  // const partUser = useRef([]);
 
   useEffect(() => {
     console.log(subscribers);
@@ -77,16 +75,12 @@ const VideoComponent = ({ isHost, title, hostName }) => {
       );
       subscribers.map((data) => {
         if (data.nickname === hostName) {
-          console.log("호스트와 닉네임이 일치함");
           setHostUser(data);
         } else {
           setPartUser((prev) => [...prev, data]);
         }
       });
     }
-
-    console.log("호스트유저출력: ", hostUser);
-    console.log("참가자유저출력: ", partUser);
   }, [subscribers, localUser]);
 
   const remotes = useRef([]);
@@ -138,11 +132,6 @@ const VideoComponent = ({ isHost, title, hostName }) => {
     };
   }, []);
 
-  // const [mySessionId, setMySessionId] = useState("SessionA");
-  // const [myUserName, setMyUserName] = useState(
-  //   "OpenVidu_User" + Math.floor(Math.random() * 100)
-  // );
-
   const joinSession = async () => {
     const newSession = OV.initSession();
     session.current = newSession;
@@ -154,7 +143,6 @@ const VideoComponent = ({ isHost, title, hostName }) => {
   const connectToSession = async (session) => {
     try {
       const token = await getToken();
-      console.log("토큰토큰토큰토큰토큰토큰토큰토큰토큰토큰", token);
       connect(session, token);
     } catch (error) {
       console.error(
@@ -302,13 +290,11 @@ const VideoComponent = ({ isHost, title, hostName }) => {
     setOV(null);
     session.current = null;
     setSubscribers([]);
-    // setMySessionId("SessionA");
     setLocalUser(undefined);
     remotes.current.length = 0;
   };
 
   const getToken = useCallback(async () => {
-    // const sessionId = await createSession(mySessionId);
     return await createToken(sessionId);
   }, []);
 
