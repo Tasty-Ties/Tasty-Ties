@@ -16,7 +16,7 @@ import com.teamcook.tastyties.shared.entity.CookingClassAndCookingClassTag;
 import com.teamcook.tastyties.shared.entity.UserAndCookingClass;
 import com.teamcook.tastyties.shared.repository.CookingClassAndCookingClassTagRepository;
 import com.teamcook.tastyties.shared.repository.UserAndCookingClassRepository;
-import com.teamcook.tastyties.user.dto.UserProfileForClassDetailDto;
+import com.teamcook.tastyties.user.dto.UserSimpleProfileDto;
 import com.teamcook.tastyties.user.entity.User;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -180,7 +180,7 @@ public class CookingClassService {
         boolean isEnrolledClass = false;
         boolean isHost = false;
         long enrolledCount = userAndCookingClassRepository.countQuota(cc);
-        Set<UserProfileForClassDetailDto> userEnrolledInClass = null;
+        Set<UserSimpleProfileDto> userEnrolledInClass = null;
 
         if (userDetails != null) {
             User user = userDetails.user();

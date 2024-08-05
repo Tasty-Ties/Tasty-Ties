@@ -47,6 +47,7 @@ public class SecurityConfig {
                                 .requestMatchers("/login", "/logout", "/public/**").permitAll()
                                 .requestMatchers("/users/me").authenticated()  // 로그인한 사용자만 접근 가능
                                 .requestMatchers("/classes/live/**").authenticated()
+                                .requestMatchers("/albums/**").authenticated()
                                 .requestMatchers("/api/v1/files/**").permitAll()
 //                        .requestMatchers("/users/profile/**").authenticated()  // 로그인한 사용자만 접근 가능
                                 .anyRequest().permitAll()
