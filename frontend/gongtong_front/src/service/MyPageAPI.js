@@ -19,9 +19,19 @@ export const deleteId = async () => {
   }
 };
 
-export const getteachClass = async () => {
+export const getTeachClass = async () => {
   try {
     const response = await axios.get("/users/me/hosting");
+    console.log(response);
+    return response.data.data.content;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const getReserveClass = async () => {
+  try {
+    const response = await axios.get("/users/me/reservations");
     console.log(response);
     return response.data.data.content;
   } catch (error) {

@@ -1,5 +1,9 @@
 import { create } from "zustand";
-import { getMyInfo, getteachClass } from "../service/MyPageAPI";
+import {
+  getMyInfo,
+  getTeachClass,
+  getReserveClass,
+} from "../service/MyPageAPI";
 
 const useMyPageStore = create((set) => ({
   informations: [],
@@ -10,8 +14,14 @@ const useMyPageStore = create((set) => ({
 
   teachClasses: [],
   fetchTeachClasses: async () => {
-    const teachClasses = await getteachClass();
+    const teachClasses = await getTeachClass();
     set({ teachClasses });
+  },
+
+  reserveClasses: [],
+  fetchReserveClasses: async () => {
+    const reserveClasses = await getReserveClass();
+    set({ reserveClasses });
   },
 }));
 
