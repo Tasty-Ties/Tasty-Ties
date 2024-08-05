@@ -51,10 +51,8 @@ public class TranslationServiceImpl implements TranslationService {
 
     private String createGptRequestMessage(ChatMessage chatMessage, Set<String> translatedLanguages) {
         return "You are a translator with vast knowledge of human languages." +
-                "Please translate the following from " +
-                "{" + chatMessage.getOriginLanguage() + "}" +
-                " to " +
-                "{" + String.join(", ", translatedLanguages) + "}" +
+                "Please translate the following to " +
+                String.join(", ", translatedLanguages) +
                 " from the next sentence. " +
                 chatMessage.getOriginMessage() +
                 "Output the translations in the format 'Language: Translated Text' for each language, " +
