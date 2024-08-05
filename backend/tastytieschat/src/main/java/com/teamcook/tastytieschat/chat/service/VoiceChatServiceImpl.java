@@ -1,48 +1,42 @@
 package com.teamcook.tastytieschat.chat.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.teamcook.tastytieschat.chat.dto.SpeechFlowCreateResponseDto;
-import com.teamcook.tastytieschat.chat.dto.SpeechFlowQueryResponseDto;
+import com.teamcook.tastytieschat.chat.service.uil.ClovaUtilByRestTemplate;
+import com.teamcook.tastytieschat.chat.service.uil.SpeechFlowUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.http.*;
-import org.springframework.http.client.MultipartBodyBuilder;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.RestTemplate;
-
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 import java.util.Base64;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Service
 public class VoiceChatServiceImpl implements VoiceChatService {
 
-
-    @Value("${speech-flow-key-id}")
-    private String keyId;
-
-    @Value("${speech-flow-key-secret}")
-    private String keySecret;
-
     @Value("${ffmpeg.path}")
     private String ffmpegPath;
+    private final String REDIS_KEY_PREFIX = "voiceData:";
 
-    private final int RETRY_CNT = 5;
-    private final RestTemplate restTemplate;
-    private final ObjectMapper objectMapper;
-
+    @Autowired
+    private RedisTemplate<String, byte[]> redisTemplate;
     private ConcurrentHashMap<String, ConcurrentHashMap<Integer, String[]>> voiceDataMap = new ConcurrentHashMap<>();
 
-    public VoiceChatServiceImpl(RestTemplate restTemplate, ObjectMapper objectMapper) {
-        this.restTemplate = restTemplate;
-        this.objectMapper = objectMapper;
+    private ClovaUtilByRestTemplate clovaUtil;
+    private SpeechFlowUtil speechFlowUtil;
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
+    public VoiceChatServiceImpl(ClovaUtilByRestTemplate clovaUtill, SpeechFlowUtil speechFlowUtil) {
+        this.clovaUtil = clovaUtill;
+        this.speechFlowUtil = speechFlowUtil;
     }
 
     //청크 저장
@@ -77,99 +71,95 @@ public class VoiceChatServiceImpl implements VoiceChatService {
         for (String chunk : chunks) {
             assembledData.append(chunk);
         }
+        String fullData = assembledData.toString();
+        logFullDataToFile(roomId, userId, fullData);
 
-        return assembledData.toString();
+        return fullData;
     }
 
-
+    @Async
     @Override
-    public String getMp3filePath(String fullData) throws IOException, InterruptedException {
+    public CompletableFuture<String> translateVoiceToTextByMemory(String fullData) throws IOException, InterruptedException {
+        byte[] wavBytes = getWavBytesAtRedis(fullData);
+        return clovaUtil.translateVoiceToTextByByte(wavBytes)
+                .thenApply(response -> extractTextFromResponse(response));
+    }
+
+    private String extractTextFromResponse(String response) {
+        try {
+            JsonNode root = objectMapper.readTree(response);
+            return root.path("text").asText();
+        } catch (IOException e) {
+            log.error("Failed to parse response JSON", e);
+            return "";
+        }
+    }
+
+    //레디스에 캐싱해두는 로직 추가
+    public byte[] getWavBytesAtRedis(String fullData) {
+        String redisKey = REDIS_KEY_PREFIX + fullData.hashCode();
+
+        // Redis 캐시에서 데이터 검색
+        byte[] cachedBytes = redisTemplate.opsForValue().get(redisKey);
+        if (cachedBytes != null) {
+            return cachedBytes;
+        }
+
         // Base64 디코딩
         byte[] decodedBytes = Base64.getDecoder().decode(fullData);
-        UUID uuid = UUID.randomUUID();
-        String wavFilePath = "./static/" + uuid + ".wav";
-        String mp3FilePath = "./static/" + uuid + ".mp3";
 
-        // 디코딩된 바이트를 WAV 파일로 저장
+        // Redis에 캐시 저장 (예: 5분 동안 유지)
+        redisTemplate.opsForValue().set(redisKey, decodedBytes, 5, TimeUnit.MINUTES);
+
+        return decodedBytes;
+    }
+
+    byte[] getWavBytes(String fullData) {
+        return Base64.getDecoder().decode(fullData);
+    }
+
+    // speechFlow 사용할 때는 mp3 file로 변환해서 저장해야 함.
+    @Async
+    @Override
+    public CompletableFuture<String> translateVoiceToTextByFileSystem(String fullData) throws IOException, InterruptedException {
+        String mp3FilePath = saveAndGetFilePath(fullData);
+        return clovaUtil.translateVoiceToTextByFile(mp3FilePath)
+                .thenApply(response -> response);
+    }
+
+    /**
+     * @param fullData : 인코딩된 문자열
+     * @return : mp3 파일이 저장된 경로 full path
+     */
+    String saveAndGetFilePath(String fullData) throws IOException, InterruptedException {
+        byte[] decodedBytes = Base64.getDecoder().decode(fullData);
+        UUID uuid = UUID.randomUUID();
+        String wavFilePath = "./dump/" + uuid + ".wav";
+        String mp3FilePath = "./dump/" + uuid + ".mp3";
+
         try (OutputStream os = new FileOutputStream(wavFilePath)) {
             os.write(decodedBytes);
         }
 
-        // ffmpeg를 사용하여 WAV 파일을 MP3로 변환
-        ProcessBuilder pb = new ProcessBuilder(ffmpegPath, "-i", wavFilePath, mp3FilePath);
-        Process process = pb.start();
-        int exitCode = process.waitFor();
-
-        if (exitCode != 0) {
-            throw new IOException("Error converting WAV to MP3");
-        }
-
-        sendFileToSpeechFlow(mp3FilePath);
-        return mp3FilePath;
+//        ProcessBuilder pb = new ProcessBuilder(ffmpegPath, "-i", wavFilePath, mp3FilePath);
+//        Process process = pb.start();
+//        int exitCode = process.waitFor();
+//
+//        if (exitCode != 0) {
+//            throw new IOException("Error converting WAV to MP3");
+//        }
+//        return mp3FilePath;
+        return wavFilePath;
     }
 
-    /**
-     * @return : TaskId
-     * SpeechFlow를 안 쓸수도 있을 것 같아서 예외처리를 자세하게 하지는 않았습니다
-     */
-    @Override
-    public String sendFileToSpeechFlow(String filePath) throws IOException {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
-        headers.set("keyId", keyId);
-        headers.set("keySecret", keySecret);
-
-        MultipartBodyBuilder builder = new MultipartBodyBuilder();
-        builder.part("lang", "ko");
-        builder.part("file", new FileSystemResource(filePath));
-
-        HttpEntity<MultiValueMap<String, HttpEntity<?>>> requestEntity = new HttpEntity<>(builder.build(), headers);
-        String url = "https://api.speechflow.io/asr/file/v1/create";
-        ResponseEntity<String> response = restTemplate.postForEntity(url, requestEntity, String.class);
-
-        if (response.getStatusCode().is2xxSuccessful()) {
-            SpeechFlowCreateResponseDto speechFlowCreateResponseDTO = objectMapper.readValue(response.getBody(), SpeechFlowCreateResponseDto.class);
-            if (speechFlowCreateResponseDTO.getCode() != 10000) {
-                throw new IOException("실패");
-            }
-            return speechFlowCreateResponseDTO.getTaskId();
-        } else {
-            throw new IOException("실패");
+    //청크 파일 로그로 남기기 (테스트용)
+    private void logFullDataToFile(String roomId, int userId, String fullData) {
+        String logFileName = String.format("./log/long_sentence.txt", roomId, userId);
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(logFileName))) {
+            writer.write(fullData);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-    }
-
-    @Override
-    public String queryTranscriptionResult(String taskId) throws IOException, InterruptedException {
-        // STT 결과를 얻기 위한 설정
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("keyId", keyId);
-        headers.set("keySecret", keySecret);
-
-        String url = "https://api.speechflow.io/asr/file/v1/query?taskId=" + taskId;
-        HttpEntity<?> requestEntity = new HttpEntity<>(headers);
-
-        // JSON 응답을 SpeechFlowResult 객체로 변환
-        int count = 0;
-        while (count < RETRY_CNT) {
-            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, requestEntity, String.class);
-            if (response.getStatusCode().is2xxSuccessful()) {
-                log.info("응답: {}", response.getBody());
-                SpeechFlowQueryResponseDto speechFlowQueryResponseDTO =
-                        objectMapper.readValue(response.getBody(), SpeechFlowQueryResponseDto.class);
-                if (speechFlowQueryResponseDTO.getCode() == 11000) {
-                    return speechFlowQueryResponseDTO.getResult();
-                } else if (speechFlowQueryResponseDTO.getCode() == 11001) {
-                    //처리가 아직 되지 않았음
-                    log.info("5초 대기");
-                    count++;
-                    Thread.sleep(5000); // 5초 대기
-                } else {
-                    break;
-                }
-            }
-        }
-
-        throw new IOException("실패");
     }
 
 }
