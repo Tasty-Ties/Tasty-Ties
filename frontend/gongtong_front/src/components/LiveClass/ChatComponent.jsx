@@ -1,4 +1,4 @@
-const SERVER_URL = "ws://localhost:8081/chat";
+const SERVER_URL = import.meta.env.VITE_CHAT_SERVER;
 const roomId = "66a9c5dd498fe728acb763f8";
 const userId = 1;
 const userLang = "Japanese";
