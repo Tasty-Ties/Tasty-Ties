@@ -22,22 +22,6 @@ const Class = ({ title, mainImage, startTime, endTime, hostName }) => {
   //   //   const timeRemainingMinute = startdate.getMinutes() - nowdate.getMinutes(); //남은 분
   //   //   const timeRemainingSecond = startdate.getSeconds() - nowdate.getSeconds(); //남은 초
 
-  //   //   let timeRemaing = "";
-  //   //   if (timeRemaingMonth > 0 || timeRemainingDate > 0) {
-  //   //     timeRemaing += `D-${timeRemainingDate}`;
-  //   //   } else if (timeRemainingHour > 0) {
-  //   //     timeRemaing += `${timeRemainingHour}:${timeRemainingMinute}`;
-  //   //   } else {
-  //   //     timeRemaing += "입장";
-  //   //   }
-  //   //   console.log(
-  //   //     timeRemaingMonth,
-  //   //     timeRemainingDate,
-  //   //     timeRemainingHour,
-  //   //     timeRemainingMinute,
-  //   //     timeRemainingSecond
-  //   //   );
-  //   //   console.log(timeRemaing);
   // startTime 설정
   let startdate = new Date(startTime);
 
@@ -56,19 +40,30 @@ const Class = ({ title, mainImage, startTime, endTime, hostName }) => {
   // 결과 출력
   console.log(`남은 시간: ${days}일 ${hours}시간 ${minutes}분 ${seconds}초`);
 
+  let timeRemaing = "";
+  if (days > 0) {
+    timeRemaing += `D-${days}`;
+  } else if (hours > 0) {
+    timeRemaing += `${hours}:${minutes}`;
+  } else {
+    timeRemaing += "입장";
+  }
+  console.log(days, hours, minutes, seconds);
+  console.log(timeRemaing);
+
   return (
     <div className="flex">
       <div>
-        <div className="flex">
-          <img src={mainImage} alt="클래스사진" />
-        </div>
+        <img src={mainImage} alt="클래스사진" />
+      </div>
+      <div>
         <h3>{title}</h3>
         <p>
           강의시간: {startTime} ~ {endTime}
         </p>
         <Link to="">상세 보기</Link>
       </div>
-      <Button text="입장" type={"orange-sqr"} />
+      <Button text={timeRemaing} type={"orange-sqr"} />
     </div>
   );
 };
