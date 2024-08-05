@@ -4,24 +4,21 @@ import { useEffect } from "react";
 import Button from "./Button";
 
 const Class = ({ classInfo }) => {
-  //   //   const timeRemaining = endTime.getHours();
-  //   //   console.log(timeRemaining);
-  //   //   console.log(endTime);
-  //   let nowdate = new Date();
-  //   let startdate = new Date(startTime);
-  //   //   console.log(startdate);
-  //   //   console.log(startdate.getTime());
-  //   //   const timeRemaingTimestamp = startdate.getTime() - nowdate.getTime();
-  //   const timeRemaing = startdate - nowdate;
-  //   console.log(timeRemaing);
-  //   let timeRemaingDate = new Date(timeRemaing);
-  //   console.log(timeRemaingDate);
+  const nav = useNavigate();
+  const location = useLocation();
 
-  //   //   const timeRemaingMonth = startdate.getMonth() - nowdate.getMonth(); // 남은 월
-  //   //   const timeRemainingDate = startdate.getDate() - nowdate.getDate(); //남은 일자
-  //   //   const timeRemainingHour = startdate.getHours() - nowdate.getHours(); // 남은 시간
-  //   //   const timeRemainingMinute = startdate.getMinutes() - nowdate.getMinutes(); //남은 분
-  //   //   const timeRemainingSecond = startdate.getSeconds() - nowdate.getSeconds(); //남은 초
+  const date = classInfo.startTime.substring(
+    0,
+    classInfo.startTime.indexOf("T")
+  );
+  const startTime = classInfo.startTime.substring(
+    classInfo.startTime.indexOf("T") + 1,
+    classInfo.startTime.indexOf("T") + 6
+  );
+  const endTime = classInfo.endTime.substring(
+    classInfo.endTime.indexOf("T") + 1,
+    classInfo.endTime.indexOf("T") + 6
+  );
 
   // startTime 설정
   let startdate = new Date(classInfo.startTime);
@@ -38,9 +35,6 @@ const Class = ({ classInfo }) => {
   let minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
   let seconds = Math.floor((diff % (1000 * 60)) / 1000);
 
-  // 결과 출력
-  console.log(`남은 시간: ${days}일 ${hours}시간 ${minutes}분 ${seconds}초`);
-
   let timeRemaing = "";
   if (days > 0) {
     timeRemaing += `D-${days}`;
@@ -49,12 +43,6 @@ const Class = ({ classInfo }) => {
   } else {
     timeRemaing += "입장";
   }
-  console.log(days, hours, minutes, seconds);
-  console.log(timeRemaing);
-  const nav = useNavigate();
-  const location = useLocation();
-
-  console.log(location.pathname);
 
   return (
     <div className="flex">
@@ -65,13 +53,15 @@ const Class = ({ classInfo }) => {
         <h3>{classInfo.title}</h3>
 
         <p>
-          강의시간: {classInfo.startTime} ~ {classInfo.endTime}
+          {date} {startTime}~{endTime}
         </p>
-        <Link to="">상세 보기</Link>
+        <button onClick={() => nav(`/class/${classInfo.uuid}`)}>
+          상세 보기
+        </button>
       </div>
       <Button
         text={timeRemaing}
-        type={"orange-sqr"}
+        type={timeRemaing === "입장" ? "orange-sqr" : "gray-sqr"}
         onClick={() =>
           nav(`/classwaiting/${classInfo.uuid}`, {
             state: {
