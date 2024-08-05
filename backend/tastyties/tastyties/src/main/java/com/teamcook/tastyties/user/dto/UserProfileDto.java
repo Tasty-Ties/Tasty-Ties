@@ -11,6 +11,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 public class UserProfileDto {
+    private int userId;
     private String profileImageUrl;
     private String nickname;
     private String description;

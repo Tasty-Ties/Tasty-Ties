@@ -7,6 +7,7 @@ import com.teamcook.tastyties.shared.entity.UserAndCookingClass;
 import com.teamcook.tastyties.shared.entity.UserAndCountry;
 import com.teamcook.tastyties.short_form.entity.ShortForm;
 import com.teamcook.tastyties.user.dto.UserUpdateDto;
+import com.teamcook.tastyties.user.entity.album.Album;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;

@@ -6,10 +6,9 @@ import com.teamcook.tastyties.s3test.Image;
 import com.teamcook.tastyties.s3test.S3Service;
 import com.teamcook.tastyties.security.userdetails.CustomUserDetails;
 import com.teamcook.tastyties.shared.repository.UserAndCookingClassRepository;
-import com.teamcook.tastyties.shared.repository.UserAndCountryRepository;
 import com.teamcook.tastyties.user.dto.UserRegistrationDto;
 import com.teamcook.tastyties.user.dto.UserUpdateDto;
-import com.teamcook.tastyties.user.entity.Album;
+import com.teamcook.tastyties.user.entity.album.Album;
 import com.teamcook.tastyties.user.entity.User;
 import com.teamcook.tastyties.user.exception.UserIDAlreadyExistsException;
 import com.teamcook.tastyties.user.repository.UserRepository;
@@ -22,7 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Optional;
 
 @Service

@@ -9,5 +9,6 @@ import java.util.UUID;
 
 public interface CookingClassRepository extends JpaRepository<CookingClass, Integer>, CookingClassCustomRepository{
 
+    // 간단한 정보만 빼옴 lazy 활용
     CookingClass findByUuid(String uuid);
 }
