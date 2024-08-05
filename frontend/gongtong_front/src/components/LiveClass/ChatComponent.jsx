@@ -1,4 +1,5 @@
-const SERVER_URL = "ws://192.168.31.83:8081/chat";
+const SERVER_URL = import.meta.env.VITE_CHAT_SERVER;
+console.log(SERVER_URL);
 const roomId = "66a9c5dd498fe728acb763f8";
 const userId = 1;
 const userLang = "Japanese";
@@ -39,9 +40,9 @@ const ChatComponent = () => {
       },
     });
 
-    // connect();
+    connect();
 
-    // return () => disconnect();
+    return () => disconnect();
   }, []);
 
   const connect = () => {
