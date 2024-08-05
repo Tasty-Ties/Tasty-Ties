@@ -1,18 +1,18 @@
 import { create } from "zustand";
-import { getMyInfo, getteachClass } from "../service/MyPageAPI";
+import { getMyInfo } from "../service/MyPageAPI";
 
-const useMyPageStore = create((set) => ({
-  informations: [],
-  fetchInformations: async () => {
+const useMyPageStore = create((set) => {
+  const fetchInformations = async () => {
     const informations = await getMyInfo();
     set({ informations });
-  },
+  };
 
-  teachClasses: [],
-  fetchTeachClasses: async () => {
-    const teachClasses = await getteachClass();
-    set({ teachClasses });
-  },
-}));
+  fetchInformations();
+
+  return {
+    informations: [],
+    fetchInformations,
+  };
+});
 
 export default useMyPageStore;

@@ -9,8 +9,7 @@ const MyPage = () => {
 
   useEffect(() => {
     fetchInformations();
-    // console.log(informations); 콘솔에 두번씩 출력됨
-  }, []);
+  }, [fetchInformations]);
 
   if (!informations) {
     return <div>정보가 없습니다.</div>;
