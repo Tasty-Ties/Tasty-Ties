@@ -1,10 +1,7 @@
 import React, { useState, useEffect } from "react";
 import OvVideoComponent from "./OVVideoComponent";
-import useVideoStore from "../../store/useVideoStore";
 
 const StreamComponent = ({ user }) => {
-  const OV = useVideoStore((state) => state.OV);
-
   return (
     <div className="OT_widget-container">
       {user && user.getStreamManager() ? (
