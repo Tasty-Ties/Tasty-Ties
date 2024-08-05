@@ -2,6 +2,7 @@ package com.teamcook.tastyties.user.controller;
 
 import com.teamcook.tastyties.common.dto.CommonResponseDto;
 import com.teamcook.tastyties.security.userdetails.CustomUserDetails;
+import com.teamcook.tastyties.user.dto.album.FolderRegisterDto;
 import com.teamcook.tastyties.user.entity.User;
 import com.teamcook.tastyties.user.entity.album.Album;
 import com.teamcook.tastyties.user.service.AlbumService;
@@ -36,16 +37,26 @@ public class AlbumController {
     @PostMapping("/register-folder")
     public ResponseEntity<CommonResponseDto> registerFolder(@AuthenticationPrincipal CustomUserDetails userDetails,
                                                             @RequestPart("images") List<MultipartFile> images,
-                                                            @RequestPart("name") String name, @RequestPart("uuid") String uuid) {
+                                                            @RequestPart("folderRegisterDto") FolderRegisterDto registerDto) {
         User user = userDetails.user();
         Album album = albumService.getAlbum(user);
-        String folderName = albumService.registerFolder(album, images, name, user, uuid);
-//        albumService
+        String folderName = albumService.registerFolder(album, images, registerDto);
         return ResponseEntity.ok()
                 .body(CommonResponseDto.builder()
                         .stateCode(200)
-                        .message("프로필이 정상적으로 조회됐습니다.")
+                        .message("사진이 정상적으로 저장되었습니다.")
                         .data(folderName)
+                        .build());
+    }
+
+    @GetMapping("/{albumId}")
+    public ResponseEntity<CommonResponseDto> getAlbum(@PathVariable int albumId) {
+
+        return ResponseEntity.ok()
+                .body(CommonResponseDto.builder()
+                        .stateCode(200)
+                        .message("앨범을 정상적으로 조회했습니다.")
+                        .data(null)
                         .build());
     }
 }

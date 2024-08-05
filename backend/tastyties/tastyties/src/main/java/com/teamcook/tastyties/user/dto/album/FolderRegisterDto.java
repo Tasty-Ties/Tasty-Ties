@@ -1,5 +1,10 @@
 package com.teamcook.tastyties.user.dto.album;
 
+import lombok.Data;
+
+@Data
 public class FolderRegisterDto {
-    String name;
+    private String folderName;
+    private String cookingClassUuid;
+    private String countryCode;
 }

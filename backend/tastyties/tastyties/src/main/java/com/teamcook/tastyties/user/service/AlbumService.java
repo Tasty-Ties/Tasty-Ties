@@ -1,10 +1,10 @@
 package com.teamcook.tastyties.user.service;
 
-import com.teamcook.tastyties.cooking_class.entity.CookingClass;
 import com.teamcook.tastyties.cooking_class.repository.CookingClassRepository;
 import com.teamcook.tastyties.s3test.Image;
 import com.teamcook.tastyties.s3test.S3Service;
-import com.teamcook.tastyties.user.dto.album.AlbumRegisterResponseDto;
+import com.teamcook.tastyties.user.dto.album.FolderListDto;
+import com.teamcook.tastyties.user.dto.album.FolderRegisterDto;
 import com.teamcook.tastyties.user.entity.User;
 import com.teamcook.tastyties.user.entity.album.Album;
 import com.teamcook.tastyties.user.entity.album.Folder;
@@ -16,13 +16,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class AlbumService {
@@ -50,9 +50,10 @@ public class AlbumService {
     }
 
     public String registerFolder(Album album, List<MultipartFile> images,
-                                                   String name, User user, String uuid) {
-        Folder folder = new Folder(album, uuid, name, 4);
+                                 FolderRegisterDto registerDto) {
 
+        Folder folder = new Folder(album, registerDto.getCookingClassUuid(),
+                registerDto.getFolderName(), 4, registerDto.getCountryCode());
         List<String> urls;
         try {
             urls = s3Service.uploadImages(images).stream()
@@ -67,7 +68,13 @@ public class AlbumService {
             log.debug("photo: {}", photo.getPhotoImageUrl());
             folder.addPhoto(photo);
         }
+        folder.setMainImgUrl(urls.get(0));
         Folder savedFolder = folderRepository.save(folder);
         return savedFolder.getFolderName();
+    }
+
+    public Page<FolderListDto> getAlbum(Album album, Pageable pageable) {
+//        folderRepository.get
+        return null;
     }
 }
