@@ -13,6 +13,7 @@ const ClassWaiting = () => {
   const nav = useNavigate();
   const location = useLocation();
   const { classData, isHost } = location.state;
+  console.log(isHost);
 
   const OV = useVideoStore((state) => state.OV);
   const setOV = useVideoStore((state) => state.setOV);

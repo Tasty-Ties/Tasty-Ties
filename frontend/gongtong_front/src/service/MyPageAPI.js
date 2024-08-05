@@ -19,3 +19,13 @@ export const deleteId = async () => {
     console.log(error);
   }
 };
+
+export const getteachClass = async () => {
+  try {
+    const response = await axios.get("/users/me/hosting");
+    console.log(response);
+    return response.data.data.content;
+  } catch (error) {
+    console.log(error);
+  }
+};

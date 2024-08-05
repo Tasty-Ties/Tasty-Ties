@@ -1,41 +1,29 @@
-import axios from "axios";
-import { useEffect, useState } from "react";
-import Cookies from "js-cookie";
-import TeachList from "./TeachList";
+import React, { useEffect } from "react";
+import useMyPageStore from "../../store/MyPageStore";
+import Class from "../../common/components/Class";
 
 const TeachClass = () => {
-  const [teachClassData, setTeachClassData] = useState([]);
-  useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const response = await axios.get(
-          "http://localhost:8080/api/v1/users/me/hosting",
-          {
-            headers: {
-              Authorization: `Bearer ${Cookies.get("accessToken")}`,
-            },
-          }
-        );
-        setTeachClassData(response.data.data.content);
-      } catch (error) {
-        console.error("Failed to fetch user data:", error);
-      }
-    };
+  const teachClasses = useMyPageStore((state) => state.teachClasses);
+  const fetchTeachClasses = useMyPageStore((state) => state.fetchTeachClasses);
 
-    fetchUserData();
+  useEffect(() => {
+    fetchTeachClasses();
+    console.log(teachClasses);
   }, []);
+  console.log(teachClasses);
+
+  if (!teachClasses || teachClasses.length === 0) {
+    return <div>수업할 클래스가 없습니다.</div>;
+  }
+
   return (
-    <>
-      <div>수업할 클래스</div>
-      <>
-        {teachClassData &&
-          teachClassData.map((data, i) => (
-            <div key={i}>
-              <TeachList data={data} />
-            </div>
-          ))}
-      </>
-    </>
+    <div>
+      <p>수업할 클래스</p>
+      {teachClasses.map((teachClass, index) => (
+        <Class key={index} classInfo={teachClass} />
+      ))}
+    </div>
   );
 };
+
 export default TeachClass;
