@@ -40,3 +40,6 @@ application.properties
 
 ### test index.html ###
 src/main/resources/static
+
+dump/
+log/

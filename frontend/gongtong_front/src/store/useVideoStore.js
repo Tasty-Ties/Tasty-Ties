@@ -11,6 +11,8 @@ const useVideoStore = create((set) => ({
     set({ selectedAudioDevice: audioDevice }),
   setSelectedVideoDevice: (videoDevice) =>
     set({ selectedVideoDevice: videoDevice }),
+  sessionId: null,
+  setSessionId: (id) => set({ sessionId: id }),
 }));
 
 export default useVideoStore;
