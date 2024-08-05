@@ -1,6 +1,4 @@
-import React, { useRef, useEffect, useState } from "react";
-import useVideoStore from "../../store/useVideoStore";
-import useMyPageStore from "../../store/MyPageStore";
+import React, { useRef, useEffect } from "react";
 
 const OvVideoComponent = ({ user }) => {
   const videoRef = useRef(null);
@@ -10,8 +8,6 @@ const OvVideoComponent = ({ user }) => {
       user.getStreamManager().addVideoElement(videoRef.current);
     }
   }, [user]);
-
-  console.log(videoRef);
 
   return (
     <div>

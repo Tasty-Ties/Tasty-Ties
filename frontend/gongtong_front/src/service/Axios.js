@@ -2,7 +2,7 @@ import axios from "axios";
 import Cookies from "js-cookie";
 
 axios.defaults.withCredentials = true;
-axios.defaults.baseURL = "http://localhost:8080/api/v1";
+axios.defaults.baseURL = import.meta.env.VITE_MAIN_SERVER;
 
 // 요청 인터셉터: 모든 요청에 `accessToken` 추가
 axios.interceptors.request.use(
@@ -25,7 +25,7 @@ axios.interceptors.response.use(
       originalRequest._retry = true;
       try {
         const response = await axios.post(
-          "http://localhost:8080/api/v1/auth/refresh",
+          MAIN_SERVER_URL + "/auth/refresh",
           { refreshToken: Cookies.get("refreshToken") },
           { withCredentials: true }
         );
