@@ -23,14 +23,12 @@ const useClassRegistStore = create((set) => ({
   hasMoreContent: true,
   fetchClassLists: async (page) => {
     const classLists = await getClassLists(page);
-    console.log(classLists);
     if (classLists.length === 0) {
       set({ hasMoreContent: false });
     } else {
-      // set((state) => ({
-      //   // classLists: [...state.classLists, ...classLists],
-      // }));
-      set({ classLists });
+      set((state) => ({
+        classLists: [...state.classLists, ...classLists],
+      }));
     }
   },
 

@@ -1,25 +1,30 @@
 import { useEffect } from "react";
 import Category from "../components/MyPage/Category";
-import Myinfo from "../components/MyPage/Myinfo";
+import { Outlet } from "react-router-dom";
 import useMyPageStore from "../store/MyPageStore";
 
 const MyPage = () => {
   const fetchInformations = useMyPageStore((state) => state.fetchInformations);
   const informations = useMyPageStore((state) => state.informations);
+
   useEffect(() => {
     fetchInformations();
-  }, [fetchInformations]);
-  console.log(fetchInformations);
-  console.log(informations);
+    // console.log(informations); 콘솔에 두번씩 출력됨
+  }, []);
+
+  if (!informations) {
+    return <div>정보가 없습니다.</div>;
+  }
 
   return (
-    <>
-      마이페이지
+    <div className="flex">
       <div>
         <Category informations={informations} />
-        <Myinfo informations={informations} />
       </div>
-    </>
+      <div>
+        <Outlet />
+      </div>
+    </div>
   );
 };
 

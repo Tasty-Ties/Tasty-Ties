@@ -9,11 +9,6 @@ import "@styles/ClassList/ClassList.css";
 
 const ClassList = () => {
   const { classLists, fetchClassLists, hasMoreContent } = useClassRegistStore();
-  // (state) => ({
-  //   classLists: state.classList,
-  //   fetchClassLists: state.fetchClassLists,
-  //   hasMoreContent: state.hasMoreContent,
-  // })
   const [page, setPage] = useState(0);
   const observerRef = useRef(null);
 

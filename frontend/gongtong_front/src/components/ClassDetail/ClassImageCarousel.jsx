@@ -44,13 +44,6 @@ const ClassImageCarousel = ({ classDetail }) => {
   return (
     <div className="container mx-auto relative">
       <Slider {...settings}>
-        <div>
-          <img
-            src={classDetail.mainImageUrl}
-            alt="Slide 1"
-            className="w-full"
-          />
-        </div>
         {classDetail.imageUrls &&
           classDetail.imageUrls.map((imageUrl, index) => (
             <div key={index}>

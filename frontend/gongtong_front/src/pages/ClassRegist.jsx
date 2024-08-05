@@ -49,6 +49,10 @@ const ClassRegist = () => {
     replayEndTime: "",
     isDelete: false,
   });
+  useEffect(() => {
+    fetchCountries();
+    fetchLanguages();
+  }, []);
 
   const onChange = (e) => {
     // 주류 체크박스
@@ -141,12 +145,7 @@ const ClassRegist = () => {
     });
   };
 
-  useEffect(() => {
-    fetchCountries();
-    fetchLanguages();
-    console.log("classRegist useEffect : ", classInformation);
-  }, [classInformation]);
-
+  // 별점
   const ratings = [5, 4, 3, 2, 1];
   const setLevelValue = (e) => {
     if (e.target.checked) {
@@ -157,6 +156,9 @@ const ClassRegist = () => {
     }
   };
 
+  // 유효성 검사
+
+  // 클래스 등록
   const handleClassRegist = async (e) => {
     e.preventDefault();
     const errors = ClassValidate({ classInformation });
@@ -192,9 +194,6 @@ const ClassRegist = () => {
               onChange={onChange}
               placeholder="클래스명을 입력해주세요"
             />
-            {errors.title && (
-              <div className="error-message">{errors.title}</div>
-            )}
           </div>
         </div>
         <div className="regist-component-box">

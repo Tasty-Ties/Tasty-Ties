@@ -39,9 +39,9 @@ const ChatComponent = () => {
       },
     });
 
-    connect();
+    // connect();
 
-    return () => disconnect();
+    // return () => disconnect();
   }, []);
 
   const connect = () => {
@@ -97,22 +97,17 @@ const ChatComponent = () => {
     setMessage(e.target.value);
   };
 
-  const chatcss = {
-    height: "400px",
-  };
-
   return (
-    <div>
+    <div className="w-1/3 self-stretch mx-3 my-3 border-solid border-2">
       <h1>채팅</h1>
-      {
-        <div style={chatcss}>
-          {messageLog.map((message, i) => (
-            <div key={i}>
-              {message.userNickname}: {message.translation}
-            </div>
-          ))}
-        </div>
-      }
+      <div>
+        {messageLog.map((message, i) => (
+          <div key={i}>
+            {message.userNickname}: {message.translation}
+          </div>
+        ))}
+      </div>
+
       <input value={message} onChange={messageHandler}></input>
       <button onClick={sendMessage}>전송</button>
     </div>

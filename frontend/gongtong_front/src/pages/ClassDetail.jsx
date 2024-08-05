@@ -23,10 +23,7 @@ const ClassDetail = () => {
 
   useEffect(() => {
     fetchClassDetail(id);
-  }, [id, fetchClassDetail]);
-  useEffect(() => {
-    fetchClassDetail(id);
-  }, []);
+  }, [id]);
 
   const handleClassReservation = async (e) => {
     try {
@@ -63,11 +60,6 @@ const ClassDetail = () => {
 
   return (
     <div className="detail-container">
-      {/* <img
-        src="http://localhost:5173/images/classImages/food-img2.png"
-        alt="클래스 상세 이미지"
-        className="info-img"
-      /> */}
       <ClassImageCarousel classDetail={classDetail} />
       <div className="class-info-box">
         <div className="title">{classDetail.title}</div>
@@ -149,11 +141,9 @@ const ClassDetail = () => {
               </button>
             )}
           </div>
-          {/* 여기 */}
           <div className="people-box">
             <ClassEnrollUsers classDetail={classDetail} />
           </div>
-          {/* 여기 */}
         </div>
       </div>
       <div className="user-info-box">
