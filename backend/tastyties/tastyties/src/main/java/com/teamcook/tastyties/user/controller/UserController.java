@@ -18,6 +18,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.net.URI;
 
 @RestController
 @RequestMapping("/users")
@@ -30,6 +33,7 @@ public class UserController {
         this.userProfileService = userProfileService;
     }
 
+    // 회원 가입
     @PostMapping()
     public ResponseEntity<CommonResponseDto> registerUser(@RequestBody UserRegistrationDto request) {
         String savedUsername = userService.registerUser(request);
@@ -42,6 +46,7 @@ public class UserController {
                         .build());
     }
 
+    // 유저이름 중복체크
     @GetMapping("/check-username")
     public ResponseEntity<CommonResponseDto> checkUsername(@RequestParam("username") String username) {
         if (!userService.isUserNameAvailable(username)) {
@@ -55,6 +60,7 @@ public class UserController {
                         .build());
     }
 
+    // 닉네임 중복체크
     @GetMapping("/check-nickname")
     public ResponseEntity<CommonResponseDto> checkNickname(@RequestParam("nickname") String nickname) {
         if (!userService.isNicknameAvailable(nickname)) {
@@ -68,6 +74,7 @@ public class UserController {
                         .build());
     }
 
+    // 이메일 중복체크
     @GetMapping("/check-email")
     public ResponseEntity<CommonResponseDto> checkEmail(@RequestParam("email_id") String emailId, @RequestParam("email_domain") String emailDomain) {
         if (!userService.isEmailIdAvailable(emailId, emailDomain)) {
@@ -81,6 +88,7 @@ public class UserController {
                         .build());
     }
 
+    // 내 프로필 조회
     @GetMapping("/me")
     public ResponseEntity<CommonResponseDto> myProfile(@AuthenticationPrincipal CustomUserDetails userDetails) {
         UserProfileDto myProfile = userProfileService.getMyProfile(userDetails.getUserId());
@@ -92,6 +100,7 @@ public class UserController {
                         .build());
     }
 
+    // 내 프로필 수정
     @PatchMapping("/me")
     public ResponseEntity<CommonResponseDto> updateProfile(@AuthenticationPrincipal CustomUserDetails userDetails, @RequestBody UserUpdateDto request) {
         UserUpdateDto userUpdateDTO = userService.updateProfile(userDetails, request);
@@ -103,6 +112,20 @@ public class UserController {
                         .build());
     }
 
+    // 프로필 이미지 업로드
+    @PatchMapping("/me/profile-image")
+    public ResponseEntity<CommonResponseDto> uploadProfileImage(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                                                @RequestPart MultipartFile profileImage) {
+        String imageUrl = userService.uploadImage(userDetails, profileImage);
+        return ResponseEntity.created(URI.create(imageUrl))
+                .body(CommonResponseDto.builder()
+                        .stateCode(201)
+                        .message("프로필이 정상적으로 수정됐습니다.")
+                        .data(imageUrl)
+                        .build());
+    }
+
+    // 내 프로필 삭제
     @DeleteMapping("/me")
     public ResponseEntity<CommonResponseDto> deleteProfile(@AuthenticationPrincipal CustomUserDetails userDetails) {
         userService.deleteProfile(userDetails.getUsername());
@@ -114,6 +137,7 @@ public class UserController {
                         .build());
     }
 
+    // 내가 예약한 클래스
     @GetMapping("/me/reservations")
     public ResponseEntity<CommonResponseDto> getMyReservations(@AuthenticationPrincipal CustomUserDetails userDetails, Pageable pageable) {
         if (userDetails == null) {
@@ -130,6 +154,7 @@ public class UserController {
                         .build());
     }
 
+    // 내가 강의할 클래스
     @GetMapping("/me/hosting")
     public ResponseEntity<CommonResponseDto> getHostingClass(@AuthenticationPrincipal CustomUserDetails userDetails, Pageable pageable) {
         if (userDetails == null) {
@@ -144,6 +169,7 @@ public class UserController {
                         .build());
     }
 
+    // {username}의 프로필 조회
     @GetMapping("/profile/{username}")
     public ResponseEntity<CommonResponseDto> viewUserProfile(@PathVariable String username) {
         UserInfoDto profile = userProfileService.getProfileMain(username);
@@ -152,6 +178,30 @@ public class UserController {
                         .stateCode(200)
                         .message(username + "님의 클래스를 정상적으로 조회했습니다.")
                         .data(profile)
+                        .build());
+    }
+
+    @GetMapping("/profile/{username}/participated")
+    public ResponseEntity<CommonResponseDto> viewUserParticipated(@PathVariable String username, Pageable pageable) {
+        Page<CookingClassListDto> reservedClasses = userProfileService.getReservedClasses(username, pageable);
+
+        return ResponseEntity.ok()
+                .body(CommonResponseDto.builder()
+                        .stateCode(200)
+                        .message("참여한 클래스가 정상적으로 조회되었습니다.")
+                        .data(reservedClasses)
+                        .build());
+    }
+
+    // {username}이 강의한 클래스
+    @GetMapping("/profile/{username}/hosting")
+    public ResponseEntity<CommonResponseDto> viewUserHosting(@PathVariable String username, Pageable pageable) {
+        Page<CookingClassListDto> hostingClasses = userProfileService.getHostingClasses(username, pageable);
+        return ResponseEntity.ok()
+                .body(CommonResponseDto.builder()
+                        .stateCode(200)
+                        .message("강의한 클래스가 정상적으로 조회되었습니다.")
+                        .data(hostingClasses)
                         .build());
     }
 }

@@ -2,6 +2,7 @@ package com.teamcook.tastytieschat.chat.repository;
 
 import com.teamcook.tastytieschat.chat.constant.MessageType;
 import com.teamcook.tastytieschat.chat.entity.ChatMessage;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -21,4 +22,7 @@ public interface ChatMessageRepository extends MongoRepository<ChatMessage, Stri
         List<ChatMessage> messages = findFirstByChatRoomIdAndTypeOrderByCreatedTimeDesc(chatRoomId, MessageType.USER, PageRequest.of(0, 1, Sort.by(Sort.Direction.DESC, "createdTime")));
         return messages.isEmpty() ? Optional.empty() : Optional.of(messages.get(0));
     }
+
+    Page<ChatMessage> findByChatRoomIdOrderByCreatedTimeDesc(String chatRoomId, Pageable pageable);
+
 }

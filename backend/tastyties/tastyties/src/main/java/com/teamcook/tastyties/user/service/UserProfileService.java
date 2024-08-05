@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -93,7 +94,25 @@ public class UserProfileService {
     }
 
     @Transactional
+    public Page<CookingClassListDto> getReservedClasses(String username, Pageable pageable) {
+        Optional<User> user = userRepository.findByUsername(username);
+        if (user.isEmpty()) {
+            throw new UsernameNotFoundException("존재하지 않는 유저입니다.");
+        }
+        return userAndClassRepository.findReservedClassesByUserId(user.get().getUserId(), pageable);
+    }
+
+    @Transactional
     public Page<CookingClassListDto> getHostingClasses(int hostId, Pageable pageable) {
         return cookingClassRepository.searchClassByHostId(hostId, pageable);
+    }
+
+    @Transactional
+    public Page<CookingClassListDto> getHostingClasses(String username, Pageable pageable) {
+        Optional<User> user = userRepository.findByUsername(username);
+        if (user.isEmpty()) {
+            throw new UsernameNotFoundException("존재하지 않는 유저입니다.");
+        }
+        return cookingClassRepository.searchClassByHostId(user.get().getUserId(), pageable);
     }
 }

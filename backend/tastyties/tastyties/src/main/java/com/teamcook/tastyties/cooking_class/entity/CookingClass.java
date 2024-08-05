@@ -86,7 +86,7 @@ public class CookingClass {
 
     // 쿠킹클래스에 사용되는 이미지
     @OneToMany(mappedBy = "cookingClass")
-    private List<CookingClassImage> cookingClassImages;
+    private Set<CookingClassImage> cookingClassImages;
     // 대표 이미지
     private String mainImage;
     private String chatRoomId;
@@ -105,5 +105,27 @@ public class CookingClass {
 
     public void delete() {
         this.isDelete = true;
+    }
+
+    public CookingClass(User host, String languageCode, String languageName, String countryCode,
+                        String countryName, String title, String description, String dishName,
+                        int dishCookingTime, int level, int quota, boolean limitedAge,
+                        LocalDateTime cookingClassStartTime, LocalDateTime cookingClassEndTime,
+                        LocalDateTime replayEndTime) {
+        this.host = host;
+        this.languageCode = languageCode;
+        this.languageName = languageName;
+        this.countryCode = countryCode;
+        this.countryName = countryName;
+        this.title = title;
+        this.description = description;
+        this.dishName = dishName;
+        this.dishCookingTime = dishCookingTime;
+        this.level = level;
+        this.quota = quota;
+        this.isLimitedAge = limitedAge;
+        this.cookingClassStartTime = cookingClassStartTime;
+        this.cookingClassEndTime = cookingClassEndTime;
+        this.replayEndTime = replayEndTime;
     }
 }

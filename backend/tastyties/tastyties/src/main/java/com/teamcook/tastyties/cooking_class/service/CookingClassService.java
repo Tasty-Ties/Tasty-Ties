@@ -5,7 +5,10 @@ import com.teamcook.tastyties.cooking_class.entity.*;
 import com.teamcook.tastyties.cooking_class.exception.CookingClassNotFoundException;
 import com.teamcook.tastyties.cooking_class.repository.*;
 import com.teamcook.tastyties.exception.CookingClassIsDeletedException;
+import com.teamcook.tastyties.exception.ImageUploadException;
 import com.teamcook.tastyties.exception.ReservationNotFoundException;
+import com.teamcook.tastyties.s3test.Image;
+import com.teamcook.tastyties.s3test.S3Service;
 import com.teamcook.tastyties.security.userdetails.CustomUserDetails;
 import com.teamcook.tastyties.shared.dto.ReviewRequestDto;
 import com.teamcook.tastyties.shared.dto.ReviewResponseDto;
@@ -21,7 +24,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -37,14 +43,15 @@ public class CookingClassService {
     private final UserAndCookingClassRepository userAndCookingClassRepository;
     private final CookingClassTagRepository cookingClassTagRepository;
     private final CookingClassImageRepository cookingClassImageRepository;
-
+    private final S3Service s3Service;
     @Autowired
     public CookingClassService(CookingClassRepository cookingClassRepository, IngredientRepository ingredientRepository,
                                RecipeRepository recipeRepository, CookingToolRepository cookingToolRepository,
                                CookingClassAndCookingClassTagRepository ccAndcctRepository,
                                UserAndCookingClassRepository userAndCookingClassRepository,
                                CookingClassTagRepository cookingClassTagRepository,
-                               CookingClassImageRepository cookingClassImageRepository) {
+                               CookingClassImageRepository cookingClassImageRepository,
+                               S3Service s3Service) {
         this.cookingClassRepository = cookingClassRepository;
         this.ingredientRepository = ingredientRepository;
         this.recipeRepository = recipeRepository;
@@ -53,80 +60,75 @@ public class CookingClassService {
         this.userAndCookingClassRepository = userAndCookingClassRepository;
         this.cookingClassTagRepository = cookingClassTagRepository;
         this.cookingClassImageRepository = cookingClassImageRepository;
+        this.s3Service = s3Service;
     }
     // 클래스 생성
     @Transactional
-    public CookingClass registerClass(User user, CookingClassDto registerDto) {
-        log.debug("mainimg: {}", registerDto.getMainImageUrl());
-        log.debug("urls: {}", registerDto.getImageUrls().toString());
-        CookingClass cc = createCookingClass(user, registerDto);
-        cookingClassRepository.save(cc);
+    public CookingClass registerClass(User user, CookingClassRegisterDto registerDto,
+                                      List<MultipartFile> images) {
+        CookingClass cookingClass = createCookingClass(user, registerDto);
+        List<MultipartFile> nonEmptyImages = filteringImage(images);
+        if (nonEmptyImages != null && !nonEmptyImages.isEmpty()) {
+            List<CookingClassImage> cookingClassImages = createCookingClassImages(images, cookingClass);
+            cookingClass.setMainImage(cookingClassImages.get(0).getCookingClassImageUrl());
+            cookingClassImageRepository.saveAll(cookingClassImages);
+        }
+        cookingClassRepository.save(cookingClass);
 
-        Set<Ingredient> ingredients = createIngredients(registerDto.getIngredients(), cc);
+        Set<Ingredient> ingredients = createIngredients(registerDto.getIngredients(), cookingClass);
         ingredientRepository.saveAll(ingredients);
 
-        Set<Recipe> recipes = createRecipe(registerDto.getRecipe(), cc);
+        Set<Recipe> recipes = createRecipe(registerDto.getRecipe(), cookingClass);
         recipeRepository.saveAll(recipes);
 
-        Set<CookingTool> cookingTools = createCookingTools(registerDto.getCookingTools(), cc);
+        Set<CookingTool> cookingTools = createCookingTools(registerDto.getCookingTools(), cookingClass);
         cookingToolRepository.saveAll(cookingTools);
 
-        List<CookingClassAndCookingClassTag> cookingClassTags = createCookingClassTags(registerDto.getCookingClassTags(), cc);
+        List<CookingClassAndCookingClassTag> cookingClassTags = createCookingClassTags(registerDto.getCookingClassTags(), cookingClass);
         ccAndcctRepository.saveAll(cookingClassTags);
-
-        List<CookingClassImage> cookingClassImages = createCookingClassImages(registerDto.getImageUrls(), cc);
-        cookingClassImageRepository.saveAll(cookingClassImages);
-        return cc;
+        return cookingClass;
     }
 
-    private CookingClass createCookingClass(User user, CookingClassDto registerDto) {
-        CookingClass cc = new CookingClass();
-        cc.setHost(user);
-        cc.setLanguageCode(registerDto.getLanguageCode());
-        cc.setLanguageName(registerDto.getLanguageName());
-        cc.setCountryCode(registerDto.getCountryCode());
-        cc.setCountryName(registerDto.getCountryName());
-        cc.setTitle(registerDto.getTitle());
-        cc.setDescription(registerDto.getDescription());
-        cc.setDishName(registerDto.getDishName());
-        cc.setDishCookingTime(registerDto.getDishCookingTime());
-        cc.setLevel(registerDto.getLevel());
-        cc.setQuota(registerDto.getQuota());
-        cc.setLimitedAge(registerDto.isLimitedAge());
-        cc.setCookingClassStartTime(registerDto.getCookingClassStartTime());
-        cc.setCookingClassEndTime(registerDto.getCookingClassEndTime());
-        cc.setReplayEndTime(registerDto.getReplayEndTime());
-        cc.setMainImage(registerDto.getMainImageUrl());
-        return cc;
+    private List<MultipartFile> filteringImage(List<MultipartFile> images) {
+        // 실제로 파일이 있는 MultipartFile만 필터링
+        return images != null
+                ? images.stream()
+                .filter(image -> image != null && !image.isEmpty())
+                .collect(Collectors.toList())
+                : Collections.emptyList();
+    }
+
+    @Transactional
+    public CookingClass createCookingClass(User user, CookingClassRegisterDto registerDto) {
+        return new CookingClass(
+                user, registerDto.getLanguageCode(), registerDto.getLanguageName(),
+                registerDto.getCountryCode(), registerDto.getCountryName(), registerDto.getTitle(),
+                registerDto.getDescription(), registerDto.getDishName(), registerDto.getDishCookingTime(),
+                registerDto.getLevel(), registerDto.getQuota(), registerDto.isLimitedAge(),
+                registerDto.getCookingClassStartTime(), registerDto.getCookingClassEndTime(), registerDto.getReplayEndTime()
+        );
     }
 
     private Set<Ingredient> createIngredients(Set<IngredientDto> ingredientDtos, CookingClass cc) {
         return ingredientDtos.stream()
                 .map(dto -> {
                     return new Ingredient(
-                            cc,
-                            dto.getIngredientName(),
-                            dto.getQuantity(),
-                            dto.getQuantityUnit(),
-                            dto.isRequired());
+                            cc, dto.getIngredientName(), dto.getQuantity(),
+                            dto.getQuantityUnit(), dto.isRequired());
                 }).collect(Collectors.toSet());
     }
 
     private Set<Recipe> createRecipe(Set<RecipeDto> recipeDtos, CookingClass cc) {
         return recipeDtos.stream()
                 .map(dto -> {
-                    return new Recipe(
-                            cc, dto.getStep(), dto.getDescription()
-                    );
+                    return new Recipe(cc, dto.getStep(), dto.getDescription());
                 }).collect(Collectors.toSet());
     }
 
     private Set<CookingTool> createCookingTools(Set<String> toolNames, CookingClass cc) {
         return toolNames.stream()
                 .map(toolName -> {
-                    return new CookingTool(
-                            cc, toolName
-                    );
+                    return new CookingTool(cc, toolName);
                 }).collect(Collectors.toSet());
     }
 
@@ -141,12 +143,17 @@ public class CookingClassService {
                 }).collect(Collectors.toList());
     }
 
-    private List<CookingClassImage> createCookingClassImages(List<String> imageUrls, CookingClass cc) {
+    private List<CookingClassImage> createCookingClassImages(List<MultipartFile> images, CookingClass cc) {
+        List<Image> imageUrls = null;
+        try {
+            imageUrls = s3Service.uploadImages(images);
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new ImageUploadException("이미지 업로드 중 문제가 생겼습니다.");
+        }
         return imageUrls.stream()
                 .map(imageUrl -> {
-                    return new CookingClassImage(
-                            cc, imageUrl
-                    );
+                    return new CookingClassImage(cc, imageUrl.getStoredImagePath());
                 }).collect(Collectors.toList());
     }
 
@@ -168,6 +175,7 @@ public class CookingClassService {
     @Transactional
     public CookingClassDto getCookingClassDetail(CustomUserDetails userDetails, String uuid) {
         CookingClass cc = cookingClassRepository.findWithUuid(uuid);
+        log.debug("cc image: {}", cc.getCookingClassImages());
         if (cc == null) {
             throw new CookingClassNotFoundException("해당 클래스를 찾을 수 없습니다.");
         }
@@ -189,7 +197,7 @@ public class CookingClassService {
         Set<String> tags = mapToTagNames(cc.getCookingClassAndCookingClassTags());
 
         // 이미지 관련 추가 필요
-        // List<String> imageUrls = 어쩌구
+        Set<String> imageUrls = mapToCookingClassImages(cc.getCookingClassImages());
 
         return new CookingClassDto(
                 cc.getUuid(), cc.getHost().getNickname(),
@@ -200,8 +208,7 @@ public class CookingClassService {
                 recipeDtos, cookingTools, cc.getQuota(),
                 cc.getReplayEndTime(), isEnrolledClass, isHost,
                 enrolledCount, userEnrolledInClass,
-                null, cc.getMainImage(),
-                cc.getChatRoomId()
+                imageUrls, cc.getMainImage(), cc.getChatRoomId()
         );
     }
 
@@ -227,6 +234,13 @@ public class CookingClassService {
                         recipe.getStep(),
                         recipe.getDescription()
                 )).collect(Collectors.toSet());
+    }
+
+    private Set<String> mapToCookingClassImages(Set<CookingClassImage> cookingClassImages) {
+        log.debug("image size: {}", cookingClassImages.size());
+        return cookingClassImages.stream()
+                .map(CookingClassImage::getCookingClassImageUrl)
+                .collect(Collectors.toSet());
     }
 
     private Set<String> mapToCookingToolNames(Set<CookingTool> cookingTools) {

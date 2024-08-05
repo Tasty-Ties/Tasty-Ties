@@ -1,6 +1,5 @@
 package com.teamcook.tastyties.cooking_class.controller;
 
-import com.teamcook.tastyties.chat.dto.ChatUserDto;
 import com.teamcook.tastyties.common.constant.RabbitMQUserType;
 import com.teamcook.tastyties.common.dto.CommonResponseDto;
 import com.teamcook.tastyties.common.dto.RabbitMQRequestDto;
@@ -19,6 +18,7 @@ import com.teamcook.tastyties.shared.dto.ReviewResponseDto;
 import com.teamcook.tastyties.user.entity.User;
 import com.teamcook.tastyties.user.exception.UserDetailsNotFoundException;
 import com.teamcook.tastyties.user.service.UserChatService;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -27,7 +27,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -48,7 +50,9 @@ public class CookingClassController {
 
     // 클래스 등록
     @PostMapping
-    public ResponseEntity<CommonResponseDto> registerClass(@AuthenticationPrincipal CustomUserDetails userDetails, @RequestBody final CookingClassDto registerDto) {
+    public ResponseEntity<CommonResponseDto> registerClass(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                                           @RequestPart("registerDto")@Valid CookingClassRegisterDto registerDto,
+                                                           @RequestPart("images") List<MultipartFile> images) {
         if (userDetails == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(CommonResponseDto.builder()
@@ -59,9 +63,10 @@ public class CookingClassController {
         }
         User user = userDetails.user();
         log.debug("userId= {}", user.getUserId());
+        CookingClass cookingClass = cookingClassService.registerClass(user, registerDto, images);
 
-        CookingClass cookingClass = cookingClassService.registerClass(user, registerDto);
-
+        log.debug("cookingClassId= {}", cookingClass.getUuid());
+        log.debug("cookingClassTitle= {}", cookingClass.getTitle());
         // TODO: 쿠킹 클래스에 채팅방 ID 저장하기
         createChatRoom(cookingClass, user.getUserId());
         registerDto.setChatRoomId(cookingClass.getChatRoomId());

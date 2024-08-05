@@ -1,4 +1,4 @@
-package com.teamcook.tastyties.chat.dto;
+package com.teamcook.tastyties.cooking_class.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

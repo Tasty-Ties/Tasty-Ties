@@ -1,10 +1,12 @@
 package com.teamcook.tastyties.cooking_class.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @NoArgsConstructor
+@Getter
 public class CookingClassImage {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

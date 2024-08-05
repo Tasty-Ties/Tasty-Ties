@@ -8,11 +8,9 @@ import com.teamcook.tastytieschat.common.dto.CommonResponseDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -50,6 +48,18 @@ public class ChatController {
                         .data(responseData)
                         .build()
                 );
+    }
+
+    @GetMapping("")
+    public ResponseEntity<CommonResponseDTO> getChatMessages(@RequestParam Map<String, Object> requestParams) {
+        Map<String, Object> responseData = chatMessageService.getChatMessagesByChatRoomId(requestParams);
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(CommonResponseDTO.builder()
+                        .stateCode(200)
+                        .message("채팅 메시지를 성공적으로 조회했습니다.")
+                        .data(responseData)
+                        .build());
     }
 
 }
