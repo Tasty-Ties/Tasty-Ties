@@ -3,12 +3,11 @@ package com.teamcook.tastyties.cooking_class.entity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
+@Getter @NoArgsConstructor
 public class Recipe {
 
     @Id
@@ -21,4 +20,10 @@ public class Recipe {
 
     private String step;
     private String description;
+
+    public Recipe(CookingClass cookingClass, String step, String description) {
+        this.cookingClass = cookingClass;
+        this.step = step;
+        this.description = description;
+    }
 }

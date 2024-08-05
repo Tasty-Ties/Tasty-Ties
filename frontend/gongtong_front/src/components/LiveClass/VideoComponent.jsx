@@ -29,6 +29,7 @@ import { Stream } from "openvidu-browser";
 import Button from "../../common/components/Button";
 import IconButton from "../../common/components/IconButton";
 
+const APPLICATION_SERVER_URL = "http://localhost:8080/api/v1/";
 const localUserSetting = new UserModel();
 
 //채팅 관련

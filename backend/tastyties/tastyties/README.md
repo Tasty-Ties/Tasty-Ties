@@ -20,7 +20,7 @@
 +    mysql db에 tastyties db가 없다면 
     ``` create database tastyties ``` 를 입력해주세요.
 
-2. 환경 설정:
+2. 메인 서버 환경 설정:
 
 + 먼저 `application.properties` 파일로 이동해주세요
 
@@ -30,6 +30,13 @@
 
 + `jwt.secret` 에 충분히 긴 문자열을 넣어주세요 
 + `access key` 와 `secret key` 는 노션을 보고 키를 입력해주세요
+
+3. 채팅 서버 환경 설정
+
++ resources 디렉토리가 안보인다면, java와 같은 level에 new -> directory를 통해 resources 디렉토리를 만듭니다.
++ 디렉토리 안에 application.properties를 생성하고, 노션에 있는 설정 값을 불러옵니다.
++ docker를 킵니다. -> docker pull rabbitmq -> `docker run -d --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq` 를 통해 rabbitmq를 실행시키고 채팅 서버를 실행합니다.
+
 
 ### 그 외 설정
 

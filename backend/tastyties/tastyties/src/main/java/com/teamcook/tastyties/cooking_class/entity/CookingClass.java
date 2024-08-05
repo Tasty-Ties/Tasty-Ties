@@ -16,11 +16,15 @@ import java.util.UUID;
 @Entity
 @Getter @Setter
 @AllArgsConstructor @NoArgsConstructor
+@Table(indexes = {
+        @Index(name = "idx_uuid", columnList = "uuid"),
+})
 public class CookingClass {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int cookingClassId;
+
+    @Column(nullable = false)
     private String uuid;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -59,6 +63,8 @@ public class CookingClass {
     @NotNull @Column(nullable = false)
     private LocalDateTime cookingClassEndTime;
 
+    private String sessionId;
+
     private LocalDateTime replayEndTime;
 
     private LocalDateTime createTime;
@@ -78,6 +84,12 @@ public class CookingClass {
     @OneToMany(mappedBy = "cookingClass")
     private List<CookingClassAndCookingClassTag> cookingClassAndCookingClassTags;
 
+    // 쿠킹클래스에 사용되는 이미지
+    @OneToMany(mappedBy = "cookingClass")
+    private Set<CookingClassImage> cookingClassImages;
+    // 대표 이미지
+    private String mainImage;
+    private String chatRoomId;
 
     @PrePersist
     protected void onCreate() {
@@ -93,5 +105,27 @@ public class CookingClass {
 
     public void delete() {
         this.isDelete = true;
+    }
+
+    public CookingClass(User host, String languageCode, String languageName, String countryCode,
+                        String countryName, String title, String description, String dishName,
+                        int dishCookingTime, int level, int quota, boolean limitedAge,
+                        LocalDateTime cookingClassStartTime, LocalDateTime cookingClassEndTime,
+                        LocalDateTime replayEndTime) {
+        this.host = host;
+        this.languageCode = languageCode;
+        this.languageName = languageName;
+        this.countryCode = countryCode;
+        this.countryName = countryName;
+        this.title = title;
+        this.description = description;
+        this.dishName = dishName;
+        this.dishCookingTime = dishCookingTime;
+        this.level = level;
+        this.quota = quota;
+        this.isLimitedAge = limitedAge;
+        this.cookingClassStartTime = cookingClassStartTime;
+        this.cookingClassEndTime = cookingClassEndTime;
+        this.replayEndTime = replayEndTime;
     }
 }
