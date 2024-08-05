@@ -9,12 +9,13 @@ import TeachClass from "./components/MyPage/TeachClass";
 import AttendClass from "./components/MyPage/AttendClass";
 import MyInfo from "./components/MyPage/Myinfo";
 import MyPoint from "./components/MyPage/MyPoint";
-import ClassList from "@pages/ClassList";
-import ClassDetail from "@pages/ClassDetail";
-import ClassIntroduction from "@components/ClassDetail/ClassIntroduction";
-import ClassIngredient from "@components/ClassDetail/ClassIngredient";
-import ClassKitchenTools from "@components/ClassDetail/ClassKitchenTools";
-import ClassReviews from "@components/ClassDetail/ClassReviews";
+import ClassList from "./pages/ClassList";
+import ClassDetail from "./pages/ClassDetail";
+import ClassIngredient from "./components/ClassDetail/ClassIngredient";
+import ClassReviews from "./components/ClassDetail/ClassReviews";
+import ClassDescription from "./components/ClassDetail/ClassDescription";
+import ClassCookingTools from "./components/ClassDetail/ClassCookingTools";
+import ClassRecipes from "./components/ClassDetail/ClassRecipes";
 import ClassRegist from "./pages/ClassRegist";
 import ClassWaiting from "./pages/ClassWaiting";
 import LiveClass from "./pages/LiveClass";
@@ -39,9 +40,10 @@ const AppRoutes = () => {
       </Route>
       <Route path="/class" element={<ClassList />} />
       <Route path="/class/:id" element={<ClassDetail />}>
-        <Route path="" element={<ClassIntroduction />} />
+        <Route path="" element={<ClassDescription />} />
         <Route path="ingredient" element={<ClassIngredient />} />
-        <Route path="kitchentools" element={<ClassKitchenTools />} />
+        <Route path="cookingTools" element={<ClassCookingTools />} />
+        <Route path="recipes" element={<ClassRecipes />} />
         <Route path="reviews" element={<ClassReviews />} />
       </Route>
       <Route path="/classregist" element={<ClassRegist />} />
