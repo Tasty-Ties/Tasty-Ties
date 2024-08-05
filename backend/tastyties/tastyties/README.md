@@ -35,7 +35,7 @@
 
 + resources 디렉토리가 안보인다면, java와 같은 level에 new -> directory를 통해 resources 디렉토리를 만듭니다.
 + 디렉토리 안에 application.properties를 생성하고, 노션에 있는 설정 값을 불러옵니다.
-+ docker를 킵니다. -> docker pull rabbitmq -> docker run -d --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq 를 통해 rabbitmq를 실행시키고 채팅 서버를 실행합니다.
++ docker를 킵니다. -> docker pull rabbitmq -> `docker run -d --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq` 를 통해 rabbitmq를 실행시키고 채팅 서버를 실행합니다.
 
 
 ### 그 외 설정
