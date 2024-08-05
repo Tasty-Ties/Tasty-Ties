@@ -457,19 +457,24 @@ const VideoComponent = ({ isHost, title, hostName }) => {
     };
 
     mediaRecorder.current.onstop = () => {
+      const stopTime = performance.now(); //녹화 중지 시각
+      console.log(`Recording stopped. Duration: ${stopTime - startTime} ms`); //녹화 기간
+
       console.log("음성 파일 서버에 전송");
       const audioBlob = new Blob(audioChunks.current, { type: "audio/wav" });
       // saveAudioFile(audioBlob);
       sendRecordingToServer(audioBlob);
     };
 
+    const startTime = performance.now();
     mediaRecorder.current.start();
     console.log("Recording started");
   };
 
   //서버로 오디오 보내기
-  const sendRecordingToServer = (audioBlob) => {
+  const sendRecordingToServer = (audioBlob, recordingStopTime) => {
     const reader = new FileReader();
+    const sendStartTime = performance.now(); //전송 시간 측정 시작
 
     reader.onload = () => {
       const base64Data = reader.result.split(",")[1];
@@ -489,6 +494,13 @@ const VideoComponent = ({ isHost, title, hostName }) => {
           destination: `/pub/chat/voice/rooms/${roomId}`,
           body: JSON.stringify(chatMessage),
         });
+
+        if (i === totalChunks - 1) {
+          const sendEndTime = performance.now(); //전송 끝 시간
+          console.log(
+            `Sending completed. Time taken: ${sendEndTime - sendStartTime} ms` //전송 토탈 시간
+          );
+        }
       }
     };
 
