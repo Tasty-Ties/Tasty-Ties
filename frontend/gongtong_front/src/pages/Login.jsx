@@ -26,6 +26,7 @@ const Login = () => {
       username: input.username,
       password: input.password,
     });
+    console.log(response);
 
     if (response.status === 200) {
       const accessToken = response.data.data.accessToken;

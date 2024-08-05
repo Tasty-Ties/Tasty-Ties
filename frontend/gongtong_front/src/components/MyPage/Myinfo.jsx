@@ -10,8 +10,8 @@ const MyInfo = () => {
   const informations = useMyPageStore((state) => state.informations);
   const nav = useNavigate();
 
-  const handleDeleteId = () => {
-    deleteId();
+  const handleDeleteId = async () => {
+    await deleteId();
     nav("/");
     Cookies.remove("accessToken");
     Cookies.remove("refreshToken");
