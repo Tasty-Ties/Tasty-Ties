@@ -2,12 +2,16 @@ package com.teamcook.tastyties.user.controller;
 
 import com.teamcook.tastyties.common.dto.CommonResponseDto;
 import com.teamcook.tastyties.security.userdetails.CustomUserDetails;
+import com.teamcook.tastyties.user.dto.album.FolderListDto;
 import com.teamcook.tastyties.user.dto.album.FolderRegisterDto;
+import com.teamcook.tastyties.user.dto.album.FolderResponseDto;
 import com.teamcook.tastyties.user.entity.User;
 import com.teamcook.tastyties.user.entity.album.Album;
 import com.teamcook.tastyties.user.service.AlbumService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -49,14 +53,30 @@ public class AlbumController {
                         .build());
     }
 
-    @GetMapping("/{albumId}")
-    public ResponseEntity<CommonResponseDto> getAlbum(@PathVariable int albumId) {
+    @GetMapping()
+    public ResponseEntity<CommonResponseDto> getAlbum(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                                      Pageable pageable,
+                                                      @RequestParam(required = false) String countryCode) {
+        log.debug("countryCode: {}", countryCode);
+        Album album = albumService.getAlbum(userDetails.user());
+        Page<FolderListDto> folderList = albumService.getFolderList(album, pageable, countryCode);
+        return ResponseEntity.ok()
+                .body(CommonResponseDto.builder()
+                        .stateCode(200)
+                        .message("앨범을 정상적으로 조회했습니다.")
+                        .data(folderList)
+                        .build());
+    }
+
+    @GetMapping("/{folderId}")
+    public ResponseEntity<CommonResponseDto> getFolder(@PathVariable int folderId) {
+        FolderResponseDto folderDetail = albumService.getFolderDetail(folderId);
 
         return ResponseEntity.ok()
                 .body(CommonResponseDto.builder()
                         .stateCode(200)
                         .message("앨범을 정상적으로 조회했습니다.")
-                        .data(null)
+                        .data(folderDetail)
                         .build());
     }
 }

@@ -1,17 +1,22 @@
 package com.teamcook.tastyties.user.service;
 
+import com.teamcook.tastyties.cooking_class.entity.CookingClass;
 import com.teamcook.tastyties.cooking_class.repository.CookingClassRepository;
+import com.teamcook.tastyties.exception.FolderNotFoundException;
 import com.teamcook.tastyties.s3test.Image;
 import com.teamcook.tastyties.s3test.S3Service;
+import com.teamcook.tastyties.shared.repository.UserAndCookingClassRepository;
+import com.teamcook.tastyties.user.dto.UserSimpleProfileDto;
 import com.teamcook.tastyties.user.dto.album.FolderListDto;
 import com.teamcook.tastyties.user.dto.album.FolderRegisterDto;
+import com.teamcook.tastyties.user.dto.album.FolderResponseDto;
 import com.teamcook.tastyties.user.entity.User;
 import com.teamcook.tastyties.user.entity.album.Album;
 import com.teamcook.tastyties.user.entity.album.Folder;
 import com.teamcook.tastyties.user.entity.album.Photo;
 import com.teamcook.tastyties.user.repository.album.AlbumRepository;
-import com.teamcook.tastyties.user.repository.album.FolderRepository;
-import com.teamcook.tastyties.user.repository.album.PhotoRepository;
+import com.teamcook.tastyties.user.repository.album.folder.FolderRepository;
+import com.teamcook.tastyties.user.repository.album.photo.PhotoRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +28,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class AlbumService {
@@ -33,16 +40,18 @@ public class AlbumService {
     private final PhotoRepository photoRepository;
     private final S3Service s3Service;
     private final CookingClassRepository cookingClassRepository;
+    private final UserAndCookingClassRepository userAndCookingClassRepository;
 
     @Autowired
     public AlbumService(AlbumRepository albumRepository, FolderRepository folderRepository,
                         PhotoRepository photoRepository, @Qualifier("Local") S3Service s3Service,
-                        CookingClassRepository cookingClassRepository) {
+                        CookingClassRepository cookingClassRepository, UserAndCookingClassRepository userAndCookingClassRepository) {
         this.albumRepository = albumRepository;
         this.folderRepository = folderRepository;
         this.photoRepository = photoRepository;
         this.s3Service = s3Service;
         this.cookingClassRepository = cookingClassRepository;
+        this.userAndCookingClassRepository = userAndCookingClassRepository;
     }
 
     public Album getAlbum(User user) {
@@ -73,8 +82,23 @@ public class AlbumService {
         return savedFolder.getFolderName();
     }
 
-    public Page<FolderListDto> getAlbum(Album album, Pageable pageable) {
-//        folderRepository.get
-        return null;
+    public Page<FolderListDto> getFolderList(Album album, Pageable pageable, String countryCode) {
+        return folderRepository.getFolderListByAlbum(album, pageable, countryCode);
+    }
+
+    public FolderResponseDto getFolderDetail(int folderId) {
+        Optional<Folder> findFolder = folderRepository.findById(folderId);
+        if (findFolder.isEmpty()) {
+            throw new FolderNotFoundException("폴더의 정보를 불러올 수 없습니다.");
+        }
+        Folder folder = findFolder.get();
+        FolderResponseDto folderDto = folderRepository.getFolderDto(folder);
+        CookingClass cookingClass = cookingClassRepository.findByUuid(folder.getCookingClassUuid());
+        List<String> photoUrlsByFolder = photoRepository.getPhotoUrlsByFolder(folder);
+        Set<UserSimpleProfileDto> userEnrolledInClass = userAndCookingClassRepository.findUserEnrolledInClass(cookingClass);
+
+        folderDto.setPhotoImageUrls(photoUrlsByFolder);
+        folderDto.setUserProfiles(userEnrolledInClass);
+        return folderDto;
     }
 }
