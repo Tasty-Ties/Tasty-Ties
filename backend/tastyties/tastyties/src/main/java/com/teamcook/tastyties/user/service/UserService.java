@@ -9,6 +9,7 @@ import com.teamcook.tastyties.shared.repository.UserAndCookingClassRepository;
 import com.teamcook.tastyties.shared.repository.UserAndCountryRepository;
 import com.teamcook.tastyties.user.dto.UserRegistrationDto;
 import com.teamcook.tastyties.user.dto.UserUpdateDto;
+import com.teamcook.tastyties.user.entity.Album;
 import com.teamcook.tastyties.user.entity.User;
 import com.teamcook.tastyties.user.exception.UserIDAlreadyExistsException;
 import com.teamcook.tastyties.user.repository.UserRepository;
@@ -21,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -60,6 +62,10 @@ public class UserService {
 
         newUser.setEmail(request.getEmailId() + "@" + request.getEmailDomain());
         newUser.setBirth(request.getBirth());
+
+        // 기본 앨범 생성 및 사용자에 추가
+        Album defaultAlbum = new Album("나의 앨범");
+        newUser.addAlbum(defaultAlbum);
 
         User savedUser = userRepository.save(newUser);
         return savedUser.getUsername();
