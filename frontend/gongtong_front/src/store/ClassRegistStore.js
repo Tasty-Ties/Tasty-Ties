@@ -4,7 +4,7 @@ import {
   getLanguages,
   getClassLists,
   getClassDetail,
-} from "../service/ClassRegistAPI";
+} from "./../service/ClassRegistAPI";
 
 const useClassRegistStore = create((set) => ({
   contries: [],
@@ -32,11 +32,10 @@ const useClassRegistStore = create((set) => ({
     }
   },
 
-  classDetail: [],
+  classDetail: {},
   fetchClassDetail: async (classId) => {
     const classDetail = await getClassDetail(classId);
     set({ classDetail });
-    console.log(classDetail);
   },
 }));
 
