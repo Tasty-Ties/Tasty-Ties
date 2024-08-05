@@ -5,10 +5,6 @@ import useVideoStore from "../../store/useVideoStore";
 const StreamComponent = ({ user }) => {
   const OV = useVideoStore((state) => state.OV);
 
-  useEffect(() => {
-    console.log(user, user.getStreamManager());
-  }, []);
-
   return (
     <div className="OT_widget-container">
       {user && user.getStreamManager() ? (

@@ -8,6 +8,7 @@ const TeachClass = () => {
 
   useEffect(() => {
     fetchTeachClasses();
+    console.log(teachClasses);
   }, []);
   console.log(teachClasses);
 
@@ -19,14 +20,7 @@ const TeachClass = () => {
     <div>
       <p>수업할 클래스</p>
       {teachClasses.map((teachClass, index) => (
-        <Class
-          key={index}
-          title={teachClass.title}
-          mainImage={teachClass.mainImage}
-          startTime={teachClass.startTime}
-          endTime={teachClass.endTime}
-          hostName={teachClass.hostName}
-        />
+        <Class key={index} classInfo={teachClass} />
       ))}
     </div>
   );

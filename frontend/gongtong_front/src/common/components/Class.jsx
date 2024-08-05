@@ -1,8 +1,9 @@
 import "../../styles/MyPage/Class.css";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import { useEffect } from "react";
 import Button from "./Button";
 
-const Class = ({ title, mainImage, startTime, endTime, hostName }) => {
+const Class = ({ classInfo }) => {
   //   //   const timeRemaining = endTime.getHours();
   //   //   console.log(timeRemaining);
   //   //   console.log(endTime);
@@ -23,7 +24,7 @@ const Class = ({ title, mainImage, startTime, endTime, hostName }) => {
   //   //   const timeRemainingSecond = startdate.getSeconds() - nowdate.getSeconds(); //남은 초
 
   // startTime 설정
-  let startdate = new Date(startTime);
+  let startdate = new Date(classInfo.startTime);
 
   // 현재 시간
   let now = new Date();
@@ -50,20 +51,36 @@ const Class = ({ title, mainImage, startTime, endTime, hostName }) => {
   }
   console.log(days, hours, minutes, seconds);
   console.log(timeRemaing);
+  const nav = useNavigate();
+  const location = useLocation();
+
+  console.log(location.pathname);
 
   return (
     <div className="flex">
       <div>
-        <img src={mainImage} alt="클래스사진" />
+        <img src={classInfo.mainImage} alt="클래스사진" />
       </div>
       <div>
-        <h3>{title}</h3>
+        <h3>{classInfo.title}</h3>
+
         <p>
-          강의시간: {startTime} ~ {endTime}
+          강의시간: {classInfo.startTime} ~ {classInfo.endTime}
         </p>
         <Link to="">상세 보기</Link>
       </div>
-      <Button text={timeRemaing} type={"orange-sqr"} />
+      <Button
+        text={timeRemaing}
+        type={"orange-sqr"}
+        onClick={() =>
+          nav(`/classwaiting/${classInfo.uuid}`, {
+            state: {
+              classData: classInfo,
+              isHost: location.pathname === "/mypage/teach" ? true : false,
+            },
+          })
+        }
+      />
     </div>
   );
 };
