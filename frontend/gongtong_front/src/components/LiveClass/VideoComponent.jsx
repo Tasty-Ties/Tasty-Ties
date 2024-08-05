@@ -111,7 +111,7 @@ const VideoComponent = ({ isHost, title, hostName }) => {
   useEffect(() => {
     window.addEventListener("beforeunload", onbeforeunload);
     joinSession();
-    // initializeMediapipe();
+    initializeMediapipe();
 
     stompClient.current = new Client({
       brokerURL: CHAT_SERVER_URL,
@@ -130,7 +130,7 @@ const VideoComponent = ({ isHost, title, hostName }) => {
       },
     });
 
-    // connectStompClient();
+    connectStompClient();
 
     return () => {
       window.removeEventListener("beforeunload", onbeforeunload);
