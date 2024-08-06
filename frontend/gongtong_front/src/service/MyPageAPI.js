@@ -1,8 +1,8 @@
-import axios from "./Axios";
+import api from "./Api";
 
 export const getMyInfo = async () => {
   try {
-    const response = await axios.get("/users/me");
+    const response = await api.get("/users/me");
     console.log(response);
     return response.data.data;
   } catch (error) {
@@ -12,7 +12,7 @@ export const getMyInfo = async () => {
 
 export const deleteId = async () => {
   try {
-    const response = await axios.delete("/users/me");
+    const response = await api.delete("/users/me");
     console.log(response);
   } catch (error) {
     console.log(error);
@@ -21,7 +21,7 @@ export const deleteId = async () => {
 
 export const getTeachClass = async () => {
   try {
-    const response = await axios.get("/users/me/hosting");
+    const response = await api.get("/users/me/hosting");
     console.log(response);
     return response.data.data.content;
   } catch (error) {
@@ -31,7 +31,7 @@ export const getTeachClass = async () => {
 
 export const getReserveClass = async () => {
   try {
-    const response = await axios.get("/users/me/reservations");
+    const response = await api.get("/users/me/reservations");
     console.log(response);
     return response.data.data.content;
   } catch (error) {
