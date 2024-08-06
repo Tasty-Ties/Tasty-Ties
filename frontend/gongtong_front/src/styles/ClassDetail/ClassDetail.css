@@ -1,0 +1,147 @@
+.detail-container {
+  width: 65%;
+  margin: 0 auto;
+  justify-content: center;
+}
+
+.info-img {
+  width: 64vw;
+}
+
+.class-info-box {
+  margin-top: 1.5vh;
+}
+
+.class-info-box .title {
+  font-size: 2.5em;
+  font-weight: 800;
+}
+.nickname-box {
+  margin-top: 1.5vh;
+  line-height: 1.5em;
+  font-size: 1.5em;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+}
+
+.nickname-box img {
+  width: 2vw;
+  margin-left: 1vw;
+}
+
+.class-info-box .sub-box {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.class-info-box .sub-box .btn-box {
+  display: flex;
+  align-items: center;
+}
+
+.class-info-box .btn-box button {
+  margin-right: 1vw;
+  padding: 0.85vw 1.2vw;
+  border: 0;
+  background-color: #005246;
+  color: #fff;
+  border-radius: 10px;
+  text-align: center;
+}
+.class-info-box .btn-box button span {
+  margin-left: 0.3vw;
+}
+.class-info-box .people-box {
+  display: flex;
+  align-items: center;
+}
+.class-info-box .people-box img {
+  width: 2vw;
+  margin-right: 0.7vw;
+}
+.class-info-box .people-box span {
+  font-size: 1.4em;
+  font-weight: 600;
+}
+
+.user-box {
+  display: flex;
+  align-items: center;
+}
+
+.user-info-box .user-box {
+  margin: 2vh 0;
+  font-weight: 800;
+}
+.user-info-box .user-box img {
+  width: 4vw;
+  margin-right: 1vw;
+}
+
+.icon-box {
+  display: flex;
+  align-items: center;
+  margin-bottom: 4vh;
+}
+
+.icon-box svg {
+  margin-right: 0.5vw;
+}
+
+.icon-box span:nth-of-type(1),
+span:nth-of-type(2) {
+  margin-right: 0.5vw;
+}
+
+.caution-box {
+  margin: 5vh 0;
+}
+
+.caution-box span {
+  border: 1px solid #f78330;
+  color: #f78330;
+  margin-right: 0.8vw;
+  padding: 0.4vw 0.6vw;
+  border-radius: 8px;
+}
+
+.class-info-menu {
+  display: flex;
+  column-gap: 10vw;
+  justify-content: center;
+  margin-top: 5vh;
+}
+/* 별점CSS */
+.class-detail-rating-box {
+  display: grid;
+  grid-template-rows: repeat(4, 1fr);
+  justify-content: center;
+  align-items: center;
+}
+
+.detail-rating-status {
+  display: inline-block; /* 하위 별점 이미지들이 있는 영역만 자리를 차지함.*/
+  direction: rtl;
+  border: 0; /* 필드셋 테두리 제거 */
+  pointer-events: none;
+}
+
+.detail-rating-status input[type="radio"] {
+  display: none; /* 라디오박스 감춤 */
+}
+
+.detail-rating-status label {
+  font-size: 2.3rem; /* 이모지 크기 */
+  color: transparent; /* 기존 이모지 컬러 제거 */
+  text-shadow: 0 0 0 #f0f0f0; /* 기본 색상은 회색 */
+}
+
+.detail-rating-status input[type="radio"]:checked ~ label {
+  text-shadow: 0 0 0 #ffbb1a; /* 체크된 별은 노란색으로 강조 */
+}
+.detail-rating-status label:hover,
+.detail-rating-status label:hover ~ label:hover {
+  text-shadow: 0 0 0 #f0f0f0; /* hover 효과 제거 */
+}
+/* 여기까지*/
