@@ -12,7 +12,7 @@ import java.util.Set;
 @Data
 public class FolderResponseDto {
     private String title;
-    private List<String> photoImageUrls = new ArrayList<>();
+    private List<PhotoResponseDto> photoResponse = new ArrayList<>();
     private UserSimpleProfileDto host;
     private LocalDateTime cookingClassStartTime;
     private LocalDateTime cookingClassEndTime;

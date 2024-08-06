@@ -79,4 +79,10 @@ public class AlbumController {
                         .data(folderDetail)
                         .build());
     }
+
+    @PatchMapping("/{folderId}/order")
+    public ResponseEntity<CommonResponseDto> orderPhotos(@PathVariable int folerId) {
+
+        return null;
+    }
 }

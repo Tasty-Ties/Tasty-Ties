@@ -1,6 +1,8 @@
 package com.teamcook.tastyties.user.repository.album.photo;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.teamcook.tastyties.user.dto.album.PhotoResponseDto;
+import com.teamcook.tastyties.user.dto.album.QPhotoResponseDto;
 import com.teamcook.tastyties.user.entity.album.Folder;
 import com.teamcook.tastyties.user.entity.album.QPhoto;
 
@@ -17,9 +19,11 @@ public class PhotoRepositoryImpl implements PhotoCustomRepository {
     }
 
     @Override
-    public List<String> getPhotoUrlsByFolder(Folder folder) {
+    public List<PhotoResponseDto> getPhotoUrlsAndIndexByFolder(Folder folder) {
         return queryFactory
-                .select(photo.photoImageUrl)
+                .select(new QPhotoResponseDto(
+                        photo.photoImageUrl,
+                        photo.orderIndex))
                 .from(photo)
                 .where(photo.folder.eq(folder))
                 .orderBy(photo.orderIndex.asc())

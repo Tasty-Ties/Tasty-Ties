@@ -10,6 +10,7 @@ import com.teamcook.tastyties.user.dto.UserSimpleProfileDto;
 import com.teamcook.tastyties.user.dto.album.FolderListDto;
 import com.teamcook.tastyties.user.dto.album.FolderRegisterDto;
 import com.teamcook.tastyties.user.dto.album.FolderResponseDto;
+import com.teamcook.tastyties.user.dto.album.PhotoResponseDto;
 import com.teamcook.tastyties.user.entity.User;
 import com.teamcook.tastyties.user.entity.album.Album;
 import com.teamcook.tastyties.user.entity.album.Folder;
@@ -24,6 +25,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -58,6 +60,7 @@ public class AlbumService {
         return albumRepository.findAlbumByUser(user);
     }
 
+    @Transactional
     public String registerFolder(Album album, List<MultipartFile> images,
                                  FolderRegisterDto registerDto) {
 
@@ -86,6 +89,7 @@ public class AlbumService {
         return folderRepository.getFolderListByAlbum(album, pageable, countryCode);
     }
 
+    @Transactional
     public FolderResponseDto getFolderDetail(int folderId) {
         Optional<Folder> findFolder = folderRepository.findById(folderId);
         if (findFolder.isEmpty()) {
@@ -94,10 +98,10 @@ public class AlbumService {
         Folder folder = findFolder.get();
         FolderResponseDto folderDto = folderRepository.getFolderDto(folder);
         CookingClass cookingClass = cookingClassRepository.findByUuid(folder.getCookingClassUuid());
-        List<String> photoUrlsByFolder = photoRepository.getPhotoUrlsByFolder(folder);
+        List<PhotoResponseDto> photoUrlsByFolder = photoRepository.getPhotoUrlsAndIndexByFolder(folder);
         Set<UserSimpleProfileDto> userEnrolledInClass = userAndCookingClassRepository.findUserEnrolledInClass(cookingClass);
 
-        folderDto.setPhotoImageUrls(photoUrlsByFolder);
+        folderDto.setPhotoResponse(photoUrlsByFolder);
         folderDto.setUserProfiles(userEnrolledInClass);
         return folderDto;
     }
