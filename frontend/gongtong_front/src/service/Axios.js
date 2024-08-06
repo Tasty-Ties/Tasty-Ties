@@ -4,6 +4,8 @@ import Cookies from "js-cookie";
 axios.defaults.withCredentials = true;
 axios.defaults.baseURL = import.meta.env.VITE_MAIN_SERVER;
 
+const MAIN_SERVER_URL = import.meta.env.VITE_MAIN_SERVER;
+
 // 요청 인터셉터: 모든 요청에 `accessToken` 추가
 axios.interceptors.request.use(
   (config) => {

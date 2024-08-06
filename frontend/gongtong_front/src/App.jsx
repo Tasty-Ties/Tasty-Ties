@@ -7,6 +7,15 @@ import { useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { listItemSecondaryActionClasses } from "@mui/material";
 
+import {requestPermission, onForegroundMessage} from "./firebase/firebaseCloudMessaging";
+
+// FCM permission & token
+if (Notification.permission !== 'granted') {
+  requestPermission();
+} else {
+  onForegroundMessage();
+}
+
 function App() {
   const location = useLocation();
   const [isHeaderVisible, setIsHeaderVisible] = useState(true);
