@@ -9,6 +9,9 @@ const Header = () => {
   const nav = useNavigate();
   const { logout } = useAuthStore();
   const handleLogout = () => {
+    // Remove FCM token
+    Cookies.remove("fcmToken");
+
     logout();
     nav("/");
   };

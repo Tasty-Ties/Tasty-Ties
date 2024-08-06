@@ -11,8 +11,7 @@ export function requestPermission() {
                 vapidKey: import.meta.env.VITE_FIREBASE_VAPID_KEY
             }).then((currentToken) => {
                 if (currentToken) {
-                    console.log(currentToken);
-                    // Save FCM token 
+                    document.cookie = `fcmToken=${currentToken}; path=/; SameSite=Lax`;
                 }
             })
         }
