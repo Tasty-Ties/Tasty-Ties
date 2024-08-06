@@ -20,6 +20,8 @@ public interface UserAndCookingClassCustomRepository {
     Long countQuota(CookingClass cookingClass);
     Set<UserSimpleProfileDto> findUserEnrolledInClass(CookingClass cookingClass);
 
+    Set<String> getAttendeeFcmTokens(String cookingClassId);
+
     long deleteCookingClass(CookingClass cookingClass);
     boolean deleteReservation(User user, CookingClass cookingClass);
 

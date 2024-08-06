@@ -80,6 +80,17 @@ public class UserAndCookingClassRepositoryImpl implements UserAndCookingClassCus
     }
 
     @Override
+    public Set<String> getAttendeeFcmTokens(String cookingClassId) {
+        return new HashSet<>(queryFactory
+                .select(user.fcmToken)
+                .from(userAndCookingClass)
+                .join(userAndCookingClass.user, user)
+                .join(userAndCookingClass.cookingClass, cookingClass)
+                .where(cookingClass.uuid.eq(cookingClassId))
+                .fetch());
+    }
+
+    @Override
     public long deleteCookingClass(CookingClass cookingClass) {
         return queryFactory
                 .delete(userAndCookingClass)
