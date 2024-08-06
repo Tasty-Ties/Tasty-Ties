@@ -1,5 +1,6 @@
 package com.teamcook.tastyties.notification.entity;
 
+import com.teamcook.tastyties.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,6 +19,9 @@ public class FcmNotification {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", referencedColumnName = "userId")
+    private User user;
     private String title;
     private String body;
     private LocalDateTime createTime;

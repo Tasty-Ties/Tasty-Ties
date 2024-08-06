@@ -9,6 +9,7 @@ import com.teamcook.tastyties.cooking_class.dto.CookingClassListDto;
 import com.teamcook.tastyties.cooking_class.dto.CookingClassDto;
 import com.teamcook.tastyties.cooking_class.dto.CookingClassSearchCondition;
 import com.teamcook.tastyties.notification.constant.NotificationType;
+import com.teamcook.tastyties.notification.dto.FcmNotificationDto;
 import com.teamcook.tastyties.notification.entity.FcmNotification;
 import com.teamcook.tastyties.notification.service.NotificationService;
 import com.teamcook.tastyties.shared.dto.ReviewRequestDto;
@@ -18,6 +19,7 @@ import com.teamcook.tastyties.cooking_class.service.CookingClassService;
 import com.teamcook.tastyties.cooking_class.service.RabbitMQProducer;
 import com.teamcook.tastyties.security.userdetails.CustomUserDetails;
 import com.teamcook.tastyties.shared.dto.ReviewResponseDto;
+import com.teamcook.tastyties.user.dto.UserFcmTokenDto;
 import com.teamcook.tastyties.user.entity.User;
 import com.teamcook.tastyties.user.exception.UserDetailsNotFoundException;
 import com.teamcook.tastyties.user.service.UserChatService;
@@ -32,6 +34,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -156,7 +159,7 @@ public class CookingClassController {
 
         deleteChatRoom(deletedCookingClass.getChatRoomId());
 
-        sendDeletionCookingClassNotification(deletedCookingClass.getClassName(), deletedCookingClass.getFcmTokens());
+        sendDeletionCookingClassNotification(deletedCookingClass.getClassName(), deletedCookingClass.getUsers());
 
         return ResponseEntity.ok()
                 .body(CommonResponseDto.builder()
@@ -174,17 +177,16 @@ public class CookingClassController {
         rabbitMQProducer.send(rabbitMQRequestDto);
     }
 
-    private void sendDeletionCookingClassNotification(String cookingClassName, Set<String> fcmTokens) {
-        log.debug(fcmTokens.toString());
-        if (fcmTokens.isEmpty()) {
+    private void sendDeletionCookingClassNotification(String cookingClassName, Set<UserFcmTokenDto> users) {
+        if (users.isEmpty()) {
             return;
         }
 
-        FcmNotification notification = FcmNotification.builder()
+        FcmNotificationDto notification = FcmNotificationDto.builder()
                 .title(NotificationType.DELETION_COOKING_CLASS.getTitle())
                 .body(NotificationType.DELETION_COOKING_CLASS.generateBodyWithCookingClassName(cookingClassName))
                 .build();
-        notificationService.sendMessagesTo(fcmTokens, notification);
+        notificationService.sendMessagesTo(users, notification);
     }
 
     // 클래스 예약
