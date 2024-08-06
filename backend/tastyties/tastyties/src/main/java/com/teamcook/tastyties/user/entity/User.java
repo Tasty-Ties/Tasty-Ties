@@ -7,13 +7,14 @@ import com.teamcook.tastyties.shared.entity.UserAndCookingClass;
 import com.teamcook.tastyties.shared.entity.UserAndCountry;
 import com.teamcook.tastyties.short_form.entity.ShortForm;
 import com.teamcook.tastyties.user.dto.UserUpdateDto;
+import com.teamcook.tastyties.user.entity.album.Album;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -71,9 +72,20 @@ public class User {
 
     private int activityPoint = 0;
 
+    private String fcmToken;
+
     // short-form
     @OneToMany(mappedBy = "user")
     private List<ShortForm> shortForm;
+
+    // album
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Album> albumList = new ArrayList<>();
+
+    public void addAlbum(Album album) {
+        albumList.add(album);
+        album.setUser(this);
+    }
 
     public void updateUser(UserUpdateDto request, String encodedPassword, String instagramHandle, String youtubeHandle) {
         this.nickname = request.getNickname();

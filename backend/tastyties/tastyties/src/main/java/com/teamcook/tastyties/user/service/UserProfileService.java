@@ -1,12 +1,11 @@
 package com.teamcook.tastyties.user.service;
 
-import com.teamcook.tastyties.common.dto.CountryResponseDto;
+import com.teamcook.tastyties.common.dto.country.CountryResponseDto;
 import com.teamcook.tastyties.common.dto.LanguageResponseDto;
 import com.teamcook.tastyties.common.entity.Country;
 import com.teamcook.tastyties.common.entity.Language;
 import com.teamcook.tastyties.cooking_class.dto.CookingClassListDto;
 import com.teamcook.tastyties.cooking_class.repository.CookingClassRepository;
-import com.teamcook.tastyties.shared.dto.ReviewRequestDto;
 import com.teamcook.tastyties.shared.dto.ReviewResponseDto;
 import com.teamcook.tastyties.shared.repository.UserAndCookingClassRepository;
 import com.teamcook.tastyties.shared.repository.UserAndCountryRepository;
@@ -78,7 +77,7 @@ public class UserProfileService {
                 ,uc.getCountry().getCountryImageUrl()))
                 .toList();
 
-        return new UserProfileDto(user.getProfileImageUrl(), user.getNickname(), user.getDescription(),
+        return new UserProfileDto(user.getUserId(), user.getProfileImageUrl(), user.getNickname(), user.getDescription(),
                 new CountryResponseDto(country.getAlpha2(), country.getEnglishName(),
                         country.getKoreanName(), country.getCountryImageUrl()),
                 collectedFlags,

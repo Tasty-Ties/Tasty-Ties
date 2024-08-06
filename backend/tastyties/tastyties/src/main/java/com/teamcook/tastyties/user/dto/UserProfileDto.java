@@ -1,6 +1,6 @@
 package com.teamcook.tastyties.user.dto;
 
-import com.teamcook.tastyties.common.dto.CountryResponseDto;
+import com.teamcook.tastyties.common.dto.country.CountryResponseDto;
 import com.teamcook.tastyties.common.dto.LanguageResponseDto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -11,6 +11,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 public class UserProfileDto {
+    private int userId;
     private String profileImageUrl;
     private String nickname;
     private String description;
