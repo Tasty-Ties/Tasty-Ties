@@ -67,6 +67,7 @@ public class UserRewardsService {
     }
 
     // 이하로 마일리지, 랭킹 관리
+    // 마일리지 부여
     @Transactional
     public void addScore(int userId, double score) {
         redisTemplate.opsForZSet().add(WEEKLY_LEADERBOARD_KEY, userId, score);
@@ -78,30 +79,35 @@ public class UserRewardsService {
         });
     }
 
+    // N명의 가장 높은 유저 반환
     @Transactional
     public Set<ZSetOperations.TypedTuple<Object>> getTopUsers(String period, int topN) {
         String key = getKeyByPeriod(period);
         return redisTemplate.opsForZSet().reverseRangeWithScores(key, 0, topN - 1);
     }
 
+    // 해당 유저의 점수 반환
     @Transactional
     public Double getUserScore(String period, int userId) {
         String key = getKeyByPeriod(period);
         return redisTemplate.opsForZSet().score(key, userId);
     }
 
+    // 해당 유저의 순위 반환
     @Transactional
     public Long getUserRank(String period, int userId) {
         String key = getKeyByPeriod(period);
         return redisTemplate.opsForZSet().reverseRank(key, userId);
     }
 
+    // 해당 유저의 점수 삭제
     @Transactional
     public void removeUser(String period, int userId) {
         String key = getKeyByPeriod(period);
         redisTemplate.opsForZSet().remove(key, userId);
     }
 
+    // 설정한 기간에 따라 key 반환
     private static String getKeyByPeriod(String period) {
         String key;
         switch (period.toLowerCase()) {
