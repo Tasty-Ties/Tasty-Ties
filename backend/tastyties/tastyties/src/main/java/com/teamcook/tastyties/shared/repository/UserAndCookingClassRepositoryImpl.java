@@ -2,7 +2,7 @@ package com.teamcook.tastyties.shared.repository;
 
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.teamcook.tastyties.common.dto.QCountryProfileDto;
+import com.teamcook.tastyties.common.dto.country.QCountryProfileDto;
 import com.teamcook.tastyties.common.entity.QCountry;
 import com.teamcook.tastyties.cooking_class.dto.CookingClassListDto;
 import com.teamcook.tastyties.cooking_class.dto.QCookingClassListDto;
