@@ -5,10 +5,11 @@ import useProfileStore from "../../store/ProfileStore";
 
 const Category = () => {
   const informations = useProfileStore((state) => state.otherInformations);
+  console.log(informations);
+
   return (
-    <>
+    <div className="flex">
       <div>
-        <br />
         <div>
           <p>프로필사진</p>
           <p>국적:{informations.country?.koreanName || "국적 정보 없음"}</p>
@@ -27,21 +28,24 @@ const Category = () => {
         <hr />
         <ul>
           <li>
-            <NavLink to="/mypage/reserve">홈</NavLink>
+            <NavLink to="">홈</NavLink>
           </li>
           <li>
-            <NavLink to="/mypage/reserve">수업한 클래스</NavLink>
+            <NavLink to="teach">수업한 클래스</NavLink>
           </li>
           <li>
-            <NavLink to="/mypage/teach">참여한 클래스</NavLink>
+            <NavLink to="attend">참여한 클래스</NavLink>
           </li>
           <li>
-            <NavLink to="/mypage/attend">수강평</NavLink>
+            <NavLink to="review">수강평</NavLink>
           </li>
         </ul>
         <br />
       </div>
-    </>
+      <div>
+        <Outlet />
+      </div>
+    </div>
   );
 };
 

@@ -11,6 +11,11 @@ import MyInfo from "./components/MyPage/Myinfo";
 import MyPoint from "./components/MyPage/MyPoint";
 import MyShorts from "./components/MyPage/MyShorts";
 import EditInfo from "./components/MyPage/EditInfo";
+import Profile from "./pages/Profile";
+import OtherInfo from "./components/Profile/OtherInfo";
+import TeachedClass from "./components/Profile/TeachedClass";
+import AttendedClass from "./components/Profile/AttendedClass";
+import Review from "./components/Profile/Review";
 import ClassList from "./pages/ClassList";
 import ClassDetail from "./pages/ClassDetail";
 import ClassIngredient from "./components/ClassDetail/ClassIngredient";
@@ -39,6 +44,12 @@ const AppRoutes = () => {
         <Route path="point" element={<MyPoint />} />
         <Route path="shorts" element={<MyShorts />} />
         <Route path="editinfo" element={<EditInfo />} />
+      </Route>
+      <Route path="/otherpage/:username" element={<Profile />}>
+        <Route path="" element={<OtherInfo />} />
+        <Route path="teach" element={<TeachedClass />} />
+        <Route path="attend" element={<AttendedClass />} />
+        <Route path="review" element={<Review />} />
       </Route>
       <Route path="/class" element={<ClassList />} />
       <Route path="/class/:id" element={<ClassDetail />}>
