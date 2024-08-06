@@ -1,4 +1,5 @@
 import "@styles/ClassList/ClassListItem.css";
+const FRONT_SERVER_URL = import.meta.env.VITE_FRONT_SERVER;
 
 const ClassListItem = (content) => {
   return (
@@ -11,7 +12,7 @@ const ClassListItem = (content) => {
             className="food-img"
           />
           <img
-            src="http://localhost:5173/images/classImages/Korea.png"
+            src={`${FRONT_SERVER_URL}/images/classImages/Korea.png`}
             alt="국기"
             className="flag-img"
           />
