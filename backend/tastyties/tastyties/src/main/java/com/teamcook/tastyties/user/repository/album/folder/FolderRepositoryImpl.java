@@ -3,14 +3,13 @@ package com.teamcook.tastyties.user.repository.album.folder;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.teamcook.tastyties.cooking_class.entity.CookingClass;
-import com.teamcook.tastyties.cooking_class.entity.QCookingClass;
+import com.teamcook.tastyties.common.dto.country.CountrySearchDto;
+import com.teamcook.tastyties.common.dto.country.QCountrySearchDto;
 import com.teamcook.tastyties.user.dto.QUserSimpleProfileDto;
 import com.teamcook.tastyties.user.dto.album.FolderListDto;
 import com.teamcook.tastyties.user.dto.album.FolderResponseDto;
 import com.teamcook.tastyties.user.dto.album.QFolderListDto;
 import com.teamcook.tastyties.user.dto.album.QFolderResponseDto;
-import com.teamcook.tastyties.user.entity.QUser;
 import com.teamcook.tastyties.user.entity.album.Album;
 import com.teamcook.tastyties.user.entity.album.Folder;
 import org.springframework.data.domain.Page;
@@ -19,6 +18,7 @@ import org.springframework.data.support.PageableExecutionUtils;
 
 import java.util.List;
 
+import static com.teamcook.tastyties.common.entity.QCountry.country;
 import static com.teamcook.tastyties.cooking_class.entity.QCookingClass.cookingClass;
 import static com.teamcook.tastyties.user.entity.QUser.user;
 import static com.teamcook.tastyties.user.entity.album.QAlbum.album;
@@ -72,5 +72,18 @@ public class FolderRepositoryImpl implements FolderCustomRepository {
     private BooleanExpression countryCodeEq(String countryCode) {
         return hasText(countryCode) ? folder.countryCode.eq(countryCode) : null;
     }
+
+    @Override
+    public List<CountrySearchDto> getCountryDistinctList(Album album) {
+        return queryFactory
+                .select(new QCountrySearchDto(
+                    country.alpha2, country.koreanName
+                )).from(folder)
+                .join(country).on(folder.countryCode.eq(country.alpha2))
+                .where(folder.album.eq(album))
+                .distinct()
+                .fetch();
+    }
+
 
 }

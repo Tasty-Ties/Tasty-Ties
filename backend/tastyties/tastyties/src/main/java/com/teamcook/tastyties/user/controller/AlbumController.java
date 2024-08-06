@@ -2,10 +2,7 @@ package com.teamcook.tastyties.user.controller;
 
 import com.teamcook.tastyties.common.dto.CommonResponseDto;
 import com.teamcook.tastyties.security.userdetails.CustomUserDetails;
-import com.teamcook.tastyties.user.dto.album.FolderListDto;
-import com.teamcook.tastyties.user.dto.album.FolderRegisterDto;
-import com.teamcook.tastyties.user.dto.album.FolderResponseDto;
-import com.teamcook.tastyties.user.dto.album.PhotoOrderChangeDto;
+import com.teamcook.tastyties.user.dto.album.*;
 import com.teamcook.tastyties.user.entity.User;
 import com.teamcook.tastyties.user.entity.album.Album;
 import com.teamcook.tastyties.user.entity.album.Photo;
@@ -40,6 +37,7 @@ public class AlbumController {
         return "test";
     }
 
+    // 쿠킹 클래스가 끝난 후 폴더를 등록
     @PostMapping("/register-folder")
     public ResponseEntity<CommonResponseDto> registerFolder(@AuthenticationPrincipal CustomUserDetails userDetails,
                                                             @RequestPart("images") List<MultipartFile> images,
@@ -55,13 +53,15 @@ public class AlbumController {
                         .build());
     }
 
+    // 앨범의 정보를 불러옴
     @GetMapping()
     public ResponseEntity<CommonResponseDto> getAlbum(@AuthenticationPrincipal CustomUserDetails userDetails,
                                                       Pageable pageable,
                                                       @RequestParam(required = false) String countryCode) {
         log.debug("countryCode: {}", countryCode);
         Album album = albumService.getAlbum(userDetails.user());
-        Page<FolderListDto> folderList = albumService.getFolderList(album, pageable, countryCode);
+        FolderListResponseDto folderList = albumService.getFolderList(album, pageable, countryCode);
+
         return ResponseEntity.ok()
                 .body(CommonResponseDto.builder()
                         .stateCode(200)
@@ -70,8 +70,10 @@ public class AlbumController {
                         .build());
     }
 
+    // folderId에 따른 폴더의 상세정보를 불러옴
     @GetMapping("/{folderId}")
     public ResponseEntity<CommonResponseDto> getFolder(@PathVariable int folderId) {
+
         FolderResponseDto folderDetail = albumService.getFolderDetail(folderId);
 
         return ResponseEntity.ok()
@@ -82,6 +84,7 @@ public class AlbumController {
                         .build());
     }
 
+    // 폴더 안에 있는 사진의 숫자를 정렬함
     @PatchMapping("/{folderId}/order")
     public ResponseEntity<CommonResponseDto> orderPhotos(@PathVariable int folderId,
                                                          @RequestBody List<PhotoOrderChangeDto> photoOrderChangeDtos) {

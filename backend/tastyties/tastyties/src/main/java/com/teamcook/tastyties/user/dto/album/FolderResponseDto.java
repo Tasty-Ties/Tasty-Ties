@@ -1,6 +1,7 @@
 package com.teamcook.tastyties.user.dto.album;
 
 import com.querydsl.core.annotations.QueryProjection;
+import com.teamcook.tastyties.common.dto.country.CountrySearchDto;
 import com.teamcook.tastyties.user.dto.UserSimpleProfileDto;
 import lombok.Data;
 
@@ -12,6 +13,7 @@ import java.util.Set;
 @Data
 public class FolderResponseDto {
     private String title;
+    private List<CountrySearchDto> countrySearchDtoList = new ArrayList<>();
     private List<PhotoResponseDto> photoResponse = new ArrayList<>();
     private UserSimpleProfileDto host;
     private LocalDateTime cookingClassStartTime;

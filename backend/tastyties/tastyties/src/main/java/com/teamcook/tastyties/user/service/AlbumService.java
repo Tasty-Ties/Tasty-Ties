@@ -1,5 +1,7 @@
 package com.teamcook.tastyties.user.service;
 
+import com.teamcook.tastyties.common.dto.country.CountrySearchDto;
+import com.teamcook.tastyties.common.repository.CountryRepository;
 import com.teamcook.tastyties.cooking_class.entity.CookingClass;
 import com.teamcook.tastyties.cooking_class.repository.CookingClassRepository;
 import com.teamcook.tastyties.exception.FolderNotFoundException;
@@ -42,19 +44,24 @@ public class AlbumService {
     private final S3Service s3Service;
     private final CookingClassRepository cookingClassRepository;
     private final UserAndCookingClassRepository userAndCookingClassRepository;
+    private final CountryRepository countryRepository;
 
     @Autowired
     public AlbumService(AlbumRepository albumRepository, FolderRepository folderRepository,
                         PhotoRepository photoRepository, @Qualifier("Local") S3Service s3Service,
-                        CookingClassRepository cookingClassRepository, UserAndCookingClassRepository userAndCookingClassRepository) {
+                        CookingClassRepository cookingClassRepository,
+                        UserAndCookingClassRepository userAndCookingClassRepository,
+                        CountryRepository countryRepository) {
         this.albumRepository = albumRepository;
         this.folderRepository = folderRepository;
         this.photoRepository = photoRepository;
         this.s3Service = s3Service;
         this.cookingClassRepository = cookingClassRepository;
         this.userAndCookingClassRepository = userAndCookingClassRepository;
+        this.countryRepository = countryRepository;
     }
 
+    // 문제가 생긴다면 여기부터 확인
     public Album getAlbum(User user) {
         return albumRepository.findAlbumByUser(user);
     }
@@ -84,8 +91,10 @@ public class AlbumService {
         return savedFolder.getFolderName();
     }
 
-    public Page<FolderListDto> getFolderList(Album album, Pageable pageable, String countryCode) {
-        return folderRepository.getFolderListByAlbum(album, pageable, countryCode);
+    public FolderListResponseDto getFolderList(Album album, Pageable pageable, String countryCode) {
+        Page<FolderListDto> folderListByAlbum = folderRepository.getFolderListByAlbum(album, pageable, countryCode);
+        List<CountrySearchDto> countryDistinctList = folderRepository.getCountryDistinctList(album);
+        return new FolderListResponseDto(folderListByAlbum, countryDistinctList);
     }
 
     @Transactional
@@ -99,6 +108,7 @@ public class AlbumService {
         CookingClass cookingClass = cookingClassRepository.findByUuid(folder.getCookingClassUuid());
         List<PhotoResponseDto> photoUrlsByFolder = photoRepository.getPhotoUrlsAndIndexByFolder(folder);
         Set<UserSimpleProfileDto> userEnrolledInClass = userAndCookingClassRepository.findUserEnrolledInClass(cookingClass);
+
 
         folderDto.setPhotoResponse(photoUrlsByFolder);
         folderDto.setUserProfiles(userEnrolledInClass);
