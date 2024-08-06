@@ -1,18 +1,16 @@
 import { NavLink, Outlet } from "react-router-dom";
 import instalogo from "../../assets/MyPage/insta.png";
 import youtubelogo from "../../assets/MyPage/Youtube.png";
-import useMyPageStore from "../../store/MyPageStore";
+import useProfileStore from "../../store/ProfileStore";
 
 const Category = () => {
-  const informations = useMyPageStore((state) => state.informations);
+  const informations = useProfileStore((state) => state.otherInformations);
   return (
     <>
       <div>
         <br />
         <div>
-          <p>
-            <img src={informations.profileImageUrl} alt="내프로필사진" />
-          </p>
+          <p>프로필사진</p>
           <p>국적:{informations.country?.koreanName || "국적 정보 없음"}</p>
           <p>이름:{informations.nickname}</p>
           <p>자기소개:{informations.description}</p>
@@ -28,31 +26,17 @@ const Category = () => {
         <br />
         <hr />
         <ul>
-          <li className="text-xl">클래스</li>
-          <hr />
           <li>
-            <NavLink to="/mypage/reserve">예약한 클래스</NavLink>
+            <NavLink to="/mypage/reserve">홈</NavLink>
           </li>
           <li>
-            <NavLink to="/mypage/teach">수업할 클래스</NavLink>
+            <NavLink to="/mypage/reserve">수업한 클래스</NavLink>
           </li>
           <li>
-            <NavLink to="/mypage/attend">참여한 클래스</NavLink>
-          </li>
-        </ul>
-
-        <br />
-        <ul>
-          <li className="text-xl">나의 활동</li>
-          <hr />
-          <li>
-            <NavLink to="/mypage">내 정보</NavLink>
+            <NavLink to="/mypage/teach">참여한 클래스</NavLink>
           </li>
           <li>
-            <NavLink to="/mypage/point">마일리지</NavLink>
-          </li>
-          <li>
-            <NavLink to="/mypage/shorts">숏폼</NavLink>
+            <NavLink to="/mypage/attend">수강평</NavLink>
           </li>
         </ul>
         <br />
