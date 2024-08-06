@@ -6,6 +6,7 @@ import com.teamcook.tastyties.s3test.Image;
 import com.teamcook.tastyties.s3test.S3Service;
 import com.teamcook.tastyties.security.userdetails.CustomUserDetails;
 import com.teamcook.tastyties.shared.repository.UserAndCookingClassRepository;
+import com.teamcook.tastyties.user.dto.AuthRequestDto;
 import com.teamcook.tastyties.user.dto.UserRegistrationDto;
 import com.teamcook.tastyties.user.dto.UserUpdateDto;
 import com.teamcook.tastyties.user.entity.album.Album;
@@ -80,6 +81,18 @@ public class UserService {
     public boolean isEmailIdAvailable(String emailId, String emailDomain) {
         String email = emailId + "@" + emailDomain;
         return !userRepository.existsByEmail(email);
+    }
+
+    public void updateFCMToken(AuthRequestDto authRequest) {
+        Optional<User> findUser = userRepository.findByUsername(authRequest.getUsername());
+        if (findUser.isEmpty()) {
+            throw new IllegalArgumentException("유저의 정보를 찾을 수 없습니다.");
+        }
+        User user = findUser.get();
+
+        user.setFcmToken(authRequest.getFcmToken());
+
+        userRepository.save(user);
     }
 
     public UserUpdateDto updateProfile(UserDetails userDetails, UserUpdateDto request) {

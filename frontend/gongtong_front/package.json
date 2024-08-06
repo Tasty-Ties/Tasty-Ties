@@ -23,6 +23,7 @@
     "axios": "^1.7.2",
     "dayjs": "^1.11.12",
     "dotenv": "^16.4.5",
+    "firebase": "^10.12.5",
     "js-cookie": "^3.0.5",
     "jwt-decode": "^4.0.0",
     "openvidu-browser": "^2.30.1",

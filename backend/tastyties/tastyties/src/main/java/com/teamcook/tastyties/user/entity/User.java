@@ -72,6 +72,8 @@ public class User {
 
     private int activityPoint = 0;
 
+    private String fcmToken;
+
     // short-form
     @OneToMany(mappedBy = "user")
     private List<ShortForm> shortForm;

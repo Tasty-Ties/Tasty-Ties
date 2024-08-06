@@ -1,6 +1,6 @@
 package com.teamcook.tastyties.user.service;
 
-import com.teamcook.tastyties.common.dto.CountryResponseDto;
+import com.teamcook.tastyties.common.dto.country.CountryResponseDto;
 import com.teamcook.tastyties.common.entity.Country;
 import com.teamcook.tastyties.common.repository.CountryRepository;
 import com.teamcook.tastyties.shared.entity.UserAndCountry;

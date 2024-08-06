@@ -1,7 +1,7 @@
 package com.teamcook.tastyties.cooking_class.dto;
 
 import com.querydsl.core.annotations.QueryProjection;
-import com.teamcook.tastyties.common.dto.CountryProfileDto;
+import com.teamcook.tastyties.common.dto.country.CountryProfileDto;
 import lombok.Data;
 
 import java.time.LocalDateTime;
