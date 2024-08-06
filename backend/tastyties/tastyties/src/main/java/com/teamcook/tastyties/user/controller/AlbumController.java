@@ -5,8 +5,10 @@ import com.teamcook.tastyties.security.userdetails.CustomUserDetails;
 import com.teamcook.tastyties.user.dto.album.FolderListDto;
 import com.teamcook.tastyties.user.dto.album.FolderRegisterDto;
 import com.teamcook.tastyties.user.dto.album.FolderResponseDto;
+import com.teamcook.tastyties.user.dto.album.PhotoOrderChangeDto;
 import com.teamcook.tastyties.user.entity.User;
 import com.teamcook.tastyties.user.entity.album.Album;
+import com.teamcook.tastyties.user.entity.album.Photo;
 import com.teamcook.tastyties.user.service.AlbumService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -81,8 +83,14 @@ public class AlbumController {
     }
 
     @PatchMapping("/{folderId}/order")
-    public ResponseEntity<CommonResponseDto> orderPhotos(@PathVariable int folerId) {
-
-        return null;
+    public ResponseEntity<CommonResponseDto> orderPhotos(@PathVariable int folderId,
+                                                         @RequestBody List<PhotoOrderChangeDto> photoOrderChangeDtos) {
+        List<Photo> photos = albumService.updatePhotoOrder(folderId, photoOrderChangeDtos);
+        return ResponseEntity.ok()
+                .body(CommonResponseDto.builder()
+                        .stateCode(200)
+                        .message("사진의 순서를 정상적으로 변경했습니다.")
+                        .data(null)
+                        .build());
     }
 }

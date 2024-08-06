@@ -6,11 +6,11 @@ import lombok.Data;
 @Data
 public class PhotoResponseDto {
     private String photoImgUrl;
-    private int photoIndex;
+    private int photoId;
 
     @QueryProjection
-    public PhotoResponseDto(String photoImgUrl, int photoIndex) {
+    public PhotoResponseDto(String photoImgUrl, int photoId) {
         this.photoImgUrl = photoImgUrl;
-        this.photoIndex = photoIndex;
+        this.photoId = photoId;
     }
 }

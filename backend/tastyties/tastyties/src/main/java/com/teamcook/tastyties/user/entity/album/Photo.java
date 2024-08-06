@@ -18,6 +18,8 @@ public class Photo {
     private Folder folder;
 
     private String photoImageUrl;
+
+    @Setter
     private int orderIndex;
 
     public Photo(String photoImageUrl, int orderIndex) {

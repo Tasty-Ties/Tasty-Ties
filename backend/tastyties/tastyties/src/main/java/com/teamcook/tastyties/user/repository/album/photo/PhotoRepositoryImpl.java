@@ -23,7 +23,7 @@ public class PhotoRepositoryImpl implements PhotoCustomRepository {
         return queryFactory
                 .select(new QPhotoResponseDto(
                         photo.photoImageUrl,
-                        photo.orderIndex))
+                        photo.photoId))
                 .from(photo)
                 .where(photo.folder.eq(folder))
                 .orderBy(photo.orderIndex.asc())

@@ -7,10 +7,7 @@ import com.teamcook.tastyties.s3test.Image;
 import com.teamcook.tastyties.s3test.S3Service;
 import com.teamcook.tastyties.shared.repository.UserAndCookingClassRepository;
 import com.teamcook.tastyties.user.dto.UserSimpleProfileDto;
-import com.teamcook.tastyties.user.dto.album.FolderListDto;
-import com.teamcook.tastyties.user.dto.album.FolderRegisterDto;
-import com.teamcook.tastyties.user.dto.album.FolderResponseDto;
-import com.teamcook.tastyties.user.dto.album.PhotoResponseDto;
+import com.teamcook.tastyties.user.dto.album.*;
 import com.teamcook.tastyties.user.entity.User;
 import com.teamcook.tastyties.user.entity.album.Album;
 import com.teamcook.tastyties.user.entity.album.Folder;
@@ -30,8 +27,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class AlbumService {
@@ -104,5 +103,27 @@ public class AlbumService {
         folderDto.setPhotoResponse(photoUrlsByFolder);
         folderDto.setUserProfiles(userEnrolledInClass);
         return folderDto;
+    }
+
+    @Transactional
+    public List<Photo> updatePhotoOrder(int folderId, List<PhotoOrderChangeDto> orderChangeDtos) {
+        Optional<Folder> findFolder = folderRepository.findById(folderId);
+        if (findFolder.isEmpty()) {
+            throw new FolderNotFoundException("폴더의 정보를 불러올 수 없습니다.");
+        }
+        Folder folder = findFolder.get();
+        List<Photo> photos = photoRepository.findByFolder(folder);
+        Map<Integer, Photo> photoMap = photos.stream()
+                .collect(Collectors.toMap(Photo::getPhotoId, photo -> photo));
+
+        for (PhotoOrderChangeDto dto : orderChangeDtos) {
+            Photo photo = photoMap.get(dto.getPhotoId());
+            if (photo != null) {
+                photo.setOrderIndex(dto.getOrderIndex());
+            } else {
+                throw new IllegalArgumentException("Photo ID " + dto.getPhotoId() + " 를 찾을 수 없습니다.");
+            }
+        }
+        return photos;
     }
 }
