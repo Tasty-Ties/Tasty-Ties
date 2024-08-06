@@ -1,6 +1,8 @@
 import "@styles/ClassList/ClassListSearch.css";
 import { useEffect, useState } from "react";
 
+const FRONT_SERVER_URL = import.meta.env.VITE_FRONT_SERVER;
+
 const ClassListSearch = ({ setSearchCondition }) => {
   const [localSearchCondition, setLocalSearchCondition] = useState({
     searchType: "title",
@@ -63,7 +65,7 @@ const ClassListSearch = ({ setSearchCondition }) => {
           <button id="search-btn" type="submit">
             <img
               name="searchQuery"
-              src="http://localhost:5173/images/classImages/search-icon.png"
+              src={`${FRONT_SERVER_URL}/images/classImages/search-icon.png`}
               alt="검색 아이콘"
               className="search-Img"
             />

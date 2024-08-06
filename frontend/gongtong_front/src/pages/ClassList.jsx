@@ -7,6 +7,8 @@ import ClassListSearch from "@components/ClassList/ClassListSearch";
 import useClassRegistStore from "../store/ClassRegistStore";
 import "@styles/ClassList/ClassList.css";
 
+const FRONT_SERVER_URL = import.meta.env.VITE_FRONT_SERVER;
+
 const ClassList = () => {
   const { classLists, fetchClassLists, hasMoreContent } = useClassRegistStore();
   const [page, setPage] = useState(0);
@@ -65,7 +67,7 @@ const ClassList = () => {
       <div ref={observerRef} id="observer" style={{ height: "10px" }}></div>
       <Link to="/classregist" className="add-class-button">
         <img
-          src="http://localhost:5173/images/classImages/add-icon.png"
+          src={`${FRONT_SERVER_URL}/images/classImages/add-icon.png`}
           alt="요리클래스 등록하기"
         />
       </Link>

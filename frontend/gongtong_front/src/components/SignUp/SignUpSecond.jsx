@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import userStore from "../../store/UserStore";
-import axios from "../../service/Axios";
+import api from "../../service/Api";
 
 const SignUpSecond = () => {
   const nav = useNavigate();
@@ -9,7 +9,7 @@ const SignUpSecond = () => {
   const userRegister = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post("/users", {
+      const response = await api.post("/users", {
         username: userForm.username,
         password: userForm.password,
         nickname: userForm.nickname,
@@ -38,7 +38,7 @@ const SignUpSecond = () => {
 
   const checkNickname = async () => {
     try {
-      const response = await axios.get(
+      const response = await api.get(
         `/users/check-nickname?nickname=${userForm.nickname}`
       );
       console.log(response);
@@ -63,7 +63,7 @@ const SignUpSecond = () => {
   useEffect(() => {
     const fetchCountries = async () => {
       try {
-        const response = await axios.get("/countries");
+        const response = await api.get("/countries");
         console.log(response.data.data);
         const sortedCountries = response.data.data.countries.sort((a, b) => {
           return a.koreanName.localeCompare(b.koreanName, "KR", {
@@ -78,7 +78,7 @@ const SignUpSecond = () => {
 
     const fetchLanguages = async () => {
       try {
-        const response = await axios.get(`/languages`);
+        const response = await api.get(`/languages`);
         console.log(response.data.data);
         const sortedLanguages = response.data.data.languages.sort((a, b) => {
           return a.koreanName.localeCompare(b.koreanName, "kr", {

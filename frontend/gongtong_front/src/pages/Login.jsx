@@ -23,7 +23,7 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const response = await axios.post("/auth/login", {
+    const response = await api.post("/auth/login", {
       username: input.username,
       password: input.password,
       fcmToken: Cookies.get("fcmToken")

@@ -1,13 +1,17 @@
 import axios from "axios";
 import Cookies from "js-cookie";
 
-axios.defaults.withCredentials = true;
-axios.defaults.baseURL = import.meta.env.VITE_MAIN_SERVER;
+const MAIN_SERVER_URL = import.meta.env.VITE_MAIN_SERVER;
+
+const api = axios.create({
+  baseURL: MAIN_SERVER_URL,
+  withCredentials: true,
+});
 
 const MAIN_SERVER_URL = import.meta.env.VITE_MAIN_SERVER;
 
 // 요청 인터셉터: 모든 요청에 `accessToken` 추가
-axios.interceptors.request.use(
+api.interceptors.request.use(
   (config) => {
     const accessToken = Cookies.get("accessToken");
     if (accessToken) {
@@ -19,14 +23,14 @@ axios.interceptors.request.use(
 );
 
 // 응답 인터셉터: 403 응답을 처리하여 새로운 `accessToken` 발급
-axios.interceptors.response.use(
+api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
     if (error.response.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
       try {
-        const response = await axios.post(
+        const response = await api.post(
           MAIN_SERVER_URL + "/auth/refresh",
           { refreshToken: Cookies.get("refreshToken") },
           { withCredentials: true }
@@ -37,12 +41,10 @@ axios.interceptors.response.use(
 
         Cookies.set("accessToken", accessToken);
 
-        axios.defaults.headers.common[
-          "Authorization"
-        ] = `Bearer ${accessToken}`;
+        api.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
         originalRequest.headers["Authorization"] = `Bearer ${accessToken}`;
 
-        return axios(originalRequest);
+        return api(originalRequest);
       } catch (err) {
         console.error("리프레시 토큰을 사용한 액세스 토큰 재발급 실패:", err);
         // 필요한 경우 로그아웃 처리 등을 수행
@@ -52,4 +54,4 @@ axios.interceptors.response.use(
   }
 );
 
-export default axios;
+export default api;

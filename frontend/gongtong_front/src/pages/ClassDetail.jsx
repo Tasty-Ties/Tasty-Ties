@@ -12,6 +12,8 @@ import {
 import "@styles/ClassDetail/ClassDetail.css";
 import ClassImageCarousel from "../components/ClassDetail/ClassImageCarousel";
 
+const FRONT_SERVER_URL = import.meta.env.VITE_FRONT_SERVER;
+
 const ClassDetail = () => {
   const { id } = useParams();
 
@@ -66,7 +68,7 @@ const ClassDetail = () => {
         <div className="nickname-box">
           <span>{classDetail.dishName}</span>
           <img
-            src="http://localhost:5173/images/classImages/Korea.png"
+            src={`${FRONT_SERVER_URL}/images/classImages/Korea.png`}
             alt="국가 이미지"
           />
         </div>
@@ -149,7 +151,7 @@ const ClassDetail = () => {
       <div className="user-info-box">
         <div className="user-box">
           <img
-            src="http://localhost:5173/images/classImages/user-img.png"
+            src={`${FRONT_SERVER_URL}/images/classImages/user-img.png`}
             alt="유저 이미지"
           />
           <span>{classDetail.hostName}</span>
