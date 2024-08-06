@@ -1,7 +1,7 @@
 import { useState } from "react";
 import useAuthStore from "../store/AuthStore";
 import { useNavigate } from "react-router-dom";
-import axios from "../service/Axios";
+import api from "../service/Api";
 import Cookies from "js-cookie";
 
 const Login = () => {
