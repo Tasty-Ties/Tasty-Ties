@@ -1,3 +1,5 @@
+const MAIN_SERVER_URL = import.meta.env.VITE_MAIN_SERVER;
+
 import { OpenVidu } from "openvidu-browser";
 import { useRef, useEffect, useState } from "react";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
@@ -57,7 +59,7 @@ const ClassWaiting = () => {
     if (isHost) {
       try {
         const response = await axios.post(
-          `http://localhost:8080/api/v1/classes/live/sessions/${classData.uuid}`,
+          MAIN_SERVER_URL + `/classes/live/sessions/${classData.uuid}`,
           null,
           {
             headers: {
@@ -74,7 +76,7 @@ const ClassWaiting = () => {
     } else {
       try {
         const response = await axios.get(
-          `http://localhost:8080/api/v1/classes/live/sessions/${classData.uuid}`,
+          MAIN_SERVER_URL + `/classes/live/sessions/${classData.uuid}`,
           {
             headers: {
               Authorization: `Bearer ${Cookies.get("accessToken")}`,

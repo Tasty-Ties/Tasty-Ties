@@ -1,13 +1,12 @@
 package com.teamcook.tastyties.cooking_class.dto;
 
-import com.teamcook.tastyties.user.dto.UserProfileForClassDetailDto;
+import com.teamcook.tastyties.user.dto.UserSimpleProfileDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Set;
 
 @Data
@@ -41,7 +40,7 @@ public class CookingClassDto {
 
     private long reservedCount;
 
-    private Set<UserProfileForClassDetailDto> userProfiles;
+    private Set<UserSimpleProfileDto> userProfiles;
     private Set<String> imageUrls;
     private String mainImageUrl;
 

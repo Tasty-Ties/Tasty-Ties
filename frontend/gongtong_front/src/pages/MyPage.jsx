@@ -12,7 +12,7 @@ const MyPage = () => {
     // console.log(informations); 콘솔에 두번씩 출력됨
   }, []);
 
-  if (!informations) {
+  if (informations.length === 0) {
     return <div>정보가 없습니다.</div>;
   }
 

@@ -1,5 +1,5 @@
-const SERVER_URL = import.meta.env.VITE_CHAT_SERVER;
-console.log(SERVER_URL);
+const CHAT_SERVER_URL = import.meta.env.VITE_CHAT_SERVER;
+
 const roomId = "66a9c5dd498fe728acb763f8";
 const userId = 1;
 const userLang = "Japanese";
@@ -15,7 +15,7 @@ const ChatComponent = () => {
 
   useEffect(() => {
     stompClient.current = new Client({
-      brokerURL: SERVER_URL,
+      brokerURL: CHAT_SERVER_URL,
 
       debug: (str) => {
         console.log(str);
