@@ -16,6 +16,13 @@ import "@styles/ClassRegist/ClassRegist.css";
 import { useNavigate } from "react-router-dom";
 import { setClassRegist } from "../service/ClassRegistAPI";
 
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
+dayjs.tz.setDefault("Asia/Seoul");
+
 const ClassRegist = () => {
   const navigate = useNavigate();
   const { countries, fetchCountries, languages, fetchLanguages } =
@@ -117,6 +124,12 @@ const ClassRegist = () => {
     } else {
       alert("1000글자 이내의 글만 입력 가능합니다.");
     }
+  };
+
+  const convertToSeoulTime = (date) => {
+    const tzoffset = new Date().getTimezoneOffset() * 60000;
+    const localIOSTime = new Date(date - tzoffset).toISOString().slice(0, -1);
+    return localIOSTime;
   };
 
   const calculateReplayEndTime = (startTime, days) => {
@@ -331,7 +344,7 @@ const ClassRegist = () => {
               onChange={(value) => {
                 setClassInformation({
                   ...classInformation,
-                  cookingClassStartTime: value,
+                  cookingClassStartTime: convertToSeoulTime(new Date(value)),
                 });
               }}
             />
@@ -348,7 +361,7 @@ const ClassRegist = () => {
               onChange={(value) => {
                 setClassInformation({
                   ...classInformation,
-                  cookingClassEndTime: value.toISOString(),
+                  cookingClassEndTime: convertToSeoulTime(new Date(value)),
                 });
               }}
             />

@@ -1,13 +1,13 @@
 package com.teamcook.tastytieschat.chat.entity;
 
 import com.teamcook.tastytieschat.chat.constant.MessageType;
-import com.teamcook.tastytieschat.chat.dto.ChatMessageRequestDTO;
+import com.teamcook.tastytieschat.chat.dto.ChatMessageRequestDto;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,10 +28,10 @@ public class ChatMessage {
     private String originMessage;
     private Map<String, String> translatedMessages;
     @CreatedDate
-    private Instant createdTime;
+    private LocalDateTime createdTime;
 
     @Builder
-    public ChatMessage(MessageType type, String chatRoomId, String userNickname, String originLanguage, String originMessage, ChatMessageRequestDTO chatMessageRequestDto) {
+    public ChatMessage(MessageType type, String chatRoomId, String userNickname, String originLanguage, String originMessage, ChatMessageRequestDto chatMessageRequestDto) {
         this.type = type;
         this.chatRoomId = chatRoomId;
         if (chatMessageRequestDto != null) {

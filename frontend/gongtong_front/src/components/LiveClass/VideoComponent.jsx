@@ -1,3 +1,6 @@
+const MAIN_SERVER_URL = import.meta.env.VITE_MAIN_SERVER;
+const CHAT_SERVER_URL = import.meta.env.VITE_CHAT_SERVER;
+
 import { useEffect, useState, useRef, useCallback } from "react";
 import { useLocation } from "react-router-dom";
 import axios from "axios";
@@ -32,7 +35,6 @@ import IconButton from "../../common/components/IconButton";
 const localUserSetting = new UserModel();
 
 //채팅 관련
-const CHAT_SERVER_URL = import.meta.env.VITE_CHAT_SERVER;
 const roomId = "66a9c5dd498fe728acb763f8";
 const userId = 1;
 const userLang = "Japanese";
@@ -301,9 +303,7 @@ const VideoComponent = ({ isHost, title, hostName }) => {
   const createToken = useCallback(async (sessionId) => {
     console.log(sessionId);
     const response = await axios.post(
-      "http://localhost:8080/api/v1/classes/live/sessions/" +
-        sessionId +
-        "/connections",
+      MAIN_SERVER_URL + "/classes/live/sessions/" + sessionId + "/connections",
       {},
       {
         headers: {

@@ -8,4 +8,6 @@ public class CookingClassSearchCondition {
     private String username;
     private boolean useLocalFilter;
     private String sort;
+    private String countryCode;
+    private String languageCode;
 }

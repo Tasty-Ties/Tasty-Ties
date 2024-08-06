@@ -52,7 +52,7 @@ dependencies {
 	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
 	//Openvidu
 	implementation group: 'io.openvidu', name: 'openvidu-java-client', version: '2.30.0'
-
+	//FFmpeg
 }
 
 tasks.named('test') {

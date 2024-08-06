@@ -3,7 +3,7 @@ import axios from "./Axios";
 export const getMyInfo = async () => {
   try {
     const response = await axios.get("/users/me");
-    // console.log(response);
+    console.log(response);
     return response.data.data;
   } catch (error) {
     console.log(error);
@@ -14,15 +14,24 @@ export const deleteId = async () => {
   try {
     const response = await axios.delete("/users/me");
     console.log(response);
-    console.log("회원탈퇴성공");
   } catch (error) {
     console.log(error);
   }
 };
 
-export const getteachClass = async () => {
+export const getTeachClass = async () => {
   try {
     const response = await axios.get("/users/me/hosting");
+    console.log(response);
+    return response.data.data.content;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const getReserveClass = async () => {
+  try {
+    const response = await axios.get("/users/me/reservations");
     console.log(response);
     return response.data.data.content;
   } catch (error) {

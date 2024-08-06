@@ -2,6 +2,9 @@ package com.teamcook.tastyties.user.service;
 
 import com.teamcook.tastyties.common.repository.CountryRepository;
 import com.teamcook.tastyties.common.repository.LanguageRepository;
+import com.teamcook.tastyties.s3test.Image;
+import com.teamcook.tastyties.s3test.S3Service;
+import com.teamcook.tastyties.security.userdetails.CustomUserDetails;
 import com.teamcook.tastyties.shared.repository.UserAndCookingClassRepository;
 import com.teamcook.tastyties.shared.repository.UserAndCountryRepository;
 import com.teamcook.tastyties.user.dto.UserRegistrationDto;
@@ -10,11 +13,14 @@ import com.teamcook.tastyties.user.entity.User;
 import com.teamcook.tastyties.user.exception.UserIDAlreadyExistsException;
 import com.teamcook.tastyties.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.Optional;
 
 @Service
@@ -24,19 +30,20 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final CountryRepository countryRepository;
     private final LanguageRepository languageRepository;
-    private final UserAndCountryRepository userAndCountryRepository;
     private final UserAndCookingClassRepository userAndCookingClassRepository;
+    private final S3Service s3Service;
 
     @Autowired
     public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder,
                        CountryRepository countryRepository, LanguageRepository languageRepository,
-                       UserAndCountryRepository userAndCountryRepository, UserAndCookingClassRepository userAndCookingClassRepository) {
+                       UserAndCookingClassRepository userAndCookingClassRepository,
+                       @Qualifier("Local") S3Service s3Service) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.countryRepository = countryRepository;
         this.languageRepository = languageRepository;
-        this.userAndCountryRepository = userAndCountryRepository;
         this.userAndCookingClassRepository = userAndCookingClassRepository;
+        this.s3Service = s3Service;
     }
 
     public String registerUser(UserRegistrationDto request) {
@@ -113,5 +120,18 @@ public class UserService {
         user.delete();
         userRepository.save(user);
         userAndCookingClassRepository.deleteAllByUser(user);
+    }
+
+    @Transactional
+    public String uploadImage(CustomUserDetails userDetails, MultipartFile file) {
+        User user = userDetails.user();
+        try {
+            Image image = s3Service.uploadImage(file);
+            user.setProfileImageUrl(image.getStoredImagePath());
+            userRepository.save(user);
+            return user.getProfileImageUrl();
+        } catch (IOException e) {
+            throw new RuntimeException("이미지 업로드 중 문제가 생겼습니다.");
+        }
     }
 }

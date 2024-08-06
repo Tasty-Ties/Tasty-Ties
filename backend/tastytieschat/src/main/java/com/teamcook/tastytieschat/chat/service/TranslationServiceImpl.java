@@ -7,6 +7,7 @@ import com.teamcook.tastytieschat.chat.entity.ChatMessage;
 import com.teamcook.tastytieschat.common.config.ChatGPTConfig;
 import com.teamcook.tastytieschat.chat.dto.GptRequestDto;
 import com.teamcook.tastytieschat.chat.dto.GptRequestMessageDto;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 
 @Service
+@Slf4j
 public class TranslationServiceImpl implements TranslationService {
 
     private final ObjectMapper objectMapper;
@@ -34,7 +36,8 @@ public class TranslationServiceImpl implements TranslationService {
     public void translationChatMessage(ChatMessage chatMessage, Set<String> translatedLanguages) throws Exception {
         GptRequestDto gptRequestDto = setGptPrompt(chatMessage, translatedLanguages);
 
-        while (!validateTranslation(chatMessage, translatedLanguages)) {
+        while (validateTranslation(chatMessage, translatedLanguages)) {
+            log.debug("try translation");
             ResponseEntity<String> response = callGptApi(gptRequestDto);
             handleApiResponse(chatMessage, response);
         }
@@ -96,10 +99,7 @@ public class TranslationServiceImpl implements TranslationService {
     }
 
     private boolean validateTranslation(ChatMessage chatMessage, Set<String> translatedLanguages) {
-        if (chatMessage.getTranslatedMessages().isEmpty()) {
-            return false;
-        }
-
+        // 번역한 언어 제외
         Iterator<String> iterator = translatedLanguages.iterator();
         while (iterator.hasNext()) {
             String translatedLanguage = iterator.next();
@@ -108,7 +108,7 @@ public class TranslationServiceImpl implements TranslationService {
             }
         }
 
-        return translatedLanguages.isEmpty();
+        return !translatedLanguages.isEmpty();
     }
 
 }
