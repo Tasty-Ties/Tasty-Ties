@@ -1,5 +1,6 @@
 package com.teamcook.tastytieschat.chat.controller;
 
+import com.teamcook.tastytieschat.chat.constant.Language;
 import com.teamcook.tastytieschat.chat.constant.MessageType;
 import com.teamcook.tastytieschat.chat.dto.ChatMessageRequestDto;
 import com.teamcook.tastytieschat.chat.dto.ChatMessageResponseDto;
@@ -115,6 +116,7 @@ public class ChatMessageController {
                 .build();
 
         Set<String> translatedLanguages = (Set<String>) map.get("translatedLanguages");
+        translatedLanguages.add(Language.EN.getName());
 
         try {
             translationService.translationChatMessage(chatMessage, translatedLanguages);
