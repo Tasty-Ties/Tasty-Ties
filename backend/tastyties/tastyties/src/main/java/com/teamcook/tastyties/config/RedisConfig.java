@@ -35,9 +35,9 @@ public class RedisConfig {
         // 해시 값 직렬화 설정
         redisTemplate.setHashValueSerializer(new GenericJackson2JsonRedisSerializer());
         // 기본 직렬화기 설정
-        redisTemplate.setDefaultSerializer(new GenericJackson2JsonRedisSerializer());
+        redisTemplate.setDefaultSerializer(new StringRedisSerializer());
         // 트랜잭션 지원 활성화
-        redisTemplate.setEnableTransactionSupport(true);
+        redisTemplate.setEnableTransactionSupport(false);
         return redisTemplate;
     }
 

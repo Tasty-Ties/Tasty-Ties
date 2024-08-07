@@ -84,10 +84,20 @@ public class UserRewardsService {
         int userId = activityPointRequestDto.getUserId();
         double score = activityPointRequestDto.getScore();
         String description = activityPointRequestDto.getDescription();
-        redisTemplate.opsForZSet().add(WEEKLY_LEADERBOARD_KEY, userId, score);
-        redisTemplate.opsForZSet().add(MONTHLY_LEADERBOARD_KEY, userId, score);
-        redisTemplate.opsForZSet().add(YEARLY_LEADERBOARD_KEY, userId, score);
+        String userKey = String.valueOf(userId);
 
+        // 기존 점수를 가져와서 누적
+        Double currentWeeklyScore = redisTemplate.opsForZSet().score(WEEKLY_LEADERBOARD_KEY, userKey);
+        Double currentMonthlyScore = redisTemplate.opsForZSet().score(MONTHLY_LEADERBOARD_KEY, userKey);
+        Double currentYearlyScore = redisTemplate.opsForZSet().score(YEARLY_LEADERBOARD_KEY, userKey);
+
+        double newWeeklyScore = (currentWeeklyScore != null ? currentWeeklyScore : 0) + score;
+        double newMonthlyScore = (currentMonthlyScore != null ? currentMonthlyScore : 0) + score;
+        double newYearlyScore = (currentYearlyScore != null ? currentYearlyScore : 0) + score;
+
+        redisTemplate.opsForZSet().add(WEEKLY_LEADERBOARD_KEY, userKey, newWeeklyScore);
+        redisTemplate.opsForZSet().add(MONTHLY_LEADERBOARD_KEY, userKey, newMonthlyScore);
+        redisTemplate.opsForZSet().add(YEARLY_LEADERBOARD_KEY, userKey, newYearlyScore);
         userRepository.findById(userId).ifPresent(user -> {
             ActivityPointLog log = new ActivityPointLog(score, description);
             activityPointLogRepository.save(log);
@@ -95,6 +105,7 @@ public class UserRewardsService {
         });
     }
 
+    // 순위 반환
     public ActivityPointResponseDto getLeaderboard(CustomUserDetails userDetails, String leaderboardKey, int page) {
         int start = (page-1)*PAGE_SIZE;
         int end = start + PAGE_SIZE - 1;
@@ -102,10 +113,9 @@ public class UserRewardsService {
         // 전체 ZSet 크기 가져오기
         Long totalSize = redisTemplate.opsForZSet().zCard(leaderboardKey);
         int totalPages = (int) Math.ceil((double) totalSize / PAGE_SIZE);
-
+        Set<ZSetOperations.TypedTuple<Object>> leaderboard = redisTemplate.opsForZSet().reverseRangeWithScores("weekly:leaderboard", 0, 6);
         Set<ZSetOperations.TypedTuple<Object>> results = redisTemplate.opsForZSet()
                 .reverseRangeWithScores(leaderboardKey, start, end);
-
         List<RankedUserDto> rankedUsers = new ArrayList<>();
         if (results == null || results.isEmpty()) {
             // 결과가 없으면 빈 리스트와 총 페이지 수를 반환
@@ -116,8 +126,10 @@ public class UserRewardsService {
         int offset = 0;
 
         for (ZSetOperations.TypedTuple<Object> result : results) {
-            int userId = (int) result.getValue();
-            double score = result.getScore();
+            String userKey = (String) result.getValue();
+            int userId = Integer.parseInt(userKey);
+            Double score = result.getScore();
+            score = score != null ? score : 0.0;
             log.debug("userId: {}, score: {}", userId, score);
             User user = userRepository.findById(userId).orElse(null);
             log.debug(user.getNickname());
@@ -139,15 +151,17 @@ public class UserRewardsService {
                     score, rank, hostedCount, attendedCount,
                     user.getProfileImageUrl(), user.getDescription()));
         }
+        // 여기 부터 나의 랭크 찾기
         RankedUserDto myRank = null;
         if (userDetails != null) {
             User user = userDetails.user();
             UserStatistics userStatistics = user.getUserStatistics();
 
             int userId = user.getUserId();
+            String userKey = String.valueOf(userId);
             myRank = new RankedUserDto(userId, user.getNickname(),
-                    getUserScore(leaderboardKey, userId),
-                    getUserRank(leaderboardKey, userId),
+                    getUserScore(leaderboardKey, userKey),
+                    getUserRank(leaderboardKey, userKey),
                     userStatistics.getClassesHosted(), userStatistics.getClassesAttended(),
                     user.getProfileImageUrl(), user.getDescription());
         }
@@ -170,47 +184,27 @@ public class UserRewardsService {
     }
 
     // 해당 유저의 점수 반환
-    @Transactional
-    public Double getUserScore(String leaderBoardKey, int userId) {
-        return redisTemplate.opsForZSet().score(leaderBoardKey, userId);
+    public Double getUserScore(String leaderBoardKey, String userId) {
+        Double score = redisTemplate.opsForZSet().score(leaderBoardKey, userId);
+        return score != null ? score : 0.0;
     }
 
-    // 해당 유저의 순위 반환
-    @Transactional
-    public int getUserRank(String leaderBoardKey, int userId) {
-        Long rank = redisTemplate.opsForZSet().reverseRank(leaderBoardKey, userId);
-        if (rank == null) {
-            return -1; // 유저가 순위에 없는 경우
-        }
-
-        double userScore = redisTemplate.opsForZSet().score(leaderBoardKey, userId);
-        if (Double.isNaN(userScore)) {
+    public int getUserRank(String leaderBoardKey, String userId) {
+        Double userScore = redisTemplate.opsForZSet().score(leaderBoardKey, userId);
+        if (userScore == null) {
             return -1; // 유저 점수가 없는 경우
         }
-
-        long start = 0;
-        long end = rank; // 유저의 현재 순위까지 조회
-        Set<ZSetOperations.TypedTuple<Object>> results = redisTemplate.opsForZSet()
-                .reverseRangeWithScores(leaderBoardKey, start, end);
-
-        int finalRank = (int) (rank + 1);
-        double previousScore = Double.NaN;
-        int offset = 0;
-
-        for (ZSetOperations.TypedTuple<Object> result : results) {
-            double score = result.getScore();
-            if (!Double.isNaN(previousScore) && score < previousScore) {
-                finalRank += offset;
-                offset = 1;
-            } else {
-                offset++;
-            }
-            previousScore = score;
-            if ((int) result.getValue() == userId) {
-                break;
-            }
-        }
+        // 현재 유저 점수보다 높은 점수의 수를 세서 rank를 계산
+        Long higherRankCount = redisTemplate.opsForZSet().count(leaderBoardKey, userScore + 1, Double.MAX_VALUE);
+        // 동점자를 고려하여 최종 순위를 계산
+        int finalRank = higherRankCount.intValue() + 1;
         return finalRank;
+    }
+
+
+    public ActivityPointResponseDto getTotalLeaderboard(CustomUserDetails userDetails, int page) {
+
+        return null;
     }
 
 }
