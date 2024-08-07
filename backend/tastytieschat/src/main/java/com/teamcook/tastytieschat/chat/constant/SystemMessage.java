@@ -21,7 +21,12 @@ public enum SystemMessage {
         this.messages = messages;
     }
 
-    public void setSystemChatMessage(String userNickname, ChatMessage chatMessage) {
+    public ChatMessage getSystemChatMessage(String chatRoomId, String userNickname) {
+        ChatMessage chatMessage = ChatMessage.builder()
+                .type(MessageType.SYSTEM)
+                .chatRoomId(chatRoomId)
+                .build();
+
         for (Language language : messages.keySet()) {
             if (language.equals("Korean")) {
                 chatMessage.setOriginLanguage("Korean");
@@ -30,5 +35,7 @@ public enum SystemMessage {
                 chatMessage.addTranslatedMessage(language.getName(), userNickname + messages.get(language));
             }
         }
+
+        return chatMessage;
     }
 }
