@@ -39,7 +39,7 @@ const Class = ({ classInfo }) => {
   if (days > 0) {
     timeRemaing += `D-${days}`;
   } else if (hours > 0) {
-    timeRemaing += `${hours}:${minutes}`;
+    timeRemaing += `${hours}:${minutes < 10 ? `0${minutes}` : minutes}`;
   } else {
     timeRemaing += "입장";
   }

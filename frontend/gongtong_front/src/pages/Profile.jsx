@@ -9,6 +9,7 @@ const Profile = () => {
   const fetchInformations = useProfileStore(
     (state) => state.fetchOtherInformations
   );
+  // const teachedClasses = useProfileStore((state) => state.teachedClasses)
 
   useEffect(() => {
     fetchInformations(username);

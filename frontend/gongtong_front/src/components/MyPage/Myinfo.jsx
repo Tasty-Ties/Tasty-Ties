@@ -18,9 +18,9 @@ const MyInfo = () => {
 
   const handleDeleteId = () => {
     deleteId();
-    nav("/");
     Cookies.remove("accessToken");
     Cookies.remove("refreshToken");
+    nav("/");
     window.location.reload();
   };
 
@@ -36,9 +36,9 @@ const MyInfo = () => {
       <p>수집한 국기: {informations.colletedFlags}</p>
       <p>SNS 연동 현황</p>
       <p className="flex">
-        <img src={instalogo} alt="인스타로고" /> {informations.youtubeHandle}
-        <img src={youtubelogo} alt="유튜브로고" />{" "}
-        {informations.instagramHandle}
+        <img src={instalogo} alt="인스타로고" /> {informations.instagramHandle}
+        <img src={youtubelogo} alt="유튜브로고" />
+        {informations.youtubeHandle}
       </p>
       <br />
       <Button

@@ -3,31 +3,35 @@ import instalogo from "../../assets/MyPage/insta.png";
 import youtubelogo from "../../assets/MyPage/Youtube.png";
 
 const Category = (informations) => {
-  const userProfileDto = informations.informations.userProfileDto;
+  const information = informations.informations;
+  console.log(information);
 
   return (
     <div className="flex">
       <div>
-        {userProfileDto && (
+        {information.userProfileDto && (
           <div>
             <p>
-              프로필사진:{" "}
-              <img src="userProfileDto.profileImageUrl" alt="프로필사진" />
+              프로필사진:
+              <img
+                src={information.userProfileDto.profileImageUrl}
+                alt="프로필사진"
+              />
             </p>
             <p>
               국적:
-              {userProfileDto.country.koreanName}
+              {information.userProfileDto.country.koreanName}
             </p>
-            <p>이름:{userProfileDto.nickname}</p>
-            <p>자기소개:{userProfileDto.description}</p>
+            <p>이름:{information.userProfileDto.nickname}</p>
+            <p>자기소개:{information.userProfileDto.description}</p>
             <div className="flex">
               <p className="flex">
                 <img src={instalogo} alt="인스타로고" /> :
-                {userProfileDto.instagramHandle}
+                {information.userProfileDto.instagramHandle}
               </p>
               <p className="flex">
                 <img src={youtubelogo} alt="유튜브로고" /> :
-                {userProfileDto.youtubeHandle}
+                {information.userProfileDto.youtubeHandle}
               </p>
             </div>
           </div>
@@ -51,7 +55,14 @@ const Category = (informations) => {
         <br />
       </div>
       <div>
-        <Outlet />
+        <Outlet
+          context={{
+            informations: informations,
+            // teachClass: informations.hostingClasses,
+            // attendClass: informations.reservedClasses,
+            // review: informations.reviews,
+          }}
+        />
       </div>
     </div>
   );
