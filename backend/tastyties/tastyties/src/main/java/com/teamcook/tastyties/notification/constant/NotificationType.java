@@ -12,6 +12,12 @@ public enum NotificationType {
         public String generateBodyWithUserAndCookingClassName(String userName, String cookingClassName) {
             return userName + "님이 '" + cookingClassName + "'라는 쿠킹 클래스를 예약했습니다.";
         }
+    },
+    LEAVE_COOKING_CLASS("쿠킹 클래스 예약 취소") {
+        @Override
+        public String generateBodyWithUserAndCookingClassName(String userName, String cookingClassName) {
+            return userName + "님이 '" + cookingClassName + "'라는 쿠킹 클래스 예약을 취소했습니다.";
+        }
     };
 
     private final String title;

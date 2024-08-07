@@ -254,9 +254,11 @@ public class CookingClassController {
                             .build());
         }
 
-        String chatRoomId = cookingClassService.deleteReservation(userDetails.user(), uuid);
+        ReservedCookingClassDto reservedCookingClass = cookingClassService.deleteReservation(userDetails.user(), uuid);
 
-        leaveChatRoom(chatRoomId, userDetails.getUserId());
+        leaveChatRoom(reservedCookingClass.getChatRoomId(), userDetails.getUserId());
+
+        sendLeaveCookingClassNotification(reservedCookingClass.getClassName(), reservedCookingClass.getHost(), userDetails.getNickname());
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT)
                 .body(CommonResponseDto.builder()
@@ -277,6 +279,18 @@ public class CookingClassController {
                         .build())
                 .build();
         rabbitMQProducer.send(rabbitMQRequestDto);
+    }
+
+    private void sendLeaveCookingClassNotification(String cookingClassName, UserFcmTokenDto host, String attendeeNickname) {
+        if (host == null) {
+            return;
+        }
+
+        FcmNotificationDto notification = FcmNotificationDto.builder()
+                .title(NotificationType.LEAVE_COOKING_CLASS.getTitle())
+                .body(NotificationType.LEAVE_COOKING_CLASS.generateBodyWithUserAndCookingClassName(attendeeNickname, cookingClassName))
+                .build();
+        notificationService.sendMessageTo(host, notification);
     }
 
     // 클래스 리뷰 생성

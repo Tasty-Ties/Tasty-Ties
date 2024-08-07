@@ -322,16 +322,25 @@ public class CookingClassService {
 
     // 예약 삭제
     @Transactional
-    public String deleteReservation(User user, String uuid) {
+    public ReservedCookingClassDto deleteReservation(User user, String uuid) {
         CookingClass cc = cookingClassRepository.findWithUuid(uuid);
 
         if (cc.isDelete()) {
             throw new CookingClassIsDeletedException("삭제된 클래스입니다.");
         }
-        String chatRoomId = cc.getChatRoomId();
+
+        ReservedCookingClassDto reservedCookingClass = ReservedCookingClassDto.builder()
+                .className(cc.getTitle())
+                .host(UserFcmTokenDto.builder()
+                        .userId(cc.getHost().getUserId())
+                        .fcmToken(cc.getHost().getFcmToken())
+                        .build())
+                .chatRoomId(cc.getChatRoomId())
+                .build();
+
         deleteUserAndCookingClassRelationship(user, cc);
 
-        return chatRoomId;
+        return reservedCookingClass;
     }
 
     private void deleteUserAndCookingClassRelationship(User user, CookingClass cc) {
