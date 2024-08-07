@@ -26,6 +26,7 @@ import ClassRecipes from "./components/ClassDetail/ClassRecipes";
 import ClassRegist from "./pages/ClassRegist";
 import ClassWaiting from "./pages/ClassWaiting";
 import LiveClass from "./pages/LiveClass";
+import AlbumPage from "./pages/AlbumPage";
 import { Route, Routes } from "react-router-dom";
 
 const AppRoutes = () => {
@@ -62,6 +63,7 @@ const AppRoutes = () => {
       <Route path="/classregist" element={<ClassRegist />} />
       <Route path="/classwaiting/:id" element={<ClassWaiting />} />
       <Route path="/liveclass" element={<LiveClass />} />
+      <Route path="/album" element={<AlbumPage />} />
       {/* <Route path="/" element={< />} /> */}
     </Routes>
   );
