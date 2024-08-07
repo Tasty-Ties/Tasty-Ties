@@ -6,6 +6,12 @@ public enum NotificationType {
         public String generateBodyWithCookingClassName(String cookingClassName) {
             return "'" + cookingClassName + "'라는 쿠킹 클래스가 삭제되었습니다.";
         }
+    },
+    RESERVATION_COOKING_CLASS("쿠킹 클래스 예약") {
+        @Override
+        public String generateBodyWithUserAndCookingClassName(String userName, String cookingClassName) {
+            return userName + "님이 '" + cookingClassName + "'라는 쿠킹 클래스를 예약했습니다.";
+        }
     };
 
     private final String title;
@@ -18,5 +24,11 @@ public enum NotificationType {
         return title;
     }
 
-    public abstract String generateBodyWithCookingClassName(String cookingClassName);
+    public String generateBodyWithCookingClassName(String cookingClassName) {
+        throw new UnsupportedOperationException("This method is not supported for this notification type.");
+    };
+
+    public String generateBodyWithUserAndCookingClassName(String userName, String cookingClassName) {
+        throw new UnsupportedOperationException("This method is not supported for this notification type.");
+    };
 }

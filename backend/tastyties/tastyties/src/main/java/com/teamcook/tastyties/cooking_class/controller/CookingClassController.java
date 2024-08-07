@@ -230,6 +230,18 @@ public class CookingClassController {
         rabbitMQProducer.send(rabbitMQRequestDto);
     }
 
+    private void sendReservationCookingClassNotification(String cookingClassName, UserFcmTokenDto userFcmTokenDto) {
+        if (users.isEmpty()) {
+            return;
+        }
+
+        FcmNotificationDto notification = FcmNotificationDto.builder()
+                .title(NotificationType.RESERVATION_COOKING_CLASS.getTitle())
+                .body(NotificationType.RESERVATION_COOKING_CLASS.generateBodyWithUserAndCookingClassName(cookingClassName))
+                .build();
+        notificationService.sendMessagesTo(users, notification);
+    }
+
     // 클래스 예약 취소
     @DeleteMapping("/reservation/{uuid}")
     public ResponseEntity<CommonResponseDto> deleteReservation(@AuthenticationPrincipal CustomUserDetails userDetails, @PathVariable String uuid) {
