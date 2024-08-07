@@ -27,9 +27,9 @@
 
 + `spring.datasource.username`, `spring.datasource.password`에 본인이 현재 로컬에 설치되어있는, db의 이름과 비밀번호를 기입합니다.
 
-
-+ `jwt.secret` 에 충분히 긴 문자열을 넣어주세요 
-+ `access key` 와 `secret key` 는 노션을 보고 키를 입력해주세요
++ `application.properties` 파일을 가져와서 넣어주세요.
++ `jwt.secret` 에는 충분히 긴 문자열을 넣어주세요
++ `serviceAccountKey.json`을 다운받아 resources 하위에 넣어주세요
 
 3. 채팅 서버 환경 설정
 
