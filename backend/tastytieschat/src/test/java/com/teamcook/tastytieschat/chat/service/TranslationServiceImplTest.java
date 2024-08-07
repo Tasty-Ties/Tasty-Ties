@@ -39,7 +39,7 @@ class TranslationServiceImplTest {
     void sendShortFileToSpeechFlowTest() throws Exception {
         long startTime = System.currentTimeMillis();
 
-        Map<String, Object> map = chatRoomService.getUserAndTranslatedLanguages(roomId, chatMessageRequestDTO.getUserId());
+        Map<String, Object> map = chatRoomService.getChatRoomInfoForChatMessage(roomId, chatMessageRequestDTO.getUserId());
         UserDto userDto = (UserDto) map.get("user");
 
         ChatMessage chatMessage = ChatMessage.builder().type(MessageType.USER).chatRoomId(roomId).userNickname(userDto.getNickname()).originLanguage(userDto.getLanguage()).chatMessageRequestDto(chatMessageRequestDTO).build();

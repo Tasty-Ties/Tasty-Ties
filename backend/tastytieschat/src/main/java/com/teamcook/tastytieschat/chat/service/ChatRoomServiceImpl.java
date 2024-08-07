@@ -26,7 +26,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     }
 
     @Override
-    public Map<String, Object> getUserAndTranslatedLanguages(String chatRoomId, int userId) {
+    public Map<String, Object> getChatRoomInfoForChatMessage(String chatRoomId, int userId) {
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId).orElse(null);
         if (chatRoom == null) {
             throw new ChatRoomNotExistException(chatRoomId);
@@ -37,10 +37,13 @@ public class ChatRoomServiceImpl implements ChatRoomService {
             throw new UserNotExistException(userId);
         }
 
+        Set<UserDto> listeners = chatRoom.getListeners(userId);
         Set<String> translatedLanguages = chatRoom.getLanguages();
 
         Map<String, Object> map = new HashMap<>();
+        map.put("chatRoomTitle", chatRoom.getTitle());
         map.put("user", userDto);
+        map.put("listeners", listeners);
         map.put("translatedLanguages", translatedLanguages);
 
         return map;

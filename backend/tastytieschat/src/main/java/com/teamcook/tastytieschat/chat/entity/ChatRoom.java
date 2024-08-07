@@ -73,6 +73,19 @@ public class ChatRoom {
         return null;
     }
 
+    public Set<UserDto> getListeners(int userId) {
+        Set<UserDto> listeners = new HashSet<>();
+        for (UserDto userDto : users) {
+            if (userId == userDto.getId()) {
+                continue;
+            }
+
+            listeners.add(userDto);
+        }
+
+        return listeners;
+    }
+
     public Set<String> getLanguages() {
         Set<String> languages = new HashSet<>();
         for (UserDto userDto : users) {

@@ -8,6 +8,10 @@ import com.teamcook.tastytieschat.chat.dto.UserDto;
 import com.teamcook.tastytieschat.chat.dto.VoiceChatRequestDto;
 import com.teamcook.tastytieschat.chat.entity.ChatMessage;
 import com.teamcook.tastytieschat.chat.service.*;
+import com.teamcook.tastytieschat.notification.constant.NotificationType;
+import com.teamcook.tastytieschat.notification.dto.FcmNotificationDto;
+import com.teamcook.tastytieschat.notification.entity.User;
+import com.teamcook.tastytieschat.notification.service.NotificationService;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,13 +34,15 @@ public class ChatMessageController {
     private final TranslationService translationService;
     private final ChatRoomService chatRoomService;
     private final VoiceChatService voiceChatService;
+    private final NotificationService notificationService;
 
     @Autowired
-    public ChatMessageController(ChatMessageService chatMessageService, TranslationService translationService, ChatRoomService chatRoomService, VoiceChatService voiceChatService) {
+    public ChatMessageController(ChatMessageService chatMessageService, TranslationService translationService, ChatRoomService chatRoomService, VoiceChatService voiceChatService, NotificationService notificationService) {
         this.chatMessageService = chatMessageService;
         this.translationService = translationService;
         this.chatRoomService = chatRoomService;
         this.voiceChatService = voiceChatService;
+        this.notificationService = notificationService;
     }
 
     @MessageMapping("/chat/text/rooms/{roomId}")
@@ -102,7 +108,7 @@ public class ChatMessageController {
 
 
     private @Nullable ChatMessage getTranslatedChatMessage(String roomId, ChatMessageRequestDto chatMessageRequestDto) {
-        Map<String, Object> map = chatRoomService.getUserAndTranslatedLanguages(roomId, chatMessageRequestDto.getUserId());
+        Map<String, Object> map = chatRoomService.getChatRoomInfoForChatMessage(roomId, chatMessageRequestDto.getUserId());
 
         UserDto userDto = (UserDto) map.get("user");
 
@@ -124,6 +130,15 @@ public class ChatMessageController {
             log.error("번역 실패: " + e.getMessage());
             return null;
         }
+
+        String chatRoomTitle = (String) map.get("chatRoomTitle");
+        Set<UserDto> listeners = (Set<UserDto>) map.get("listeners");
+        FcmNotificationDto notificationDto = FcmNotificationDto.builder()
+                .title(NotificationType.NEW_CHAT_MESSAGE.getTitle())
+                .body(NotificationType.NEW_CHAT_MESSAGE.generateBodyWittChatRoomTitle(chatRoomTitle))
+                .build();
+        notificationService.sendMessage(listeners, notificationDto);
+
         return chatMessage;
     }
 
