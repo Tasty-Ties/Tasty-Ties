@@ -3,6 +3,7 @@ package com.teamcook.tastyties.user.entity;
 import com.teamcook.tastyties.common.entity.Country;
 import com.teamcook.tastyties.common.entity.Language;
 import com.teamcook.tastyties.cooking_class.entity.CookingClass;
+import com.teamcook.tastyties.notification.entity.FcmNotification;
 import com.teamcook.tastyties.shared.entity.UserAndCookingClass;
 import com.teamcook.tastyties.shared.entity.UserAndCountry;
 import com.teamcook.tastyties.short_form.entity.ShortForm;
@@ -71,6 +72,12 @@ public class User {
     private String youtubeHandle;
 
     private int activityPoint = 0;
+
+    private String fcmToken;
+
+    // 유저 알람
+    @OneToMany(mappedBy = "user")
+    private Set<FcmNotification> notifications = new HashSet<>();
 
     // short-form
     @OneToMany(mappedBy = "user")

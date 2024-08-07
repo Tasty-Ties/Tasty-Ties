@@ -53,6 +53,8 @@ dependencies {
 	//Openvidu
 	implementation group: 'io.openvidu', name: 'openvidu-java-client', version: '2.30.0'
 	//FFmpeg
+	// Firebase
+	implementation 'com.google.firebase:firebase-admin:9.2.0'
 }
 
 tasks.named('test') {
