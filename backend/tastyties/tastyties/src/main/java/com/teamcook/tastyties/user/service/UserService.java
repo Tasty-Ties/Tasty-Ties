@@ -83,6 +83,7 @@ public class UserService {
         return !userRepository.existsByEmail(email);
     }
 
+    @Transactional
     public void updateFCMToken(AuthRequestDto authRequest) {
         Optional<User> findUser = userRepository.findByUsername(authRequest.getUsername());
         if (findUser.isEmpty()) {
@@ -91,8 +92,6 @@ public class UserService {
         User user = findUser.get();
 
         user.setFcmToken(authRequest.getFcmToken());
-
-        userRepository.save(user);
     }
 
     public UserUpdateDto updateProfile(UserDetails userDetails, UserUpdateDto request) {
