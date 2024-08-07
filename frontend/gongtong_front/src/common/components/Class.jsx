@@ -63,12 +63,14 @@ const Class = ({ classInfo }) => {
         text={timeRemaing}
         type={timeRemaing === "입장" ? "orange-sqr" : "gray-sqr"}
         onClick={() =>
-          nav(`/classwaiting/${classInfo.uuid}`, {
-            state: {
-              classData: classInfo,
-              isHost: location.pathname === "/mypage/teach" ? true : false,
-            },
-          })
+          timeRemaing === "입장"
+            ? nav(`/classwaiting/${classInfo.uuid}`, {
+                state: {
+                  classData: classInfo,
+                  isHost: location.pathname === "/mypage/teach" ? true : false,
+                },
+              })
+            : ""
         }
       />
     </div>
