@@ -29,7 +29,7 @@ public class NotificationService {
         this.userRepository = userRepository;
     }
 
-    public void sendMessage(UserFcmTokenDto user, FcmNotificationDto fcmNotification) {
+    public void sendMessageTo(UserFcmTokenDto user, FcmNotificationDto fcmNotification) {
         Notification notification = createNotification(fcmNotification);
 
         Message message = Message.builder()

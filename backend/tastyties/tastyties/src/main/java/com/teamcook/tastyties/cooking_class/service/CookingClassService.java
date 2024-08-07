@@ -284,7 +284,8 @@ public class CookingClassService {
 
     // 클래스 예약
     @Transactional
-    public String reserveClass(User user, String uuid) {
+    public ReservedCookingClassDto reserveClass(User user, String uuid) {
+        // TODO: 쿠킹 클래스 정보 가지고 올 때 호스트 정보도 가져오기 why? 호스트의 id와 fcm token이 필요함 (current)
         CookingClass cc = cookingClassRepository.findWithUuid(uuid);
         if (cc == null) {
             throw new CookingClassNotFoundException("존재하지 않는 클래스입니다.");
@@ -298,7 +299,14 @@ public class CookingClassService {
         }
         createUserAndCookingClassRelationship(user, cc);
 
-        return cc.getChatRoomId();
+        return ReservedCookingClassDto.builder()
+                .className(cc.getTitle())
+                .host(UserFcmTokenDto.builder()
+                        .userId(cc.getHost().getUserId())
+                        .fcmToken(cc.getHost().getFcmToken())
+                        .build())
+                .chatRoomId(cc.getChatRoomId())
+                .build();
     }
 
     // user와 cookingclass 관계 생성
