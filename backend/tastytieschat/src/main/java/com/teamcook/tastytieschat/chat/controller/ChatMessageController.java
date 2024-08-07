@@ -108,6 +108,7 @@ public class ChatMessageController {
         ChatMessage chatMessage = ChatMessage.builder()
                 .type(MessageType.USER)
                 .chatRoomId(roomId)
+                .userType(userDto.getType())
                 .userNickname(userDto.getNickname())
                 .originLanguage(userDto.getLanguage())
                 .chatMessageRequestDto(chatMessageRequestDto)

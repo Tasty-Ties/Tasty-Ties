@@ -1,6 +1,7 @@
 package com.teamcook.tastytieschat.chat.entity;
 
 import com.teamcook.tastytieschat.chat.constant.MessageType;
+import com.teamcook.tastytieschat.chat.constant.UserType;
 import com.teamcook.tastytieschat.chat.dto.ChatMessageRequestDto;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -22,6 +23,7 @@ public class ChatMessage {
     private String id;
     private MessageType type;
     private String chatRoomId;
+    private UserType userType;
     private int userId;
     private String userNickname;
     private String originLanguage;
@@ -31,9 +33,10 @@ public class ChatMessage {
     private LocalDateTime createdTime;
 
     @Builder
-    public ChatMessage(MessageType type, String chatRoomId, String userNickname, String originLanguage, String originMessage, ChatMessageRequestDto chatMessageRequestDto) {
+    public ChatMessage(MessageType type, String chatRoomId, UserType userType, String userNickname, String originLanguage, String originMessage, ChatMessageRequestDto chatMessageRequestDto) {
         this.type = type;
         this.chatRoomId = chatRoomId;
+        this.userType = userType;
         if (chatMessageRequestDto != null) {
             this.userId = chatMessageRequestDto.getUserId();
         }

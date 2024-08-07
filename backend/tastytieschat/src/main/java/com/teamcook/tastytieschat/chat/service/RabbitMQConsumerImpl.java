@@ -1,10 +1,13 @@
 package com.teamcook.tastytieschat.chat.service;
 
+import com.teamcook.tastytieschat.chat.constant.SystemMessage;
 import com.teamcook.tastytieschat.chat.dto.RabbitMQRequestDto;
 import com.teamcook.tastytieschat.chat.dto.UserDto;
+import com.teamcook.tastytieschat.chat.entity.ChatMessage;
 import com.teamcook.tastytieschat.chat.entity.ChatRoom;
 import com.teamcook.tastytieschat.chat.entity.ChatUser;
 import com.teamcook.tastytieschat.chat.exception.UserHasNoChatRoomException;
+import com.teamcook.tastytieschat.chat.repository.ChatMessageRepository;
 import com.teamcook.tastytieschat.chat.repository.ChatRoomRepository;
 import com.teamcook.tastytieschat.chat.repository.ChatUserRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -29,12 +32,14 @@ public class RabbitMQConsumerImpl implements RabbitMQConsumer {
     private final ChatRoomRepository chatRoomRepository;
     private final RabbitTemplate rabbitTemplate;
     private final ChatUserRepository chatUserRepository;
+    private final ChatMessageRepository chatMessageRepository;
 
     @Autowired
-    public RabbitMQConsumerImpl(ChatRoomRepository chatRoomRepository, RabbitTemplate rabbitTemplate, ChatUserRepository chatUserRepository) {
+    public RabbitMQConsumerImpl(ChatRoomRepository chatRoomRepository, RabbitTemplate rabbitTemplate, ChatUserRepository chatUserRepository, ChatMessageRepository chatMessageRepository) {
         this.chatRoomRepository = chatRoomRepository;
         this.rabbitTemplate = rabbitTemplate;
         this.chatUserRepository = chatUserRepository;
+        this.chatMessageRepository = chatMessageRepository;
     }
 
     @Override
@@ -133,6 +138,8 @@ public class RabbitMQConsumerImpl implements RabbitMQConsumer {
             chatRoom.getUsers().add(userDto);
             chatRoomRepository.save(chatRoom);
 
+            saveSystemChatMessage(chatRoomId, SystemMessage.ENTER, userDto.getNickname());
+
             addChatRoomOfChatUser(rabbitMQRequestDto.getUserId(), rabbitMQRequestDto.getChatRoomId());
         } else {
             log.error("Error entering chat room: chat room does not exist.");
@@ -149,6 +156,8 @@ public class RabbitMQConsumerImpl implements RabbitMQConsumer {
                 String removedUserNickname = chatRoom.removeUser(userId);
 
                 chatRoomRepository.save(chatRoom);
+
+                saveSystemChatMessage(chatRoomId, SystemMessage.EXIT, removedUserNickname);
 
                 removeChatRoomOfChatUser(userId, chatRoomId);
             }
@@ -178,6 +187,12 @@ public class RabbitMQConsumerImpl implements RabbitMQConsumer {
         } else {
             throw new UserHasNoChatRoomException(userId);
         }
+    }
+
+    private void saveSystemChatMessage(String chatRoomId, SystemMessage systemMessage, String userNickname) {
+        ChatMessage chatMessage = systemMessage.getSystemChatMessage(chatRoomId, userNickname);
+
+        chatMessageRepository.save(chatMessage);
     }
 
 }
