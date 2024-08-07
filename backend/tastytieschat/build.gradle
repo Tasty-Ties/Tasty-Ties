@@ -38,6 +38,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
     implementation 'com.squareup.okhttp3:okhttp:4.9.3'
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
+    implementation 'com.google.firebase:firebase-admin:9.2.0'
 }
 
 tasks.named('test') {
