@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
 const Recipe = ({ onChange }) => {
-  const [recipes, setRecipes] = useState([{ step: 0, description: "" }]);
+  const [recipes, setRecipes] = useState([{ step: 1, description: "" }]);
 
   const handleAddFields = () => {
     const values = [...recipes, { step: recipes.length + 1, description: "" }];

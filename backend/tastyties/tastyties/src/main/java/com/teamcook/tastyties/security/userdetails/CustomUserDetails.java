@@ -12,9 +12,16 @@ import java.util.Collections;
 
 public record CustomUserDetails(User user) implements UserDetails {
 
+
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return Collections.emptyList();
+    }
+
+    @Override
+    public User user() {
+        return user;
     }
 
     public Integer getUserId() {

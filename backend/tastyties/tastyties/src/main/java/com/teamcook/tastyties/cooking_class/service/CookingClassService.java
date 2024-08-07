@@ -16,7 +16,8 @@ import com.teamcook.tastyties.shared.entity.CookingClassAndCookingClassTag;
 import com.teamcook.tastyties.shared.entity.UserAndCookingClass;
 import com.teamcook.tastyties.shared.repository.CookingClassAndCookingClassTagRepository;
 import com.teamcook.tastyties.shared.repository.UserAndCookingClassRepository;
-import com.teamcook.tastyties.user.dto.UserProfileForClassDetailDto;
+import com.teamcook.tastyties.user.dto.UserFcmTokenDto;
+import com.teamcook.tastyties.user.dto.UserSimpleProfileDto;
 import com.teamcook.tastyties.user.entity.User;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -180,7 +181,7 @@ public class CookingClassService {
         boolean isEnrolledClass = false;
         boolean isHost = false;
         long enrolledCount = userAndCookingClassRepository.countQuota(cc);
-        Set<UserProfileForClassDetailDto> userEnrolledInClass = null;
+        Set<UserSimpleProfileDto> userEnrolledInClass = null;
 
         if (userDetails != null) {
             User user = userDetails.user();
@@ -267,10 +268,14 @@ public class CookingClassService {
             throw new IllegalArgumentException("본인의 클래스만 삭제할 수 있습니다.");
         }
 
+        Set<UserFcmTokenDto> users = userAndCookingClassRepository.getAttendeeForNotification(uuid);
+
         long row = userAndCookingClassRepository.deleteCookingClass(cookingClass);
         cookingClass.delete();
 
         return DeletedCookingClassDto.builder()
+                .className(cookingClass.getTitle())
+                .users(users)
                 .chatRoomId(cookingClass.getChatRoomId())
                 .deletedReservationCount(row)
                 .build();

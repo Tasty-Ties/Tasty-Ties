@@ -1,28 +1,31 @@
 import "@styles/ClassList/ClassListItem.css";
+const FRONT_SERVER_URL = import.meta.env.VITE_FRONT_SERVER;
 
-const ClassListItem = () => {
+const ClassListItem = (content) => {
   return (
     <>
       <a href="">
         <div className="ClassListItem-imgBox">
           <img
-            src="http://localhost:5173/images/classImages/food-img.png"
+            src={content.content.mainImage}
             alt="클래스 썸네일"
             className="food-img"
           />
           <img
-            src="http://localhost:5173/images/classImages/Korea.png"
+            src={`${FRONT_SERVER_URL}/images/classImages/Korea.png`}
             alt="국기"
             className="flag-img"
           />
         </div>
         <div className="ClassListItem-TextBox">
-          <div className="title">
-            건강한 아침 식사 아이디어 : 충전을 위한 메뉴
-          </div>
+          <div className="title">{content.content.title}</div>
           <div className="sub-box">
-            <div className="date">2024-07-11 17:00 ~ 17:40</div>
-            <div className="nickname">죠니월드</div>
+            <div className="date">
+              {content.content.startTime.substring(0, 10)}&nbsp;
+              {content.content.startTime.substring(11, 16)}&nbsp;~&nbsp;
+              {content.content.endTime.substring(11, 16)}
+            </div>
+            <div className="nickname">{content.content.hostName}</div>
           </div>
         </div>
       </a>

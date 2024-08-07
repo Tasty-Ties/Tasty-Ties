@@ -1,49 +1,53 @@
 import axios from "axios";
 import Cookies from "js-cookie";
-import useAuthStore from "../store/AuthStore";
+
+const MAIN_SERVER_URL = import.meta.env.VITE_MAIN_SERVER;
 
 const api = axios.create({
-  baseURL: "http://localhost:8080/api/v1", // 실제 API URL로 변경
-  withCredentials: true, // 쿠키를 포함하여 요청
-  headers: {
-    Authorization: `Bearer ${Cookies.get("accessToken")}`,
-  },
+  baseURL: MAIN_SERVER_URL,
+  withCredentials: true,
 });
 
-api.interceptors.response.use(
-  (response) => {
-    return response;
+// 요청 인터셉터: 모든 요청에 `accessToken` 추가
+api.interceptors.request.use(
+  (config) => {
+    const accessToken = Cookies.get("accessToken");
+    if (accessToken) {
+      config.headers["Authorization"] = `Bearer ${accessToken}`;
+    }
+    return config;
   },
-  async (error) => {
-    const { logout } = useAuthStore();
-    const originalRequest = error.config;
+  (error) => Promise.reject(error)
+);
 
+// 응답 인터셉터: 403 응답을 처리하여 새로운 `accessToken` 발급
+api.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
     if (error.response.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
-      const refreshToken = Cookies.get("refreshToken");
-
       try {
-        const { data } = await axios.post(
-          "http://localhost:8080/api/v1/auth/refresh",
-          {
-            refreshToken: refreshToken,
-          }
+        const response = await api.post(
+          MAIN_SERVER_URL + "/auth/refresh",
+          { refreshToken: Cookies.get("refreshToken") },
+          { withCredentials: true }
         );
+        console.log("새로운 엑세스 토큰 발급 성공:", response.data);
 
-        Cookies.set("accessToken", data.data.accessToken);
-        console.log(data.data.accessToken);
-        originalRequest.headers["Authorization"] = `Bearer ${Cookies.get(
-          "accessToken"
-        )}`;
+        const accessToken = response.data.data.accessToken;
+
+        Cookies.set("accessToken", accessToken);
+
+        api.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
+        originalRequest.headers["Authorization"] = `Bearer ${accessToken}`;
 
         return api(originalRequest);
-      } catch (refreshError) {
-        console.error("토큰 갱신 실패:", refreshError);
-        // 필요 시 로그아웃 처리
-        logout();
+      } catch (err) {
+        console.error("리프레시 토큰을 사용한 액세스 토큰 재발급 실패:", err);
+        // 필요한 경우 로그아웃 처리 등을 수행
       }
     }
-
     return Promise.reject(error);
   }
 );

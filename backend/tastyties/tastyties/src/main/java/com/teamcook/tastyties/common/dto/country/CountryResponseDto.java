@@ -1,4 +1,4 @@
-package com.teamcook.tastyties.common.dto;
+package com.teamcook.tastyties.common.dto.country;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

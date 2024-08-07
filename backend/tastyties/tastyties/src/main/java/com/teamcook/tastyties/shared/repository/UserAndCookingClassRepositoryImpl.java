@@ -2,7 +2,7 @@ package com.teamcook.tastyties.shared.repository;
 
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.teamcook.tastyties.common.dto.QCountryProfileDto;
+import com.teamcook.tastyties.common.dto.country.QCountryProfileDto;
 import com.teamcook.tastyties.common.entity.QCountry;
 import com.teamcook.tastyties.cooking_class.dto.CookingClassListDto;
 import com.teamcook.tastyties.cooking_class.dto.QCookingClassListDto;
@@ -10,8 +10,10 @@ import com.teamcook.tastyties.cooking_class.entity.CookingClass;
 import com.teamcook.tastyties.shared.dto.QReviewResponseDto;
 import com.teamcook.tastyties.shared.dto.ReviewResponseDto;
 import com.teamcook.tastyties.shared.entity.UserAndCookingClass;
-import com.teamcook.tastyties.user.dto.QUserProfileForClassDetailDto;
-import com.teamcook.tastyties.user.dto.UserProfileForClassDetailDto;
+import com.teamcook.tastyties.user.dto.QUserFcmTokenDto;
+import com.teamcook.tastyties.user.dto.QUserSimpleProfileDto;
+import com.teamcook.tastyties.user.dto.UserFcmTokenDto;
+import com.teamcook.tastyties.user.dto.UserSimpleProfileDto;
 import com.teamcook.tastyties.user.entity.QUser;
 import com.teamcook.tastyties.user.entity.User;
 import org.springframework.data.domain.Page;
@@ -41,6 +43,7 @@ public class UserAndCookingClassRepositoryImpl implements UserAndCookingClassCus
         return null;
     }
 
+    // 유저가 해당 클래스에 예약을 한 상태인지 확인
     @Override
     public boolean isUserEnrolledInClass(User user, CookingClass cookingClass) {
         Integer count = queryFactory
@@ -54,6 +57,7 @@ public class UserAndCookingClassRepositoryImpl implements UserAndCookingClassCus
     }
 
 
+    // 현재 클래스의 인원 확인
     @Override
     public Long countQuota(CookingClass cookingClass) {
         return queryFactory
@@ -63,16 +67,28 @@ public class UserAndCookingClassRepositoryImpl implements UserAndCookingClassCus
                 .fetchOne();
     }
 
+    // 해당 클래스 참여자 정보 확인
     @Override
-    public Set<UserProfileForClassDetailDto> findUserEnrolledInClass(CookingClass cookingClass) {
+    public Set<UserSimpleProfileDto> findUserEnrolledInClass(CookingClass cookingClass) {
         return new HashSet<>(queryFactory
-                .select(new QUserProfileForClassDetailDto(
+                .select(new QUserSimpleProfileDto(
                         user.profileImageUrl,
                         user.nickname,
                         user.username))
                 .from(userAndCookingClass)
                 .join(userAndCookingClass.user, user)
                 .where(userAndCookingClass.cookingClass.eq(cookingClass))
+                .fetch());
+    }
+
+    @Override
+    public Set<UserFcmTokenDto> getAttendeeForNotification(String cookingClassId) {
+        return new HashSet<>(queryFactory
+                .select(new QUserFcmTokenDto(user.userId, user.fcmToken))
+                .from(userAndCookingClass)
+                .join(userAndCookingClass.user, user)
+                .join(userAndCookingClass.cookingClass, cookingClass)
+                .where(cookingClass.uuid.eq(cookingClassId))
                 .fetch());
     }
 

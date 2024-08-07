@@ -1,3 +1,5 @@
+const MAIN_SERVER_URL = import.meta.env.VITE_MAIN_SERVER;
+
 import { OpenVidu } from "openvidu-browser";
 import { useRef, useEffect, useState } from "react";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
@@ -7,17 +9,13 @@ import MediaDeviceSetting from "./../components/LiveClass/MediaDeviceSetting";
 
 import axios from "axios";
 import Cookies from "js-cookie";
+import Button from "../common/components/Button";
 
 const ClassWaiting = () => {
   const nav = useNavigate();
-  const classId = useParams().id;
-  console.log(classId);
-
   const location = useLocation();
-  // const { isHost } = location.state;
-  const isHost = false;
-  console.log("호스트 여부 : ", isHost);
-  console.log("클래스 ID: ", classId);
+  const { classData, isHost } = location.state;
+  console.log(isHost);
 
   const OV = useVideoStore((state) => state.OV);
   const setOV = useVideoStore((state) => state.setOV);
@@ -31,8 +29,8 @@ const ClassWaiting = () => {
     (state) => state.selectedVideoDevice
   );
 
-  const [audioActive, setAudioActive] = useState(true);
-  const [videoActive, setVideoActive] = useState(true);
+  const isAudioActive = useVideoStore((state) => state.isAudioActive);
+  const isVideoActive = useVideoStore((state) => state.isVideoActive);
 
   const videoPreviewRef = useRef(null);
 
@@ -44,13 +42,14 @@ const ClassWaiting = () => {
     if (selectedVideoDevice) {
       startPreview();
     }
-  }, [selectedAudioDevice, selectedVideoDevice]);
+  }, [selectedAudioDevice, selectedVideoDevice, isAudioActive, isVideoActive]);
 
   const startPreview = async () => {
     if (selectedVideoDevice) {
       const stream = await OV.getUserMedia({
-        audioSource: selectedAudioDevice,
-        videoSource: selectedVideoDevice.deviceId,
+        audioSource: isAudioActive ? selectedAudioDevice : false,
+        videoSource: isVideoActive ? selectedVideoDevice.deviceId : false,
+        resolution: "1280x720",
       });
       videoPreviewRef.current.srcObject = stream;
     }
@@ -60,7 +59,7 @@ const ClassWaiting = () => {
     if (isHost) {
       try {
         const response = await axios.post(
-          `http://localhost:8080/api/v1/classes/live/sessions/${classId}`,
+          MAIN_SERVER_URL + `/classes/live/sessions/${classData.uuid}`,
           null,
           {
             headers: {
@@ -68,7 +67,6 @@ const ClassWaiting = () => {
             },
           }
         );
-        console.log(response.data.data);
         setSessionId(response.data.data);
       } catch (error) {
         console.log(error);
@@ -77,20 +75,21 @@ const ClassWaiting = () => {
       }
     } else {
       try {
-        console.log(classId);
         const response = await axios.get(
-          `http://localhost:8080/api/v1/classes/live/sessions/${classId}`,
+          MAIN_SERVER_URL + `/classes/live/sessions/${classData.uuid}`,
           {
             headers: {
               Authorization: `Bearer ${Cookies.get("accessToken")}`,
             },
           }
         );
-        console.log(response);
         setSessionId(response.data.data);
       } catch (error) {
-        console.log(error);
-        alert("오류 발생으로 리턴");
+        if (error.response.data.stateCode === 404) {
+          alert("아직 클래스가 생성되지 않았습니다.");
+        } else {
+          alert("오류 발생으로 리턴");
+        }
         return;
       }
     }
@@ -98,28 +97,42 @@ const ClassWaiting = () => {
     nav("/liveclass", {
       state: {
         isHost: isHost,
+        title: classData.title,
+        hostName: classData.hostName,
       },
     });
   };
 
   return (
-    <div>
-      <h2>
-        {"호스트 이름"}님의 {"클래스 제목"} 클래스 시작을 기다리는 중...
-      </h2>
+    <div className="h-5/6 flex flex-col items-center">
+      {isHost ? (
+        <div className="h-10  text-2xl">
+          클래스 시작 버튼을 눌러 {classData.title} 클래스를 시작해주세요
+        </div>
+      ) : (
+        <div>
+          {classData.hostName}님의 {classData.title} 클래스 시작을 기다리는
+          중...
+        </div>
+      )}
 
-      <MediaDeviceSetting />
-
-      <div>
+      <div className="flex-auto">
         <video
           ref={videoPreviewRef}
           autoPlay
           playsInline
-          style={{ width: "640px" }}
+          className="aspect-video h-96"
         ></video>
       </div>
-
-      <button onClick={EntryTry}>클래스 입장</button>
+      <div className="flex h-10">
+        <MediaDeviceSetting currentPublisher={null} />
+        <Button
+          text={isHost ? "클래스 시작" : "클래스 입장"}
+          type="green-short"
+          onClick={EntryTry}
+          className="self-center"
+        />
+      </div>
     </div>
   );
 };
