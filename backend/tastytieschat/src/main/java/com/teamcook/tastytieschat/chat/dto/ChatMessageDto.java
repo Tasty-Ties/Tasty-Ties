@@ -16,12 +16,14 @@ import java.util.Map;
 public class ChatMessageDto {
     private MessageType type;
     private int userId;
+    private String userNickname;
     private Map<String, String> messages;
     private LocalDateTime createdTime;
 
     public ChatMessageDto(ChatMessage chatMessage) {
         this.type = chatMessage.getType();
         this.userId = chatMessage.getUserId();
+        this.userNickname = chatMessage.getUserNickname();
         this.messages = new HashMap<>();
         this.messages.put(chatMessage.getOriginLanguage(), chatMessage.getOriginMessage());
         this.messages.putAll(chatMessage.getTranslatedMessages());
