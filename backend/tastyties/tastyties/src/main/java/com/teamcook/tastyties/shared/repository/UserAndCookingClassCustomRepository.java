@@ -4,6 +4,7 @@ import com.teamcook.tastyties.cooking_class.dto.CookingClassListDto;
 import com.teamcook.tastyties.cooking_class.entity.CookingClass;
 import com.teamcook.tastyties.shared.dto.ReviewResponseDto;
 import com.teamcook.tastyties.shared.entity.UserAndCookingClass;
+import com.teamcook.tastyties.user.dto.UserFcmTokenDto;
 import com.teamcook.tastyties.user.dto.UserSimpleProfileDto;
 import com.teamcook.tastyties.user.entity.User;
 import org.springframework.data.domain.Page;
@@ -19,6 +20,8 @@ public interface UserAndCookingClassCustomRepository {
     boolean isUserEnrolledInClass(User user, CookingClass cookingClass);
     Long countQuota(CookingClass cookingClass);
     Set<UserSimpleProfileDto> findUserEnrolledInClass(CookingClass cookingClass);
+
+    Set<UserFcmTokenDto> getAttendeeForNotification(String cookingClassId);
 
     long deleteCookingClass(CookingClass cookingClass);
     boolean deleteReservation(User user, CookingClass cookingClass);

@@ -1,13 +1,10 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import userStore from "../../store/UserStore";
-import useApiStore from "../../store/ApiStore";
-import axios from "axios";
 import api from "../../service/Api";
 
 const SignUpSecond = () => {
   const nav = useNavigate();
-  const { baseURL } = useApiStore();
 
   const userRegister = async (e) => {
     e.preventDefault();
@@ -41,8 +38,8 @@ const SignUpSecond = () => {
 
   const checkNickname = async () => {
     try {
-      const response = await axios.get(
-        `${baseURL}/users/check-nickname?nickname=${userForm.nickname}`
+      const response = await api.get(
+        `/users/check-nickname?nickname=${userForm.nickname}`
       );
       console.log(response);
       if (response.data.stateCode === 200) {
@@ -81,7 +78,7 @@ const SignUpSecond = () => {
 
     const fetchLanguages = async () => {
       try {
-        const response = await axios.get(`${baseURL}/languages`);
+        const response = await api.get(`/languages`);
         console.log(response.data.data);
         const sortedLanguages = response.data.data.languages.sort((a, b) => {
           return a.koreanName.localeCompare(b.koreanName, "kr", {
@@ -96,7 +93,7 @@ const SignUpSecond = () => {
 
     fetchCountries();
     fetchLanguages();
-  }, [baseURL]);
+  }, []);
 
   return (
     <>

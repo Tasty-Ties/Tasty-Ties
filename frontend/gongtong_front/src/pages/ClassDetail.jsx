@@ -1,116 +1,157 @@
-import { useEffect } from "react";
-import { Link, Outlet, useParams } from "react-router-dom";
-import "@styles/ClassDetail/ClassDetail.css";
-import useClassRegistStore from "./../store/ClassRegistStore";
 import axios from "axios";
+import React, { useEffect } from "react";
+import { Link, Outlet, useNavigate, useParams } from "react-router-dom";
+import useClassRegistStore from "./../store/ClassRegistStore";
+import ClassEnrollUsers from "../components/ClassDetail/ClassEnrollUsers";
+import {
+  setClassReservation,
+  setDeleteClass,
+  setDeleteClassReservation,
+} from "../service/ClassRegistAPI";
+
+import "@styles/ClassDetail/ClassDetail.css";
+import ClassImageCarousel from "../components/ClassDetail/ClassImageCarousel";
+
+const FRONT_SERVER_URL = import.meta.env.VITE_FRONT_SERVER;
 
 const ClassDetail = () => {
   const { id } = useParams();
 
-  const { classDetail, fetchClassDetail } = useClassRegistStore();
-  let startDate = new Date(classDetail.cookingClassStartTime);
-  console.log(startDate);
+  const { classDetail, fetchClassDetail } = useClassRegistStore((state) => ({
+    classDetail: state.classDetail,
+    fetchClassDetail: state.fetchClassDetail,
+  }));
+  console.log(classDetail);
 
   useEffect(() => {
     fetchClassDetail(id);
-  }, [id, fetchClassDetail]);
+  }, [id]);
 
-  const RatingComponent = ({ evaluateMain }) => {
-    // 전체 별의 개수
-    const totalStars = 5;
-
-    // 별을 생성하는 함수
-    const renderStars = () => {
-      return Array.from({ length: totalStars }, (_, index) => (
-        <span
-          key={index}
-          className="star"
-          style={{
-            color: index < evaluateMain ? "gold" : "#ccc",
-          }}
-        >
-          ★
-        </span>
-      ));
-    };
-
-    return <div>{renderStars()}</div>;
-  };
-  const setClassReservation = async (e) => {
-    const token =
-      "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzc2FmeSIsImlhdCI6MTcyMjQxMjk5OSwiZXhwIjoxNzIyNDEzMzU5fQ.72fxEidy7i90Q1AFzoMjTVGB8JvU9qKk8TWGPtzxjQM";
+  const handleClassReservation = async (e) => {
     try {
-      await axios.post(
-        `http://localhost:8080/api/v1/classes/reservation/${id}`,
-        {
-          header: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      alert("예약 성공욤");
+      await setClassReservation(id);
+      alert("등록 완료!");
+      fetchClassDetail(id);
     } catch (error) {
       console.error("클래스 예약 실패:", error);
     }
   };
 
+  const cancelClassReservation = async (e) => {
+    try {
+      await setDeleteClassReservation(id);
+      alert("취소 완료!");
+      fetchClassDetail(id);
+    } catch (error) {
+      console.error("클래스 예약 취소 실패:", error);
+    }
+  };
+
+  const deleteClass = async (e) => {
+    try {
+      let isTrue = confirm("정말 삭제하시겠습니까?");
+      if (isTrue) {
+        await setDeleteClass(id);
+        alert("삭제 완료!");
+        window.location.replace("/class");
+      }
+    } catch (error) {
+      console.error("클래스 삭제 실패", error);
+    }
+  };
+
   return (
     <div className="detail-container">
-      <img
-        src="http://localhost:5173/images/classImages/food-img2.png"
-        alt="클래스 상세 이미지"
-        className="info-img"
-      />
+      <ClassImageCarousel classDetail={classDetail} />
       <div className="class-info-box">
         <div className="title">{classDetail.title}</div>
         <div className="nickname-box">
           <span>{classDetail.dishName}</span>
           <img
-            src="http://localhost:5173/images/classImages/Korea.png"
+            src={`${FRONT_SERVER_URL}/images/classImages/Korea.png`}
             alt="국가 이미지"
           />
         </div>
         <div className="sub-box">
-          <span className="content">
-            <span className="content-rating-2${voReview.idx} content-rating-2">
-              ⭐⭐⭐⭐⭐
-              <span>⭐⭐⭐⭐⭐</span>
-              <input type="range" step="1" min="0" max="5" />
-            </span>
-            <RatingComponent evaluateMain={classDetail.level} />
-          </span>
-          <div className="btn-box">
-            <button onClick={setClassReservation}>
-              <svg
-                width="14"
-                height="14"
-                viewBox="0 0 14 12"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M5.25 8.75H0.75V7.25H5.25V2.75H6.75V7.25H11.25V8.75H6.75V13.25H5.25V8.75Z"
-                  fill="white"
-                />
-              </svg>
-              <span>예약하기</span>
-            </button>
-            <div className="people-box">
-              <img
-                src="http://localhost:5173/images/classImages/groups-img.png"
-                alt="인원 이미지"
-              />
-              <span>
-                {classDetail.reservedCount}/{classDetail.quota}
-              </span>
+          <div className="class-detail-rating-box">
+            <div className="rating">
+              <div className="detail-rating-status">
+                {[5, 4, 3, 2, 1].map((rating) => (
+                  <React.Fragment key={`rating-${rating}`}>
+                    <input
+                      type="radio"
+                      className="detail-rating"
+                      id={`rate-${rating}`}
+                      checked={rating <= classDetail.level}
+                    />
+                    <label htmlFor={`rate-${rating}`}>⭐</label>
+                  </React.Fragment>
+                ))}
+              </div>
             </div>
+          </div>
+          <div className="btn-box">
+            {!classDetail.userEnrolled && !classDetail.host && (
+              <button onClick={handleClassReservation}>
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 14 12"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M5.25 8.75H0.75V7.25H5.25V2.75H6.75V7.25H11.25V8.75H6.75V13.25H5.25V8.75Z"
+                    fill="white"
+                  />
+                </svg>
+                <span>예약하기</span>
+              </button>
+            )}
+            {classDetail.userEnrolled && !classDetail.host && (
+              <button onClick={cancelClassReservation}>
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 14 12"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M5.25 8.75H0.75V7.25H5.25V2.75H6.75V7.25H11.25V8.75H6.75V13.25H5.25V8.75Z"
+                    fill="white"
+                  />
+                </svg>
+                <span>예약 취소</span>
+              </button>
+            )}
+            {classDetail.host && (
+              <button onClick={deleteClass}>
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 14 12"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M5.25 8.75H0.75V7.25H5.25V2.75H6.75V7.25H11.25V8.75H6.75V13.25H5.25V8.75Z"
+                    fill="white"
+                  />
+                </svg>
+                <span>강의 삭제하기</span>
+              </button>
+            )}
+          </div>
+          <div className="people-box">
+            <ClassEnrollUsers classDetail={classDetail} />
           </div>
         </div>
       </div>
       <div className="user-info-box">
         <div className="user-box">
           <img
-            src="http://localhost:5173/images/classImages/user-img.png"
+            src={`${FRONT_SERVER_URL}/images/classImages/user-img.png`}
             alt="유저 이미지"
           />
           <span>{classDetail.hostName}</span>
@@ -130,7 +171,13 @@ const ClassDetail = () => {
               />
             </svg>
             <span>실시간 클래스 시간 : </span>
-            <span></span>
+            <span>
+              {classDetail.cookingClassStartTime &&
+                classDetail.cookingClassEndTime &&
+                `${classDetail.cookingClassStartTime.substring(0, 10)} 
+                  ${classDetail.cookingClassStartTime.substring(11, 16)} ~ 
+                  ${classDetail.cookingClassEndTime.substring(11, 16)}`}
+            </span>
           </div>
           <div className="icon-box">
             <svg
@@ -147,7 +194,7 @@ const ClassDetail = () => {
             </svg>
 
             <span>언어 : </span>
-            <span>한국어</span>
+            <span>{classDetail.languageName}</span>
           </div>
           <div className="icon-box">
             <svg
@@ -165,7 +212,13 @@ const ClassDetail = () => {
 
             <div>
               <span>다시보기 기간 : </span>
-              <span>{classDetail.replayEndTime}</span>
+              <span>
+                {classDetail.replayEndTime &&
+                  `${classDetail.replayEndTime.substring(
+                    0,
+                    10
+                  )} ${classDetail.replayEndTime.substring(11, 16)}`}
+              </span>
             </div>
           </div>
         </div>
@@ -178,18 +231,20 @@ const ClassDetail = () => {
       </div>
       <hr />
       <div className="class-info-menu">
-        <Link to="" description={classDetail.description}>
-          클래스 소개
-        </Link>
-        <Link to="ingredient" ingredients={classDetail.ingredients}>
-          식재료
-        </Link>
-        <Link to="kitchentools" cookingTools={classDetail.cookingTools}>
-          조리 도구
-        </Link>
+        <Link to="">클래스 소개</Link>
+        <Link to="ingredient">식재료</Link>
+        <Link to="cookingTools">조리 도구</Link>
+        <Link to="recipes">레시피</Link>
         <Link to="reviews">수강평</Link>
       </div>
-      <Outlet />
+      <Outlet
+        context={{
+          description: classDetail.description,
+          ingredients: classDetail.ingredients,
+          cookingTools: classDetail.cookingTools,
+          recipes: classDetail.recipe,
+        }}
+      />
     </div>
   );
 };

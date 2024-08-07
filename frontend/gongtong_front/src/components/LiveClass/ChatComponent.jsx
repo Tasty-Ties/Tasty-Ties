@@ -1,4 +1,5 @@
-const SERVER_URL = "ws://192.168.31.83:8081/chat";
+const CHAT_SERVER_URL = import.meta.env.VITE_CHAT_SERVER;
+
 const roomId = "66a9c5dd498fe728acb763f8";
 const userId = 1;
 const userLang = "Japanese";
@@ -14,7 +15,7 @@ const ChatComponent = () => {
 
   useEffect(() => {
     stompClient.current = new Client({
-      brokerURL: SERVER_URL,
+      brokerURL: CHAT_SERVER_URL,
 
       debug: (str) => {
         console.log(str);
@@ -97,22 +98,17 @@ const ChatComponent = () => {
     setMessage(e.target.value);
   };
 
-  const chatcss = {
-    height: "400px",
-  };
-
   return (
-    <div>
+    <div className="w-1/3 self-stretch mx-3 my-3 border-solid border-2">
       <h1>채팅</h1>
-      {
-        <div style={chatcss}>
-          {messageLog.map((message, i) => (
-            <div key={i}>
-              {message.userNickname}: {message.translation}
-            </div>
-          ))}
-        </div>
-      }
+      <div>
+        {messageLog.map((message, i) => (
+          <div key={i}>
+            {message.userNickname}: {message.translation}
+          </div>
+        ))}
+      </div>
+
       <input value={message} onChange={messageHandler}></input>
       <button onClick={sendMessage}>전송</button>
     </div>
