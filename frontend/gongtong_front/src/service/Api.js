@@ -24,7 +24,13 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
-    if (error.response.status === 401 && Cookies.get("accessToken")) {
+    const originalRequest = error.config;
+    if (
+      error.response.status === 401 &&
+      !originalRequest._retry &&
+      Cookies.get("accessToken")
+    ) {
+      originalRequest._retry = true;
       try {
         const response = await api.post(
           MAIN_SERVER_URL + "/auth/refresh",
@@ -36,11 +42,17 @@ api.interceptors.response.use(
         const accessToken = response.data.data.accessToken;
 
         Cookies.set("accessToken", accessToken);
+
+        api.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
+        originalRequest.headers["Authorization"] = `Bearer ${accessToken}`;
+
+        return api(originalRequest);
       } catch (err) {
         console.error("리프레시 토큰을 사용한 액세스 토큰 재발급 실패:", err);
         // 필요한 경우 로그아웃 처리 등을 수행
       }
     }
+    return Promise.reject(error);
   }
 );
 
