@@ -17,6 +17,9 @@ import com.teamcook.tastyties.user.repository.UserRepository;
 import com.teamcook.tastyties.user.repository.activitypoint.ActivityPointLogRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Service;
@@ -113,7 +116,6 @@ public class UserRewardsService {
         // 전체 ZSet 크기 가져오기
         Long totalSize = redisTemplate.opsForZSet().zCard(leaderboardKey);
         int totalPages = (int) Math.ceil((double) totalSize / PAGE_SIZE);
-        Set<ZSetOperations.TypedTuple<Object>> leaderboard = redisTemplate.opsForZSet().reverseRangeWithScores("weekly:leaderboard", 0, 6);
         Set<ZSetOperations.TypedTuple<Object>> results = redisTemplate.opsForZSet()
                 .reverseRangeWithScores(leaderboardKey, start, end);
         List<RankedUserDto> rankedUsers = new ArrayList<>();
@@ -121,36 +123,20 @@ public class UserRewardsService {
             // 결과가 없으면 빈 리스트와 총 페이지 수를 반환
             return new ActivityPointResponseDto(rankedUsers, null, totalPages);
         }
-        int rank = start + 1;
-        double previousScore = Double.NaN;
-        int offset = 0;
 
+        int rank = start + 1;
         for (ZSetOperations.TypedTuple<Object> result : results) {
-            String userKey = (String) result.getValue();
-            int userId = Integer.parseInt(userKey);
-            Double score = result.getScore();
-            score = score != null ? score : 0.0;
-            log.debug("userId: {}, score: {}", userId, score);
-            User user = userRepository.findById(userId).orElse(null);
-            log.debug(user.getNickname());
-            if (!Double.isNaN(previousScore) && score < previousScore) {
-                rank += offset;
-                offset = 1;
-            } else {
-                offset++;
-            }
-            previousScore = score;
+            int userId = Integer.parseInt((String) result.getValue());
+            double score = result.getScore();
+            User user = userRepository.findById(userId).orElseThrow();
             UserStatistics userStatistics = user.getUserStatistics();
-            int hostedCount = 0;
-            int attendedCount = 0;
-            if (userStatistics != null) {
-                hostedCount = userStatistics.getClassesHosted();
-                attendedCount = userStatistics.getClassesAttended();
-            }
-            rankedUsers.add(new RankedUserDto(userId, user.getNickname(),
-                    score, rank, hostedCount, attendedCount,
+            rankedUsers.add(new RankedUserDto(userId, user.getNickname(), score, rank,
+                    userStatistics.getClassesHosted(), userStatistics.getClassesAttended(),
                     user.getProfileImageUrl(), user.getDescription()));
+            rank++;
         }
+
+
         // 여기 부터 나의 랭크 찾기
         RankedUserDto myRank = null;
         if (userDetails != null) {
@@ -190,29 +176,41 @@ public class UserRewardsService {
     }
 
     public int getUserRank(String leaderBoardKey, String userId) {
-        Double userScore = redisTemplate.opsForZSet().score(leaderBoardKey, userId);
-        if (userScore == null) {
-            return -1; // 유저 점수가 없는 경우
-        }
-        // 현재 유저 점수보다 높은 점수의 수를 세서 rank를 계산
-        Long higherRankCount = redisTemplate.opsForZSet().count(leaderBoardKey, userScore + 1, Double.MAX_VALUE);
-        // 동점자를 고려하여 최종 순위를 계산
-        int finalRank = higherRankCount.intValue() + 1;
-        return finalRank;
+        Long rank = redisTemplate.opsForZSet().reverseRank(leaderBoardKey, userId);
+        return rank != null ? rank.intValue() + 1 : 0;
     }
 
-
+    @Transactional
     public ActivityPointResponseDto getTotalLeaderboard(CustomUserDetails userDetails, int page) {
-        int start = (page-1)*PAGE_SIZE;
-        int end = start + PAGE_SIZE - 1;
+        Pageable pageable = PageRequest.of(page - 1, PAGE_SIZE, Sort.by(Sort.Direction.DESC, "activityPoint"));
+        List<User> users = userRepository.findAll(pageable).getContent();
 
-        // 전체 크기 가져오기
-        long totalSize = userRepository.count();
-        int totalPages = (int) Math.ceil((double) totalSize / PAGE_SIZE);
+        long count = userRepository.count();
+        int totalPages = (int) Math.ceil((double) count / PAGE_SIZE);
 
+        List<RankedUserDto> rankedUsers = new ArrayList<>();
+        int rank = (page - 1) * PAGE_SIZE + 1;
+        for (User user : users) {
+            UserStatistics userStatistics = user.getUserStatistics();
+            rankedUsers.add(new RankedUserDto(user.getUserId(), user.getNickname(), user.getActivityPoint(), rank,
+                    userStatistics.getClassesHosted(), userStatistics.getClassesAttended(),
+                    user.getProfileImageUrl(), user.getDescription()));
+            rank++;
+        }
 
-        return null;
+        RankedUserDto myRank = null;
+        if (userDetails != null) {
+            User user = userDetails.user();
+            UserStatistics userStatistics = user.getUserStatistics();
+            myRank = new RankedUserDto(user.getUserId(), user.getNickname(), user.getActivityPoint(),
+                    getUserRankByActivityPoint(user), userStatistics.getClassesHosted(),
+                    userStatistics.getClassesAttended(), user.getProfileImageUrl(), user.getDescription());
+        }
+        return new ActivityPointResponseDto(rankedUsers, myRank, totalPages);
     }
 
-
+    private int getUserRankByActivityPoint(User user) {
+        long rank = userRepository.countByActivityPointGreaterThan(user.getActivityPoint());
+        return (int) rank + 1;
+    }
 }
