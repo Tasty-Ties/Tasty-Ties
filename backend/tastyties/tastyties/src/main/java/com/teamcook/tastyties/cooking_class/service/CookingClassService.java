@@ -198,8 +198,9 @@ public class CookingClassService {
         // 이미지 관련 추가 필요
         Set<String> imageUrls = mapToCookingClassImages(cc.getCookingClassImages());
 
+        User host = cc.getHost();
         return new CookingClassDto(
-                cc.getUuid(), cc.getHost().getNickname(),
+                cc.getUuid(), new UserSimpleProfileDto(host.getProfileImageUrl(), host.getNickname(), host.getUsername()),
                 cc.getTitle(), cc.getDishName(), cc.isLimitedAge(),
                 cc.getCountryCode(), cc.getCountryName(), tags, cc.getDescription(),
                 cc.getLanguageCode(), cc.getLanguageName(), cc.getLevel(), cc.getCookingClassStartTime(),

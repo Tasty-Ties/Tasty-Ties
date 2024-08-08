@@ -1,4 +1,4 @@
-package com.teamcook.tastyties.user.dto;
+package com.teamcook.tastyties.user.dto.reward;
 
 import lombok.Data;
 
