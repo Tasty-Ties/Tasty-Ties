@@ -22,6 +22,10 @@ public class User {
     @NotNull
     @Column(nullable = false)
     private String password;
+    @NotNull
+    @Column(nullable = false, unique = true)
+    private String nickname;
+    private String profileImageUrl;
     private String fcmToken;
     @OneToMany(mappedBy = "user")
     private Set<FcmNotification> notifications = new HashSet<>();

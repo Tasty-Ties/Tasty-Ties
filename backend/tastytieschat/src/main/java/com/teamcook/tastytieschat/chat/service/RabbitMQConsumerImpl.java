@@ -135,7 +135,7 @@ public class RabbitMQConsumerImpl implements RabbitMQConsumer {
                 log.error("Error entering chat room: user already exists.");
             }
 
-            chatRoom.getUsers().add(userDto);
+            chatRoom.addUser(userDto);
             chatRoomRepository.save(chatRoom);
 
             saveSystemChatMessage(chatRoomId, SystemMessage.ENTER, userDto.getNickname());

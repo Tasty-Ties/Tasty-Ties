@@ -8,7 +8,6 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -89,6 +88,19 @@ public class ChatRoom {
         }
 
         return languages;
+    }
+
+    public List<String> getUsernames() {
+        List<String> usernames = new ArrayList<>();
+        for (UserDto user : users) {
+            usernames.add(user.getUsername());
+        }
+        return usernames;
+    }
+
+    public void addUser(UserDto user) {
+        user.setEnteredTime(LocalDateTime.now());
+        users.add(user);
     }
 
 }

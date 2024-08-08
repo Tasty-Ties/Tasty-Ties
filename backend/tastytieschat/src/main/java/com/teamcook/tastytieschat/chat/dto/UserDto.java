@@ -1,20 +1,21 @@
 package com.teamcook.tastytieschat.chat.dto;
 
 import com.teamcook.tastytieschat.chat.constant.UserType;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
 
 @Getter
 @Setter
+@AllArgsConstructor
+@Builder
 public class UserDto {
     private UserType type;
     private String username;
     private String nickname;
     private String language;
+    private String profileImageUrl;
     private LocalDateTime enteredTime;
 
     @Override
