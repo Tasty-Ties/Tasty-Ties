@@ -53,7 +53,7 @@ public class CookingClassService {
                                UserAndCookingClassRepository userAndCookingClassRepository,
                                CookingClassTagRepository cookingClassTagRepository,
                                CookingClassImageRepository cookingClassImageRepository,
-                               @Qualifier("Local") S3Service s3Service) {
+                               @Qualifier("S3") S3Service s3Service) {
         this.cookingClassRepository = cookingClassRepository;
         this.ingredientRepository = ingredientRepository;
         this.recipeRepository = recipeRepository;

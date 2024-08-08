@@ -48,7 +48,7 @@ public class AlbumService {
 
     @Autowired
     public AlbumService(AlbumRepository albumRepository, FolderRepository folderRepository,
-                        PhotoRepository photoRepository, @Qualifier("Local") S3Service s3Service,
+                        PhotoRepository photoRepository, @Qualifier("S3") S3Service s3Service,
                         CookingClassRepository cookingClassRepository,
                         UserAndCookingClassRepository userAndCookingClassRepository,
                         CountryRepository countryRepository) {

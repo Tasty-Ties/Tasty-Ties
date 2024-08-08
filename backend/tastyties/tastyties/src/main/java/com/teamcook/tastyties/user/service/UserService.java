@@ -39,7 +39,7 @@ public class UserService {
     public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder,
                        CountryRepository countryRepository, LanguageRepository languageRepository,
                        UserAndCookingClassRepository userAndCookingClassRepository,
-                       @Qualifier("Local") S3Service s3Service) {
+                       @Qualifier("S3") S3Service s3Service) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.countryRepository = countryRepository;
