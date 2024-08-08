@@ -15,18 +15,17 @@ const ChatRoom = () => {
   const [chatRoomList, setChatRoomList] = useState([]);
   const [chatRoomId, setChatRoomId] = useState();
   const [chatRoomTitle, setChatRoomTitle] = useState();
+  const [isEmpty, setIsEmpty] = useState(false);
 
   const userInfo = useMyPageStore((state) => state.informations);
   const fetchInformation = useMyPageStore((state) => state.fetchInformations);
 
   const [messageTime, setMessageTime] = useState();
 
-  useEffect(() => {
-    if (userInfo.length === 0) {
-      console.log("userInfo가 비어있어서 새로운 정보를 가져옵니다.");
+  console.log(userInfo);
 
-      fetchInformation();
-    }
+  useEffect(() => {
+    fetchInformation();
 
     stompClient.current = new Client({
       brokerURL: CHAT_SERVER,
@@ -48,6 +47,7 @@ const ChatRoom = () => {
     console.log("stompClient가 활성화됨");
 
     return () => {
+      chatRoomList.length = 0;
       stompClient.current.deactivate();
       console.log("stompClient가 비활성화됨");
     };
@@ -71,6 +71,10 @@ const ChatRoom = () => {
       console.log("유저의 채팅방 목록입니다.", response);
       setChatRoomList(response.data.data.chatRooms);
     } catch (error) {
+      if (error.response.status === 404) {
+        setIsEmpty(true);
+      }
+      console.log();
       console.error(error);
       return;
     }
@@ -80,34 +84,36 @@ const ChatRoom = () => {
     <div className="flex flex-row flex-auto mx-3 py-5">
       <div className="w-1/3">
         <div className="divide-y divide-gray-100">
-          {chatRoomList &&
-            chatRoomList.map((chatRoom, i) => (
-              <button
-                key={i}
-                className="flex justify-between gap-x-6 py-5 bg-white hover:bg-yellow-100  w-full"
-                onClick={() => {
-                  setChatRoomId(chatRoom.id);
-                  setChatRoomTitle(chatRoom.title);
-                }}
-              >
-                <div className="flex min-w-0 gap-x-4 w-full px-3">
-                  <img
-                    alt=""
-                    src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRF1IwK6-SxM83UpFVY6WtUZxXx-phss_gAUfdKbkTfau6VWVkt"
-                    className="h-12 w-12 flex-none rounded-full bg-gray-50"
-                  />
-                  <ChatRoomList
-                    chatRoom={chatRoom}
-                    userLang={userInfo.language.englishName}
-                  />
-                </div>
-                <div className="hidden shrink-0 sm:flex sm:flex-col sm:items-end">
-                  <p className="text-sm leading-6 text-gray-900">
-                    {chatRoom.message ? messageTime : ""}
-                  </p>
-                </div>
-              </button>
-            ))}
+          {isEmpty
+            ? "아무런 채팅방에도 참여하고 있지 않습니다."
+            : chatRoomList &&
+              chatRoomList.map((chatRoom, i) => (
+                <button
+                  key={i}
+                  className="flex justify-between gap-x-6 py-5 bg-white hover:bg-yellow-100  w-full"
+                  onClick={() => {
+                    setChatRoomId(chatRoom.id);
+                    setChatRoomTitle(chatRoom.title);
+                  }}
+                >
+                  <div className="flex min-w-0 gap-x-4 w-full px-3">
+                    <img
+                      alt=""
+                      src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRF1IwK6-SxM83UpFVY6WtUZxXx-phss_gAUfdKbkTfau6VWVkt"
+                      className="h-12 w-12 flex-none rounded-full bg-gray-50"
+                    />
+                    <ChatRoomList
+                      chatRoom={chatRoom}
+                      userLang={userInfo.language.englishName}
+                    />
+                  </div>
+                  <div className="hidden shrink-0 sm:flex sm:flex-col sm:items-end">
+                    <p className="text-sm leading-6 text-gray-900">
+                      {chatRoom.message ? messageTime : ""}
+                    </p>
+                  </div>
+                </button>
+              ))}
         </div>
       </div>
       <div className="w-2/3 h-full bg-yellow-100">
