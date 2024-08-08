@@ -26,7 +26,7 @@ const Login = () => {
     const response = await api.post("/auth/login", {
       username: input.username,
       password: input.password,
-      fcmToken: Cookies.get("fcmToken")
+      fcmToken: Cookies.get("fcmToken"),
     });
     console.log(response);
 

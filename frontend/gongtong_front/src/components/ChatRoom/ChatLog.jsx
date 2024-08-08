@@ -8,6 +8,7 @@ import ChatMessage from "./ChatMessage";
 const CHAT_SERVER_URL = import.meta.env.VITE_CHAT_SERVER_URL;
 
 const ChatLog = ({
+  userProfile,
   chatRoomId,
   chatRoomTitle,
   stompClient,
@@ -21,8 +22,12 @@ const ChatLog = ({
   const chatInputRef = useRef();
   const topScrollRef = useRef();
   const scrollBoxRef = useRef();
+  const endScrollRef = useRef();
+  const chatLogIndexRef = useRef(0);
+  //   const [chatLogIndex, setChatLogIndex] = useState(0);
   const [messageLog, setMessageLog] = useState([]);
   const [previousLog, setPreviousLog] = useState([]);
+  const [receivedType, setReceivedType] = useState([]);
 
   useEffect(() => {
     getChatLog();
@@ -30,6 +35,7 @@ const ChatLog = ({
     setMessageLog([]);
 
     return () => {
+      chatLogIndexRef.current = 0;
       stompClient.current.unsubscribe();
       setMessageLog([]);
       setPreviousLog([]);
@@ -37,18 +43,17 @@ const ChatLog = ({
     };
   }, [chatRoomId]);
 
-  //   useEffect(() => {
-  //     if (messageLog.length === 0) {
-  //       endScrollRef.current.scrollIntoView();
-  //       // console.log("스크롤 이벤트 호출됨");
-  //     }
-  //   }, [messageLog]);
+  useEffect(() => {
+    console.log("스크롤을 맨 마지막으로 이동합니다.");
+    endScrollRef.current.scrollIntoView();
+  }, [chatRoomId, previousLog, messageLog]);
 
   const subscribeChatRoom = async () => {
     await stompClient.current.subscribe(
       `/sub/chat/rooms/${chatRoomId}`,
       async (message) => {
         receivedMessage(JSON.parse(message.body));
+        console.log(JSON.parse(message.body));
       }
     );
     console.log(`${chatRoomTitle} 채팅방 구독이 활성화되었습니다.`);
@@ -59,9 +64,14 @@ const ChatLog = ({
       const response = await axios.get(CHAT_SERVER_URL + `/chats`, {
         params: {
           chatRoomId: chatRoomId,
-          pgNo: 0,
+          pgNo: chatLogIndexRef.current,
         },
       });
+      console.log(
+        ">>>>>>> 기존 채팅 목록을 불러옵니다. 채팅 페이지는 : ",
+        chatLogIndexRef.current
+      );
+      console.log("기존 채팅 목록", response.data.data.chatMessages);
       setPreviousLog((prev) => [...prev, ...response.data.data.chatMessages]);
     } catch (error) {
       console.error;
@@ -70,6 +80,15 @@ const ChatLog = ({
   };
 
   const receivedMessage = (chatMessage) => {
+    if (chatMessage.type === "USER") {
+      if (chatMessage.userId === userId) {
+        setReceivedType("ME");
+      } else {
+        setReceivedType("USER");
+      }
+    } else {
+      setReceivedType("HOST");
+    }
     setUserNickname(chatMessage.userNickname);
     setOriginalMessage(chatMessage.messages);
   };
@@ -142,21 +161,23 @@ const ChatLog = ({
               </div>
             ))}
         </div>
-        {messageLog &&
-          messageLog.map((message, i) => (
-            <div key={i}>
-              {
-                <ChatMessage
-                  type={"ME"}
-                  imgSrc="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRF1IwK6-SxM83UpFVY6WtUZxXx-phss_gAUfdKbkTfau6VWVkt"
-                  nickname={message.userNickname}
-                  message={message.translation}
-                  chatTime={new Date()}
-                />
-              }
-            </div>
-          ))}
-        {<div id="endPoint"></div>}
+        <div className="pt-0">
+          {messageLog &&
+            messageLog.map((message, i) => (
+              <div key={i}>
+                {
+                  <ChatMessage
+                    type={receivedType}
+                    imgSrc={userProfile}
+                    nickname={message.userNickname}
+                    message={message.translation}
+                    chatTime={new Date()}
+                  />
+                }
+              </div>
+            ))}
+        </div>
+        {<div id="endPoint" ref={endScrollRef}></div>}
       </div>
       <div className="w-full flex flex-row space-x-2 py-5 items-end justify-center">
         <input

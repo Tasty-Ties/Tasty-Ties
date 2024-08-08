@@ -20,13 +20,11 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// 응답 인터셉터: 403 응답을 처리하여 새로운 `accessToken` 발급
+// 응답 인터셉터: 401 응답을 처리하여 새로운 `accessToken` 발급
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
-    const originalRequest = error.config;
-    if (error.response.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true;
+    if (error.response.status === 401 && Cookies.get("accessToken")) {
       try {
         const response = await api.post(
           MAIN_SERVER_URL + "/auth/refresh",
@@ -38,17 +36,11 @@ api.interceptors.response.use(
         const accessToken = response.data.data.accessToken;
 
         Cookies.set("accessToken", accessToken);
-
-        api.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
-        originalRequest.headers["Authorization"] = `Bearer ${accessToken}`;
-
-        return api(originalRequest);
       } catch (err) {
         console.error("리프레시 토큰을 사용한 액세스 토큰 재발급 실패:", err);
         // 필요한 경우 로그아웃 처리 등을 수행
       }
     }
-    return Promise.reject(error);
   }
 );
 

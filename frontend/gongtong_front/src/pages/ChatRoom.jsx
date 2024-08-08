@@ -58,7 +58,7 @@ const ChatRoom = () => {
   }, [userInfo]);
 
   const getRoomList = async () => {
-    if (userInfo.length === 0) {
+    if (userInfo && userInfo.length === 0) {
       console.log("userInfo가 비어 있어서 리턴함");
       return;
     }
@@ -79,12 +79,12 @@ const ChatRoom = () => {
   return (
     <div className="flex flex-row flex-auto mx-3 py-5">
       <div className="w-1/3">
-        <ul role="list" className="divide-y divide-gray-100">
+        <div className="divide-y divide-gray-100">
           {chatRoomList &&
             chatRoomList.map((chatRoom, i) => (
-              <li
+              <button
                 key={i}
-                className="flex justify-between gap-x-6 py-5 bg-white hover:bg-yellow-100"
+                className="flex justify-between gap-x-6 py-5 bg-white hover:bg-yellow-100  w-full"
                 onClick={() => {
                   setChatRoomId(chatRoom.id);
                   setChatRoomTitle(chatRoom.title);
@@ -105,26 +105,15 @@ const ChatRoom = () => {
                   <p className="text-sm leading-6 text-gray-900">
                     {chatRoom.message ? messageTime : ""}
                   </p>
-                  {/* {chatRoom.message ? (
-              <p className="mt-1 text-xs leading-5 text-gray-500">
-                Last seen{" "}
-                <time dateTime={person.lastSeenDateTime}>
-                  {person.lastSeen}
-                </time>
-              </p>
-            ) : (
-              <div className="mt-1 flex items-center gap-x-1.5">
-                <p className="text-xs leading-5 text-gray-500">아직 아무런 메시지도 없습니다.</p>
-              </div>
-            )} */}
                 </div>
-              </li>
+              </button>
             ))}
-        </ul>
+        </div>
       </div>
       <div className="w-2/3 h-full bg-yellow-100">
         {chatRoomId && userInfo && (
           <ChatLog
+            userProfile={userInfo.profileImageUrl}
             chatRoomId={chatRoomId}
             chatRoomTitle={chatRoomTitle}
             stompClient={stompClient}
