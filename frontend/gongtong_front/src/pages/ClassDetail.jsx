@@ -15,7 +15,6 @@ import ClassImageCarousel from "../components/ClassDetail/ClassImageCarousel";
 const FRONT_SERVER_URL = import.meta.env.VITE_FRONT_SERVER;
 
 const ClassDetail = () => {
-  // const nav = useNavigate();
   const { id } = useParams();
 
   const { classDetail, fetchClassDetail } = useClassRegistStore((state) => ({
@@ -23,8 +22,6 @@ const ClassDetail = () => {
     fetchClassDetail: state.fetchClassDetail,
   }));
   console.log(classDetail);
-  // const username = classDetail.userProfiles.username;
-  // console.log(username);
 
   useEffect(() => {
     fetchClassDetail(id);
@@ -156,9 +153,6 @@ const ClassDetail = () => {
           <img
             src={`${FRONT_SERVER_URL}/images/classImages/user-img.png`}
             alt="유저 이미지"
-            // onClick={() => {
-            //   nav(`/otherpage/${username}`);
-            // }}
           />
           <span>{classDetail.hostName}</span>
         </div>
