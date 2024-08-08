@@ -8,7 +8,7 @@ import lombok.Getter;
 @AllArgsConstructor
 @Builder
 public class ChatUserDto {
-    private int id;
+    private String username;
     private String nickname;
     private String profileImageUrl;
     private String language;

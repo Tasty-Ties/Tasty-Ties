@@ -16,7 +16,10 @@ public class Language {
     @OneToMany(mappedBy = "language")
     private Set<User> user;
 
+    @Column(nullable = false, unique = true)
     private String alpha2;
+    @Column(nullable = false, unique = true)
     private String english;
+    @Column(nullable = false, unique = true)
     private String korean;
 }

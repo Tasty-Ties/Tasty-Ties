@@ -1,7 +1,7 @@
 package com.teamcook.tastytieschat.chat.entity;
 
 import com.teamcook.tastytieschat.chat.constant.MessageType;
-import com.teamcook.tastytieschat.chat.dto.ChatMessageRequestDto;
+import com.teamcook.tastytieschat.chat.constant.UserType;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
@@ -22,8 +22,8 @@ public class ChatMessage {
     private String id;
     private MessageType type;
     private String chatRoomId;
-    private int userId;
-    private String userNickname;
+    private UserType userType;
+    private String username;
     private String originLanguage;
     private String originMessage;
     private Map<String, String> translatedMessages;
@@ -31,19 +31,13 @@ public class ChatMessage {
     private LocalDateTime createdTime;
 
     @Builder
-    public ChatMessage(MessageType type, String chatRoomId, String userNickname, String originLanguage, String originMessage, ChatMessageRequestDto chatMessageRequestDto) {
+    public ChatMessage(MessageType type, String chatRoomId, UserType userType, String username, String originLanguage, String originMessage) {
         this.type = type;
         this.chatRoomId = chatRoomId;
-        if (chatMessageRequestDto != null) {
-            this.userId = chatMessageRequestDto.getUserId();
-        }
-        this.userNickname = userNickname;
+        this.userType = userType;
+        this.username = username;
         this.originLanguage = originLanguage;
-        if (chatMessageRequestDto != null) {
-            this.originMessage = chatMessageRequestDto.getMessage();
-        } else {
-            this.originMessage = originMessage;
-        }
+        this.originMessage = originMessage;
         this.translatedMessages = new HashMap<>();
     }
 
