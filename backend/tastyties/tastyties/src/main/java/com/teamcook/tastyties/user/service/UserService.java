@@ -1,5 +1,7 @@
 package com.teamcook.tastyties.user.service;
 
+import com.teamcook.tastyties.common.entity.Country;
+import com.teamcook.tastyties.common.entity.Language;
 import com.teamcook.tastyties.common.repository.CountryRepository;
 import com.teamcook.tastyties.common.repository.LanguageRepository;
 import com.teamcook.tastyties.s3test.Image;
@@ -53,14 +55,11 @@ public class UserService {
         if (userRepository.existsByUsername(request.getUsername())) {
             throw new UserIDAlreadyExistsException("이미 존재하는 사용자 ID입니다");
         }
-        User newUser = new User();
-        newUser.setUsername(request.getUsername());
-        newUser.setPassword(encodedPassword);
-        newUser.setNickname(request.getNickname());
-        newUser.setCountry(countryRepository.findByAlpha2(request.getCountryCode()));
-        newUser.setLanguage(languageRepository.findByAlpha2(request.getLanguageCode()));
-        newUser.setEmail(request.getEmailId() + "@" + request.getEmailDomain());
-        newUser.setBirth(request.getBirth());
+        Country country = countryRepository.findByAlpha2(request.getCountryCode());
+        Language language = languageRepository.findByAlpha2(request.getLanguageCode());
+        User newUser = new User(country, language, request.getUsername(), encodedPassword,
+                request.getNickname(), request.getBirth(), request.getEmailId() + "@" + request.getEmailDomain());
+
 
         // 기본 앨범 생성 및 사용자에 추가
         Album defaultAlbum = new Album("나의 앨범");
