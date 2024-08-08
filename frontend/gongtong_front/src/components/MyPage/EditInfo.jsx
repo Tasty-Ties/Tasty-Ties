@@ -14,11 +14,14 @@ const EditInfo = () => {
   const [description, setDescription] = useState(
     informations.description || ""
   );
-  const [instaUrl, setInstaUrl] = useState(informations.instagramUrl || "");
-  const [youtubeUrl, setYoutubeUrl] = useState(informations.youtubeUrl || "");
+  const [instaHandle, setInstaHandle] = useState(
+    informations.instagramHandle || ""
+  );
+  const [youtubeHandle, setYoutubeHandle] = useState(
+    informations.youtubeHandle || ""
+  );
   const [emailId, setEmailId] = useState("");
   const [emailDomain, setEmailDomain] = useState("");
-
   const nav = useNavigate();
 
   useEffect(() => {
@@ -72,8 +75,8 @@ const EditInfo = () => {
       emailId,
       emailDomain,
       description,
-      instagramUrl: instaUrl,
-      youtubeUrl,
+      instagramUrl: "https://www.instagram.com/" + instaHandle,
+      youtubeUrl: "https://www.youtube.com/@" + youtubeHandle,
     };
 
     try {
@@ -139,20 +142,20 @@ const EditInfo = () => {
       </section>
       <br />
       <section>
-        인스타:
+        인스타: https://www.instagram.com/
         <input
           type="text"
-          value={instaUrl}
-          onChange={(e) => setInstaUrl(e.target.value)}
+          value={instaHandle}
+          onChange={(e) => setInstaHandle(e.target.value)}
         />
       </section>
       <br />
       <section>
-        유튜브:
+        유튜브: https://www.youtube.com/@
         <input
           type="text"
-          value={youtubeUrl}
-          onChange={(e) => setYoutubeUrl(e.target.value)}
+          value={youtubeHandle}
+          onChange={(e) => setYoutubeHandle(e.target.value)}
         />
       </section>
       <br />

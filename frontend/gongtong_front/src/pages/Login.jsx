@@ -22,27 +22,31 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    try {
+      const response = await api.post("/auth/login", {
+        username: input.username,
+        password: input.password,
+        fcmToken: Cookies.get("fcmToken"),
+      });
+      console.log(response);
 
-    const response = await api.post("/auth/login", {
-      username: input.username,
-      password: input.password,
-      fcmToken: Cookies.get("fcmToken")
-    });
-    console.log(response);
-
-    if (response.status === 200) {
-      const accessToken = response.data.data.accessToken;
-      const refreshToken = response.data.data.refreshToken;
-      document.cookie = `accessToken=${accessToken}; path=/; SameSite=Lax`;
-      document.cookie = `refreshToken=${refreshToken}; path=/; SameSite=Lax`;
-      login(accessToken, refreshToken);
-      nav("/");
-    } else if (response.status === 401) {
-      alert("아이디 또는 비밀번호가 잘못되었습니다.");
-    } else if (response.status === 500) {
-      alert("탈퇴한 사용자입니다.");
-    } else {
-      alert("인증 오류가 발생했습니다.");
+      if (response.status === 200) {
+        const accessToken = response.data.data.accessToken;
+        const refreshToken = response.data.data.refreshToken;
+        document.cookie = `accessToken=${accessToken}; path=/; SameSite=Lax`;
+        document.cookie = `refreshToken=${refreshToken}; path=/; SameSite=Lax`;
+        login(accessToken, refreshToken);
+        nav("/");
+      }
+    } catch (error) {
+      console.log(error);
+      if (error.response.status === 401) {
+        alert("아이디 또는 비밀번호가 잘못되었습니다.");
+      } else if (error.response.status === 500) {
+        alert("탈퇴한 사용자입니다.");
+      } else {
+        alert("인증 오류가 발생했습니다.");
+      }
     }
   };
 

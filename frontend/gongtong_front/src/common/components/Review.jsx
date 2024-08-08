@@ -1,12 +1,6 @@
 import "../../styles/MyPage/Class.css";
-import { Link, useNavigate, useLocation } from "react-router-dom";
-import { useEffect } from "react";
-import Button from "./Button";
 
 const Class = ({ classInfo }) => {
-  const nav = useNavigate();
-  const location = useLocation();
-
   const date = classInfo.startTime.substring(
     0,
     classInfo.startTime.indexOf("T")
@@ -47,32 +41,16 @@ const Class = ({ classInfo }) => {
   return (
     <div className="flex">
       <div>
-        <img src={classInfo.mainImage} alt="클래스사진" />
-      </div>
-      <div>
         <h3>{classInfo.title}</h3>
 
+        <p>{classInfo.hostname}</p>
         <p>
           {date} {startTime}~{endTime}
         </p>
-        <button onClick={() => nav(`/class/${classInfo.uuid}`)}>
-          상세 보기
-        </button>
       </div>
-      <Button
-        text={timeRemaing}
-        type={timeRemaing === "입장" ? "orange-sqr" : "gray-sqr"}
-        onClick={() =>
-          timeRemaing === "입장"
-            ? nav(`/classwaiting/${classInfo.uuid}`, {
-                state: {
-                  classData: classInfo,
-                  isHost: location.pathname === "/mypage/teach" ? true : false,
-                },
-              })
-            : ""
-        }
-      />
+      <div>
+        <img src={classInfo.mainImage} alt="클래스사진" />
+      </div>
     </div>
   );
 };
