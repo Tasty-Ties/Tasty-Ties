@@ -19,7 +19,7 @@ const AttendClass = () => {
       <div>참여한 클래스</div>
       <p>전체</p>
       <p>{attendedClasses.totalElements}</p>
-      {attendedClasses.content.map((attendClass, index) => (
+      {attendedClasses.content?.map((attendClass, index) => (
         <Lecture key={index} classInfo={attendClass} />
       ))}
     </>
