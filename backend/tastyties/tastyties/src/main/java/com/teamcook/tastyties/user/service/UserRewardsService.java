@@ -17,6 +17,9 @@ import com.teamcook.tastyties.user.repository.UserRepository;
 import com.teamcook.tastyties.user.repository.activitypoint.ActivityPointLogRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Service;
@@ -175,5 +178,39 @@ public class UserRewardsService {
     public int getUserRank(String leaderBoardKey, String userId) {
         Long rank = redisTemplate.opsForZSet().reverseRank(leaderBoardKey, userId);
         return rank != null ? rank.intValue() + 1 : 0;
+    }
+
+    @Transactional
+    public ActivityPointResponseDto getTotalLeaderboard(CustomUserDetails userDetails, int page) {
+        Pageable pageable = PageRequest.of(page - 1, PAGE_SIZE, Sort.by(Sort.Direction.DESC, "activityPoint"));
+        List<User> users = userRepository.findAll(pageable).getContent();
+
+        long count = userRepository.count();
+        int totalPages = (int) Math.ceil((double) count / PAGE_SIZE);
+
+        List<RankedUserDto> rankedUsers = new ArrayList<>();
+        int rank = (page - 1) * PAGE_SIZE + 1;
+        for (User user : users) {
+            UserStatistics userStatistics = user.getUserStatistics();
+            rankedUsers.add(new RankedUserDto(user.getUserId(), user.getNickname(), user.getActivityPoint(), rank,
+                    userStatistics.getClassesHosted(), userStatistics.getClassesAttended(),
+                    user.getProfileImageUrl(), user.getDescription()));
+            rank++;
+        }
+
+        RankedUserDto myRank = null;
+        if (userDetails != null) {
+            User user = userDetails.user();
+            UserStatistics userStatistics = user.getUserStatistics();
+            myRank = new RankedUserDto(user.getUserId(), user.getNickname(), user.getActivityPoint(),
+                    getUserRankByActivityPoint(user), userStatistics.getClassesHosted(),
+                    userStatistics.getClassesAttended(), user.getProfileImageUrl(), user.getDescription());
+        }
+        return new ActivityPointResponseDto(rankedUsers, myRank, totalPages);
+    }
+
+    private int getUserRankByActivityPoint(User user) {
+        long rank = userRepository.countByActivityPointGreaterThan(user.getActivityPoint());
+        return (int) rank + 1;
     }
 }

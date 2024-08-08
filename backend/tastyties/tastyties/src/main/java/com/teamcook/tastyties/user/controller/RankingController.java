@@ -53,24 +53,36 @@ public class RankingController {
     @GetMapping("/monthly")
     public ResponseEntity<CommonResponseDto> getMonthlyLeaderboard(@AuthenticationPrincipal CustomUserDetails userDetails,
                                                                   @RequestParam int page) {
-        ActivityPointResponseDto weeklyLeaderboard = userRewardsService.getMonthlyLeaderboard(userDetails, page);
+        ActivityPointResponseDto monthlyLeaderboard = userRewardsService.getMonthlyLeaderboard(userDetails, page);
         return ResponseEntity.ok()
                 .body(CommonResponseDto.builder()
                         .stateCode(200)
                         .message("월간 랭킹을 정상적으로 조회했습니다.")
-                        .data(weeklyLeaderboard)
+                        .data(monthlyLeaderboard)
                         .build());
     }
 
     @GetMapping("/yearly")
     public ResponseEntity<CommonResponseDto> getYearlyLeaderboard(@AuthenticationPrincipal CustomUserDetails userDetails,
                                                                   @RequestParam int page) {
-        ActivityPointResponseDto weeklyLeaderboard = userRewardsService.getYearlyLeaderboard(userDetails, page);
+        ActivityPointResponseDto yearlyLeaderboard = userRewardsService.getYearlyLeaderboard(userDetails, page);
         return ResponseEntity.ok()
                 .body(CommonResponseDto.builder()
                         .stateCode(200)
                         .message("연간 랭킹을 정상적으로 조회했습니다.")
-                        .data(weeklyLeaderboard)
+                        .data(yearlyLeaderboard)
+                        .build());
+    }
+
+    @GetMapping("/total")
+    public ResponseEntity<CommonResponseDto> getTotalLeaderboard(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                                                  @RequestParam int page) {
+        ActivityPointResponseDto totalLeaderboard = userRewardsService.getTotalLeaderboard(userDetails, page);
+        return ResponseEntity.ok()
+                .body(CommonResponseDto.builder()
+                        .stateCode(200)
+                        .message("종합 랭킹을 정상적으로 조회했습니다.")
+                        .data(totalLeaderboard)
                         .build());
     }
 
