@@ -15,12 +15,14 @@ public class ChatMessageResponseDto {
 
     private MessageType type;
     private String username;
+    private String originLanguage;
     private Map<String, String> messages;
     private LocalDateTime createdTime;
 
     public ChatMessageResponseDto(ChatMessage chatMessage) {
         this.type = chatMessage.getType();
         this.username = chatMessage.getUsername();
+        this.originLanguage = chatMessage.getOriginLanguage();
         this.messages = new HashMap<>();
         this.messages.put(chatMessage.getOriginLanguage(), chatMessage.getOriginMessage());
         this.messages.putAll(chatMessage.getTranslatedMessages());
