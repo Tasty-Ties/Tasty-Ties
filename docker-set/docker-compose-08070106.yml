@@ -1,0 +1,194 @@
+services:
+  nginx:
+    image: openvidu/openvidu-proxy:2.30.0
+    restart: always
+    network_mode: host
+    volumes:
+      - /opt/openvidu/certificates:/etc/letsencrypt
+      - /opt/openvidu/owncert:/owncert
+      - /opt/openvidu/custom-nginx-vhosts:/etc/nginx/vhost.d/
+      - /opt/openvidu/custom-nginx-locations:/custom-nginx-locations
+        # - ${OPENVIDU_RECORDING_CUSTOM_LAYOUT}:/opt/openvidu/custom-layout
+    environment:
+      - DOMAIN_OR_PUBLIC_IP=${DOMAIN_OR_PUBLIC_IP}
+      - CERTIFICATE_TYPE=${CERTIFICATE_TYPE}
+      - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
+      - PROXY_HTTP_PORT=${HTTP_PORT:-}
+      - PROXY_HTTPS_PORT=${HTTPS_PORT:-}
+      - PROXY_HTTPS_PROTOCOLS=${HTTPS_PROTOCOLS:-}
+      - PROXY_HTTPS_CIPHERS=${HTTPS_CIPHERS:-}
+      - PROXY_HTTPS_HSTS=${HTTPS_HSTS:-}
+      - ALLOWED_ACCESS_TO_DASHBOARD=${ALLOWED_ACCESS_TO_DASHBOARD:-}
+      - ALLOWED_ACCESS_TO_RESTAPI=${ALLOWED_ACCESS_TO_RESTAPI:-}
+      - PROXY_MODE=CE
+      - WITH_APP=true
+      - SUPPORT_DEPRECATED_API=${SUPPORT_DEPRECATED_API:-false}
+      - REDIRECT_WWW=${REDIRECT_WWW:-false}
+      - WORKER_CONNECTIONS=${WORKER_CONNECTIONS:-10240}
+      - PUBLIC_IP=${PROXY_PUBLIC_IP:-auto-ipv4}
+    logging:
+      options:
+        max-size: "${DOCKER_LOGS_MAX_SIZE:-100M}"
+
+  openvidu-server:
+    image: openvidu/openvidu-server:2.30.0
+    environment:
+      - OPENVIDU_SECRET=${OPENVIDU_SECRET}
+      - DOMAIN_OR_PUBLIC_IP=${DOMAIN_OR_PUBLIC_IP}
+      - CERTIFICATE_TYPE=${CERTIFICATE_TYPE}
+      - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
+    ports:
+      - "5443:5443"
+    depends_on:
+      - kms
+
+  kms:
+    image: kurento/kurento-media-server:latest
+    ports:
+      - "8888:8888"
+    environment:
+      - KMS_STUN_IP=stun.l.google.com
+      - KMS_STUN_PORT=19302
+
+  app:
+    image: openvidu/openvidu-call:2.30.0
+    depends_on:
+      - openvidu-server
+    ports:
+      - "5000:5000"
+
+  frontend:
+    image: seminss/gongtong_frontend:latest
+    container_name: gongtong_frontend
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+    networks:
+      - tastyties1net
+
+  tastyties:
+    image: seminss/tastyties:latest
+    container_name: tastyties
+    restart: always
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+      - redis
+      - rabbitmq
+    environment:
+      SERVER_PORT: 8080
+      OPENVIDU_URL: http://i11b206.p.ssafy.io:5443/
+      OPENVIDU_SECRET: MY_SECRET
+      DB_URL: jdbc:mysql://db:3306/tastyties
+      DB_USERNAME: b206
+      DB_PASSWORD: B206!Ssafy206!
+      UPLOAD_IMAGE_DIR: /app/files/image
+      UPLOAD_VIDEO_DIR: /app/files/video
+      FILE_SERVER_URL: http://localhost:8080/api/v1/files
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      AWS_ACCESS_KEY: AKIA5P7FDIJH7RU6Q2OZ
+      AWS_SECRET_KEY: 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
+      AWS_BUCKET_NAME: teamcook-bucket
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USERNAME: guest
+      RABBITMQ_PASSWORD: guest
+    networks:
+      - tastyties1net
+
+  tastytieschat:
+    image: seminss/tastytiescaht:latest
+    container_name: tastytieschat
+    restart: always
+    ports:
+      - "8081:8081"
+    depends_on:
+      - mongo
+      - rabbitmq
+      - redis
+    environment:
+      SERVER_PORT: 8081
+      MONGO_HOST: mongo
+      MONGO_PORT: 27017
+      MONGO_DATABASE: tastyties
+      MONGO_USERNAME: b206
+      MONGO_PASSWORD: B206!Ssafy206!
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USERNAME: guest
+      RABBITMQ_PASSWORD: guest
+      OPENAI_SECRET_KEY: JnS85SLEnE9fHH7irPu2T3BlbkFJrLcxXP5PpBPZQi79tvXY
+      SPEECH_FLOW_KEY_ID: wnwh8a4z7zqsRKF3
+      SPEECH_FLOW_KEY_SECRET: yTvItNNCQGeeQAH8
+      FFMPEG_PATH: /usr/local/bin/ffmpeg
+      CLOVA_CLIENT_ID: 4e63vkv6t1
+      CLOVA_CLIENT_SECRET: 8pzPaUwrrK0PabkbT0k4zp3Uk66aYtFfydE5obSp
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+    networks:
+      - tastyties1net
+
+  db:
+    image: mysql:8
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: B206!Ssafy206!Root1234$
+      MYSQL_DATABASE: tastyties
+      MYSQL_USER: b206
+      MYSQL_PASSWORD: B206!Ssafy206!
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - tastyties1net
+
+  mongo:
+    image: mongo:latest
+    container_name: mongo
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: B206!Ssafy206!Root1234$
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - tastyties1net
+
+  rabbitmq:
+    image: rabbitmq:management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    networks:
+      - tastyties1net
+
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - tastyties1net
+
+volumes:
+  mysql_data:
+  mongo_data:
+  redis_data:
+
+networks:
+  tastyties1net:
+    driver: bridge
+
