@@ -5,13 +5,19 @@ import { deleteId } from "../../service/MyPageAPI";
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 import useMyPageStore from "../../store/MyPageStore";
+import { useEffect } from "react";
 
 const MyInfo = () => {
-  const informations = useMyPageStore((state) => state.informations);
   const nav = useNavigate();
+  const informations = useMyPageStore((state) => state.informations);
+  const fetchInformations = useMyPageStore((state) => state.fetchInformations);
 
-  const handleDeleteId = async () => {
-    await deleteId();
+  useEffect(() => {
+    fetchInformations();
+  }, [fetchInformations]);
+
+  const handleDeleteId = () => {
+    deleteId();
     nav("/");
     Cookies.remove("accessToken");
     Cookies.remove("refreshToken");
@@ -23,22 +29,24 @@ const MyInfo = () => {
       <h1>내 정보</h1>
       <p>닉네임: {informations.nickname}</p>
       <p>국적: {informations.country?.koreanName || "국적 정보 없음"}</p>
-      <p>모국어: {informations.language?.koreanName || "국적 정보 없음"}</p>
+      <p>모국어: {informations.language?.koreanName || "모국어 정보 없음"}</p>
       <p>마일리지: {informations.activityPoint}</p>
       <p>이메일: {informations.email}</p>
       <p>생년월일: {informations.birth}</p>
       <p>수집한 국기: {informations.colletedFlags}</p>
       <p>SNS 연동 현황</p>
-      <p>
+      <p className="flex">
         <img src={instalogo} alt="인스타로고" /> {informations.youtubeHandle}
-      </p>
-      <p>
-        <img src={youtubelogo} alt="유튜브로고" />
+        <img src={youtubelogo} alt="유튜브로고" />{" "}
         {informations.instagramHandle}
       </p>
       <br />
-      <Button text="내정보 수정하기" type={"green-sqr"} />
-      <Button text="회원탈퇴" type={"gray-sqr"} onClick={handleDeleteId} />
+      <Button
+        text="내정보 수정하기"
+        type="green-sqr"
+        onClick={() => nav("/mypage/editinfo", { state: { informations } })}
+      />
+      <Button text="회원탈퇴" type="gray-sqr" onClick={handleDeleteId} />
       <br /> <br /> <br /> <br /> <br /> <br /> <br />
     </div>
   );

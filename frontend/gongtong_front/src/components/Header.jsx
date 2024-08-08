@@ -22,7 +22,7 @@ const Header = () => {
         <img src={logo} alt="맛잇다로고" />
       </Link>
       <div>
-        {Cookies.get("accessToken") && <Link to="">앨범 |</Link>}
+        {Cookies.get("accessToken") && <Link to="/album">앨범 |</Link>}
         <Link to="">숏폼 |</Link> <Link to="">랭킹 |</Link>
         <Link to="/class">쿠킹클래스 |</Link>
         {!Cookies.get("accessToken") && <Link to="/signup">회원가입 |</Link>}

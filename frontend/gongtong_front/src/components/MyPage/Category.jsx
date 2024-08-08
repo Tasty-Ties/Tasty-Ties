@@ -10,7 +10,14 @@ const Category = () => {
       <div>
         <br />
         <div>
-          <p>프로필사진</p>
+          <p>
+            <img src={informations.profileImageUrl} alt="내프로필사진" />
+            <img
+              alt="프로필사진"
+              src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRF1IwK6-SxM83UpFVY6WtUZxXx-phss_gAUfdKbkTfau6VWVkt"
+              className="h-12 w-12 flex-none rounded-lg bg-gray-50"
+            />
+          </p>
           <p>국적:{informations.country?.koreanName || "국적 정보 없음"}</p>
           <p>이름:{informations.nickname}</p>
           <p>자기소개:{informations.description}</p>
