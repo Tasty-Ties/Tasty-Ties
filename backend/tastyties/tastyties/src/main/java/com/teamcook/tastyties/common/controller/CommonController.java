@@ -1,7 +1,7 @@
 package com.teamcook.tastyties.common.controller;
 
 import com.teamcook.tastyties.common.dto.CommonResponseDto;
-import com.teamcook.tastyties.common.dto.CountryResponseDto;
+import com.teamcook.tastyties.common.dto.country.CountryResponseDto;
 import com.teamcook.tastyties.common.dto.LanguageResponseDto;
 import com.teamcook.tastyties.common.entity.Country;
 import com.teamcook.tastyties.common.entity.Language;

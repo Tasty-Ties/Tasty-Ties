@@ -16,6 +16,7 @@ import com.teamcook.tastyties.shared.entity.CookingClassAndCookingClassTag;
 import com.teamcook.tastyties.shared.entity.UserAndCookingClass;
 import com.teamcook.tastyties.shared.repository.CookingClassAndCookingClassTagRepository;
 import com.teamcook.tastyties.shared.repository.UserAndCookingClassRepository;
+import com.teamcook.tastyties.user.dto.UserFcmTokenDto;
 import com.teamcook.tastyties.user.dto.UserSimpleProfileDto;
 import com.teamcook.tastyties.user.entity.User;
 import lombok.extern.slf4j.Slf4j;
@@ -198,7 +199,7 @@ public class CookingClassService {
         Set<String> imageUrls = mapToCookingClassImages(cc.getCookingClassImages());
 
         return new CookingClassDto(
-                cc.getUuid(), cc.getHost().getNickname(),
+                cc.getUuid(), cc.getHost().getUsername(), cc.getHost().getNickname(),
                 cc.getTitle(), cc.getDishName(), cc.isLimitedAge(),
                 cc.getCountryCode(), cc.getCountryName(), tags, cc.getDescription(),
                 cc.getLanguageCode(), cc.getLanguageName(), cc.getLevel(), cc.getCookingClassStartTime(),
@@ -267,10 +268,14 @@ public class CookingClassService {
             throw new IllegalArgumentException("본인의 클래스만 삭제할 수 있습니다.");
         }
 
+        Set<UserFcmTokenDto> users = userAndCookingClassRepository.getAttendeeForNotification(uuid);
+
         long row = userAndCookingClassRepository.deleteCookingClass(cookingClass);
         cookingClass.delete();
 
         return DeletedCookingClassDto.builder()
+                .className(cookingClass.getTitle())
+                .users(users)
                 .chatRoomId(cookingClass.getChatRoomId())
                 .deletedReservationCount(row)
                 .build();
@@ -279,7 +284,8 @@ public class CookingClassService {
 
     // 클래스 예약
     @Transactional
-    public String reserveClass(User user, String uuid) {
+    public ReservedCookingClassDto reserveClass(User user, String uuid) {
+        // TODO: 쿠킹 클래스 정보 가지고 올 때 호스트 정보도 가져오기 why? 호스트의 id와 fcm token이 필요함 (current)
         CookingClass cc = cookingClassRepository.findWithUuid(uuid);
         if (cc == null) {
             throw new CookingClassNotFoundException("존재하지 않는 클래스입니다.");
@@ -293,7 +299,14 @@ public class CookingClassService {
         }
         createUserAndCookingClassRelationship(user, cc);
 
-        return cc.getChatRoomId();
+        return ReservedCookingClassDto.builder()
+                .className(cc.getTitle())
+                .host(UserFcmTokenDto.builder()
+                        .userId(cc.getHost().getUserId())
+                        .fcmToken(cc.getHost().getFcmToken())
+                        .build())
+                .chatRoomId(cc.getChatRoomId())
+                .build();
     }
 
     // user와 cookingclass 관계 생성
@@ -309,16 +322,25 @@ public class CookingClassService {
 
     // 예약 삭제
     @Transactional
-    public String deleteReservation(User user, String uuid) {
+    public ReservedCookingClassDto deleteReservation(User user, String uuid) {
         CookingClass cc = cookingClassRepository.findWithUuid(uuid);
 
         if (cc.isDelete()) {
             throw new CookingClassIsDeletedException("삭제된 클래스입니다.");
         }
-        String chatRoomId = cc.getChatRoomId();
+
+        ReservedCookingClassDto reservedCookingClass = ReservedCookingClassDto.builder()
+                .className(cc.getTitle())
+                .host(UserFcmTokenDto.builder()
+                        .userId(cc.getHost().getUserId())
+                        .fcmToken(cc.getHost().getFcmToken())
+                        .build())
+                .chatRoomId(cc.getChatRoomId())
+                .build();
+
         deleteUserAndCookingClassRelationship(user, cc);
 
-        return chatRoomId;
+        return reservedCookingClass;
     }
 
     private void deleteUserAndCookingClassRelationship(User user, CookingClass cc) {

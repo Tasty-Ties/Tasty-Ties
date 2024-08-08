@@ -15,6 +15,7 @@ import java.util.Set;
 @Builder
 public class CookingClassDto {
     private String uuid;
+    private String hostUsername;
     private String hostName;
     private String title;
     private String dishName;

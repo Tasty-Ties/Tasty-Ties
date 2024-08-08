@@ -3,6 +3,7 @@ package com.teamcook.tastyties.user.controller;
 import com.teamcook.tastyties.common.dto.CommonResponseDto;
 import com.teamcook.tastyties.security.jwtutil.JwtTokenProvider;
 import com.teamcook.tastyties.user.dto.AuthRequestDto;
+import com.teamcook.tastyties.user.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,12 +34,14 @@ public class AuthController {
     private final JwtTokenProvider tokenProvider;
     private final AuthenticationManager authenticationManager;
     private final UserDetailsService userDetailsService;
+    private UserService userService;
 
     @Autowired
-    public AuthController(JwtTokenProvider jwtTokenProvider, AuthenticationManager authenticationManager, UserDetailsService userDetailsService) {
+    public AuthController(JwtTokenProvider jwtTokenProvider, AuthenticationManager authenticationManager, UserDetailsService userDetailsService, UserService userService) {
         this.tokenProvider = jwtTokenProvider;
         this.authenticationManager = authenticationManager;
         this.userDetailsService = userDetailsService;
+        this.userService = userService;
     }
 
     @PostMapping("/login")
@@ -55,6 +58,11 @@ public class AuthController {
             Map<String, String> tokens = new HashMap<>();
             tokens.put("accessToken", accessToken);
             tokens.put("refreshToken", refreshToken);
+
+            // FCM token이 있으면 저장
+            if (authRequest.getFcmToken() != null) {
+                userService.updateFCMToken(authRequest);
+            }
 
             // 토큰과 함께 성공 응답
             return ResponseEntity.ok()

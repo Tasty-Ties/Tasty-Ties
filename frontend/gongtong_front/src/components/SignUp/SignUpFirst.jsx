@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import userStore from "../../store/UserStore";
-import axios from "../../service/Axios";
+import api from "../../service/Api";
 
 const SignUpFirst = () => {
   const nav = useNavigate();
@@ -81,7 +81,7 @@ const SignUpFirst = () => {
         userForm.email.indexOf("@") + 1
       );
 
-      const response = await axios.get(
+      const response = await api.get(
         `/users/check-email?email_id=${emailId}&email_domain=${emailDomain}`
       );
       if (response.data.stateCode === 200) {
@@ -101,7 +101,7 @@ const SignUpFirst = () => {
 
   const checkUsername = async () => {
     try {
-      const response = await axios.get(
+      const response = await api.get(
         `/users/check-username?username=${userForm.username}`
       );
       if (response.data.stateCode === 200) {

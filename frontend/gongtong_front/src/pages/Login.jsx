@@ -1,7 +1,8 @@
 import { useState } from "react";
 import useAuthStore from "../store/AuthStore";
 import { useNavigate } from "react-router-dom";
-import axios from "../service/Axios";
+import api from "../service/Api";
+import Cookies from "js-cookie";
 
 const Login = () => {
   const { login } = useAuthStore();
@@ -22,9 +23,10 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const response = await axios.post("/auth/login", {
+    const response = await api.post("/auth/login", {
       username: input.username,
       password: input.password,
+      fcmToken: Cookies.get("fcmToken")
     });
     console.log(response);
 
