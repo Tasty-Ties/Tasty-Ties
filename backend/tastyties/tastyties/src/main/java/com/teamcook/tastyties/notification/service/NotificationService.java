@@ -29,11 +29,44 @@ public class NotificationService {
         this.userRepository = userRepository;
     }
 
-    public void sendMessagesTo(Set<UserFcmTokenDto> users, FcmNotificationDto fcmNotification) {
-        Notification notification = Notification.builder()
-                .setTitle(fcmNotification.getTitle())
-                .setBody(fcmNotification.getBody())
+    public void sendMessageTo(UserFcmTokenDto user, FcmNotificationDto fcmNotification) {
+        Notification notification = createNotification(fcmNotification);
+
+        Message message = Message.builder()
+                .setToken(user.getFcmToken())
+                .setNotification(notification)
                 .build();
+
+        try {
+            firebaseMessaging.send(message);
+
+            saveMessage(fcmNotification);
+        } catch (FirebaseMessagingException e) {
+            log.error("Failed to send fcm notification", e);
+        }
+    }
+
+    private Notification createNotification(FcmNotificationDto fcmNotificationDto) {
+        return Notification.builder()
+                .setTitle(fcmNotificationDto.getTitle())
+                .setBody(fcmNotificationDto.getBody())
+                .build();
+    }
+
+    private void saveMessage(FcmNotificationDto fcmNotification) {
+        User user = userRepository.findById(fcmNotification.getUserId()).orElse(null);
+
+        if (user != null) {
+            fcmNotificationRepository.save(FcmNotification.builder()
+                    .user(user)
+                    .title(fcmNotification.getTitle())
+                    .body(fcmNotification.getBody())
+                    .build());
+        }
+    }
+
+    public void sendMessagesTo(Set<UserFcmTokenDto> users, FcmNotificationDto fcmNotification) {
+        Notification notification = createNotification(fcmNotification);
 
         MulticastMessage messages = MulticastMessage.builder()
                 .addAllTokens(getFcmTokens(users))

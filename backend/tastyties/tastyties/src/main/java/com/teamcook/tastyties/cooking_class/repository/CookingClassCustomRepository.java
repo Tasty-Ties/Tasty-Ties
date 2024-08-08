@@ -3,6 +3,7 @@ package com.teamcook.tastyties.cooking_class.repository;
 import com.teamcook.tastyties.cooking_class.dto.CookingClassDto;
 import com.teamcook.tastyties.cooking_class.dto.CookingClassListDto;
 import com.teamcook.tastyties.cooking_class.dto.CookingClassSearchCondition;
+import com.teamcook.tastyties.cooking_class.dto.ReservedCookingClassDto;
 import com.teamcook.tastyties.cooking_class.entity.CookingClass;
 import com.teamcook.tastyties.cooking_class.entity.CookingClassTag;
 import org.springframework.data.domain.Page;
