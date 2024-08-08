@@ -16,8 +16,8 @@ const MyInfo = () => {
     fetchInformations();
   }, [fetchInformations]);
 
-  const handleDeleteId = () => {
-    deleteId();
+  const handleDeleteId = async () => {
+    await deleteId();
     Cookies.remove("accessToken");
     Cookies.remove("refreshToken");
     nav("/");

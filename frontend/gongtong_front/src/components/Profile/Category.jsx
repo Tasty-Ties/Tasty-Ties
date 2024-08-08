@@ -20,18 +20,18 @@ const Category = (informations) => {
             </p>
             <p>
               국적:
-              {information.userProfileDto.country.koreanName}
+              {information.userProfileDto.country?.koreanName}
             </p>
-            <p>이름:{information.userProfileDto.nickname}</p>
-            <p>자기소개:{information.userProfileDto.description}</p>
+            <p>이름:{information.userProfileDto?.nickname}</p>
+            <p>자기소개:{information.userProfileDto?.description}</p>
             <div className="flex">
               <p className="flex">
                 <img src={instalogo} alt="인스타로고" /> :
-                {information.userProfileDto.instagramHandle}
+                {information.userProfileDto?.instagramHandle}
               </p>
               <p className="flex">
                 <img src={youtubelogo} alt="유튜브로고" /> :
-                {information.userProfileDto.youtubeHandle}
+                {information.userProfileDto?.youtubeHandle}
               </p>
             </div>
           </div>

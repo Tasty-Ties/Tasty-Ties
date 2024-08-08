@@ -6,7 +6,8 @@ import Button from "../../common/components/Button";
 const OtherInfo = () => {
   const nav = useNavigate();
   const { informations } = useOutletContext();
-  const username = informations.informations.userProfileDto.nickname;
+  const username = informations.informations.userProfileDto?.username;
+  console.log(username); // username없음
 
   return (
     <>
@@ -36,7 +37,7 @@ const OtherInfo = () => {
           <Button
             text="더보기"
             type="green-border-short"
-            onClick={() => nav(`/otherpage/:${username}/teach`)}
+            onClick={() => nav(`/otherpage/${username}/teach`)}
           />
           <br />
           <br />
@@ -52,7 +53,7 @@ const OtherInfo = () => {
           <Button
             text="더보기"
             type="green-border-short"
-            onClick={() => nav(`/otherpage/:${username}/attend`)}
+            onClick={() => nav(`/otherpage/${username}/attend`)}
           />
         </div>
       )}

@@ -1,8 +1,8 @@
 import { create } from "zustand";
 import {
   getOtherInfo,
-  // getTeachedClass,
-  // getAttendedClass,
+  getTeachedClass,
+  getAttendedClass,
 } from "../service/ProfileAPI";
 
 const useProfileStore = create((set) => ({
@@ -12,17 +12,17 @@ const useProfileStore = create((set) => ({
     set({ otherInformations });
   },
 
-  // teachedClasses: [],
-  // fetchTeachedClasses: async (username) => {
-  //   const teachedClasses = await getTeachedClass(username);
-  //   set({ teachedClasses });
-  // },
+  teachedClasses: [],
+  fetchTeachedClasses: async (username) => {
+    const teachedClasses = await getTeachedClass(username);
+    set({ teachedClasses });
+  },
 
-  // attendedClasses: [],
-  // fetchAttendedClasses: async (username) => {
-  //   const attendedClasses = await getAttendedClass(username);
-  //   set({ attendedClasses });
-  // },
+  attendedClasses: [],
+  fetchAttendedClasses: async (username) => {
+    const attendedClasses = await getAttendedClass(username);
+    set({ attendedClasses });
+  },
 }));
 
 export default useProfileStore;
