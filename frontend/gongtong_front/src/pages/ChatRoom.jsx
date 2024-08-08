@@ -23,6 +23,9 @@ const ChatRoom = () => {
   const [messageTime, setMessageTime] = useState();
   const chatRoomRef = useRef();
 
+  const defaultImage =
+    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRF1IwK6-SxM83UpFVY6WtUZxXx-phss_gAUfdKbkTfau6VWVkt";
+
   console.log("유저 정보입니다.", userInfo);
 
   useEffect(() => {
@@ -84,7 +87,7 @@ const ChatRoom = () => {
   };
 
   return (
-    <div className="flex flex-row flex-auto mx-3 py-5">
+    <div className="flex flex-row flex-auto mx-3 pb-5 pt-2">
       <div className="w-1/3">
         <div className="divide-y divide-gray-100">
           {isEmpty
@@ -103,7 +106,7 @@ const ChatRoom = () => {
                   <div className="flex min-w-0 gap-x-4 w-full px-3">
                     <img
                       alt=""
-                      src={chatRoom.imageUrl}
+                      src={chatRoom.imageUrl ? chatRoom.imageUrl : defaultImage}
                       className="h-12 w-12 flex-none rounded-full bg-gray-50"
                     />
                     <ChatRoomList

@@ -14,12 +14,14 @@ const ChatMessage = ({
   const [messageDirection, setMessageDirection] = useState();
   const [nicknamePlace, setNicknamePlace] = useState();
   const [messageBox, setMessageBox] = useState();
+  const [textBox, setTextBox] = useState();
 
   useEffect(() => {
     typeInput(type);
   }, []);
 
   const typeInput = (type) => {
+    setTextBox("p-3 break-words");
     switch (type) {
       case "ME":
         setMessageDirection("flex flex-row-reverse px-4 py-2");
@@ -38,6 +40,7 @@ const ChatMessage = ({
       case "SYSTEM":
         setNicknamePlace("flex justify-center");
         setMessageBox("bg-white rounded-2xl px-3");
+        setTextBox("py-1 px-3 break-words");
         break;
       default:
         setMessageDirection("flex flex-row px-4 py-2");
@@ -71,7 +74,7 @@ const ChatMessage = ({
               : nickname}
           </div>
           <div className={messageBox}>
-            <p className="p-3 break-words">{message}</p>
+            <p className={textBox}>{message}</p>
           </div>
         </div>
         {type === "SYSTEM" ? (
