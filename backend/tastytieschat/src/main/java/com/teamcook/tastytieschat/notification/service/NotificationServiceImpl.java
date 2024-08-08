@@ -4,9 +4,9 @@ import com.google.firebase.messaging.*;
 import com.teamcook.tastytieschat.chat.dto.UserDto;
 import com.teamcook.tastytieschat.notification.dto.FcmNotificationDto;
 import com.teamcook.tastytieschat.notification.entity.FcmNotification;
-import com.teamcook.tastytieschat.notification.entity.User;
+import com.teamcook.tastytieschat.user.entity.User;
 import com.teamcook.tastytieschat.notification.repository.FcmNotificationRepository;
-import com.teamcook.tastytieschat.notification.repository.UserRepository;
+import com.teamcook.tastytieschat.user.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -46,12 +46,12 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     private Set<User> getUserFcmTokens(Set<UserDto> listeners) {
-        Set<Integer> userIds = new HashSet<>();
+        Set<String> usernames = new HashSet<>();
         for (UserDto userDto : listeners) {
-            userIds.add(userDto.getId());
+            usernames.add(userDto.getUsername());
         }
 
-        return userRepository.findByUserIds(userIds);
+        return userRepository.findByUsernames(usernames);
     }
 
     private void sendMessageTo(User user, FcmNotificationDto fcmNotification) {

@@ -2,7 +2,6 @@ package com.teamcook.tastytieschat.notification.service;
 
 import com.teamcook.tastytieschat.chat.dto.UserDto;
 import com.teamcook.tastytieschat.notification.dto.FcmNotificationDto;
-import com.teamcook.tastytieschat.notification.entity.User;
 
 import java.util.Set;
 

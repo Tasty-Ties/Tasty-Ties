@@ -41,9 +41,9 @@ public class ChatRoom {
         users.add(userDto);
     }
 
-    public boolean isContainedUser(int userId) {
-        for (UserDto userDto : users) {
-            if (userId == userDto.getId()) {
+    public boolean isContainedUser(String username) {
+        for (UserDto user : users) {
+            if (user.getUsername().equals(username)) {
                 return true;
             }
         }
@@ -51,36 +51,32 @@ public class ChatRoom {
         return false;
     }
 
-    public String removeUser(int userId) {
+    public void removeUser(String username) {
         for (UserDto user : users) {
-            if (userId == user.getId()) {
-                String removedUserNickname = user.getNickname();
+            if (user.getUsername().equals(username)) {
                 users.remove(user);
-                return removedUserNickname;
+            }
+        }
+    }
+
+    public UserDto getUser(String username) {
+        for (UserDto user : users) {
+            if (user.getUsername().equals(username)) {
+                return user;
             }
         }
 
         return null;
     }
 
-    public UserDto getUser(int userId) {
-        for (UserDto userDto : users) {
-            if (userId == userDto.getId()) {
-                return userDto;
-            }
-        }
-
-        return null;
-    }
-
-    public Set<UserDto> getListeners(int userId) {
+    public Set<UserDto> getListeners(String speakerUsername) {
         Set<UserDto> listeners = new HashSet<>();
-        for (UserDto userDto : users) {
-            if (userId == userDto.getId()) {
+        for (UserDto user : users) {
+            if (user.getUsername().equals(speakerUsername)) {
                 continue;
             }
 
-            listeners.add(userDto);
+            listeners.add(user);
         }
 
         return listeners;
@@ -88,8 +84,8 @@ public class ChatRoom {
 
     public Set<String> getLanguages() {
         Set<String> languages = new HashSet<>();
-        for (UserDto userDto : users) {
-            languages.add(userDto.getLanguage());
+        for (UserDto user : users) {
+            languages.add(user.getLanguage());
         }
 
         return languages;

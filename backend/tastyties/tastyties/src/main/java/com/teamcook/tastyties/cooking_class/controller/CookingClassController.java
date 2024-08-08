@@ -75,7 +75,7 @@ public class CookingClassController {
         log.debug("cookingClassId= {}", cookingClass.getUuid());
         log.debug("cookingClassTitle= {}", cookingClass.getTitle());
         // TODO: 쿠킹 클래스에 채팅방 ID 저장하기
-        createChatRoom(cookingClass, user.getUserId());
+        createChatRoom(cookingClass, user.getUsername());
         registerDto.setChatRoomId(cookingClass.getChatRoomId());
 
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -86,18 +86,17 @@ public class CookingClassController {
                         .build());
     }
 
-    private void createChatRoom(CookingClass cookingClass, int userId) {
-        ChatUserDto chatUser = userChatService.getUser(userId);
+    private void createChatRoom(CookingClass cookingClass, String username) {
+        ChatUserDto chatUser = userChatService.getUser(username);
 
         RabbitMQRequestDto rabbitMQRequestDto = RabbitMQRequestDto.builder()
                 .type(RabbitMQRequestType.CREATE)
                 .title(cookingClass.getTitle())
                 .user(RabbitMQUserDto.builder()
-                        .id(chatUser.getId())
                         .type(RabbitMQUserType.HOST)
+                        .username(chatUser.getUsername())
                         .nickname(chatUser.getNickname())
                         .language(chatUser.getLanguage())
-                        .imageUrl(chatUser.getProfileImageUrl())
                         .build())
                 .imageUrl(cookingClass.getMainImage())
                 .build();
@@ -201,7 +200,7 @@ public class CookingClassController {
 
         ReservedCookingClassDto reservedCookingClass = cookingClassService.reserveClass(userDetails.user(), uuid);
 
-        joinChatRoom(reservedCookingClass.getChatRoomId(), userDetails.getUserId());
+        joinChatRoom(reservedCookingClass.getChatRoomId(), userDetails.getUsername());
 
         sendReservationCookingClassNotification(reservedCookingClass.getClassName(), reservedCookingClass.getHost(), userDetails.getNickname());
 
@@ -213,18 +212,17 @@ public class CookingClassController {
                         .build());
     }
 
-    private void joinChatRoom(String chatRoomId, int userId) {
-        ChatUserDto chatUser = userChatService.getUser(userId);
+    private void joinChatRoom(String chatRoomId, String username) {
+        ChatUserDto chatUser = userChatService.getUser(username);
 
         RabbitMQRequestDto rabbitMQRequestDto = RabbitMQRequestDto.builder()
                 .type(RabbitMQRequestType.JOIN)
                 .chatRoomId(chatRoomId)
                 .user(RabbitMQUserDto.builder()
-                        .id(chatUser.getId())
                         .type(RabbitMQUserType.ATTENDEE)
+                        .username(chatUser.getUsername())
                         .nickname(chatUser.getNickname())
                         .language(chatUser.getLanguage())
-                        .imageUrl(chatUser.getProfileImageUrl())
                         .build())
                 .build();
         rabbitMQProducer.send(rabbitMQRequestDto);
@@ -256,7 +254,7 @@ public class CookingClassController {
 
         ReservedCookingClassDto reservedCookingClass = cookingClassService.deleteReservation(userDetails.user(), uuid);
 
-        leaveChatRoom(reservedCookingClass.getChatRoomId(), userDetails.getUserId());
+        leaveChatRoom(reservedCookingClass.getChatRoomId(), userDetails.getUsername());
 
         sendLeaveCookingClassNotification(reservedCookingClass.getClassName(), reservedCookingClass.getHost(), userDetails.getNickname());
 
@@ -268,14 +266,15 @@ public class CookingClassController {
                         .build());
     }
 
-    private void leaveChatRoom(String chatRoomId, int userId) {
-        ChatUserDto chatUser = userChatService.getUser(userId);
+    private void leaveChatRoom(String chatRoomId, String username) {
+        ChatUserDto chatUser = userChatService.getUser(username);
 
         RabbitMQRequestDto rabbitMQRequestDto = RabbitMQRequestDto.builder()
                 .type(RabbitMQRequestType.LEAVE)
                 .chatRoomId(chatRoomId)
                 .user(RabbitMQUserDto.builder()
-                        .id(chatUser.getId())
+                        .username(chatUser.getUsername())
+                        .nickname(chatUser.getNickname())
                         .build())
                 .build();
         rabbitMQProducer.send(rabbitMQRequestDto);

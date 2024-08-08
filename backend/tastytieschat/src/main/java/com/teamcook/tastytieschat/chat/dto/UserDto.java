@@ -10,19 +10,17 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
-@ToString
 public class UserDto {
-    private int id;
     private UserType type;
+    private String username;
     private String nickname;
     private String language;
-    private String imageUrl;
     private LocalDateTime enteredTime;
 
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof UserDto) {
-            return this.id == ((UserDto) obj).id;
+            return this.username.equals(((UserDto) obj).username);
         }
 
         return false;

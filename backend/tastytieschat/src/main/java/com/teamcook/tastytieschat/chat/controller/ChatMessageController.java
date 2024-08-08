@@ -10,7 +10,6 @@ import com.teamcook.tastytieschat.chat.entity.ChatMessage;
 import com.teamcook.tastytieschat.chat.service.*;
 import com.teamcook.tastytieschat.notification.constant.NotificationType;
 import com.teamcook.tastytieschat.notification.dto.FcmNotificationDto;
-import com.teamcook.tastytieschat.notification.entity.User;
 import com.teamcook.tastytieschat.notification.service.NotificationService;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.Nullable;
@@ -47,9 +46,14 @@ public class ChatMessageController {
 
     @MessageMapping("/chat/text/rooms/{roomId}")
     @SendTo("/sub/chat/rooms/{roomId}")
-    public ChatMessageResponseDto sendMessage(@DestinationVariable String roomId, @Payload ChatMessageRequestDto chatMessageRequestDto) {
+    public ChatMessageResponseDto sendMessage(@DestinationVariable String roomId, @Payload String message) {
         try {
-            ChatMessage chatMessage = getTranslatedChatMessage(roomId, chatMessageRequestDto);
+            // TODO: session에서 username 가져오기
+            ChatMessageRequestDto chatMessageRequest = ChatMessageRequestDto.builder()
+                    .username("ssafy")
+                    .message(message)
+                    .build();
+            ChatMessage chatMessage = getTranslatedChatMessage(roomId, chatMessageRequest);
             if (chatMessage == null) return null;
 
             // 채팅 메시지 저장하기
@@ -64,18 +68,21 @@ public class ChatMessageController {
     @MessageMapping("/chat/voice/rooms/{roomId}")
     @SendTo("/sub/chat/rooms/{roomId}")
     public ChatMessageResponseDto processVoice(@DestinationVariable String roomId, @Payload VoiceChatRequestDto voiceChatRequestDTO) throws IOException, InterruptedException {
+        // TODO: session에서 username 가져오기
+        voiceChatRequestDTO.setUsername("ssafy");
+
         long startTime = System.currentTimeMillis();
-        voiceChatService.storeChunk(roomId, voiceChatRequestDTO.getUserId(), voiceChatRequestDTO.getChunkIndex(), voiceChatRequestDTO.getTotalChunks(), voiceChatRequestDTO.getFileContent());
+        voiceChatService.storeChunk(roomId, voiceChatRequestDTO.getUsername(), voiceChatRequestDTO.getChunkIndex(), voiceChatRequestDTO.getTotalChunks(), voiceChatRequestDTO.getFileContent());
         long storeChunkTime = System.currentTimeMillis();
         log.info("storeChunk 소요시간: {} ms", storeChunkTime - startTime);
 
         String textMessage = null;
-        if (voiceChatService.isComplete(roomId, voiceChatRequestDTO.getUserId())) {
+        if (voiceChatService.isComplete(roomId, voiceChatRequestDTO.getUsername())) {
             long isCompleteTime = System.currentTimeMillis();
             log.info("isComplete 소요시간: {} ms", isCompleteTime - storeChunkTime);
 
             log.info("음성 인식");
-            String fullData = voiceChatService.assembleChunks(roomId, voiceChatRequestDTO.getUserId());
+            String fullData = voiceChatService.assembleChunks(roomId, voiceChatRequestDTO.getUsername());
             long assembleChunksTime = System.currentTimeMillis();
             log.info("assembleChunks 소요시간: {} ms", assembleChunksTime - isCompleteTime);
 
@@ -91,7 +98,7 @@ public class ChatMessageController {
 
         long beforeTranslationTime = System.currentTimeMillis();
         ChatMessage chatMessage = getTranslatedChatMessage(roomId,
-                new ChatMessageRequestDto(voiceChatRequestDTO.getUserId(), textMessage));
+                new ChatMessageRequestDto(voiceChatRequestDTO.getUsername(), textMessage));
         long afterTranslationTime = System.currentTimeMillis();
         log.info("getTranslatedChatMessage 소요시간: {} ms", afterTranslationTime - beforeTranslationTime);
 
@@ -107,8 +114,8 @@ public class ChatMessageController {
     }
 
 
-    private @Nullable ChatMessage getTranslatedChatMessage(String roomId, ChatMessageRequestDto chatMessageRequestDto) {
-        Map<String, Object> map = chatRoomService.getChatRoomInfoForChatMessage(roomId, chatMessageRequestDto.getUserId());
+    private @Nullable ChatMessage getTranslatedChatMessage(String roomId, ChatMessageRequestDto chatMessageRequest) {
+        Map<String, Object> map = chatRoomService.getChatRoomInfoForChatMessage(roomId, chatMessageRequest.getUsername());
 
         UserDto userDto = (UserDto) map.get("user");
 
@@ -116,9 +123,9 @@ public class ChatMessageController {
                 .type(MessageType.USER)
                 .chatRoomId(roomId)
                 .userType(userDto.getType())
-                .userNickname(userDto.getNickname())
+                .username(userDto.getUsername())
                 .originLanguage(userDto.getLanguage())
-                .chatMessageRequestDto(chatMessageRequestDto)
+                .originMessage(chatMessageRequest.getMessage())
                 .build();
 
         Set<String> translatedLanguages = (Set<String>) map.get("translatedLanguages");

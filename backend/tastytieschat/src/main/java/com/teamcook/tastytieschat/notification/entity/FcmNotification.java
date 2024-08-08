@@ -1,5 +1,6 @@
 package com.teamcook.tastytieschat.notification.entity;
 
+import com.teamcook.tastytieschat.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
