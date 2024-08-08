@@ -3,6 +3,7 @@ package com.teamcook.tastyties.user.entity.album;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,16 +22,20 @@ public class Folder {
     private String cookingClassUuid;
     private String folderName;
     private int maxPhotoCount;
+    private String countryCode;
+    @Setter
+    private String mainImgUrl;
 
     @OneToMany(mappedBy = "folder", cascade = CascadeType.ALL, orphanRemoval = true)
     List<Photo> photoList = new ArrayList<>();
 
-    public Folder(Album album, String cookingClassUuid,
-                  String folderName, int maxPhotoCount) {
+    public Folder(Album album, String cookingClassUuid, String folderName,
+                  int maxPhotoCount, String countryCode) {
         this.album = album;
         this.cookingClassUuid = cookingClassUuid;
         this.folderName = folderName;
         this.maxPhotoCount = maxPhotoCount;
+        this.countryCode = countryCode;
     }
 
     public void addPhoto(Photo photo) {

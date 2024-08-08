@@ -24,3 +24,6 @@ dist-ssr
 *.sw?
 
 .env
+
+# firebase
+firebase-messaging-sw.js

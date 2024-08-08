@@ -1,10 +1,9 @@
-import axios from "./Axios";
-import Axios from "axios";
+import api from "./Api";
 
 // 국적
 export const getCountries = async () => {
   try {
-    const response = await axios.get("/countries");
+    const response = await api.get("/countries");
     return response.data.data.countries;
   } catch (error) {
     console.log("ClassRegistAPI - getCountriesError : " + error);
@@ -14,7 +13,7 @@ export const getCountries = async () => {
 // 언어
 export const getLanguages = async () => {
   try {
-    const response = await axios.get("/languages");
+    const response = await api.get("/languages");
     return response.data.data.languages;
   } catch (error) {
     console.log("ClassRegistAPI - getLanguagesError : " + error);
@@ -24,7 +23,7 @@ export const getLanguages = async () => {
 // 클래스 목록
 export const getClassLists = async (page) => {
   try {
-    const response = await axios.get("/classes", {
+    const response = await api.get("/classes", {
       params: {
         page: page,
         size: 12,
@@ -39,7 +38,7 @@ export const getClassLists = async (page) => {
 // 클래스 상세
 export const getClassDetail = async (classId) => {
   try {
-    const response = await axios.get(`/classes/${classId}`);
+    const response = await api.get(`/classes/${classId}`);
     return response.data.data;
   } catch (error) {
     console.log("ClassDetailAPI - getClassDetailError : " + error);
@@ -49,7 +48,7 @@ export const getClassDetail = async (classId) => {
 // 클래스 예약
 export const setClassReservation = async (id) => {
   try {
-    await axios.post(`/classes/reservation/${id}`);
+    await api.post(`/classes/reservation/${id}`);
   } catch (error) {
     console.log("setClassReservation - setClassReservationError : " + error);
   }
@@ -58,7 +57,7 @@ export const setClassReservation = async (id) => {
 // 클래스 예약 취소
 export const setDeleteClassReservation = async (id) => {
   try {
-    await axios.delete(`/classes/reservation/${id}`, null);
+    await api.delete(`/classes/reservation/${id}`, null);
   } catch (error) {
     console.log(
       "setDeleteClassReservation - setDeleteClassReservation : " + error
@@ -69,7 +68,7 @@ export const setDeleteClassReservation = async (id) => {
 // 클래스 삭제
 export const setDeleteClass = async (id) => {
   try {
-    axios.delete(`classes/${id}`, null);
+    api.delete(`classes/${id}`, null);
   } catch (error) {
     console.log("setDeleteClass - setDeleteClass : " + error);
   }
@@ -88,7 +87,7 @@ export const setClassRegist = async (classInformation, files) => {
     formData.append("images", file);
   });
   try {
-    await axios.post("/classes", formData, {
+    await api.post("/classes", formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },

@@ -39,7 +39,7 @@ const Class = ({ classInfo }) => {
   if (days > 0) {
     timeRemaing += `D-${days}`;
   } else if (hours > 0) {
-    timeRemaing += `${hours}:${minutes}`;
+    timeRemaing += `${hours}:${minutes < 10 ? `0${minutes}` : minutes}`;
   } else {
     timeRemaing += "입장";
   }
@@ -63,12 +63,14 @@ const Class = ({ classInfo }) => {
         text={timeRemaing}
         type={timeRemaing === "입장" ? "orange-sqr" : "gray-sqr"}
         onClick={() =>
-          nav(`/classwaiting/${classInfo.uuid}`, {
-            state: {
-              classData: classInfo,
-              isHost: location.pathname === "/mypage/teach" ? true : false,
-            },
-          })
+          timeRemaing === "입장"
+            ? nav(`/classwaiting/${classInfo.uuid}`, {
+                state: {
+                  classData: classInfo,
+                  isHost: location.pathname === "/mypage/teach" ? true : false,
+                },
+              })
+            : ""
         }
       />
     </div>

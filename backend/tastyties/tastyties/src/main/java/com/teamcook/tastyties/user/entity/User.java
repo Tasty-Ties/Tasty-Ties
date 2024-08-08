@@ -3,6 +3,7 @@ package com.teamcook.tastyties.user.entity;
 import com.teamcook.tastyties.common.entity.Country;
 import com.teamcook.tastyties.common.entity.Language;
 import com.teamcook.tastyties.cooking_class.entity.CookingClass;
+import com.teamcook.tastyties.notification.entity.FcmNotification;
 import com.teamcook.tastyties.shared.entity.UserAndCookingClass;
 import com.teamcook.tastyties.shared.entity.UserAndCountry;
 import com.teamcook.tastyties.short_form.entity.ShortForm;
@@ -70,7 +71,13 @@ public class User {
     private String youtubeUrl;
     private String youtubeHandle;
 
-    private int activityPoint = 0;
+    private double activityPoint = 0;
+
+    private String fcmToken;
+
+    // 유저 알람
+    @OneToMany(mappedBy = "user")
+    private Set<FcmNotification> notifications = new HashSet<>();
 
     // short-form
     @OneToMany(mappedBy = "user")
@@ -80,9 +87,22 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Album> albumList = new ArrayList<>();
 
+    // 유저 통계
+    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private UserStatistics userStatistics;
+
+    // 마일리지 적립 로그
+    @OneToMany(mappedBy = "user")
+    private List<ActivityPointLog> activityPointLogs = new ArrayList<>();
+
     public void addAlbum(Album album) {
         albumList.add(album);
         album.setUser(this);
+    }
+
+    public void addStatistics(UserStatistics userStatistics) {
+        this.userStatistics = userStatistics;
+        userStatistics.setUser(this);
     }
 
     public void updateUser(UserUpdateDto request, String encodedPassword, String instagramHandle, String youtubeHandle) {
@@ -101,6 +121,13 @@ public class User {
             this.youtubeHandle = youtubeHandle;
         }
     }
+
+    public void addActivityPointLog(ActivityPointLog log) {
+        activityPointLogs.add(log);
+        log.setUser(this);
+        this.activityPoint += log.getAmount();
+    }
+
 
     public void delete() {
         this.isDeleted = true;

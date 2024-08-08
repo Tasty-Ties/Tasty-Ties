@@ -2,7 +2,7 @@ package com.teamcook.tastyties.shared.repository;
 
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.teamcook.tastyties.common.dto.QCountryProfileDto;
+import com.teamcook.tastyties.common.dto.country.QCountryProfileDto;
 import com.teamcook.tastyties.common.entity.QCountry;
 import com.teamcook.tastyties.cooking_class.dto.CookingClassListDto;
 import com.teamcook.tastyties.cooking_class.dto.QCookingClassListDto;
@@ -10,7 +10,9 @@ import com.teamcook.tastyties.cooking_class.entity.CookingClass;
 import com.teamcook.tastyties.shared.dto.QReviewResponseDto;
 import com.teamcook.tastyties.shared.dto.ReviewResponseDto;
 import com.teamcook.tastyties.shared.entity.UserAndCookingClass;
+import com.teamcook.tastyties.user.dto.QUserFcmTokenDto;
 import com.teamcook.tastyties.user.dto.QUserSimpleProfileDto;
+import com.teamcook.tastyties.user.dto.UserFcmTokenDto;
 import com.teamcook.tastyties.user.dto.UserSimpleProfileDto;
 import com.teamcook.tastyties.user.entity.QUser;
 import com.teamcook.tastyties.user.entity.User;
@@ -80,6 +82,17 @@ public class UserAndCookingClassRepositoryImpl implements UserAndCookingClassCus
     }
 
     @Override
+    public Set<UserFcmTokenDto> getAttendeeForNotification(String cookingClassId) {
+        return new HashSet<>(queryFactory
+                .select(new QUserFcmTokenDto(user.userId, user.fcmToken))
+                .from(userAndCookingClass)
+                .join(userAndCookingClass.user, user)
+                .join(userAndCookingClass.cookingClass, cookingClass)
+                .where(cookingClass.uuid.eq(cookingClassId))
+                .fetch());
+    }
+
+    @Override
     public long deleteCookingClass(CookingClass cookingClass) {
         return queryFactory
                 .delete(userAndCookingClass)
@@ -111,6 +124,7 @@ public class UserAndCookingClassRepositoryImpl implements UserAndCookingClassCus
                         cookingClass.title, cookingClass.mainImage,
                         cookingClass.cookingClassStartTime.as("startTime"),
                         cookingClass.cookingClassEndTime.as("endTime"),
+                        host.username.as("hostUsername"),
                         host.nickname.as("hostName"),
                         cookingClass.uuid,
                         new QCountryProfileDto(
@@ -153,6 +167,7 @@ public class UserAndCookingClassRepositoryImpl implements UserAndCookingClassCus
                                 cookingClass.title, cookingClass.mainImage,
                                 cookingClass.cookingClassStartTime.as("startTime"),
                                 cookingClass.cookingClassEndTime.as("endTime"),
+                                host.username.as("hostUsername"),
                                 host.nickname.as("hostName"),
                                 cookingClass.uuid,
                                 new QCountryProfileDto(
