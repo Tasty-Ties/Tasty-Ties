@@ -59,8 +59,10 @@ public class ChatController {
     }
 
     @GetMapping("")
-    public ResponseEntity<CommonResponseDTO> getChatMessages(@RequestParam Map<String, Object> requestParams) {
-        Map<String, Object> responseData = chatMessageService.getChatMessagesByChatRoomId(requestParams);
+    public ResponseEntity<CommonResponseDTO> getChatMessages(@AuthenticationPrincipal CustomUserDetails userDetails, @RequestParam Map<String, Object> requestParams) {
+        String username = userDetails.getUsername();
+
+        Map<String, Object> responseData = chatMessageService.getChatMessagesByChatRoomId(username, requestParams);
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(CommonResponseDTO.builder()

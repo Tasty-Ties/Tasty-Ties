@@ -2,7 +2,11 @@ package com.teamcook.tastytieschat.chat.service;
 
 import com.teamcook.tastytieschat.chat.dto.ChatMessageDto;
 import com.teamcook.tastytieschat.chat.entity.ChatMessage;
+import com.teamcook.tastytieschat.chat.entity.ChatRoom;
+import com.teamcook.tastytieschat.chat.exception.ChatRoomNotExistException;
+import com.teamcook.tastytieschat.chat.exception.UserNotExistException;
 import com.teamcook.tastytieschat.chat.repository.ChatMessageRepository;
+import com.teamcook.tastytieschat.chat.repository.ChatRoomRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -17,10 +21,12 @@ public class ChatMessageServiceImpl implements ChatMessageService {
     private final static int LIST_SIZE = 30;
 
     private final ChatMessageRepository chatMessageRepository;
+    private final ChatRoomRepository chatRoomRepository;
 
     @Autowired
-    public ChatMessageServiceImpl(ChatMessageRepository chatMessageRepository) {
+    public ChatMessageServiceImpl(ChatMessageRepository chatMessageRepository, ChatRoomRepository chatRoomRepository) {
         this.chatMessageRepository = chatMessageRepository;
+        this.chatRoomRepository = chatRoomRepository;
     }
 
     @Override
@@ -40,10 +46,14 @@ public class ChatMessageServiceImpl implements ChatMessageService {
     }
 
     @Override
-    public Map<String, Object> getChatMessagesByChatRoomId(Map<String, Object> requestParams) {
+    public Map<String, Object> getChatMessagesByChatRoomId(String username, Map<String, Object> requestParams) {
         Map<String, Object> result = new HashMap<>();
 
         String chatRoomId = (String)requestParams.get("chatRoomId");
+        if (!isContainedUser(chatRoomId, username)) {
+            throw new UserNotExistException(username);
+        }
+
         int pgNo = requestParams.get("pgNo") == null ? 0 : Integer.parseInt(requestParams.get("pgNo").toString());
 
         List<ChatMessageDto> chatMessages = getChatMessagesByChatRoomId(chatRoomId, pgNo);
@@ -52,6 +62,15 @@ public class ChatMessageServiceImpl implements ChatMessageService {
         result.put("chatMessages", chatMessages);
 
         return result;
+    }
+
+    private boolean isContainedUser(String chatRoomId, String username) {
+        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId).orElse(null);
+        if (chatRoom != null) {
+            return chatRoom.isContainedUser(username);
+        } else {
+            throw new ChatRoomNotExistException(chatRoomId);
+        }
     }
 
     private List<ChatMessageDto> getChatMessagesByChatRoomId(String chatRoomId, int pgNo) {
