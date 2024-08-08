@@ -1,7 +1,15 @@
 import { useEffect, useState } from "react";
 
-const ChatMessage = ({ type, imgSrc, nickname, message, chatTime }) => {
-  // const left
+const ChatMessage = ({
+  type,
+  imgSrc,
+  nickname,
+  message,
+  chatTime,
+  usersList,
+}) => {
+  const defaultImage =
+    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRF1IwK6-SxM83UpFVY6WtUZxXx-phss_gAUfdKbkTfau6VWVkt";
 
   const [messageDirection, setMessageDirection] = useState();
   const [nicknamePlace, setNicknamePlace] = useState();
@@ -27,6 +35,10 @@ const ChatMessage = ({ type, imgSrc, nickname, message, chatTime }) => {
           "bg-white rounded-r-2xl rounded-bl-2xl border-solid border-yellow-400 border-4"
         );
         break;
+      case "SYSTEM":
+        setNicknamePlace("flex justify-center");
+        setMessageBox("bg-white rounded-2xl px-3");
+        break;
       default:
         setMessageDirection("flex flex-row px-4 py-2");
         setNicknamePlace("mx-2 max-w-xl flex flex-col");
@@ -40,12 +52,20 @@ const ChatMessage = ({ type, imgSrc, nickname, message, chatTime }) => {
   return (
     <>
       <div className={messageDirection}>
-        <img alt="" src={imgSrc} className="h-12 w-12 flex-none rounded-full" />
+        {type === "SYSTEM" ? (
+          <></>
+        ) : (
+          <img
+            alt=""
+            src={imgSrc ? imgSrc : defaultImage}
+            className="h-12 w-12 flex-none rounded-full"
+          />
+        )}
         <div className={nicknamePlace}>
           <div className="px-1">
             {/* {nickname} */}
             {type === "SYSTEM"
-              ? "SYSTEM"
+              ? ""
               : type === "HOST"
               ? `${nickname} (HOST)`
               : nickname}
@@ -54,20 +74,24 @@ const ChatMessage = ({ type, imgSrc, nickname, message, chatTime }) => {
             <p className="p-3 break-words">{message}</p>
           </div>
         </div>
-        <div className="self-end my-2 tex t-xs">
-          {chatTime
-            ? new Date().getDate() > new Date(chatTime).getDate() &&
-              new Date().getMonth() >= new Date(chatTime).getMonth()
-              ? new Date(chatTime).getMonth() +
-                1 +
-                "월 " +
-                new Date(chatTime).getDate() +
-                "일"
-              : new Date(chatTime).getHours().toString().padStart(2, "0") +
-                " : " +
-                new Date(chatTime).getMinutes().toString().padStart(2, "0")
-            : ""}
-        </div>
+        {type === "SYSTEM" ? (
+          <></>
+        ) : (
+          <div className="self-end my-2 tex t-xs">
+            {chatTime
+              ? new Date().getDate() > new Date(chatTime).getDate() &&
+                new Date().getMonth() >= new Date(chatTime).getMonth()
+                ? new Date(chatTime).getMonth() +
+                  1 +
+                  "월 " +
+                  new Date(chatTime).getDate() +
+                  "일"
+                : new Date(chatTime).getHours().toString().padStart(2, "0") +
+                  " : " +
+                  new Date(chatTime).getMinutes().toString().padStart(2, "0")
+              : ""}
+          </div>
+        )}
       </div>
     </>
   );

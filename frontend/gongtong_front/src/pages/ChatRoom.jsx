@@ -21,8 +21,9 @@ const ChatRoom = () => {
   const fetchInformation = useMyPageStore((state) => state.fetchInformations);
 
   const [messageTime, setMessageTime] = useState();
+  const chatRoomRef = useRef();
 
-  console.log(userInfo);
+  console.log("유저 정보입니다.", userInfo);
 
   useEffect(() => {
     fetchInformation();
@@ -63,14 +64,16 @@ const ChatRoom = () => {
       return;
     }
     try {
-      console.log(userInfo.userId);
-      const response = await axios.get(
-        CHAT_SERVER_URL + `/chats/${userInfo.userId}`
-      );
-      console.log(response.data.data.chatRooms[0].message.createdTime);
+      console.log(userInfo);
+      const response = await axios.get(CHAT_SERVER_URL + `/chats/rooms`, {
+        headers: {
+          Authorization: `Bearer ${Cookies.get("accessToken")}`,
+        },
+      });
       console.log("유저의 채팅방 목록입니다.", response);
       setChatRoomList(response.data.data.chatRooms);
     } catch (error) {
+      console.log(error);
       if (error.response.status === 404) {
         setIsEmpty(true);
       }
@@ -90,7 +93,8 @@ const ChatRoom = () => {
               chatRoomList.map((chatRoom, i) => (
                 <button
                   key={i}
-                  className="flex justify-between gap-x-6 py-5 bg-white hover:bg-yellow-100  w-full"
+                  className={`flex justify-between gap-x-6 py-5 hover:bg-yellow-100 w-full`}
+                  ref={chatRoomRef}
                   onClick={() => {
                     setChatRoomId(chatRoom.id);
                     setChatRoomTitle(chatRoom.title);
@@ -99,7 +103,7 @@ const ChatRoom = () => {
                   <div className="flex min-w-0 gap-x-4 w-full px-3">
                     <img
                       alt=""
-                      src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRF1IwK6-SxM83UpFVY6WtUZxXx-phss_gAUfdKbkTfau6VWVkt"
+                      src={chatRoom.imageUrl}
                       className="h-12 w-12 flex-none rounded-full bg-gray-50"
                     />
                     <ChatRoomList
@@ -124,7 +128,7 @@ const ChatRoom = () => {
             chatRoomTitle={chatRoomTitle}
             stompClient={stompClient}
             userId={userInfo.userId}
-            nickname={userInfo.userNickname}
+            nickname={userInfo.nickname}
             userLang={userInfo.language.englishName}
           />
         )}
