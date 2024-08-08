@@ -12,7 +12,6 @@ const Profile = () => {
 
   useEffect(() => {
     fetchInformations(username);
-    console.log(informations);
   }, []);
 
   return (

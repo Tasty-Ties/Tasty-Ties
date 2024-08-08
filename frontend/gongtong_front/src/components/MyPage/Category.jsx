@@ -11,10 +11,9 @@ const Category = () => {
         <br />
         <div>
           <p>
-            <img src={informations.profileImageUrl} alt="내프로필사진" />
             <img
-              alt="프로필사진"
-              src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRF1IwK6-SxM83UpFVY6WtUZxXx-phss_gAUfdKbkTfau6VWVkt"
+              src={informations.profileImageUrl}
+              alt="내프로필사진"
               className="h-12 w-12 flex-none rounded-lg bg-gray-50"
             />
           </p>
