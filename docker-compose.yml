@@ -17,7 +17,7 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - NODE_ENV=production
+      - NODE_ENV = production
     networks:
       - shared_network
   
@@ -50,6 +50,8 @@ services:
       RABBITMQ_PORT: 5672
       RABBITMQ_USERNAME: guest
       RABBITMQ_PASSWORD: guest
+    volumes:
+      - /home/ubuntu/b206/S11P12B206/backend/tastyties/tastyties/src/main/resources/serviceAccountKey.json:/app/src/main/resources/serviceAccountKey.json
     networks:
       - shared_network
 
