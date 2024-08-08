@@ -55,4 +55,13 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
                 .fetchOne();
     }
 
+    @Override
+    public long getMyRank(double score) {
+        Long count = queryFactory.select(user.count())
+                .from(user)
+                .where(user.activityPoint.gt(score))
+                .fetchOne();
+        return (count == null ? 0 : count) + 1;
+    }
+
 }

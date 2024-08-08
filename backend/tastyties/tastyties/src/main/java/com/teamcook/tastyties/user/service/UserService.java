@@ -9,6 +9,7 @@ import com.teamcook.tastyties.shared.repository.UserAndCookingClassRepository;
 import com.teamcook.tastyties.user.dto.AuthRequestDto;
 import com.teamcook.tastyties.user.dto.UserRegistrationDto;
 import com.teamcook.tastyties.user.dto.UserUpdateDto;
+import com.teamcook.tastyties.user.entity.UserStatistics;
 import com.teamcook.tastyties.user.entity.album.Album;
 import com.teamcook.tastyties.user.entity.User;
 import com.teamcook.tastyties.user.exception.UserIDAlreadyExistsException;
@@ -58,14 +59,13 @@ public class UserService {
         newUser.setNickname(request.getNickname());
         newUser.setCountry(countryRepository.findByAlpha2(request.getCountryCode()));
         newUser.setLanguage(languageRepository.findByAlpha2(request.getLanguageCode()));
-
         newUser.setEmail(request.getEmailId() + "@" + request.getEmailDomain());
         newUser.setBirth(request.getBirth());
 
         // 기본 앨범 생성 및 사용자에 추가
         Album defaultAlbum = new Album("나의 앨범");
         newUser.addAlbum(defaultAlbum);
-
+        newUser.addStatistics(new UserStatistics());
         User savedUser = userRepository.save(newUser);
         return savedUser.getUsername();
     }

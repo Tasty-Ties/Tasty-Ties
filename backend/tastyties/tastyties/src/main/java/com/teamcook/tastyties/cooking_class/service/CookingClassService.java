@@ -199,7 +199,7 @@ public class CookingClassService {
         Set<String> imageUrls = mapToCookingClassImages(cc.getCookingClassImages());
 
         return new CookingClassDto(
-                cc.getUuid(), cc.getHost().getNickname(),
+                cc.getUuid(), cc.getHost().getUsername(), cc.getHost().getNickname(),
                 cc.getTitle(), cc.getDishName(), cc.isLimitedAge(),
                 cc.getCountryCode(), cc.getCountryName(), tags, cc.getDescription(),
                 cc.getLanguageCode(), cc.getLanguageName(), cc.getLevel(), cc.getCookingClassStartTime(),

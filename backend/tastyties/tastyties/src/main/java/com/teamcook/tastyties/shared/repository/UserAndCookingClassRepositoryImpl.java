@@ -124,6 +124,7 @@ public class UserAndCookingClassRepositoryImpl implements UserAndCookingClassCus
                         cookingClass.title, cookingClass.mainImage,
                         cookingClass.cookingClassStartTime.as("startTime"),
                         cookingClass.cookingClassEndTime.as("endTime"),
+                        host.username.as("hostUsername"),
                         host.nickname.as("hostName"),
                         cookingClass.uuid,
                         new QCountryProfileDto(
@@ -166,6 +167,7 @@ public class UserAndCookingClassRepositoryImpl implements UserAndCookingClassCus
                                 cookingClass.title, cookingClass.mainImage,
                                 cookingClass.cookingClassStartTime.as("startTime"),
                                 cookingClass.cookingClassEndTime.as("endTime"),
+                                host.username.as("hostUsername"),
                                 host.nickname.as("hostName"),
                                 cookingClass.uuid,
                                 new QCountryProfileDto(

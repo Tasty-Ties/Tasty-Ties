@@ -133,6 +133,9 @@ public class AlbumService {
             } else {
                 throw new IllegalArgumentException("Photo ID " + dto.getPhotoId() + " 를 찾을 수 없습니다.");
             }
+            if (dto.getOrderIndex() == 0) {
+                folder.setMainImgUrl(photo.getPhotoImageUrl());
+            }
         }
         return photos;
     }

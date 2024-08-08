@@ -2,7 +2,7 @@ package com.teamcook.tastyties.user.controller;
 
 import com.teamcook.tastyties.common.dto.CommonResponseDto;
 import com.teamcook.tastyties.security.userdetails.CustomUserDetails;
-import com.teamcook.tastyties.user.dto.CollectFlagDto;
+import com.teamcook.tastyties.user.dto.reward.CollectFlagDto;
 import com.teamcook.tastyties.user.entity.User;
 import com.teamcook.tastyties.user.service.UserRewardsService;
 import org.springframework.beans.factory.annotation.Autowired;
