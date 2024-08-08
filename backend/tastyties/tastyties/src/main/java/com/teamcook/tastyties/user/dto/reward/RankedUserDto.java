@@ -14,4 +14,15 @@ public class RankedUserDto {
     private int classesAttended;
     private String profileImageUrl;
     private String description;
+
+    public RankedUserDto(int userId, String nickname, int classesHosted, int classesAttended,
+                         String profileImageUrl, String description, double score) {
+        this.userId = userId;
+        this.nickname = nickname;
+        this.classesHosted = classesHosted;
+        this.classesAttended = classesAttended;
+        this.profileImageUrl = profileImageUrl;
+        this.description = description;
+        this.score = score;
+    }
 }

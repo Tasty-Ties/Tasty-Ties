@@ -203,8 +203,16 @@ public class UserRewardsService {
 
 
     public ActivityPointResponseDto getTotalLeaderboard(CustomUserDetails userDetails, int page) {
+        int start = (page-1)*PAGE_SIZE;
+        int end = start + PAGE_SIZE - 1;
+
+        // 전체 크기 가져오기
+        long totalSize = userRepository.count();
+        int totalPages = (int) Math.ceil((double) totalSize / PAGE_SIZE);
+
 
         return null;
     }
+
 
 }
