@@ -2,7 +2,7 @@ package com.teamcook.tastyties.shared.repository;
 
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.teamcook.tastyties.common.dto.QCountryProfileDto;
+import com.teamcook.tastyties.common.dto.country.QCountryProfileDto;
 import com.teamcook.tastyties.common.entity.QCountry;
 import com.teamcook.tastyties.cooking_class.dto.CookingClassListDto;
 import com.teamcook.tastyties.cooking_class.dto.QCookingClassListDto;
@@ -10,7 +10,9 @@ import com.teamcook.tastyties.cooking_class.entity.CookingClass;
 import com.teamcook.tastyties.shared.dto.QReviewResponseDto;
 import com.teamcook.tastyties.shared.dto.ReviewResponseDto;
 import com.teamcook.tastyties.shared.entity.UserAndCookingClass;
+import com.teamcook.tastyties.user.dto.QUserFcmTokenDto;
 import com.teamcook.tastyties.user.dto.QUserSimpleProfileDto;
+import com.teamcook.tastyties.user.dto.UserFcmTokenDto;
 import com.teamcook.tastyties.user.dto.UserSimpleProfileDto;
 import com.teamcook.tastyties.user.entity.QUser;
 import com.teamcook.tastyties.user.entity.User;
@@ -18,6 +20,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -80,6 +83,17 @@ public class UserAndCookingClassRepositoryImpl implements UserAndCookingClassCus
     }
 
     @Override
+    public Set<UserFcmTokenDto> getAttendeeForNotification(String cookingClassId) {
+        return new HashSet<>(queryFactory
+                .select(new QUserFcmTokenDto(user.userId, user.fcmToken))
+                .from(userAndCookingClass)
+                .join(userAndCookingClass.user, user)
+                .join(userAndCookingClass.cookingClass, cookingClass)
+                .where(cookingClass.uuid.eq(cookingClassId))
+                .fetch());
+    }
+
+    @Override
     public long deleteCookingClass(CookingClass cookingClass) {
         return queryFactory
                 .delete(userAndCookingClass)
@@ -104,6 +118,7 @@ public class UserAndCookingClassRepositoryImpl implements UserAndCookingClassCus
     @Override
     public Page<CookingClassListDto> findReservedClassesByUserId(int userId, Pageable pageable) {
         QUser host = new QUser("host");
+        LocalDateTime now = LocalDateTime.now();
         QCountry countryByClass = new QCountry("countryByClass");
         List<CookingClassListDto> results = queryFactory
                 .select(
@@ -111,6 +126,7 @@ public class UserAndCookingClassRepositoryImpl implements UserAndCookingClassCus
                         cookingClass.title, cookingClass.mainImage,
                         cookingClass.cookingClassStartTime.as("startTime"),
                         cookingClass.cookingClassEndTime.as("endTime"),
+                        host.username.as("hostUsername"),
                         host.nickname.as("hostName"),
                         cookingClass.uuid,
                         new QCountryProfileDto(
@@ -123,6 +139,52 @@ public class UserAndCookingClassRepositoryImpl implements UserAndCookingClassCus
                                 ),
                                 cookingClass.countryCode.eq(country.alpha2)
                 ))
+                .from(userAndCookingClass)
+                .join(userAndCookingClass.cookingClass, cookingClass)
+                .join(userAndCookingClass.user, user)
+                .join(cookingClass.host, host)
+                .leftJoin(host.country, country)
+                .leftJoin(countryByClass).on(cookingClass.countryCode.eq(countryByClass.alpha2))
+                .where(userAndCookingClass.user.userId.eq(userId),
+                        cookingClass.cookingClassEndTime.after(now))
+                .orderBy(cookingClass.cookingClassStartTime.asc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        JPAQuery<Long> countQuery = queryFactory
+                .select(userAndCookingClass.count())
+                .from(userAndCookingClass)
+                .where(userAndCookingClass.user.userId.eq(userId),
+                        cookingClass.cookingClassEndTime.after(now));
+
+        return PageableExecutionUtils.getPage(results, pageable, countQuery::fetchOne);
+    }
+
+    @Override
+    public Page<CookingClassListDto> findParticipatedClassesByUserId(int userId, Pageable pageable) {
+        QUser host = new QUser("host");
+        LocalDateTime now = LocalDateTime.now();
+        QCountry countryByClass = new QCountry("countryByClass");
+        List<CookingClassListDto> results = queryFactory
+                .select(
+                        new QCookingClassListDto(
+                                cookingClass.title, cookingClass.mainImage,
+                                cookingClass.cookingClassStartTime.as("startTime"),
+                                cookingClass.cookingClassEndTime.as("endTime"),
+                                host.username.as("hostUsername"),
+                                host.nickname.as("hostName"),
+                                cookingClass.uuid,
+                                new QCountryProfileDto(
+                                        country.alpha2,
+                                        country.countryImageUrl
+                                ),
+                                new QCountryProfileDto(
+                                        countryByClass.alpha2,
+                                        countryByClass.countryImageUrl
+                                ),
+                                cookingClass.countryCode.eq(country.alpha2)
+                        ))
                 .from(userAndCookingClass)
                 .join(userAndCookingClass.cookingClass, cookingClass)
                 .join(userAndCookingClass.user, user)
@@ -153,6 +215,7 @@ public class UserAndCookingClassRepositoryImpl implements UserAndCookingClassCus
                                 cookingClass.title, cookingClass.mainImage,
                                 cookingClass.cookingClassStartTime.as("startTime"),
                                 cookingClass.cookingClassEndTime.as("endTime"),
+                                host.username.as("hostUsername"),
                                 host.nickname.as("hostName"),
                                 cookingClass.uuid,
                                 new QCountryProfileDto(
@@ -189,7 +252,7 @@ public class UserAndCookingClassRepositoryImpl implements UserAndCookingClassCus
                 .join(userAndCookingClass.user, user)
                 .join(userAndCookingClass.cookingClass, cookingClass)
                 .leftJoin(country).on(cookingClass.countryCode.eq(country.alpha2))
-                .where(cookingClass.uuid.eq(uuid))
+                .where(cookingClass.uuid.eq(uuid), userAndCookingClass.cookingClassReview.isNotNull())
                 .orderBy(userAndCookingClass.cookingClassReviewCreateTime.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -216,7 +279,7 @@ public class UserAndCookingClassRepositoryImpl implements UserAndCookingClassCus
                 .join(userAndCookingClass.cookingClass, cookingClass)
                 .join(cookingClass.host, host)
                 .leftJoin(country).on(cookingClass.countryCode.eq(country.alpha2))
-                .where(host.userId.eq(hostId))
+                .where(host.userId.eq(hostId), userAndCookingClass.cookingClassReview.isNotNull())
                 .orderBy(userAndCookingClass.cookingClassReviewCreateTime.desc())
                 .limit(3)
                 .fetch();

@@ -23,7 +23,8 @@ public interface CookingClassCustomRepository {
     CookingClassDto findCookingClassDtoWithUuid(String uuid);
     CookingClass findClassForDelete(String uuid);
 
-    Page<CookingClassListDto> searchClassByHostId(int hostId, Pageable pageable);
+    Page<CookingClassListDto> getHostingClassByHostId(int hostId, Pageable pageable);
+    Page<CookingClassListDto> getHostedClassByHostId(int hostId, Pageable pageable);
     Set<CookingClassListDto> searchClassByHostIdForProfile(int hostId);
 
     boolean isCookingClassHost(int hostId, String uuid);
@@ -32,5 +33,5 @@ public interface CookingClassCustomRepository {
 
     boolean isCookingClassGuest(Integer userId, String uuid);
 
-    String findSessionIdWidthUuid(String uuid);
+    String findSessionIdWithUuid(String uuid);
 }

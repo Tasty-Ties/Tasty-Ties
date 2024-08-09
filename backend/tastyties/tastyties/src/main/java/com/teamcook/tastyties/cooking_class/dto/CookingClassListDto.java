@@ -1,7 +1,7 @@
 package com.teamcook.tastyties.cooking_class.dto;
 
 import com.querydsl.core.annotations.QueryProjection;
-import com.teamcook.tastyties.common.dto.CountryProfileDto;
+import com.teamcook.tastyties.common.dto.country.CountryProfileDto;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -14,6 +14,9 @@ public class CookingClassListDto {
     private String mainImage;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
+    // host의 username
+    private String hostUsername;
+    // host의 nickname
     private String hostName;
     private String uuid;
     private CountryProfileDto hostCountry;
@@ -23,13 +26,14 @@ public class CookingClassListDto {
     @QueryProjection
     public CookingClassListDto(String title, String mainImage,
                                LocalDateTime startTime, LocalDateTime endTime,
-                               String hostName, String uuid,
+                               String hostUsername, String hostName, String uuid,
                                CountryProfileDto hostCountry, CountryProfileDto classCountry,
                                boolean isLocal) {
         this.title = title;
         this.mainImage = mainImage;
         this.startTime = startTime;
         this.endTime = endTime;
+        this.hostUsername = hostUsername;
         this.hostName = hostName;
         this.uuid = uuid;
         this.hostCountry = hostCountry;

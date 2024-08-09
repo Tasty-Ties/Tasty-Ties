@@ -1,6 +1,6 @@
 package com.teamcook.tastyties.user.dto;
 
-import com.teamcook.tastyties.common.dto.CountryResponseDto;
+import com.teamcook.tastyties.common.dto.country.CountryResponseDto;
 import com.teamcook.tastyties.common.dto.LanguageResponseDto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -20,7 +20,7 @@ public class UserProfileDto {
     private LanguageResponseDto language;
     private String email;
     private LocalDate birth;
-    private int activityPoint;
+    private double activityPoint;
 
     //SNS
     private String instagramUrl;

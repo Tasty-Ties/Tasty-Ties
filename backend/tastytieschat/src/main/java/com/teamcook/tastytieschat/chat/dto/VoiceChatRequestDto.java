@@ -8,8 +8,12 @@ import lombok.ToString;
 @AllArgsConstructor
 @ToString
 public class VoiceChatRequestDto {
-    private int userId;
+    private String username;
     private String fileContent;
     private int chunkIndex;
     private int totalChunks;
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
 }

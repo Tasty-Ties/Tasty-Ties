@@ -11,8 +11,12 @@ import StreamComponent from "./StreamComponent";
 import ToolbarComponent from "./ToolbarComponent";
 import UserModel from "./UserModel";
 
-import { Hands } from "@mediapipe/hands";
-import { Camera } from "@mediapipe/camera_utils";
+import {
+  FilesetResolver,
+  HandLandmarker,
+  GestureRecognizer,
+} from "@mediapipe/tasks-vision";
+
 import { Client } from "@stomp/stompjs";
 import MediaDeviceSetting from "./MediaDeviceSetting";
 import useMyPageStore from "../../store/MyPageStore";
@@ -108,6 +112,7 @@ const VideoComponent = ({ isHost, title, hostName }) => {
     window.addEventListener("beforeunload", onbeforeunload);
     joinSession();
     initializeMediapipe();
+    initializeGestureRecognizer();
 
     stompClient.current = new Client({
       brokerURL: CHAT_SERVER_URL,
@@ -315,54 +320,227 @@ const VideoComponent = ({ isHost, title, hostName }) => {
     return response.data.data;
   }, []);
 
-  //미디어파이프 관련
-  const initializeMediapipe = () => {
+  //GestureRecognizer
+  const initializeGestureRecognizer = async () => {
     const videoElement = document.querySelector(".input_video");
 
-    navigator.mediaDevices
-      .getUserMedia({ audio: true, video: true })
-      .then((stream) => {
-        videoElement.srcObject = stream;
-        videoElement.play();
-        audioStream.current = stream;
-      })
-      .catch((error) => {
-        console.error("Error accessing the camera: ", error);
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: true,
+        video: true,
       });
+      videoElement.srcObject = stream;
+      videoElement.play();
+    } catch (error) {
+      console.error("Error accessing the camera: ", error);
+      return;
+    }
 
-    hands.current = new Hands({
-      locateFile: (file) =>
-        `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`,
+    try {
+      const vision = await FilesetResolver.forVisionTasks(
+        "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/wasm"
+      );
+
+      const gestureRecognizer = await GestureRecognizer.createFromModelPath(
+        vision,
+        "https://storage.googleapis.com/mediapipe-models/gesture_recognizer/gesture_recognizer/float16/1/gesture_recognizer.task"
+      );
+
+      if (!gestureRecognizer) {
+        console.error("Gesture Recognizer 초기화 실패");
+        return;
+      }
+
+      // Running mode를 video로 설정
+      await gestureRecognizer.setOptions({ runningMode: "video" });
+
+      console.log("Gesture Recognizer 초기화 성공");
+
+      // 비디오가 로드되면 렌더 루프를 시작
+      videoElement.addEventListener("loadeddata", () => {
+        console.log("렌더 루프 시작");
+        renderLoop(videoElement, gestureRecognizer);
+      });
+    } catch (error) {
+      console.error("Gesture Recognizer 초기화 중 오류 발생:", error);
+    }
+  };
+
+  let lastVideoTime = -1;
+
+  const renderLoop = (videoElement, gestureRecognizer) => {
+    // 현재 비디오 타임스탬프를 확인하여 이미 처리된 프레임인지 확인
+    if (videoElement.currentTime !== lastVideoTime) {
+      const gestureRecognitionResult = gestureRecognizer.recognizeForVideo(
+        videoElement,
+        Date.now()
+      );
+
+      // 결과를 처리하는 함수 호출
+      processResult(gestureRecognitionResult);
+
+      // 타임스탬프 업데이트
+      lastVideoTime = videoElement.currentTime;
+    }
+
+    // 다음 프레임을 처리하도록 루프를 계속 실행
+    requestAnimationFrame(() => {
+      renderLoop(videoElement, gestureRecognizer);
     });
+  };
 
-    hands.current.setOptions({
-      maxNumHands: 1,
-      modelComplexity: 1,
-      minDetectionConfidence: 0.7,
-      minTrackingConfidence: 0.7,
-    });
+  const processResult = (result) => {
+    console.log("인식된 결과:", result);
 
-    hands.current.onResults(onResults);
+    if (result.gestures && result.gestures.length > 0) {
+      const gesture = result.gestures[0][0].categoryName;
 
-    camera.current = new Camera(videoElement, {
-      onFrame: async () => {
-        await hands.current.send({ image: videoElement });
+      if (gesture === "Open_Palm") {
+        console.log("손을 들었음 (Open_Palm 제스처 인식됨)");
+        // 추가 동작 수행 (예: 녹화 시작)
+      } else if (gesture === "Closed_Fist") {
+        console.log("주먹을 쥠 (Closed_Fist 제스처 인식됨)");
+        // 추가 동작 수행 (예: 녹화 중지)
+      }
+    }
+  };
+
+  //미디어파이프 관련
+  // Mediapipe Task Vision related setup
+  const initializeMediapipe = async () => {
+    const videoElement = document.querySelector(".input_video");
+
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: true,
+        video: true,
+      });
+      videoElement.srcObject = stream;
+      videoElement.play();
+      audioStream.current = stream;
+    } catch (error) {
+      console.error("Error accessing the camera: ", error);
+    }
+
+    // Use FilesetResolver to resolve model files
+    const vision = await FilesetResolver.forVisionTasks(
+      // "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/wasm"
+      "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/wasm" // 최신 버전의 패키지 사용
+    );
+
+    hands.current = await HandLandmarker.createFromOptions(vision, {
+      // baseOptions: {
+      //   modelAssetPath: "https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task",
+      //   // modelAssetPath: `https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/models/hand_landmarker.task`,
+      //   numHands: 1,
+      // },
+
+      baseOptions: {
+        // modelAssetPath: `https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.1.0/hand_landmarker.task`, // 올바른 모델 파일 경로
+        modelAssetPath:
+          "https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task",
+        numHands: 1,
       },
-      width: 1280,
-      height: 720,
+      runningMode: "VIDEO",
+      minTrackingConfidence: 0.7,
+      minDetectionConfidence: 0.7,
     });
 
-    camera.current.start();
+    videoElement.addEventListener("loadeddata", (event) => {
+      processVideoFrame(videoElement);
+    });
+  };
+
+  // const processVideoFrame = async (videoElement) => {
+  //   const results = await hands.current.detectForVideo(
+  //     videoElement,
+  //     Date.now()
+  //   );
+
+  //   onResults(results);
+
+  //   // Continue processing the video stream
+  //   requestAnimationFrame(() => {
+  //     processVideoFrame(videoElement);
+  //   });
+  // };
+
+  const processVideoFrame = async (videoElement, gestureRecognizer) => {
+    const results = await gestureRecognizer.recognizeForVideo(
+      videoElement,
+      Date.now()
+    );
+
+    onGestureResults(results);
+
+    // 다음 프레임 처리
+    requestAnimationFrame(() => {
+      processVideoFrame(videoElement, gestureRecognizer);
+    });
+  };
+
+  const onGestureResults = (results) => {
+    console.log("제스처 인식 결과:", results);
+
+    if (results.gestures && results.gestures.length > 0) {
+      const gesture = results.gestures[0][0].categoryName; // 가장 높은 확률의 제스처
+
+      if (gesture === "Open_Palm") {
+        // 손을 든 상태 인식 (손바닥을 펴고 있는 제스처로 가정)
+        console.log("손을 들었음");
+        if (!isRecording.current && !raiseTimeout.current) {
+          console.log("2초 동안 손 들고 있으면, 이후 녹화 시작");
+          raiseTimeout.current = setTimeout(() => {
+            startRecording();
+            raiseTimeout.current = null;
+          }, 2000);
+        }
+        if (lowerTimeout.current) {
+          clearTimeout(lowerTimeout.current);
+          lowerTimeout.current = null;
+        }
+      } else if (gesture === "Closed_Fist") {
+        // 손을 내린 상태 인식 (주먹을 쥔 제스처로 가정)
+        if (raiseTimeout.current) {
+          console.log("녹화 취소");
+          clearTimeout(raiseTimeout.current);
+          raiseTimeout.current = null;
+        }
+
+        if (isRecording.current && !lowerTimeout.current) {
+          console.log("2초 동안 손 내리고 있으면, 이후 녹화 종료");
+          lowerTimeout.current = setTimeout(() => {
+            stopRecording();
+            lowerTimeout.current = null;
+          }, 2000);
+        }
+      }
+    } else {
+      if (isRecording.current) {
+        if (!lowerTimeout.current) {
+          console.log("2초 동안 손 내리고 있으면, 이후 녹화 종료");
+          lowerTimeout.current = setTimeout(() => {
+            stopRecording();
+            lowerTimeout.current = null;
+          }, 2000);
+        }
+      } else {
+        if (raiseTimeout.current) {
+          clearTimeout(raiseTimeout.current);
+          raiseTimeout.current = null;
+        }
+      }
+    }
   };
 
   const onResults = (results) => {
-    if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
-      for (const landmarks of results.multiHandLandmarks) {
+    console.log("손 인식");
+    if (results.landmarks && results.landmarks.length > 0) {
+      for (const landmarks of results.landmarks) {
         const wrist = landmarks[0]; // 손목 위치
         const indexFingerTip = landmarks[8]; // 검지 손가락 끝 위치
         const middleFingerTip = landmarks[12]; // 중지 손가락 끝 위치
 
-        // 손목보다 손가락 끝이 높으면 손을 든 것으로 간주 (y값이 작을수록 더 높음)
         if (
           indexFingerTip.y < wrist.y &&
           middleFingerTip.y < wrist.y &&
@@ -370,7 +548,6 @@ const VideoComponent = ({ isHost, title, hostName }) => {
         ) {
           console.log("손을 들었음");
           if (!isRecording.current && !raiseTimeout.current) {
-            // 손이 올라갔을 때 타이머
             console.log("2초 동안 손 들고 있으면, 이후 녹화 시작");
             raiseTimeout.current = setTimeout(() => {
               startRecording();
@@ -378,13 +555,11 @@ const VideoComponent = ({ isHost, title, hostName }) => {
             }, 2000);
           }
           if (lowerTimeout.current) {
-            // 손이 내려갔을 때 타이머 초기화
             clearTimeout(lowerTimeout.current);
             lowerTimeout.current = null;
           }
         } else {
           if (raiseTimeout.current) {
-            // 손이 2초 동안 들리지 않으면 타이머 취소
             console.log("녹화 취소");
             clearTimeout(raiseTimeout.current);
             raiseTimeout.current = null;
