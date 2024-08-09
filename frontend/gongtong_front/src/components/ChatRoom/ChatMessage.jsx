@@ -1,13 +1,6 @@
 import { useEffect, useState } from "react";
 
-const ChatMessage = ({
-  type,
-  imgSrc,
-  nickname,
-  message,
-  chatTime,
-  usersList,
-}) => {
+const ChatMessage = ({ type, imgSrc, nickname, message, chatTime }) => {
   const defaultImage =
     "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRF1IwK6-SxM83UpFVY6WtUZxXx-phss_gAUfdKbkTfau6VWVkt";
 
@@ -66,7 +59,6 @@ const ChatMessage = ({
         )}
         <div className={nicknamePlace}>
           <div className="px-1">
-            {/* {nickname} */}
             {type === "SYSTEM"
               ? ""
               : type === "HOST"
