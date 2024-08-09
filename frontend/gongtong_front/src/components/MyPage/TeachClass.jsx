@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import useMyPageStore from "../../store/MyPageStore";
-import Class from "../../common/components/Class";
+import ClassForm from "../../common/components/ClassForm";
 
 const TeachClass = () => {
   const teachClasses = useMyPageStore((state) => state.teachClasses);
@@ -20,7 +20,7 @@ const TeachClass = () => {
     <div>
       <p>수업할 클래스</p>
       {teachClasses.map((teachClass, index) => (
-        <Class key={index} classInfo={teachClass} />
+        <ClassForm key={index} classInfo={teachClass} />
       ))}
     </div>
   );

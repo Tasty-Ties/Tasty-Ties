@@ -14,15 +14,18 @@ const TeachedClass = () => {
     fetchTeachedClasses(username);
   }, []);
   console.log(teachedClasses);
+
   return (
-    <>
-      <div>수업한 클래스</div>
-      <p>전체</p>
-      <p>{teachedClasses.totalElements}</p>
+    <div>
+      <p className="text-xl">수업한 클래스</p>
+      <div className="flex">
+        <p className="text-sm">전체</p>
+        <p className="text-xs">{teachedClasses.totalElements}</p>
+      </div>
       {teachedClasses.content?.map((attendClass, index) => (
         <Lecture key={index} classInfo={attendClass} />
       ))}
-    </>
+    </div>
   );
 };
 export default TeachedClass;

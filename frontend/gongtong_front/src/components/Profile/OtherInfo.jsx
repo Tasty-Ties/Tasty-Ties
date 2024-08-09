@@ -28,8 +28,8 @@ const OtherInfo = () => {
             )}
           </div>
           <br />
-          <p>진행한 클래스</p>
-          <div className="flex">
+          <p className="text-3xl">진행한 클래스</p>
+          <div className="flex space-x-3">
             {informations.informations.hostingClasses?.map(
               (teachClass, index) => (
                 <Lecture key={index} classInfo={teachClass} />
@@ -44,8 +44,8 @@ const OtherInfo = () => {
           <br />
           <br />
           <br />
-          <p>참여한 클래스</p>
-          <div>
+          <p className="text-3xl">참여한 클래스</p>
+          <div className="flex">
             {informations.informations.reservedClasses?.map(
               (attendClass, index) => (
                 <Lecture key={index} classInfo={attendClass} />
@@ -57,7 +57,7 @@ const OtherInfo = () => {
             type="green-border-short"
             onClick={() => nav(`/otherpage/${username}/attend`)}
           />
-          <p>수강평</p>
+          <p className="text-3xl">수강평</p>
           <div>
             {informations.informations.reviews?.map((review, index) => (
               <ReviewForm key={index} review={review} />

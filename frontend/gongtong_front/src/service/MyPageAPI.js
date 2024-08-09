@@ -43,6 +43,17 @@ export const getReserveClass = async () => {
   }
 };
 
+// 참여한 클래스
+export const getAttendClass = async () => {
+  try {
+    const response = await api.get("/users/me/participated");
+    console.log(response);
+    return response.data.data.content;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 // 이미지 업로드
 export const imageUpload = async (formData) => {
   try {
