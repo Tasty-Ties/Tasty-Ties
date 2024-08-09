@@ -1,23 +1,16 @@
-import { useNavigate } from "react-router-dom";
-
-const ProfileButton = ({ username, type, page }) => {
-  const nav = useNavigate();
+const ProfileButton = ({ image, type, size, onClick }) => {
   const typeList = {
-    round: "h-12 w-12 flex-none rounded-full bg-gray-50",
-    square: "h-12 w-12 flex-none rounded-lg bg-gray-50",
-  };
-  const pageList = {
-    mypage: "mypage",
-    otherpage: "otherpage",
+    round: "rounded-full bg-gray-50",
+    square: "rounded-lg bg-gray-50", //모서리가 둥근 사각형
   };
 
   return (
     <div>
       <img
         alt="프로필사진"
-        src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRF1IwK6-SxM83UpFVY6WtUZxXx-phss_gAUfdKbkTfau6VWVkt"
-        className={`${typeList[type]}`}
-        onClick={() => nav(`/${pageList[page]}/${username}`)}
+        src={image}
+        className={`${typeList[type]} ${size}`}
+        onClick={onClick}
       />
     </div>
   );

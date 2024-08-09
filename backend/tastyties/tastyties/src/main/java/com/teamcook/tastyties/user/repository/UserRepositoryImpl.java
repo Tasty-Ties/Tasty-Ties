@@ -47,11 +47,11 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
     }
 
     @Override
-    public User findUserWithLanguage(Integer userId) {
+    public User findUserWithLanguage(String username) {
         return queryFactory
                 .selectFrom(user)
                 .leftJoin(user.language, language).fetchJoin()
-                .where(user.userId.eq(userId))
+                .where(user.username.eq(username))
                 .fetchOne();
     }
 

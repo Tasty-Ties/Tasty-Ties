@@ -27,6 +27,7 @@ public interface UserAndCookingClassCustomRepository {
     boolean deleteReservation(User user, CookingClass cookingClass);
 
     Page<CookingClassListDto> findReservedClassesByUserId(int userId, Pageable pageable);
+    Page<CookingClassListDto> findParticipatedClassesByUserId(int userId, Pageable pageable);
     Set<CookingClassListDto> findReservedClassesForProfile(int userId);
 
     Page<ReviewResponseDto> findReviewsForCookingClass(String uuid, Pageable pageable);
