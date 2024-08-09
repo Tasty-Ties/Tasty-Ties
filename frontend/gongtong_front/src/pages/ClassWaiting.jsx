@@ -104,27 +104,35 @@ const ClassWaiting = () => {
   };
 
   return (
-    <div className="h-5/6 flex flex-col items-center">
-      {isHost ? (
-        <div className="h-10  text-2xl">
-          클래스 시작 버튼을 눌러 {classData.title} 클래스를 시작해주세요
-        </div>
-      ) : (
-        <div>
-          {classData.hostName}님의 {classData.title} 클래스 시작을 기다리는
-          중...
-        </div>
-      )}
-
-      <div className="flex-auto">
-        <video
-          ref={videoPreviewRef}
-          autoPlay
-          playsInline
-          className="aspect-video h-96"
-        ></video>
+    <div className="flex flex-col">
+      <div className="text-2xl pt-2 self-center">
+        {isHost ? (
+          <div>
+            클래스 시작 버튼을 눌러 {classData.title} 클래스를 시작해주세요
+          </div>
+        ) : (
+          <div>
+            {classData.hostName}님의 {classData.title} 클래스 시작을 기다리는
+            중...
+          </div>
+        )}
       </div>
-      <div className="flex h-10">
+      <div className="px-64 py-2 flex self-center">
+        {isVideoActive ? (
+          <video
+            ref={videoPreviewRef}
+            autoPlay
+            playsInline
+            className=""
+          ></video>
+        ) : (
+          <img
+            className=""
+            src="https://cdn.pixabay.com/video/2023/11/22/190276-887495682_tiny.jpg"
+          />
+        )}
+      </div>
+      <div className="flex flex-row self-center pt-1">
         <MediaDeviceSetting currentPublisher={null} />
         <Button
           text={isHost ? "클래스 시작" : "클래스 입장"}
