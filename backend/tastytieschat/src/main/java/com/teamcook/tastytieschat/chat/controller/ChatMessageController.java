@@ -8,10 +8,7 @@ import com.teamcook.tastytieschat.chat.dto.ChatMessageResponseDto;
 import com.teamcook.tastytieschat.chat.dto.UserDto;
 import com.teamcook.tastytieschat.chat.dto.VoiceChatRequestDto;
 import com.teamcook.tastytieschat.chat.entity.ChatMessage;
-import com.teamcook.tastytieschat.chat.service.ChatMessageService;
-import com.teamcook.tastytieschat.chat.service.ChatRoomService;
-import com.teamcook.tastytieschat.chat.service.TranslationService;
-import com.teamcook.tastytieschat.chat.service.VoiceChatService;
+import com.teamcook.tastytieschat.chat.service.*;
 import com.teamcook.tastytieschat.notification.constant.NotificationType;
 import com.teamcook.tastytieschat.notification.dto.FcmNotificationDto;
 import com.teamcook.tastytieschat.notification.service.NotificationService;
@@ -45,16 +42,18 @@ public class ChatMessageController {
     private final ChatMessageService chatMessageService;
     private final TranslationService translationService;
     private final ChatRoomService chatRoomService;
+    private final ChatUserService chatUserService;
     private final VoiceChatService voiceChatService;
     private final NotificationService notificationService;
 
     private static final Map<String, String> sessions = new HashMap<>();
 
     @Autowired
-    public ChatMessageController(ChatMessageService chatMessageService, TranslationService translationService, ChatRoomService chatRoomService, VoiceChatService voiceChatService, NotificationService notificationService) {
+    public ChatMessageController(ChatMessageService chatMessageService, TranslationService translationService, ChatRoomService chatRoomService, ChatUserService chatUserService, VoiceChatService voiceChatService, NotificationService notificationService) {
         this.chatMessageService = chatMessageService;
         this.translationService = translationService;
         this.chatRoomService = chatRoomService;
+        this.chatUserService = chatUserService;
         this.voiceChatService = voiceChatService;
         this.notificationService = notificationService;
     }
@@ -71,13 +70,17 @@ public class ChatMessageController {
 
             if (username != null) {
                 sessions.put(sessionId, username);
+                chatUserService.setActiveChatUser(username);
             }
         } catch (NullPointerException e) {}
     }
 
     @EventListener(SessionDisconnectEvent.class)
     public void onDisconnect(SessionDisconnectEvent event) {
-        sessions.remove(event.getSessionId());
+        String sessionId = event.getSessionId();
+        String username = sessions.get(sessionId);
+        chatUserService.setDeactiveChatUser(username);
+        sessions.remove(sessionId);
     }
 
     private String extractUsername(String input) {

@@ -83,7 +83,6 @@ public class ChatMessageServiceImpl implements ChatMessageService {
 
         List<ChatMessageDto> chatMessageDtos = new ArrayList<>();
         for (ChatMessage chatMessage : chatMessages) {
-            log.debug(chatMessage.getOriginMessage());
             chatMessageDtos.add(new ChatMessageDto(chatMessage));
         }
 
