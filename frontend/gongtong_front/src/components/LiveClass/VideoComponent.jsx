@@ -821,7 +821,7 @@ const VideoComponent = ({ isHost, title, hostName }) => {
                 ))}
             </div>
           )}
-          {isChatOpen && <ChatComponent />}
+          {isChatOpen && <ChatComponent stompClient={stompClient} />}
           {isPeopleListOpen && <PeopleListComponent />}
         </div>
 
