@@ -2,6 +2,7 @@ package com.teamcook.tastyties.user.controller;
 
 import com.teamcook.tastyties.common.dto.CommonResponseDto;
 import com.teamcook.tastyties.security.jwtutil.JwtTokenProvider;
+import com.teamcook.tastyties.security.userdetails.CustomUserDetails;
 import com.teamcook.tastyties.user.dto.AuthRequestDto;
 import com.teamcook.tastyties.user.service.UserService;
 import org.slf4j.Logger;
@@ -15,6 +16,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -152,12 +154,10 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<CommonResponseDto> logout(@RequestBody Map<String, String> request) {
-        String refreshToken = request.get("refreshToken");
-
+    public ResponseEntity<CommonResponseDto> logout(@AuthenticationPrincipal CustomUserDetails userDetails) {
         // 리프레시 토큰 무효화 로직 추가 (DB에서 제거 등)
-        invalidateRefreshToken(refreshToken);
-
+        invalidateRefreshToken(userDetails.getUsername());
+ 
         return ResponseEntity.ok()
                 .body(CommonResponseDto.builder()
                         .stateCode(200)
@@ -166,10 +166,7 @@ public class AuthController {
                         .build());
     }
 
-    private void invalidateRefreshToken(String refreshToken) {
-        // 리프레시 토큰 무효화 로직
-        String username = tokenProvider.getUsernameFromJWT(refreshToken);
-
+    private void invalidateRefreshToken(String username) {
         // Redis에서 해당 사용자의 리프레시 토큰 삭제
         redisTemplate.delete("refreshToken:" + username);
     }
