@@ -6,7 +6,7 @@ export const getCountries = async () => {
     const response = await api.get("/countries");
     return response.data.data.countries;
   } catch (error) {
-    console.log("ClassRegistAPI - getCountriesError : " + error);
+    console.log("CookingClassAPI - getCountriesError : " + error);
   }
 };
 
@@ -16,7 +16,7 @@ export const getLanguages = async () => {
     const response = await api.get("/languages");
     return response.data.data.languages;
   } catch (error) {
-    console.log("ClassRegistAPI - getLanguagesError : " + error);
+    console.log("CookingClassAPI - getLanguagesError : " + error);
   }
 };
 
@@ -31,7 +31,7 @@ export const getClassLists = async (page) => {
     });
     return response.data.data.content;
   } catch (error) {
-    console.log("ClassListsAPI - getClassListsError : " + error);
+    console.log("CookingClassAPI - getClassListsError : " + error);
   }
 };
 
@@ -41,7 +41,7 @@ export const getClassDetail = async (classId) => {
     const response = await api.get(`/classes/${classId}`);
     return response.data.data;
   } catch (error) {
-    console.log("ClassDetailAPI - getClassDetailError : " + error);
+    console.log("CookingClassAPI - getClassDetailError : " + error);
   }
 };
 
@@ -50,7 +50,7 @@ export const setClassReservation = async (id) => {
   try {
     await api.post(`/classes/reservation/${id}`);
   } catch (error) {
-    console.log("setClassReservation - setClassReservationError : " + error);
+    console.log("CookingClassAPI - setClassReservationError : " + error);
   }
 };
 
@@ -59,9 +59,7 @@ export const setDeleteClassReservation = async (id) => {
   try {
     await api.delete(`/classes/reservation/${id}`, null);
   } catch (error) {
-    console.log(
-      "setDeleteClassReservation - setDeleteClassReservation : " + error
-    );
+    console.log("CookingClassAPI - setDeleteClassReservation : " + error);
   }
 };
 
@@ -70,7 +68,7 @@ export const setDeleteClass = async (id) => {
   try {
     api.delete(`classes/${id}`, null);
   } catch (error) {
-    console.log("setDeleteClass - setDeleteClass : " + error);
+    console.log("CookingClassAPI - setDeleteClass : " + error);
   }
 };
 
@@ -93,6 +91,31 @@ export const setClassRegist = async (classInformation, files) => {
       },
     });
   } catch (error) {
-    console.log("setClassRegist - setClassRegist : " + error);
+    console.log("CookingClassAPI - setClassRegist : " + error);
+  }
+};
+
+// 클래스 리뷰
+export const getClassReviews = async (id) => {
+  try {
+    const response = await api.get(`/classes/${id}/reviews`);
+    // console.log(response.data.data.content[0]);
+    return response.data.data.content;
+  } catch (error) {
+    console.log("CookingClassAPI - setDeleteClassReservation : " + error);
+  }
+};
+
+export const getSearchLists = async (page) => {
+  try {
+    const response = await api.get("/classes", {
+      params: {
+        page: page,
+        size: 12,
+      },
+    });
+    return response.data.data.content;
+  } catch (error) {
+    console.log("CookingClassAPI - getClassListsError : " + error);
   }
 };

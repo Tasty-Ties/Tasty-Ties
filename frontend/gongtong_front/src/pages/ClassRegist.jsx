@@ -1,32 +1,24 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 
-import Ingredient from "@components/ClassRegist/Ingredient";
+import Ingredient from "./../components/ClassRegist/Ingredient";
 import Recipe from "./../components/ClassRegist/Recipe";
 import CookingTools from "./../components/ClassRegist/CookingTools";
 import ClassImageFiles from "./../components/ClassRegist/ClassImageFile";
 import CookingClassTags from "./../components/ClassRegist/CookingClassTags";
-import useClassRegistStore from "./../store/ClassRegistStore";
-import ClassValidate from "./../components/ClassRegist/ClassValidate";
+import useCookingClassStore from "../store/CookingClassStore";
 
-import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import dayjs from "dayjs";
 
-import "@styles/ClassRegist/ClassRegist.css";
+import "./../styles/ClassRegist/ClassRegist.css";
+import { setClassRegist } from "../service/CookingClassAPI";
+import Button from "../common/components/Button";
 import { useNavigate } from "react-router-dom";
-import { setClassRegist } from "../service/ClassRegistAPI";
-
-import utc from "dayjs/plugin/utc";
-import timezone from "dayjs/plugin/timezone";
-
-dayjs.extend(utc);
-dayjs.extend(timezone);
-dayjs.tz.setDefault("Asia/Seoul");
 
 const ClassRegist = () => {
   const navigate = useNavigate();
   const { countries, fetchCountries, languages, fetchLanguages } =
-    useClassRegistStore((state) => ({
+    useCookingClassStore((state) => ({
       countries: state.countries,
       fetchCountries: state.fetchCountries,
       languages: state.languages,
@@ -34,7 +26,6 @@ const ClassRegist = () => {
     }));
   const [replayDays, setReplayDays] = useState(0);
   const [files, setFiles] = useState([]);
-  const [errors, setErrors] = useState({});
   const [classInformation, setClassInformation] = useState({
     title: "",
     dishName: "",
@@ -174,31 +165,26 @@ const ClassRegist = () => {
   // 클래스 등록
   const handleClassRegist = async (e) => {
     e.preventDefault();
-    const errors = ClassValidate({ classInformation });
-    if (Object.keys(errors).length > 0) {
-      // 에러 메시지를 사용자에게 표시
-      alert(Object.values(errors).join("\n"));
-      setErrors(errors); // Optional: store errors in state for detailed display
-      return;
-    }
     try {
       await setClassRegist(classInformation, files);
       alert("성공");
-      location.replace("/class");
+      // location.replace("/class");
     } catch (error) {
       console.error("클래스 등록 실패:", error);
     }
   };
 
   return (
-    <div className="class-regist-container">
-      <div className="class-regist-title">클래스 등록</div>
+    <div className="w-3/6 mx-auto justify-center">
+      <div className="mt-8 mb-4 text-center text-first-800 font-bold border-b-2 border-first-800 pb-4 text-2xl">
+        클래스 등록
+      </div>
       <form encType="multipart/form-data">
-        <div className="regist-component-box">
-          <div className="title-box">
+        <div className="grid grid-cols-8">
+          <div className="col-span-2">
             <label htmlFor="title">클래스명</label>
           </div>
-          <div className="input-box">
+          <div className="col-span-6">
             <input
               type="text"
               id="title"
@@ -206,14 +192,17 @@ const ClassRegist = () => {
               value={classInformation.title}
               onChange={onChange}
               placeholder="클래스명을 입력해주세요"
+              className="w-full border p-2 rounded"
             />
           </div>
         </div>
-        <div className="regist-component-box">
-          <div className="title-box">
+        <hr className="my-4" />
+
+        <div className="grid grid-cols-8">
+          <div className="col-span-2">
             <label htmlFor="dishName">음식명</label>
           </div>
-          <div className="input-box">
+          <div className="col-span-6">
             <input
               type="text"
               name="dishName"
@@ -221,30 +210,35 @@ const ClassRegist = () => {
               value={classInformation.dishName}
               onChange={onChange}
               placeholder="음식명을 입력해주세요"
+              className="w-full border p-2 rounded"
             />
-          </div>
-          <div className="title-box">
-            <label htmlFor="isLimitedAge" />
-          </div>
-          <div className="input-box">
-            <input
-              type="checkbox"
-              name="isLimitedAge"
-              id="isLimitedAge"
-              checked={classInformation.isLimitedAge}
-              onChange={onChange}
-            />
-            <label htmlFor="isLimitedAge">
-              성인 인증이 필요한 경우(주류 사용 등) 체크해주세요.
-            </label>
+            <div className="flex items-center mt-2">
+              <input
+                type="checkbox"
+                name="isLimitedAge"
+                id="isLimitedAge"
+                checked={classInformation.isLimitedAge}
+                onChange={onChange}
+                className="mr-1"
+              />
+              <label htmlFor="isLimitedAge" className="text-gray-500 text-sm">
+                성인 인증이 필요한 경우(주류 사용 등) 체크해주세요.
+              </label>
+            </div>
           </div>
         </div>
-        <div className="regist-component-box">
-          <div className="title-box">
+        <hr className="my-4" />
+        <div className="grid grid-cols-8">
+          <div className="col-span-2">
             <label htmlFor="countryCode">국가명</label>
           </div>
-          <div className="input-box">
-            <select id="countryCode" name="countryCode" onChange={onChange}>
+          <div className="col-span-6">
+            <select
+              id="countryCode"
+              name="countryCode"
+              onChange={onChange}
+              className="w-1/2 border p-2 rounded"
+            >
               <option>선택</option>
               {countries &&
                 countries.map((country) => (
@@ -260,35 +254,54 @@ const ClassRegist = () => {
             </select>
           </div>
         </div>
-        <CookingClassTags
-          hashtags={classInformation.cookingClassTags}
-          setHashtags={(cookingClassTags) =>
-            setClassInformation({ ...classInformation, cookingClassTags })
-          }
-        />
-        <div className="regist-component-box">
-          <div className="title-box">
-            <label htmlFor="description">소개</label>
+        <hr className="my-4" />
+        <div className="grid grid-cols-8">
+          <div className="col-span-2">
+            <label htmlFor="hashtage">해시태그</label>
           </div>
-          <div className="input-box">
+          <div className="col-span-6">
+            <CookingClassTags
+              hashtags={classInformation.cookingClassTags}
+              setHashtags={(cookingClassTags) =>
+                setClassInformation({
+                  ...classInformation,
+                  cookingClassTags,
+                })
+              }
+            />
+          </div>
+        </div>
+        <hr className="my-4" />
+        <div className="grid grid-cols-8">
+          <div className="col-span-2">
+            <label htmlFor="description">소개글</label>
+          </div>
+          <div className="col-span-6">
             <textarea
               name="description"
               id="description"
               placeholder="클래스 소개를 입력해주세요"
               value={classInformation.description}
               onChange={handleTextChange}
+              className="w-full resize-none h-48 border p-2 rounded"
             ></textarea>
-            <div>
+            <div className="text-right text-sm text-gray-500">
               {classInformation.description.length} / {MAX_LENGTH}
             </div>
           </div>
         </div>
-        <div className="regist-component-box">
-          <div className="title-box">
+        <hr className="my-4" />
+        <div className="grid grid-cols-8">
+          <div className="col-span-2">
             <label htmlFor="languageCode">수업 진행할 언어</label>
           </div>
-          <div className="input-box">
-            <select id="languageCode" name="languageCode" onChange={onChange}>
+          <div className="col-span-6">
+            <select
+              id="languageCode"
+              name="languageCode"
+              onChange={onChange}
+              className="w-1/2 border p-2 rounded"
+            >
               <option>선택</option>
               {languages &&
                 languages.map((language) => (
@@ -304,11 +317,12 @@ const ClassRegist = () => {
             </select>
           </div>
         </div>
-        <div className="regist-component-box">
-          <div className="title-box">
+        <hr className="my-4" />
+        <div className="grid grid-cols-8">
+          <div className="col-span-2">
             <label htmlFor="level">수업 난이도</label>
           </div>
-          <div className="input-box">
+          <div className="col-span-6">
             <div className="review-rating-box">
               <div className="rating">
                 <div className="rating-status">
@@ -330,17 +344,17 @@ const ClassRegist = () => {
             </div>
           </div>
         </div>
-        <div className="regist-component-box">
-          <div className="title-box">
+        <hr className="my-4" />
+        <div className="grid grid-cols-8">
+          <div className="col-span-2">
             <label htmlFor="cookingClassStartTime">수업일정</label>
           </div>
-          <div className="input-box">
-            <DateTimePicker
-              label="수업 시작시간"
-              value={dayjs(classInformation.cookingClassStartTime)}
+          <div className="col-span-6">
+            <input
+              aria-label="Date and time"
+              type="datetime-local"
+              // value={dayjs(classInformation.cookingClassStartTime)}
               name="cookingClassStartTime"
-              minDate={dayjs(new Date())}
-              minTime={dayjs(new Date())}
               onChange={(value) => {
                 setClassInformation({
                   ...classInformation,
@@ -348,16 +362,10 @@ const ClassRegist = () => {
                 });
               }}
             />
-            <DateTimePicker
-              label="수업 종료 시간"
-              value={dayjs(classInformation.cookingClassEndTime)}
+            <input
+              aria-label="Date and time"
+              type="datetime-local"
               name="cookingClassEndTime"
-              minDate={dayjs(classInformation.cookingClassStartTime)}
-              maxDate={dayjs(classInformation.cookingClassStartTime).add(
-                1,
-                "day"
-              )}
-              s
               onChange={(value) => {
                 setClassInformation({
                   ...classInformation,
@@ -365,58 +373,151 @@ const ClassRegist = () => {
                 });
               }}
             />
+            {/* <DateTimePicker
+                label="수업 시작시간"
+                id="classStartTime"
+                value={dayjs(classInformation.cookingClassStartTime)}
+                name="cookingClassStartTime"
+                minDate={dayjs(new Date())}
+                minTime={dayjs(new Date())}
+                onChange={(value) => {
+                  setClassInformation({
+                    ...classInformation,
+                    cookingClassStartTime: convertToSeoulTime(new Date(value)),
+                  });
+                }}
+              /> */}
+            {/* <DateTimePicker
+                label="수업 종료 시간"
+                value={dayjs(classInformation.cookingClassEndTime)}
+                name="cookingClassEndTime"
+                minDate={dayjs(classInformation.cookingClassStartTime)}
+                maxDate={dayjs(classInformation.cookingClassStartTime).add(
+                  1,
+                  "day"
+                )}
+                s
+                onChange={(value) => {
+                  setClassInformation({
+                    ...classInformation,
+                    cookingClassEndTime: convertToSeoulTime(new Date(value)),
+                  });
+                }}
+              /> */}
           </div>
         </div>
-        <ClassImageFiles setFiles={setFiles} />
-        <div className="regist-component-box">
-          <div className="title-box">
+        <hr className="my-4" />
+        <div className="grid grid-cols-8">
+          <div className="col-span-2">
+            <label htmlFor="classImageInput">완성사진</label>
+          </div>
+          <div className="col-span-6">
+            <ClassImageFiles setFiles={setFiles} />
+          </div>
+        </div>
+        <hr className="my-4" />
+        <div className="grid grid-cols-8">
+          <div className="col-span-2">
             <label htmlFor="dishCookingTime">조리 시간</label>
           </div>
-          <div className="input-box">
+          <div className="col-span-6">
             <input
               type="number"
               id="dishCookingTime"
               name="dishCookingTime"
               onChange={onChange}
+              className="w-1/2 border p-2 rounded"
             />
-            <span>분</span>
+            <span className="ml-2">분</span>
           </div>
         </div>
-        <Ingredient onChange={handleIngredientsChange} />
-        <Recipe onChange={handleRecipeChange} />
-        <CookingTools
-          cookingTools={classInformation.cookingTools}
-          setCookingTools={(cookingTools) =>
-            setClassInformation({ ...classInformation, cookingTools })
-          }
-        />
-        <div className="regist-component-box">
-          <div className="title-box">
+        <hr className="my-4" />
+        <div className="grid grid-cols-8">
+          <div className="col-span-2">
+            <label htmlFor="">식재료</label>
+            <div className="text-sm text-gray-400 mt-1">* 필수여부 체크</div>
+          </div>
+          <div className="col-span-6">
+            <Ingredient onChange={handleIngredientsChange} />
+          </div>
+        </div>
+        <hr className="my-4" />
+        <div className="grid grid-cols-8">
+          <div className="col-span-2">
+            <label htmlFor="">레시피</label>
+            <div className="text-sm text-gray-400 mt-1">* 단계별로 작성</div>
+          </div>
+          <div className="col-span-6">
+            {" "}
+            <Recipe onChange={handleRecipeChange} />
+          </div>
+        </div>
+        <hr className="my-4" />
+        <div className="grid grid-cols-8">
+          <div className="col-span-2">
+            <label htmlFor="cookingTools">조리도구</label>
+          </div>
+          <div className="col-span-6">
+            <CookingTools
+              cookingTools={classInformation.cookingTools}
+              setCookingTools={(cookingTools) =>
+                setClassInformation({ ...classInformation, cookingTools })
+              }
+            />
+          </div>
+        </div>
+        <hr className="my-4" />
+        <div className="grid grid-cols-8">
+          <div className="col-span-2">
             <label htmlFor="quota">클래스 정원</label>
           </div>
-          <div className="input-box">
-            <input type="number" id="quota" name="quota" onChange={onChange} />
+          <div className="col-span-6">
+            <input
+              type="number"
+              id="quota"
+              name="quota"
+              onChange={onChange}
+              className="w-1/2 border p-2 rounded"
+              placeholder="클래스 정원을 입력해주세요"
+            />
+            <span className="ml-2">명</span>
           </div>
         </div>
-        <div className="regist-component-box">
-          <div className="title-box">
+        <hr className="my-4" />
+        <div className="grid grid-cols-8">
+          <div className="col-span-2">
             <label htmlFor="replayEndTime">다시보기 기간</label>
           </div>
-          <div className="input-box">
+          <div className="col-span-6">
             <input
               type="number"
               id="replayEndTime"
               name="replayEndTime"
               onChange={handleReplayEndTime}
+              className="w-1/2 border p-2 rounded"
+              placeholder="다시보기 기간을 입력해주세요"
+            />
+            <span className="ml-2">일</span>
+          </div>
+        </div>
+        <hr className="my-4" />
+        <div className="mt-5 flex justify-center">
+          <div className="mr-2">
+            <Button
+              text="취소"
+              type="green-border-semi-long"
+              onClick={() => navigate("/class")}
+            />
+          </div>
+          <div>
+            <Button
+              text="등록"
+              type="green-semi-long"
+              onClick={handleClassRegist}
             />
           </div>
         </div>
-        <div className="button-box">
-          <button className="cancel-box">취소</button>
-          <button className="regist-box" onClick={handleClassRegist}>
-            등록
-          </button>
-        </div>
+        <div className="h-36"></div>
       </form>
     </div>
   );

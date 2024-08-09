@@ -37,7 +37,6 @@ public class TranslationServiceImpl implements TranslationService {
         GptRequestDto gptRequestDto = setGptPrompt(chatMessage, translatedLanguages);
 
         while (validateTranslation(chatMessage, translatedLanguages)) {
-            log.debug("try translation");
             ResponseEntity<String> response = callGptApi(gptRequestDto);
             handleApiResponse(chatMessage, response);
         }

@@ -5,6 +5,8 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,6 +18,7 @@ import java.util.Base64;
 import java.util.Date;
 
 @Component
+@Slf4j
 public class JwtTokenProvider {
 
     @Value("${jwt.secret}")
@@ -24,6 +27,7 @@ public class JwtTokenProvider {
     @Value("${jwt.accessTokenExpiration}")
     private long accessTokenExpirationInMs;
 
+    @Getter
     @Value("${jwt.refreshTokenExpiration}")
     private long refreshTokenExpirationInMs;
 
@@ -71,6 +75,7 @@ public class JwtTokenProvider {
     }
 
     public boolean validateToken(String token) {
+        log.debug("token: {}", token);
         try {
             Jwts.parserBuilder().setSigningKey(jwtSecret).build().parseClaimsJws(token);
             return true;

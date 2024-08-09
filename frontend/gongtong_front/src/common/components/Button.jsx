@@ -18,6 +18,10 @@ const Button = ({ text, type, onClick }) => {
       "bg-transparent hover:bg-transparent text-second-600 font-semibold hover:text-second-700 py-2 px-4 border border-second-600 hover:border-second-700 rounded",
     "green-long":
       "bg-first hover:bg-first-800 text-white font-bold py-2 px-40 rounded",
+    "green-semi-long":
+      "bg-first hover:bg-first-800 text-white font-bold py-2 px-20 rounded",
+    "green-border-semi-long":
+      "bg-transparent hover:bg-transparent text-first font-semibold hover:text-first-600 py-2 px-20 border border-first hover:border-first-600 rounded",
     "black-login":
       "bg-gray-900 hover:bg-gray-800 text-white font-bold py-2 px-3 rounded",
     "black-short":
