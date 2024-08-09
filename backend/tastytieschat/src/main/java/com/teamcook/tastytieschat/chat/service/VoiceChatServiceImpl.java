@@ -28,7 +28,7 @@ public class VoiceChatServiceImpl implements VoiceChatService {
 
     @Autowired
     private RedisTemplate<String, byte[]> redisTemplate;
-    private ConcurrentHashMap<String, ConcurrentHashMap<Integer, String[]>> voiceDataMap = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<String, ConcurrentHashMap<String, String[]>> voiceDataMap = new ConcurrentHashMap<>();
 
     private ClovaUtilByRestTemplate clovaUtil;
     private SpeechFlowUtil speechFlowUtil;
@@ -41,19 +41,19 @@ public class VoiceChatServiceImpl implements VoiceChatService {
 
     //청크 저장
     @Override
-    public synchronized void storeChunk(String roomId, int userId, int chunkIndex, int totalChunks, String chunkData) {
+    public synchronized void storeChunk(String roomId, String username, int chunkIndex, int totalChunks, String chunkData) {
         voiceDataMap.putIfAbsent(roomId, new ConcurrentHashMap<>()); //ConcurrentHashMap -> 쓰기를 할 때 특정 버킷에 Lock 걸기
-        ConcurrentHashMap<Integer, String[]> userChunksMap = voiceDataMap.get(roomId);
+        ConcurrentHashMap<String, String[]> userChunksMap = voiceDataMap.get(roomId);
 
-        userChunksMap.putIfAbsent(userId, new String[totalChunks]);
-        userChunksMap.get(userId)[chunkIndex] = chunkData;
+        userChunksMap.putIfAbsent(username, new String[totalChunks]);
+        userChunksMap.get(username)[chunkIndex] = chunkData;
     }
 
     //모든 청크가 도착했는지 확인
     @Override
-    public synchronized boolean isComplete(String roomId, int userId) {
-        ConcurrentHashMap<Integer, String[]> userChunksMap = voiceDataMap.get(roomId);
-        String[] chunks = userChunksMap.get(userId);
+    public synchronized boolean isComplete(String roomId, String username) {
+        ConcurrentHashMap<String, String[]> userChunksMap = voiceDataMap.get(roomId);
+        String[] chunks = userChunksMap.get(username);
         for (String chunk : chunks) {
             if (chunk == null) {
                 return false;
@@ -64,15 +64,15 @@ public class VoiceChatServiceImpl implements VoiceChatService {
 
     //청크를 하나의 문자열로 재조립
     @Override
-    public synchronized String assembleChunks(String roomId, int userId) {
-        ConcurrentHashMap<Integer, String[]> userChunksMap = voiceDataMap.get(roomId);
-        String[] chunks = userChunksMap.remove(userId);
+    public synchronized String assembleChunks(String roomId, String username) {
+        ConcurrentHashMap<String, String[]> userChunksMap = voiceDataMap.get(roomId);
+        String[] chunks = userChunksMap.remove(username);
         StringBuilder assembledData = new StringBuilder();
         for (String chunk : chunks) {
             assembledData.append(chunk);
         }
         String fullData = assembledData.toString();
-        logFullDataToFile(roomId, userId, fullData);
+        logFullDataToFile(roomId, username, fullData);
 
         return fullData;
     }
@@ -153,8 +153,8 @@ public class VoiceChatServiceImpl implements VoiceChatService {
     }
 
     //청크 파일 로그로 남기기 (테스트용)
-    private void logFullDataToFile(String roomId, int userId, String fullData) {
-        String logFileName = String.format("./log/long_sentence.txt", roomId, userId);
+    private void logFullDataToFile(String roomId, String username, String fullData) {
+        String logFileName = String.format("./log/long_sentence.txt", roomId, username);
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(logFileName))) {
             writer.write(fullData);
         } catch (IOException e) {

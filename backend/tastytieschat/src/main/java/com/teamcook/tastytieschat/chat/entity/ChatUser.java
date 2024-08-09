@@ -15,11 +15,11 @@ import java.util.Set;
 public class ChatUser {
     @Id
     private String id;
-    private int userId;
+    private String username;
     private Set<String> chatRoomIds;
 
-    public ChatUser(int userId, String chatRoomId) {
-        this.userId = userId;
+    public ChatUser(String username, String chatRoomId) {
+        this.username = username;
         this.chatRoomIds = new HashSet<>();
         chatRoomIds.add(chatRoomId);
     }

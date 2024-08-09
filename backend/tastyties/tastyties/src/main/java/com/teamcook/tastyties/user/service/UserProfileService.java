@@ -21,9 +21,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -33,14 +31,16 @@ public class UserProfileService {
     private final UserAndCountryRepository userAndCountryRepository;
     private final UserAndCookingClassRepository userAndClassRepository;
     private final CookingClassRepository cookingClassRepository;
+    private final UserAndCookingClassRepository userAndCookingClassRepository;
 
     @Autowired
     public UserProfileService(UserRepository userRepository, UserAndCountryRepository userAndCountryRepository,
-                              UserAndCookingClassRepository userAndClassRepository, CookingClassRepository cookingClassRepository) {
+                              UserAndCookingClassRepository userAndClassRepository, CookingClassRepository cookingClassRepository, UserAndCookingClassRepository userAndCookingClassRepository) {
         this.userRepository = userRepository;
         this.userAndCountryRepository = userAndCountryRepository;
         this.userAndClassRepository = userAndClassRepository;
         this.cookingClassRepository = cookingClassRepository;
+        this.userAndCookingClassRepository = userAndCookingClassRepository;
     }
 
     @Transactional
@@ -51,6 +51,7 @@ public class UserProfileService {
         return getUserProfileDto(user);
     }
 
+    // 프로필 메인 페이지
     @Transactional
     public UserInfoDto getProfileMain(String username) {
         log.debug("username: {}", username);
@@ -67,6 +68,7 @@ public class UserProfileService {
         return new UserInfoDto(userProfileDto, hostingClasses, reservedClasses, reviewList);
     }
 
+    // 남이 보는 프로필 조회
     private static UserProfileDto getUserProfileDto(User user) {
         Country country = user.getCountry();
         Language language = user.getLanguage();
@@ -87,31 +89,33 @@ public class UserProfileService {
                 user.getYoutubeUrl(), user.getYoutubeHandle());
     }
 
+    // 예약한 클래스
     @Transactional
     public Page<CookingClassListDto> getReservedClasses(int userId, Pageable pageable) {
         return userAndClassRepository.findReservedClassesByUserId(userId, pageable);
     }
 
+    // 참여한 클래스
     @Transactional
-    public Page<CookingClassListDto> getReservedClasses(String username, Pageable pageable) {
+    public Page<CookingClassListDto> getParticipatedClasses(String username, Pageable pageable) {
         Optional<User> user = userRepository.findByUsername(username);
         if (user.isEmpty()) {
             throw new UsernameNotFoundException("존재하지 않는 유저입니다.");
         }
-        return userAndClassRepository.findReservedClassesByUserId(user.get().getUserId(), pageable);
+        return userAndClassRepository.findParticipatedClassesByUserId(user.get().getUserId(), pageable);
     }
 
     @Transactional
     public Page<CookingClassListDto> getHostingClasses(int hostId, Pageable pageable) {
-        return cookingClassRepository.searchClassByHostId(hostId, pageable);
+        return cookingClassRepository.getHostingClassByHostId(hostId, pageable);
     }
 
     @Transactional
-    public Page<CookingClassListDto> getHostingClasses(String username, Pageable pageable) {
+    public Page<CookingClassListDto> getHostedClasses(String username, Pageable pageable) {
         Optional<User> user = userRepository.findByUsername(username);
         if (user.isEmpty()) {
             throw new UsernameNotFoundException("존재하지 않는 유저입니다.");
         }
-        return cookingClassRepository.searchClassByHostId(user.get().getUserId(), pageable);
+        return cookingClassRepository.getHostedClassByHostId(user.get().getUserId(), pageable);
     }
 }

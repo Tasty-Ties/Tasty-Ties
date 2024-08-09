@@ -14,8 +14,11 @@ public class Country {
   @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
   private int id;
 
+  @Column(nullable = false, unique = true)
   private String alpha2;
+  @Column(nullable = false, unique = true)
   private String englishName;
+  @Column(nullable = false, unique = true)
   private String koreanName;
   private String countryImageUrl;
 

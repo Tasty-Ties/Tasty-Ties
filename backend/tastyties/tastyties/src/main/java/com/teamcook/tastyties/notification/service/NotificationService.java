@@ -68,6 +68,11 @@ public class NotificationService {
     public void sendMessagesTo(Set<UserFcmTokenDto> users, FcmNotificationDto fcmNotification) {
         Notification notification = createNotification(fcmNotification);
 
+        Set<String> fcmTokens = getFcmTokens(users);
+        if (fcmTokens.isEmpty()) {
+            return;
+        }
+
         MulticastMessage messages = MulticastMessage.builder()
                 .addAllTokens(getFcmTokens(users))
                 .setNotification(notification)
@@ -87,6 +92,7 @@ public class NotificationService {
         for (UserFcmTokenDto user : users) {
             fcmTokens.add(user.getFcmToken());
         }
+        fcmTokens.remove(null);
         return fcmTokens;
     }
 
