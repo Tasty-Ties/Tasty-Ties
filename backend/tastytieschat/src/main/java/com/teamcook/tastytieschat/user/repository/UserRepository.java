@@ -11,5 +11,7 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<User, Integer> {
     @Query("SELECT u FROM User u WHERE u.username IN :usernames")
     List<User> findByUsernames(@Param("usernames") List<String> usernames);
+    @Query("SELECT u FROM User u WHERE u.username IN :usernames AND u.fcmToken IS NOT NULL")
+    List<User> findFcmTokensByUsernames(@Param("usernames") List<String> usernames);
     Optional<User> findByUsername(String username);
 }

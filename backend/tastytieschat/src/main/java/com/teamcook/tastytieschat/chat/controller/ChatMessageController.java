@@ -129,7 +129,8 @@ public class ChatMessageController {
                 .build();
 
         Set<String> translatedLanguages = (Set<String>) map.get("translatedLanguages");
-        translatedLanguages.add(Language.EN.getName());
+        translatedLanguages.add(Language.EN.getName());  // 기본 언어 추가
+        translatedLanguages.remove(userDto.getLanguage());  // 원본 언어 삭제
 
         try {
             translationService.translationChatMessage(chatMessage, translatedLanguages);

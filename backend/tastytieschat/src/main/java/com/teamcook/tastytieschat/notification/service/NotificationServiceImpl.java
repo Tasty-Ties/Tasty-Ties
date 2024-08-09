@@ -31,16 +31,16 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     public void sendMessage(Set<UserDto> listeners, FcmNotificationDto fcmNotification) {
-        int size = listeners.size();
-        if (size == 0) {
+        if (listeners.isEmpty()) {
             return;
         }
 
         Set<User> users = getUserFcmTokens(listeners);
+        int size = users.size();
 
         if (size == 1) {
             sendMessageTo(users.iterator().next(), fcmNotification);
-        } else {
+        } else if (size > 1) {
             sendMessagesTo(users, fcmNotification);
         }
     }
@@ -51,7 +51,7 @@ public class NotificationServiceImpl implements NotificationService {
             usernames.add(userDto.getUsername());
         }
 
-        return new HashSet<>(userRepository.findByUsernames(usernames));
+        return new HashSet<>(userRepository.findFcmTokensByUsernames(usernames));
     }
 
     private void sendMessageTo(User user, FcmNotificationDto fcmNotification) {
