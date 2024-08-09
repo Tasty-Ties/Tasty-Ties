@@ -13,6 +13,10 @@ public enum SystemMessage {
     EXIT(new HashMap<>(){{
         put(Language.KO, "님이 나갔습니다.");
         put(Language.EN, " left the chat room.");
+    }}),
+    AUTHORIZATION_ERROR(new HashMap<>(){{
+        put(Language.KO, "해당 채팅방에 대한 권한이 없습니다.");
+        put(Language.EN, "You do not have permission for this chat room.");
     }});
 
     private final Map<Language, String> messages;
