@@ -1,7 +1,6 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import Button from "../../common/components/Button";
-import IdImage from "./EditInfo/IdImage";
 import api from "../../service/Api";
 
 const EditInfo = () => {
@@ -32,9 +31,15 @@ const EditInfo = () => {
     }
   }, [email]);
 
+  const [profileImagePreview, setProfileImagePreview] = useState(null);
+
+  // handleFileChange 함수 수정됨
   const handleFileChange = async (file) => {
     const formData = new FormData();
     formData.append("profileImage", file);
+
+    const imageUrl = URL.createObjectURL(file);
+    setProfileImagePreview(imageUrl);
 
     try {
       const response = await api.patch("/users/me/profile-image", formData, {
@@ -52,6 +57,28 @@ const EditInfo = () => {
       console.error("업로드 중 오류 발생:", error);
       alert("업로드 중 오류가 발생했습니다.");
     }
+  };
+
+  const IdImage = ({ setFiles }) => {
+    const handleImageChange = (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        setFiles(file);
+      }
+    };
+
+    return (
+      <div>
+        <input type="file" accept="image/*" onChange={handleImageChange} />
+        {profileImagePreview && (
+          <img
+            src={profileImagePreview}
+            alt="미리보기 이미지"
+            style={{ width: "150px", height: "150px", objectFit: "cover" }}
+          />
+        )}
+      </div>
+    );
   };
 
   const handleEmailChange = (e) => {
@@ -96,71 +123,70 @@ const EditInfo = () => {
 
   return (
     <div>
-      <h1>내 정보 수정</h1>
-      <br />
-      <IdImage setFiles={handleFileChange} />
+      <p className="text-xl mb-4">내 정보 수정</p>
+      <p className="mb-1">
+        <IdImage setFiles={handleFileChange} className="mb-1" />
+      </p>
+      <p className="mb-1 text-sm">닉네임</p>
+      <input
+        type="text"
+        value={nickname}
+        onChange={(e) => setNickname(e.target.value)}
+        className="border border-slate-400 rounded-md mb-2"
+      />
+      <p className="mb-1 text-sm">비밀번호</p>
+      <input
+        type="password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        className="border border-slate-400 rounded-md mb-2"
+      />
+      <p className="mb-1 text-sm">비밀번호 확인</p>
+      <input
+        type="password"
+        value={verifyPassword}
+        onChange={(e) => setVerifyPassword(e.target.value)}
+        className="border border-slate-400 rounded-md mb-2"
+      />
+      <p className="mb-1 text-sm">이메일</p>
+      <input
+        type="email"
+        value={email}
+        onChange={handleEmailChange}
+        className="border border-slate-400 rounded-md mb-2"
+      />
+      <p className="mb-1 text-sm">자기소개</p>
 
-      <section>
-        닉네임:
-        <input
-          type="text"
-          value={nickname}
-          onChange={(e) => setNickname(e.target.value)}
+      <input
+        type="textarea"
+        value={description}
+        onChange={(e) => setDescription(e.target.value)}
+        className="border border-slate-400 rounded-md mb-2"
+      />
+
+      <p className="mb-1 text-sm">인스타 https://www.instagram.com/</p>
+      <input
+        type="text"
+        value={instaHandle}
+        onChange={(e) => setInstaHandle(e.target.value)}
+        className="border border-slate-400 rounded-md w-24 mb-2"
+      />
+      <p className="mb-1 text-sm">유튜브 https://www.youtube.com/@</p>
+      <input
+        type="text"
+        value={youtubeHandle}
+        onChange={(e) => setYoutubeHandle(e.target.value)}
+        className="border border-slate-400 rounded-md w-24 mb-2"
+      />
+      <br />
+      <div className="space-x-40">
+        <Button text="수정완료" type="green-sqr" onClick={handleSave} />
+        <Button
+          text="수정취소"
+          type="gray-sqr"
+          onClick={() => nav("/mypage")}
         />
-      </section>
-      <br />
-      <section>
-        비밀번호:
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-      </section>
-      <br />
-      <section>
-        비밀번호 확인:
-        <input
-          type="password"
-          value={verifyPassword}
-          onChange={(e) => setVerifyPassword(e.target.value)}
-        />
-      </section>
-      <br />
-      <section>
-        이메일:
-        <input type="email" value={email} onChange={handleEmailChange} />
-      </section>
-      <br />
-      <section>
-        자기소개:
-        <input
-          type="textarea"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-        />
-      </section>
-      <br />
-      <section>
-        인스타: https://www.instagram.com/
-        <input
-          type="text"
-          value={instaHandle}
-          onChange={(e) => setInstaHandle(e.target.value)}
-        />
-      </section>
-      <br />
-      <section>
-        유튜브: https://www.youtube.com/@
-        <input
-          type="text"
-          value={youtubeHandle}
-          onChange={(e) => setYoutubeHandle(e.target.value)}
-        />
-      </section>
-      <br />
-      <Button text="저장하기" type="green-sqr" onClick={handleSave} />
-      <Button text="취소" type="gray-sqr" onClick={() => nav("/mypage")} />
+      </div>
     </div>
   );
 };

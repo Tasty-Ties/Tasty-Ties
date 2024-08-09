@@ -50,7 +50,8 @@ const ClassRegist = () => {
   useEffect(() => {
     fetchCountries();
     fetchLanguages();
-  }, []);
+  }, [classInformation]);
+  console.log(classInformation);
 
   const onChange = (e) => {
     // 주류 체크박스
@@ -175,7 +176,7 @@ const ClassRegist = () => {
   };
 
   return (
-    <div className="w-3/6 mx-auto justify-center">
+    <div className="justify-center">
       <div className="mt-8 mb-4 text-center text-first-800 font-bold border-b-2 border-first-800 pb-4 text-2xl">
         클래스 등록
       </div>
