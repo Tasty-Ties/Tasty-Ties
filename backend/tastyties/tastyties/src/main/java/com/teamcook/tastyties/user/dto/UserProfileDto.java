@@ -13,6 +13,7 @@ import java.util.List;
 public class UserProfileDto {
     private int userId;
     private String profileImageUrl;
+    private String username;
     private String nickname;
     private String description;
     private CountryResponseDto country;
