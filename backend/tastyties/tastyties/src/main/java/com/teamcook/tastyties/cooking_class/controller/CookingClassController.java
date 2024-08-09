@@ -229,7 +229,7 @@ public class CookingClassController {
     }
 
     private void sendReservationCookingClassNotification(String cookingClassName, UserFcmTokenDto host, String attendeeNickname) {
-        if (host == null) {
+        if (host == null || host.getFcmToken() == null) {
             return;
         }
 
@@ -281,7 +281,7 @@ public class CookingClassController {
     }
 
     private void sendLeaveCookingClassNotification(String cookingClassName, UserFcmTokenDto host, String attendeeNickname) {
-        if (host == null) {
+        if (host == null || host.getFcmToken() == null) {
             return;
         }
 
