@@ -9,7 +9,7 @@ const AttendeeList = ({ setOpen, users, nickname }) => {
   const nav = useNavigate();
 
   const toProfilePage = (user) => {
-    nav(`/otherpage/${user.username}`);
+    nav(`/otherpage/${user}`);
   };
 
   console.log(users);
@@ -47,7 +47,7 @@ const AttendeeList = ({ setOpen, users, nickname }) => {
                 <div
                   key={i}
                   className="flex flex-row space-y-2 py-1 px-2"
-                  onClick={() => toProfilePage(user)}
+                  onClick={() => toProfilePage(user[3])}
                 >
                   <img
                     alt=""

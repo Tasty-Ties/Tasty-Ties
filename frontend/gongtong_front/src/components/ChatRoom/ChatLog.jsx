@@ -86,7 +86,12 @@ const ChatLog = ({
         console.log(user);
         setUserProfileList((prev) => ({
           ...prev,
-          [user.username]: [user.nickname, user.profileImageUrl, user.type],
+          [user.username]: [
+            user.nickname,
+            user.profileImageUrl,
+            user.type,
+            user.username,
+          ],
         }));
       });
 
