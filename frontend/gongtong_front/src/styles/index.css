@@ -40,6 +40,7 @@
   font-style: normal;
 }
 @font-face {
+<<<<<<< HEAD
   font-family: "Dovemayo_gothic";
   src: url("https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2302@1.1/Dovemayo_gothic.woff2")
     format("woff2");
@@ -54,4 +55,14 @@
   /* font-family: "Pretendard-Regular"; */
   /* font-family: "NanumSquareRound"; */
   /* font-family: "Dovemayo_gothic"; */
+=======
+  font-family: "LeeSeoyun";
+  src: url("https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2202-2@1.0/LeeSeoyun.woff")
+    format("woff");
+  font-weight: normal;
+  font-style: normal;
+}
+* {
+  font-family: "LeeSeoyun";
+>>>>>>> 4834be9a03a1397c2442434cb3f750b667577897
 }

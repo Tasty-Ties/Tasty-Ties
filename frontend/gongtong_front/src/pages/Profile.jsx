@@ -1,7 +1,7 @@
 import useProfileStore from "../store/ProfileStore";
 import { useEffect } from "react";
 import { useParams } from "react-router-dom";
-import Category from "../components/Profile/Category";
+import OtherCategory from "../components/Profile/OtherCategory";
 
 const Profile = () => {
   const { username } = useParams();
@@ -12,13 +12,12 @@ const Profile = () => {
 
   useEffect(() => {
     fetchInformations(username);
-    console.log(informations);
   }, []);
 
   return (
     <>
       <div>
-        <Category informations={informations} />
+        <OtherCategory informations={informations} />
       </div>
     </>
   );

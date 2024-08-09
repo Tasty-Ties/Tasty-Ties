@@ -8,7 +8,6 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -41,9 +40,9 @@ public class ChatRoom {
         users.add(userDto);
     }
 
-    public boolean isContainedUser(int userId) {
-        for (UserDto userDto : users) {
-            if (userId == userDto.getId()) {
+    public boolean isContainedUser(String username) {
+        for (UserDto user : users) {
+            if (user.getUsername().equals(username)) {
                 return true;
             }
         }
@@ -51,35 +50,57 @@ public class ChatRoom {
         return false;
     }
 
-    public String removeUser(int userId) {
+    public void removeUser(String username) {
         for (UserDto user : users) {
-            if (userId == user.getId()) {
-                String removedUserNickname = user.getNickname();
+            if (user.getUsername().equals(username)) {
                 users.remove(user);
-                return removedUserNickname;
+            }
+        }
+    }
+
+    public UserDto getUser(String username) {
+        for (UserDto user : users) {
+            if (user.getUsername().equals(username)) {
+                return user;
             }
         }
 
         return null;
     }
 
-    public UserDto getUser(int userId) {
-        for (UserDto userDto : users) {
-            if (userId == userDto.getId()) {
-                return userDto;
+    public Set<UserDto> getListeners(String speakerUsername) {
+        Set<UserDto> listeners = new HashSet<>();
+        for (UserDto user : users) {
+            if (user.getUsername().equals(speakerUsername)) {
+                continue;
             }
+
+            listeners.add(user);
         }
 
-        return null;
+        return listeners;
     }
 
     public Set<String> getLanguages() {
         Set<String> languages = new HashSet<>();
-        for (UserDto userDto : users) {
-            languages.add(userDto.getLanguage());
+        for (UserDto user : users) {
+            languages.add(user.getLanguage());
         }
 
         return languages;
+    }
+
+    public List<String> getUsernames() {
+        List<String> usernames = new ArrayList<>();
+        for (UserDto user : users) {
+            usernames.add(user.getUsername());
+        }
+        return usernames;
+    }
+
+    public void addUser(UserDto user) {
+        user.setEnteredTime(LocalDateTime.now());
+        users.add(user);
     }
 
 }
