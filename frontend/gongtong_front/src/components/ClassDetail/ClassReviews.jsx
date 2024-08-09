@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useOutletContext } from "react-router-dom";
-import useCookingClassStore from "../../store/CookingClassStore";
+import useCookingClassStore from "./../../store/CookingClassStore";
 
 const ClassReview = () => {
   const { reviews } = useOutletContext();
@@ -14,14 +14,18 @@ const ClassReview = () => {
   console.log(classReviews);
   return (
     <>
-      <div className="w-full">
+      <div className="w-full mt-20">
         {classReviews &&
           classReviews.map((classReview, index) => (
-            <div key={index} className="flex">
-              <div className="basis-4/6">{classReview.comment}</div>
-              <div className="basis-1/6">{classReview.nickname}</div>
-              <div className="basis-1/6">
-                {classReview.cookingClassReviewCreateTime}
+            <div key={index} className="flex my-6">
+              <div className="basis-4/6 truncate mr-4 ">
+                {classReview.comment}
+              </div>
+              <div className="basis-1/6 text-right mr-4">
+                {classReview.nickname}
+              </div>
+              <div className="basis-1/6 text-right">
+                {classReview.cookingClassReviewCreateTime?.substring(0, 10)}
               </div>
             </div>
           ))}

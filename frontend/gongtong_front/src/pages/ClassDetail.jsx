@@ -112,9 +112,10 @@ const ClassDetail = () => {
                   onClick={handleClassReservation}
                 />
               )}
-            {classDetail.quota <= classDetail.reservedCount && (
-              <Button text="마감" type="green-border-short" />
-            )}
+            {classDetail.quota <= classDetail.reservedCount &&
+              !classDetail.host && (
+                <Button text="마감" type="green-border-short" />
+              )}
             {classDetail.userEnrolled && (
               <Button
                 text="예약 취소하기"

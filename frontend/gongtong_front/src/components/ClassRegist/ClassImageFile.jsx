@@ -22,7 +22,7 @@ const ClassImageFiles = ({ setFiles }) => {
         return;
       }
       validFiles.push(file);
-      const currentImageUrl = URL.createObjectURL(file);
+      const currentImageUrl = URL.createObjectURL(file); // 생성
       imageUrlLists.push(currentImageUrl);
     });
 
@@ -37,7 +37,7 @@ const ClassImageFiles = ({ setFiles }) => {
   const handleDeleteImage = (id) => {
     const imageUrl = classImages[id];
     setClassImages(classImages.filter((_, index) => index !== id));
-    URL.revokeObjectURL(imageUrl);
+    URL.revokeObjectURL(imageUrl); // 소멸
   };
 
   return (
@@ -62,7 +62,7 @@ const ClassImageFiles = ({ setFiles }) => {
                   className="w-28 mt-4 h-28 bg-cover"
                 />
                 <div
-                  className="absolute top-4 right-1 bg-first rounded-3xl text-white px-2 py-0.5"
+                  className="absolute top-2 -right-2 bg-first rounded-3xl text-white px-2 py-0.5"
                   onClick={() => handleDeleteImage(id)}
                 >
                   X

@@ -5,16 +5,18 @@ import ClassListItem from "./../components/ClassList/ClassListItem";
 import SearchBar from "./../components/ClassList/SearchBar";
 import useCookingClassStore from "./../store/CookingClassStore";
 import useAuthStore from "./../store/AuthStore";
+import Cookies from "js-cookie";
 
 const FRONT_SERVER_URL = import.meta.env.VITE_FRONT_SERVER;
 
 const ClassList = () => {
-  const { isAuthenticated } = useAuthStore();
   const navigate = useNavigate();
   const { classLists, fetchClassLists, hasMoreContent } =
     useCookingClassStore();
   const [page, setPage] = useState(0);
   const observerRef = useRef(null);
+
+  let cookie = Cookies.get("accessToken");
 
   useEffect(() => {
     const fetchClassListData = async () => {
@@ -68,7 +70,7 @@ const ClassList = () => {
         </div>
       </div>
       <div ref={observerRef} id="observer" style={{ height: "10px" }}></div>
-      {isAuthenticated ? (
+      {cookie ? (
         <Link
           to="/classregist"
           className="fixed bottom-48 right-36 float-right"

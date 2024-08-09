@@ -257,7 +257,7 @@ const ClassRegist = () => {
         <hr className="my-4" />
         <div className="grid grid-cols-8">
           <div className="col-span-2">
-            <label htmlFor="hashtage">해쉬태그</label>
+            <label htmlFor="hashtage">해시태그</label>
           </div>
           <div className="col-span-6">
             <CookingClassTags

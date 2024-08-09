@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 
-export default function Pagination({
+const Pagination = ({
   totalItems,
   itemCountPerPage,
   pageCount,
   currentPage,
-}) {
+}) => {
   const totalPages = Math.ceil(totalItems / itemCountPerPage);
   const [start, setStart] = useState(1);
   const noPrev = start === 1;
@@ -63,4 +63,5 @@ export default function Pagination({
       </ul>
     </div>
   );
-}
+};
+export default Pagination;
