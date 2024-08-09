@@ -12,6 +12,7 @@ import com.teamcook.tastyties.cooking_class.dto.*;
 import com.teamcook.tastyties.cooking_class.entity.*;
 import com.teamcook.tastyties.shared.entity.CookingClassAndCookingClassTag;
 import com.teamcook.tastyties.shared.entity.QCookingClassAndCookingClassTag;
+import com.teamcook.tastyties.user.dto.QUserFcmTokenDto;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -19,6 +20,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.support.PageableExecutionUtils;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -65,6 +67,7 @@ public class CookingClassRepositoryImpl implements CookingClassCustomRepository 
                 .select(new QCookingClassListDto(cookingClass.title, cookingClass.mainImage,
                         cookingClass.cookingClassStartTime.as("startTime"),
                         cookingClass.cookingClassEndTime.as("endTime"),
+                        user.username.as("hostUsername"),
                         user.nickname.as("hostName"),
                         cookingClass.uuid,
                         new QCountryProfileDto(
@@ -242,13 +245,57 @@ public class CookingClassRepositoryImpl implements CookingClassCustomRepository 
     }
 
     @Override
-    public Page<CookingClassListDto> searchClassByHostId(int hostId, Pageable pageable) {
+    public Page<CookingClassListDto> getHostingClassByHostId(int hostId, Pageable pageable) {
+        QCountry countryByClass = new QCountry("countryByClass");
+        LocalDateTime now = LocalDateTime.now();
+        List<CookingClassListDto> results = queryFactory
+                .select(new QCookingClassListDto(
+                        cookingClass.title, cookingClass.mainImage,
+                        cookingClass.cookingClassStartTime.as("startTime"),
+                        cookingClass.cookingClassEndTime.as("endTime"),
+                        user.username.as("hostUsername"),
+                        user.nickname.as("hostName"),
+                        cookingClass.uuid,
+                        new QCountryProfileDto(
+                                country.alpha2,
+                                country.countryImageUrl
+                        ), new QCountryProfileDto(
+                        countryByClass.alpha2,
+                        countryByClass.countryImageUrl
+                ), cookingClass.countryCode.eq(country.alpha2)
+                ))
+                .from(cookingClass)
+                .leftJoin(cookingClass.host, user)
+                .leftJoin(user.country, country)
+                .leftJoin(countryByClass).on(cookingClass.countryCode.eq(countryByClass.alpha2))
+                .where(
+                        cookingClass.isDelete.eq(false),
+                        cookingClass.host.userId.eq(hostId),
+                        cookingClass.cookingClassEndTime.after(now))
+                .orderBy(cookingClass.cookingClassStartTime.asc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        JPAQuery<Long> countQuery = queryFactory
+                .select(cookingClass.count())
+                .from(cookingClass)
+                .where(cookingClass.host.userId.eq(hostId),
+                        cookingClass.isDelete.eq(false),
+                        cookingClass.cookingClassEndTime.after(now));
+
+        return PageableExecutionUtils.getPage(results, pageable, countQuery::fetchOne);
+    }
+
+    @Override
+    public Page<CookingClassListDto> getHostedClassByHostId(int hostId, Pageable pageable) {
         QCountry countryByClass = new QCountry("countryByClass");
         List<CookingClassListDto> results = queryFactory
                 .select(new QCookingClassListDto(
                         cookingClass.title, cookingClass.mainImage,
                         cookingClass.cookingClassStartTime.as("startTime"),
                         cookingClass.cookingClassEndTime.as("endTime"),
+                        user.username.as("hostUsername"),
                         user.nickname.as("hostName"),
                         cookingClass.uuid,
                         new QCountryProfileDto(
@@ -274,10 +321,12 @@ public class CookingClassRepositoryImpl implements CookingClassCustomRepository 
         JPAQuery<Long> countQuery = queryFactory
                 .select(cookingClass.count())
                 .from(cookingClass)
-                .where(cookingClass.host.userId.eq(hostId));
+                .where(cookingClass.host.userId.eq(hostId),
+                        cookingClass.isDelete.eq(false));
 
         return PageableExecutionUtils.getPage(results, pageable, countQuery::fetchOne);
     }
+
 
     // 남이 보는 프로필에 사용되는 진행한 클래스 정보
     @Override
@@ -289,6 +338,7 @@ public class CookingClassRepositoryImpl implements CookingClassCustomRepository 
                                 cookingClass.title, cookingClass.mainImage,
                                 cookingClass.cookingClassStartTime.as("startTime"),
                                 cookingClass.cookingClassEndTime.as("endTime"),
+                                user.username.as("hostUsername"),
                                 user.nickname.as("hostName"),
                                 cookingClass.uuid,
                                 new QCountryProfileDto(
@@ -345,7 +395,7 @@ public class CookingClassRepositoryImpl implements CookingClassCustomRepository 
     }
 
     @Override
-    public String findSessionIdWidthUuid(String uuid) {
+    public String findSessionIdWithUuid(String uuid) {
         CookingClass cookingClass = queryFactory
                 .selectFrom(QCookingClass.cookingClass)
                 .where(QCookingClass.cookingClass.uuid.eq(uuid))

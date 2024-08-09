@@ -48,7 +48,7 @@ public class AlbumService {
 
     @Autowired
     public AlbumService(AlbumRepository albumRepository, FolderRepository folderRepository,
-                        PhotoRepository photoRepository, @Qualifier("Local") S3Service s3Service,
+                        PhotoRepository photoRepository, @Qualifier("S3") S3Service s3Service,
                         CookingClassRepository cookingClassRepository,
                         UserAndCookingClassRepository userAndCookingClassRepository,
                         CountryRepository countryRepository) {
@@ -132,6 +132,9 @@ public class AlbumService {
                 photo.setOrderIndex(dto.getOrderIndex());
             } else {
                 throw new IllegalArgumentException("Photo ID " + dto.getPhotoId() + " 를 찾을 수 없습니다.");
+            }
+            if (dto.getOrderIndex() == 0) {
+                folder.setMainImgUrl(photo.getPhotoImageUrl());
             }
         }
         return photos;

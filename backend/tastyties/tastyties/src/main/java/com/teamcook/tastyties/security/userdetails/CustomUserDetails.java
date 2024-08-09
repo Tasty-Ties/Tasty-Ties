@@ -37,4 +37,8 @@ public record CustomUserDetails(User user) implements UserDetails {
     public String getUsername() {
         return user.getUsername();
     }
+
+    public String getNickname() {
+        return user.getNickname();
+    }
 }

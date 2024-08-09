@@ -47,12 +47,21 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
     }
 
     @Override
-    public User findUserWithLanguage(Integer userId) {
+    public User findUserWithLanguage(String username) {
         return queryFactory
                 .selectFrom(user)
                 .leftJoin(user.language, language).fetchJoin()
-                .where(user.userId.eq(userId))
+                .where(user.username.eq(username))
                 .fetchOne();
+    }
+
+    @Override
+    public long getMyRank(double score) {
+        Long count = queryFactory.select(user.count())
+                .from(user)
+                .where(user.activityPoint.gt(score))
+                .fetchOne();
+        return (count == null ? 0 : count) + 1;
     }
 
 }

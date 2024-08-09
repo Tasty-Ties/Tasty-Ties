@@ -4,5 +4,5 @@ import com.teamcook.tastytieschat.chat.entity.ChatUser;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 public interface ChatUserRepository extends MongoRepository<ChatUser, String> {
-    ChatUser findByUserId(int userId);
+    ChatUser findByUsername(String username);
 }

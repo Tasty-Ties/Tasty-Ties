@@ -37,6 +37,7 @@ out/
 .vscode/
 
 application.properties
+serviceAccountKey.json
 
 ### test index.html ###
 src/main/resources/static
