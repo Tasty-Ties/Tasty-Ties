@@ -1,5 +1,6 @@
 package com.teamcook.tastytieschat.chat.entity;
 
+import com.teamcook.tastytieschat.user.entity.User;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -17,6 +18,7 @@ public class ChatUser {
     private String id;
     private String username;
     private Set<String> chatRoomIds;
+    private boolean isActive;
 
     public ChatUser(String username, String chatRoomId) {
         this.username = username;
@@ -30,5 +32,13 @@ public class ChatUser {
 
     public void removeChatRoomId(String chatRoomId) {
         chatRoomIds.remove(chatRoomId);
+    }
+
+    public boolean isEqualsWithUser(User user) {
+        if (user.getUsername().equals(username)) {
+            return true;
+        }
+
+        return false;
     }
 }
