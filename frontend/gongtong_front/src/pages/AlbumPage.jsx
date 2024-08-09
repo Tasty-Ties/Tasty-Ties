@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { DndProvider } from "react-dnd/dist";
-import { HTML5Backend } from "react-dnd-html5-backend/dist";
+import { DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
 import AlbumSort from "./../components/Album/AlbumSort";
 import AlbumDetail from "./../components/Album/AlbumDetail";
 import CountryFlags from "./../common/components/CountryFlags";
@@ -9,26 +9,32 @@ import useAlbumStore from "./../store/AlbumStore";
 const AlbumPage = () => {
   const [open, setOpen] = useState(false);
   const { albumLists, fetchAlbumLists, hasMoreContent } = useAlbumStore();
-  const [countryCode, setCountryCode] = useState();
-  const [countryName, setCountryName] = useState();
+  const [countryCode, setCountryCode] = useState(null);
+  const [countryName, setCountryName] = useState(null);
   const [folderId, setFolderId] = useState(null);
   const [page, setPage] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
   const observerRef = useRef(null);
 
-  useEffect(() => {
-    fetchAlbumLists(0, countryCode);
-  }, [countryCode]);
+  const isInitialLoad = useRef(true);
 
   useEffect(() => {
-    if (page !== 0) {
-      fetchAlbumLists(page, countryCode);
+    const loadAlbums = async () => {
+      setIsLoading(true);
+      await fetchAlbumLists(page, countryCode);
+      setIsLoading(false);
+      isInitialLoad.current = false;
+    };
+
+    if (!isLoading && (page === 0 || hasMoreContent)) {
+      loadAlbums();
     }
-  }, [page, countryCode]);
+  }, [page, countryCode, fetchAlbumLists, hasMoreContent]);
 
   useEffect(() => {
     const handleObserver = (entries) => {
       const target = entries[0];
-      if (target.isIntersecting && hasMoreContent) {
+      if (target.isIntersecting && !isLoading && hasMoreContent) {
         setPage((prev) => prev + 1);
       }
     };
@@ -36,7 +42,7 @@ const AlbumPage = () => {
     const options = {
       root: null,
       rootMargin: "0px",
-      threshold: 0.5,
+      threshold: 1.0,
     };
 
     const observer = new IntersectionObserver(handleObserver, options);
@@ -49,14 +55,14 @@ const AlbumPage = () => {
         observer.unobserve(observerRef.current);
       }
     };
-  }, [hasMoreContent]);
+  }, [isLoading, hasMoreContent]);
 
   return (
     <>
       <div className="w-9/12 mx-auto mt-24">
         <div className="flex justify-between items-center mb-8">
           {!countryCode && (
-            <div className="text-3xl font-extrabold flex items-baseline gap-x-2 ">
+            <div className="text-3xl font-extrabold flex items-baseline gap-x-2">
               <p>전체보기</p>
             </div>
           )}
@@ -79,7 +85,7 @@ const AlbumPage = () => {
             <img
               key={album.folderId}
               src={album.mainImgUrl}
-              className=" rounded-3xl"
+              className="rounded-3xl w-full h-48"
               onClick={() => {
                 setFolderId(album.folderId);
                 setOpen(true);
@@ -92,7 +98,11 @@ const AlbumPage = () => {
         </DndProvider>
       </div>
       <div ref={observerRef} id="observer" style={{ height: "10px" }}></div>
+      {isLoading && (
+        <div className="loading-spinner">Loading...</div> // 로딩 중일 때 표시
+      )}
     </>
   );
 };
+
 export default AlbumPage;

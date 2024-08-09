@@ -3,9 +3,16 @@
 @tailwind utilities;
 
 @font-face {
-  font-family: "Cafe24Ssurround";
-  src: url("https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2105_2@1.0/Cafe24Ssurround.woff")
-    format("woff");
-  font-weight: normal;
+  font-family: "IBM Plex Sans KR";
+  src: url("https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR&display=swap");
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Noto Sans KR";
+  src: url("https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100..900&display=swap");
+  font-optical-sizing: auto;
+  font-weight: <weight>;
   font-style: normal;
 }

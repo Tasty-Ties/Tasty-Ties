@@ -1,16 +1,18 @@
 import { useEffect, useState, useRef } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
-import ClassItem from "@components/ClassList/ClassListItem";
-import ClassListSearch from "@components/ClassList/ClassListSearch";
-
-import useClassRegistStore from "../store/ClassRegistStore";
-import "@styles/ClassList/ClassList.css";
+import ClassListItem from "./../components/ClassList/ClassListItem";
+import SearchBar from "./../components/ClassList/SearchBar";
+import useCookingClassStore from "./../store/CookingClassStore";
+import useAuthStore from "./../store/AuthStore";
 
 const FRONT_SERVER_URL = import.meta.env.VITE_FRONT_SERVER;
 
 const ClassList = () => {
-  const { classLists, fetchClassLists, hasMoreContent } = useClassRegistStore();
+  const { isAuthenticated } = useAuthStore();
+  const navigate = useNavigate();
+  const { classLists, fetchClassLists, hasMoreContent } =
+    useCookingClassStore();
   const [page, setPage] = useState(0);
   const observerRef = useRef(null);
 
@@ -21,7 +23,7 @@ const ClassList = () => {
       }
     };
     fetchClassListData();
-  }, [page, hasMoreContent]);
+  }, [page]);
 
   useEffect(() => {
     const handleObserver = (entries) => {
@@ -34,7 +36,7 @@ const ClassList = () => {
     const options = {
       root: null,
       rootMargin: "0px",
-      threshold: 0.1,
+      threshold: 0.5,
     };
 
     const observer = new IntersectionObserver(handleObserver, options);
@@ -51,26 +53,34 @@ const ClassList = () => {
 
   return (
     <>
-      <div className="classlist-components-box">
-        <ClassListSearch />
-        <div className="classlist-item-box">
+      <div className="w-2/3 mt-16 mx-auto content-center relative">
+        <SearchBar page={page} />
+        <hr className="mt-10" />
+        <div className="mt-10 grid grid-cols-4 gap-6">
           {classLists &&
             classLists.map((content, index) => (
               <div key={index}>
                 <Link to={`/class/${content.uuid}`}>
-                  <ClassItem content={content} />
+                  <ClassListItem content={content} />
                 </Link>
               </div>
             ))}
         </div>
       </div>
       <div ref={observerRef} id="observer" style={{ height: "10px" }}></div>
-      <Link to="/classregist" className="add-class-button">
-        <img
-          src={`${FRONT_SERVER_URL}/images/classImages/add-icon.png`}
-          alt="요리클래스 등록하기"
-        />
-      </Link>
+      {isAuthenticated ? (
+        <Link
+          to="/classregist"
+          className="fixed bottom-48 right-36 float-right"
+        >
+          <img
+            src={`${FRONT_SERVER_URL}/images/classImages/add-icon.svg`}
+            alt="요리클래스 등록하기"
+          />
+        </Link>
+      ) : (
+        <Link to="/login" />
+      )}
     </>
   );
 };

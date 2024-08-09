@@ -4,9 +4,11 @@ import {
   getLanguages,
   getClassLists,
   getClassDetail,
-} from "./../service/ClassRegistAPI";
+  getClassReviews,
+  getSearchLists,
+} from "./../service/CookingClassAPI";
 
-const useClassRegistStore = create((set) => ({
+const useCookingClassStore = create((set) => ({
   contries: [],
   fetchCountries: async () => {
     const countries = await getCountries();
@@ -37,6 +39,18 @@ const useClassRegistStore = create((set) => ({
     const classDetail = await getClassDetail(classId);
     set({ classDetail });
   },
+
+  classReviews: [],
+  fetchClassReviews: async (id) => {
+    const classReviews = await getClassReviews(id);
+    set({ classReviews });
+  },
+
+  classSearchLists: [],
+  fetchSearchLists: async () => {
+    const classSearchLists = await getSearchLists();
+    set({ classSearchLists });
+  },
 }));
 
-export default useClassRegistStore;
+export default useCookingClassStore;

@@ -14,6 +14,7 @@ import "./../styles/ClassRegist/ClassRegist.css";
 import { setClassRegist } from "../service/CookingClassAPI";
 import Button from "../common/components/Button";
 import { useNavigate } from "react-router-dom";
+import { useForm } from "react-hook-form";
 
 const ClassRegist = () => {
   const navigate = useNavigate();
@@ -24,98 +25,84 @@ const ClassRegist = () => {
       languages: state.languages,
       fetchLanguages: state.fetchLanguages,
     }));
+  const {
+    mode: onBlur,
+    register,
+    formState: { errors },
+    handleSubmit,
+  } = useForm();
+  const onSubmit = (data) => console.log(data);
   const [replayDays, setReplayDays] = useState(0);
   const [files, setFiles] = useState([]);
-  const [classInformation, setClassInformation] = useState({
-    title: "",
-    dishName: "",
-    isLimitedAge: false,
-    countryCode: "",
-    countryName: "",
-    cookingClassTags: [],
-    description: "",
-    languageCode: "",
-    languageName: "",
-    level: 0,
-    cookingClassStartTime: new Date().toISOString(),
-    cookingClassEndTime: "",
-    dishCookingTime: 0,
-    ingredients: [],
-    recipe: [],
-    cookingTools: [],
-    quota: 0,
-    replayEndTime: "",
-    isDelete: false,
-  });
   useEffect(() => {
     fetchCountries();
     fetchLanguages();
   }, []);
 
-  const onChange = (e) => {
-    // 주류 체크박스
-    if (e.target.name === "isLimitedAge") {
-      setClassInformation({
-        ...classInformation,
-        [e.target.name]: e.target.checked,
-      });
-      // 주류 체크박스를 제외한 나머지 값 저장
-    } else if (e.target.name === "cookingClassStartTime") {
-      let newStartTime = e.target.value;
-      setClassInformation({
-        ...classInformation,
-        [e.target.name]: newStartTime,
-      });
-      handleReplayEndTime(replayDays);
-    } else if (
-      e.target.name === "countryCode" ||
-      e.target.name === "languageCode"
-    ) {
-      const selectedOption = e.target.options[e.target.selectedIndex];
-      const dataset = selectedOption.dataset;
-      console.log(dataset);
-      console.log(selectedOption);
-      setClassInformation({
-        ...classInformation,
-        [e.target.name]: e.target.value,
-        [dataset.id]: dataset.value,
-      });
-    } else {
-      setClassInformation({
-        ...classInformation,
-        [e.target.name]: e.target.value,
-      });
-    }
-  };
+  // const onChange = (e) => {
+  //   // 주류 체크박스
+  //   if (e.target.name === "isLimitedAge") {
+  //     setClassInformation({
+  //       ...classInformation,
+  //       [e.target.name]: e.target.checked,
+  //     });
+  //     // 주류 체크박스를 제외한 나머지 값 저장
+  //   } else if (e.target.name === "cookingClassStartTime") {
+  //     let newStartTime = e.target.value;
+  //     setClassInformation({
+  //       ...classInformation,
+  //       [e.target.name]: newStartTime,
+  //     });
+  //     handleReplayEndTime(replayDays);
+  //   } else if (
+  //     e.target.name === "countryCode" ||
+  //     e.target.name === "languageCode"
+  //   ) {
+  //     const selectedOption = e.target.options[e.target.selectedIndex];
+  //     const dataset = selectedOption.dataset;
+  //     console.log(dataset);
+  //     console.log(selectedOption);
+  //     setClassInformation({
+  //       ...classInformation,
+  //       [e.target.name]: e.target.value,
+  //       [dataset.id]: dataset.value,
+  //     });
+  //   } else {
+  //     setClassInformation({
+  //       ...classInformation,
+  //       [e.target.name]: e.target.value,
+  //     });
+  //   }
+  // };
 
-  // 레시피 값 객체에 넣기
-  const handleRecipeChange = (recipe) => {
-    setClassInformation({
-      ...classInformation,
-      recipe: recipe,
-    });
-    console.log(recipe);
-  };
-  // 재료 관리
-  const handleIngredientsChange = (ingredients) => {
-    setClassInformation({
-      ...classInformation,
-      ingredients: ingredients,
-    });
-  };
+  // // 레시피 값 객체에 넣기
+  // const handleRecipeChange = (recipe) => {
+  //   setClassInformation({
+  //     ...classInformation,
+  //     recipe: recipe,
+  //   });
+  //   console.log(recipe);
+  // };
+  // // 재료 관리
+  // const handleIngredientsChange = (ingredients) => {
+  //   setClassInformation({
+  //     ...classInformation,
+  //     ingredients: ingredients,
+  //   });
+  // };
 
-  // 소개글 최대길이
-  const MAX_LENGTH = 1000;
-  const handleTextChange = (e) => {
-    if (e.target.value.length <= MAX_LENGTH) {
-      setClassInformation({
-        ...classInformation,
-        description: e.target.value,
-      });
-    } else {
-      alert("1000글자 이내의 글만 입력 가능합니다.");
-    }
-  };
+  // // 소개글 최대길이
+  // const MAX_LENGTH = 1000;
+  // const handleTextChange = (e) => {
+  //   if (e.target.value.length <= MAX_LENGTH) {
+  //     setClassInformation({
+  //       ...classInformation,
+  //       description: e.target.value,
+  //     });
+  //   } else {
+  //     alert("1000글자 이내의 글만 입력 가능합니다.");
+  //   }
+  // };
 
   const convertToSeoulTime = (date) => {
     const tzoffset = new Date().getTimezoneOffset() * 60000;
@@ -136,43 +123,43 @@ const ClassRegist = () => {
   };
 
   // 리플레이 시간 변환 및 저장
-  const handleReplayEndTime = (e) => {
-    const inputValue = e.target.value;
-    setReplayDays(inputValue);
-    const newReplayEndTime = calculateReplayEndTime(
-      classInformation.cookingClassStartTime,
-      inputValue
-    );
-    setClassInformation({
-      ...classInformation,
-      replayEndTime: newReplayEndTime,
-    });
-  };
+  // const handleReplayEndTime = (e) => {
+  //   const inputValue = e.target.value;
+  //   setReplayDays(inputValue);
+  //   const newReplayEndTime = calculateReplayEndTime(
+  //     classInformation.cookingClassStartTime,
+  //     inputValue
+  //   );
+  //   setClassInformation({
+  //     ...classInformation,
+  //     replayEndTime: newReplayEndTime,
+  //   });
+  // };
 
-  // 별점
-  const ratings = [5, 4, 3, 2, 1];
-  const setLevelValue = (e) => {
-    if (e.target.checked) {
-      setClassInformation({
-        ...classInformation,
-        level: e.target.value,
-      });
-    }
-  };
+  // // 별점
+  // const ratings = [5, 4, 3, 2, 1];
+  // const setLevelValue = (e) => {
+  //   if (e.target.checked) {
+  //     setClassInformation({
+  //       ...classInformation,
+  //       level: e.target.value,
+  //     });
+  //   }
+  // };
 
   // 유효성 검사
 
   // 클래스 등록
-  const handleClassRegist = async (e) => {
-    e.preventDefault();
-    try {
-      await setClassRegist(classInformation, files);
-      alert("성공");
-      // location.replace("/class");
-    } catch (error) {
-      console.error("클래스 등록 실패:", error);
-    }
-  };
+  // const handleClassRegist = async (e) => {
+  //   e.preventDefault();
+  //   try {
+  //     await setClassRegist(classInformation, files);
+  //     alert("성공");
+  //     // location.replace("/class");
+  //   } catch (error) {
+  //     console.error("클래스 등록 실패:", error);
+  //   }
+  // };
 
   return (
     <div className="w-3/6 mx-auto justify-center">
@@ -189,10 +176,17 @@ const ClassRegist = () => {
               type="text"
               id="title"
               name="title"
-              value={classInformation.title}
-              onChange={onChange}
               placeholder="클래스명을 입력해주세요"
               className="w-full border p-2 rounded"
+              {...register("title", {
+                required: "클래스명은 필수입니다.",
+                pattern: {
+                  value: /^[a-zA-Z가-힣0-9\s]{1,50}$/,
+                  message:
+                    "클래스명은 50자 이내의 문자, 숫자만 입력 가능합니다.",
+                },
+              })}
+              errors={errors}
             />
           </div>
         </div>

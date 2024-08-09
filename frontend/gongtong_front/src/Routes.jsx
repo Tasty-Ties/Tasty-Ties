@@ -27,7 +27,8 @@ import ClassRegist from "./pages/ClassRegist";
 import ClassWaiting from "./pages/ClassWaiting";
 import LiveClass from "./pages/LiveClass";
 import AlbumPage from "./pages/AlbumPage";
-import { Route, Routes } from "react-router-dom";
+import Ranking from "./pages/Ranking";
+import { Navigate, Route, Routes } from "react-router-dom";
 
 const AppRoutes = () => {
   return (
@@ -54,7 +55,8 @@ const AppRoutes = () => {
       </Route>
       <Route path="/class" element={<ClassList />} />
       <Route path="/class/:id" element={<ClassDetail />}>
-        <Route path="" element={<ClassDescription />} />
+        <Route path="" element={<Navigate to="description" />} />
+        <Route path="description" element={<ClassDescription />} />
         <Route path="ingredient" element={<ClassIngredient />} />
         <Route path="cookingTools" element={<ClassCookingTools />} />
         <Route path="recipes" element={<ClassRecipes />} />
@@ -64,6 +66,7 @@ const AppRoutes = () => {
       <Route path="/classwaiting/:id" element={<ClassWaiting />} />
       <Route path="/liveclass" element={<LiveClass />} />
       <Route path="/album" element={<AlbumPage />} />
+      <Route path="/ranking" element={<Ranking />} />
       {/* <Route path="/" element={< />} /> */}
     </Routes>
   );
