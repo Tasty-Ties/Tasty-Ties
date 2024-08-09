@@ -6,11 +6,11 @@ import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
 
 public interface VoiceChatService {
-    void storeChunk(String roomId, int userId, int chunkIndex, int totalChunks, String chunkData);
+    void storeChunk(String roomId, String username, int chunkIndex, int totalChunks, String chunkData);
 
-    boolean isComplete(String roomId, int userId);
+    boolean isComplete(String roomId, String username);
 
-    String assembleChunks(String roomId, int userId);
+    String assembleChunks(String roomId, String username);
 
     @Async
     CompletableFuture<String> translateVoiceToTextByFileSystem(String filePath) throws IOException, InterruptedException;

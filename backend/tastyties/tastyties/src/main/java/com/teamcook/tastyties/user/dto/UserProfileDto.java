@@ -20,7 +20,7 @@ public class UserProfileDto {
     private LanguageResponseDto language;
     private String email;
     private LocalDate birth;
-    private int activityPoint;
+    private double activityPoint;
 
     //SNS
     private String instagramUrl;
