@@ -1,5 +1,6 @@
 import React from "react";
 import Slider from "react-slick";
+
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 
@@ -39,22 +40,36 @@ const ClassImageCarousel = ({ classDetail }) => {
     slidesToScroll: 1,
     prevArrow: <CustomPrevArrow />,
     nextArrow: <CustomNextArrow />,
+    adaptiveHeight: true,
+    responsive: [
+      {
+        breakpoint: 1024,
+        settings: {
+          slidesToShow: 1,
+          slidesToScroll: 1,
+        },
+      },
+    ],
   };
 
   return (
-    <div className="container mx-auto relative">
-      <Slider {...settings}>
-        {classDetail.imageUrls &&
-          classDetail.imageUrls.map((imageUrl, index) => (
-            <div key={index}>
-              <img
-                src={imageUrl}
-                alt={`Slide ${index + 2}`}
-                className="w-full"
-              />
-            </div>
-          ))}
-      </Slider>
+    <div className="container mx-auto relative mb-8">
+      <div className="overflow-hidden">
+        <Slider {...settings} className="-mx-2">
+          {classDetail.imageUrls &&
+            classDetail.imageUrls.map((imageUrl, index) => (
+              <div key={index} className="px-2">
+                <div className="aspect-w-16 aspect-h-9">
+                  <img
+                    src={imageUrl}
+                    alt={`Slide ${index + 1}`}
+                    className="w-full h-full object-cover rounded-lg"
+                  />
+                </div>
+              </div>
+            ))}
+        </Slider>
+      </div>
     </div>
   );
 };
