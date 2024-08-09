@@ -15,7 +15,7 @@ import java.util.Set;
 @Builder
 public class CookingClassDto {
     private String uuid;
-    private String hostName;
+    private UserSimpleProfileDto host;
     private String title;
     private String dishName;
     private boolean isLimitedAge;

@@ -9,17 +9,16 @@ import java.time.LocalDateTime;
 @Getter
 @Builder
 public class RabbitMQUserDto {
-    private int id;
     private RabbitMQUserType type;
+    private String username;
     private String nickname;
     private String language;
-    private String imageUrl;
     private LocalDateTime enteredTime;
 
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof RabbitMQUserDto) {
-            return this.id == ((RabbitMQUserDto) obj).id;
+            return this.username.equals(((RabbitMQUserDto) obj).username);
         }
 
         return false;

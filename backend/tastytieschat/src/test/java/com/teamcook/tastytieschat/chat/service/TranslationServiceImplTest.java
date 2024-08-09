@@ -30,7 +30,7 @@ class TranslationServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        chatMessageRequestDTO = new ChatMessageRequestDto(1, longSentence);
+        chatMessageRequestDTO = new ChatMessageRequestDto("ssafy", longSentence);
         roomId = "66a9c5dd498fe728acb763f8";
     }
 
@@ -39,10 +39,10 @@ class TranslationServiceImplTest {
     void sendShortFileToSpeechFlowTest() throws Exception {
         long startTime = System.currentTimeMillis();
 
-        Map<String, Object> map = chatRoomService.getUserAndTranslatedLanguages(roomId, chatMessageRequestDTO.getUserId());
+        Map<String, Object> map = chatRoomService.getChatRoomInfoForChatMessage(roomId, chatMessageRequestDTO.getUsername());
         UserDto userDto = (UserDto) map.get("user");
 
-        ChatMessage chatMessage = ChatMessage.builder().type(MessageType.USER).chatRoomId(roomId).userNickname(userDto.getNickname()).originLanguage(userDto.getLanguage()).chatMessageRequestDto(chatMessageRequestDTO).build();
+        ChatMessage chatMessage = ChatMessage.builder().type(MessageType.USER).chatRoomId(roomId).username(chatMessageRequestDTO.getUsername()).originLanguage(userDto.getLanguage()).originMessage(chatMessageRequestDTO.getMessage()).build();
 
         Set<String> translatedLanguages = (Set<String>) map.get("translatedLanguages");
         translationService.translationChatMessage(chatMessage, translatedLanguages);
