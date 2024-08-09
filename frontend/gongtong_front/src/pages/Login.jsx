@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import useAuthStore from "../store/AuthStore";
 import { useNavigate } from "react-router-dom";
 import api from "../service/Api";
 import Cookies from "js-cookie";
+import { getFcmToken } from "../firebase/firebaseCloudMessaging";
 
 const Login = () => {
   const { login } = useAuthStore();
@@ -19,6 +20,12 @@ const Login = () => {
       [e.target.name]: e.target.value,
     });
   };
+
+  useEffect(() => {
+    if (Cookies.get("fcmToken") === undefined && Notification.permission === 'granted') {
+      getFcmToken();
+    }
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

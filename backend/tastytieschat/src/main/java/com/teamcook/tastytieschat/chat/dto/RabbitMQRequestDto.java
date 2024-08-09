@@ -11,7 +11,11 @@ public class RabbitMQRequestDto {
     private String imageUrl;
     private UserDto user;
 
-    public int getUserId() {
-        return user.getId();
+    public String getUsername() {
+        return user.getUsername();
+    }
+
+    public String getUserNickname() {
+        return user.getNickname();
     }
 }
