@@ -9,7 +9,7 @@ const ProfileButton = ({ image, type, size, onClick }) => {
       <img
         alt="프로필사진"
         src={image}
-        className={`${typeList[type]} ${size}`}
+        className={`m-1 ${typeList[type]} ${size}`}
         onClick={onClick}
       />
     </div>
