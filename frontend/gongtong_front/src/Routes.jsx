@@ -27,13 +27,8 @@ import ClassRegist from "./pages/ClassRegist";
 import ClassWaiting from "./pages/ClassWaiting";
 import LiveClass from "./pages/LiveClass";
 import AlbumPage from "./pages/AlbumPage";
-<<<<<<< HEAD
-import Ranking from "./pages/Ranking";
 import { Navigate, Route, Routes } from "react-router-dom";
-=======
-import { Route, Routes } from "react-router-dom";
 import ChatRoom from "./pages/ChatRoom";
->>>>>>> 4834be9a03a1397c2442434cb3f750b667577897
 
 const AppRoutes = () => {
   return (
@@ -71,12 +66,8 @@ const AppRoutes = () => {
       <Route path="/classwaiting/:id" element={<ClassWaiting />} />
       <Route path="/liveclass" element={<LiveClass />} />
       <Route path="/album" element={<AlbumPage />} />
-<<<<<<< HEAD
-      <Route path="/ranking" element={<Ranking />} />
-=======
       <Route path="/chatting" element={<ChatRoom />} />
 
->>>>>>> 4834be9a03a1397c2442434cb3f750b667577897
       {/* <Route path="/" element={< />} /> */}
     </Routes>
   );

@@ -11,29 +11,14 @@ import {
   requestPermission,
   onForegroundMessage,
 } from "./firebase/firebaseCloudMessaging";
-<<<<<<< HEAD
-import { getMessaging, getToken } from "firebase/messaging";
-import { app as firebaseApp } from "./firebase/firebase";
-=======
 import { getFcmToken } from "./firebase/firebaseCloudMessaging";
->>>>>>> 4834be9a03a1397c2442434cb3f750b667577897
 
 // FCM permission & token
 if (Notification.permission !== "granted") {
   requestPermission();
 } else {
   // Save FCM token
-<<<<<<< HEAD
-  getToken(getMessaging(firebaseApp), {
-    vapidKey: import.meta.env.VITE_FIREBASE_VAPID_KEY,
-  }).then((currentToken) => {
-    if (currentToken) {
-      document.cookie = `fcmToken=${currentToken}; path=/; SameSite=Lax`;
-    }
-  });
-=======
   getFcmToken();
->>>>>>> 4834be9a03a1397c2442434cb3f750b667577897
   onForegroundMessage();
 }
 

@@ -21,21 +21,12 @@ const Header = () => {
       <Link to="/">
         <img src={logo} alt="맛잇다로고" />
       </Link>
-<<<<<<< HEAD
-      <div>
-        {Cookies.get("accessToken") && <Link to="/album">앨범 |</Link>}
-        <Link to="">숏폼 |</Link> <Link to="/ranking">랭킹 |</Link>
-        <Link to="/class">쿠킹클래스 |</Link>
-        {!Cookies.get("accessToken") && <Link to="/signup">회원가입 |</Link>}
-        {Cookies.get("accessToken") && <Link to="">메신저 |</Link>}
-=======
       <div className="flex flex-row space-x-4 items-center mx-3">
         {Cookies.get("accessToken") && <Link to="/album">앨범</Link>}
         <Link to="">숏폼</Link> <Link to="">랭킹</Link>
         <Link to="/class">쿠킹클래스</Link>
         {!Cookies.get("accessToken") && <Link to="/signup">회원가입</Link>}
         {Cookies.get("accessToken") && <Link to="/chatting">메신저</Link>}
->>>>>>> 4834be9a03a1397c2442434cb3f750b667577897
         {Cookies.get("accessToken") ? (
           <button onClick={handleLogout}>로그아웃</button>
         ) : (
