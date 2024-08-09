@@ -46,8 +46,9 @@ const ClassWaiting = () => {
 
   const startPreview = async () => {
     if (selectedVideoDevice) {
+      console.log(isAudioActive, selectedAudioDevice.deviceId);
       const stream = await OV.getUserMedia({
-        audioSource: isAudioActive ? selectedAudioDevice : false,
+        audioSource: isAudioActive ? selectedAudioDevice.deviceId : false,
         videoSource: isVideoActive ? selectedVideoDevice.deviceId : false,
         resolution: "1280x720",
       });

@@ -6,8 +6,10 @@ const useVideoStore = create((set) => ({
 
   selectedAudioDevice: null,
   selectedVideoDevice: null,
-  setSelectedAudioDevice: (audioDevice) =>
-    set({ selectedAudioDevice: audioDevice }),
+  setSelectedAudioDevice: (audioDevice) => {
+    console.log("오디오 디바이스 변경 호출됨");
+    set({ selectedAudioDevice: audioDevice });
+  },
   setSelectedVideoDevice: (videoDevice) =>
     set({ selectedVideoDevice: videoDevice }),
 
