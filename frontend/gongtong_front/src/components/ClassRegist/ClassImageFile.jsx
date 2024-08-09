@@ -1,11 +1,10 @@
 import React, { useState } from "react";
-import "@styles/ClassRegist/ClassImageFile.css";
 
 const ClassImageFiles = ({ setFiles }) => {
   const [classImages, setClassImages] = useState([]);
 
-  const validExtensions = ["jpg", "jpeg", "png", "gif"];
-  const maxFileSize = 10 * 1024 * 1024; // 5MB
+  const validExtensions = ["jpg", "jpeg", "png"];
+  const maxFileSize = 10 * 1024 * 1024; // 10MB
 
   const handleAddImages = (e) => {
     const imagesLists = Array.from(e.target.files);
@@ -23,7 +22,7 @@ const ClassImageFiles = ({ setFiles }) => {
         return;
       }
       validFiles.push(file);
-      const currentImageUrl = URL.createObjectURL(file);
+      const currentImageUrl = URL.createObjectURL(file); // 생성
       imageUrlLists.push(currentImageUrl);
     });
 
@@ -38,14 +37,11 @@ const ClassImageFiles = ({ setFiles }) => {
   const handleDeleteImage = (id) => {
     const imageUrl = classImages[id];
     setClassImages(classImages.filter((_, index) => index !== id));
-    URL.revokeObjectURL(imageUrl);
+    URL.revokeObjectURL(imageUrl); // 소멸
   };
 
   return (
     <div className="regist-component-box">
-      <div className="title-box">
-        <label htmlFor="">완성사진</label>
-      </div>
       <div className="input-box">
         <div className="addImage">
           <label htmlFor="classImageInput" className="addButton">
@@ -57,18 +53,25 @@ const ClassImageFiles = ({ setFiles }) => {
               onChange={handleAddImages}
             />
           </label>
-          <div className="test">
+          <div className="flex gap-4 whitespace-nowrap">
             {classImages.map((image, id) => (
-              <div className="imageContainer" key={id}>
-                <img src={image} alt={`${image}-${id}`} className="image" />
+              <div className="relative inline-block" key={id}>
+                <img
+                  src={image}
+                  alt={`${image}-${id}`}
+                  className="w-28 mt-4 h-28 bg-cover"
+                />
                 <div
-                  className="deleteButton"
+                  className="absolute top-2 -right-2 bg-first rounded-3xl text-white px-2 py-0.5"
                   onClick={() => handleDeleteImage(id)}
                 >
-                  삭제
+                  X
                 </div>
               </div>
             ))}
+          </div>
+          <div className="text-sm text-gray-400 mt-1">
+            * 이미지 파일은 jpg, jpeg, png만 업로드 가능합니다.
           </div>
         </div>
       </div>

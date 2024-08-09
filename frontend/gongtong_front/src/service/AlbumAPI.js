@@ -1,13 +1,12 @@
 import api from "./Api";
 
 // 앨범 목록
-export const getAlbums = async (page, countryCode) => {
+export const getAlbums = async (page) => {
   try {
     const response = await api.get("/albums", {
       params: {
         page: page,
         size: 12,
-        countryCode: countryCode,
       },
     });
     return response.data.data.folderListDtoPage.content;

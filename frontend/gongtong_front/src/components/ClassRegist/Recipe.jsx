@@ -37,28 +37,48 @@ const Recipe = ({ onChange }) => {
 
   return (
     <div className="regist-component-box">
-      <div className="title-box">
-        <label htmlFor="">레시피</label>
-        <div>*단계별로 작성</div>
-      </div>
       <div className="input-box">
         {recipes.map((field, index) => (
-          <div key={index}>
-            {index + 1}
+          <div key={index} className="flex items-center my-4">
+            <span className="mr-2 text-xl">{index + 1}.</span>
             <input
               type="text"
               name="description"
               value={field.description}
               onChange={(e) => handleInputChange(index, e)}
+              className="w-full border p-2 rounded"
+              placeholder="레시피를 작성해주세요"
             />
-            <button type="button" onClick={() => handleRemoveFields(index)}>
-              X
-            </button>
+            <div className="ml-6">
+              <button type="button" onClick={() => handleRemoveFields(index)}>
+                ✖
+              </button>
+            </div>
           </div>
         ))}
-        <button type="button" onClick={handleAddFields}>
-          추가
-        </button>
+        <div className="text-right">
+          <button type="button" onClick={handleAddFields}>
+            <svg
+              width="37"
+              height="36"
+              viewBox="0 0 37 36"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <ellipse
+                cx="18.5"
+                cy="17.6429"
+                rx="18.5"
+                ry="17.6429"
+                fill="#005246"
+              />
+              <path
+                d="M17.209 19.0138H9.45898V16.5501H17.209V9.15918H19.7923V16.5501H27.5423V19.0138H19.7923V26.4047H17.209V19.0138Z"
+                fill="white"
+              />
+            </svg>
+          </button>
+        </div>
       </div>
     </div>
   );
