@@ -17,13 +17,8 @@ const MyPage = () => {
   }
 
   return (
-    <div className="flex">
-      <div>
-        <Category informations={informations} />
-      </div>
-      <div>
-        <Outlet />
-      </div>
+    <div>
+      <Category informations={informations} />
     </div>
   );
 };
