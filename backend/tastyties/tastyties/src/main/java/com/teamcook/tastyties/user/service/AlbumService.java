@@ -70,8 +70,16 @@ public class AlbumService {
     public String registerFolder(Album album, List<MultipartFile> images,
                                  FolderRegisterDto registerDto) {
 
-        Folder folder = new Folder(album, registerDto.getCookingClassUuid(),
-                registerDto.getFolderName(), 4, registerDto.getCountryCode());
+        Folder folder = folderRepository.findByCookingClassUuid(registerDto.getCookingClassUuid());
+
+        if (folder != null) {
+            folder.updateFolder(album, registerDto.getCookingClassUuid(),
+                    registerDto.getFolderName(), folder.getMaxPhotoCount(), registerDto.getCountryCode());
+        } else {
+            folder = new Folder(album, registerDto.getCookingClassUuid(),
+                    registerDto.getFolderName(), 4, registerDto.getCountryCode());
+        }
+
         List<String> urls;
         try {
             urls = s3Service.uploadImages(images).stream()
