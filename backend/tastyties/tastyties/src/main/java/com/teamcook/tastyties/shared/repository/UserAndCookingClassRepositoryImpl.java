@@ -252,7 +252,7 @@ public class UserAndCookingClassRepositoryImpl implements UserAndCookingClassCus
                 .join(userAndCookingClass.user, user)
                 .join(userAndCookingClass.cookingClass, cookingClass)
                 .leftJoin(country).on(cookingClass.countryCode.eq(country.alpha2))
-                .where(cookingClass.uuid.eq(uuid))
+                .where(cookingClass.uuid.eq(uuid), userAndCookingClass.cookingClassReview.isNotNull())
                 .orderBy(userAndCookingClass.cookingClassReviewCreateTime.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -279,7 +279,7 @@ public class UserAndCookingClassRepositoryImpl implements UserAndCookingClassCus
                 .join(userAndCookingClass.cookingClass, cookingClass)
                 .join(cookingClass.host, host)
                 .leftJoin(country).on(cookingClass.countryCode.eq(country.alpha2))
-                .where(host.userId.eq(hostId))
+                .where(host.userId.eq(hostId), userAndCookingClass.cookingClassReview.isNotNull())
                 .orderBy(userAndCookingClass.cookingClassReviewCreateTime.desc())
                 .limit(3)
                 .fetch();
