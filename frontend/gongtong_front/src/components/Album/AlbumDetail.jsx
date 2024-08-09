@@ -5,7 +5,8 @@ import useAlbumStore from "./../../store/AlbumStore";
 import { patchAlbumImagesOrder } from "./../../service/AlbumAPI";
 
 const AlbumDetail = ({ open, setOpen, folderId }) => {
-  const { albumDetailImageLists, fetchAlbumDetailImageLists } = useAlbumStore();
+  const { albumDetailImageLists, fetchAlbumDetailImageLists, fetchAlbumLists } =
+    useAlbumStore();
   const [imageList, setImageList] = useState([]);
 
   useEffect(() => {
@@ -50,7 +51,7 @@ const AlbumDetail = ({ open, setOpen, folderId }) => {
   };
   const handleSave = () => {
     patchAlbumImagesOrder(folderId, formatImageList(imageList));
-    fetchAlbumDetailImageLists(folderId);
+    location.reload();
   };
 
   return (

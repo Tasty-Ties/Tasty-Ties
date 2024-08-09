@@ -43,7 +43,7 @@ export default {
         },
       },
       fontFamily: {
-        test: ["Cafe24Ssurround"],
+        ibm: ["IBM Plex Sans KR"],
       },
       screens: {
         sm: { max: "480px" },

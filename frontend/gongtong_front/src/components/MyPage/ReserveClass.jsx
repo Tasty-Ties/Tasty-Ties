@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import useMyPageStore from "../../store/MyPageStore";
-import Class from "../../common/components/Class";
+import ClassForm from "../../common/components/ClassForm";
 
 const ReserveClass = () => {
   const reserveClasses = useMyPageStore((state) => state.reserveClasses);
@@ -21,7 +21,7 @@ const ReserveClass = () => {
     <div>
       <p>예약한 클래스</p>
       {reserveClasses.map((reserveClasses, index) => (
-        <Class key={index} classInfo={reserveClasses} />
+        <ClassForm key={index} classInfo={reserveClasses} />
       ))}
     </div>
   );

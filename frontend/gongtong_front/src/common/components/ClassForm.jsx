@@ -35,19 +35,19 @@ const Class = ({ classInfo }) => {
   let minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
   let seconds = Math.floor((diff % (1000 * 60)) / 1000);
 
-  let timeRemaing = "";
+  let timeRemaining = "";
   if (days > 0) {
-    timeRemaing += `D-${days}`;
+    timeRemaining += `D-${days}`;
   } else if (hours > 0) {
-    timeRemaing += `${hours}:${minutes < 10 ? `0${minutes}` : minutes}`;
+    timeRemaining += `${hours}:${minutes < 10 ? `0${minutes}` : minutes}`;
   } else {
-    timeRemaing += "입장";
+    timeRemaining += "입장";
   }
 
   return (
     <div className="flex">
       <div>
-        <img src={classInfo.mainImage} alt="클래스사진" />
+        <img src={classInfo.mainImage} alt="클래스사진" className="w-60 h-40" />
       </div>
       <div>
         <h3>{classInfo.title}</h3>
@@ -59,20 +59,24 @@ const Class = ({ classInfo }) => {
           상세 보기
         </button>
       </div>
-      <Button
-        text={timeRemaing}
-        type={timeRemaing === "입장" ? "orange-sqr" : "gray-sqr"}
-        onClick={() =>
-          timeRemaing === "입장"
-            ? nav(`/classwaiting/${classInfo.uuid}`, {
-                state: {
-                  classData: classInfo,
-                  isHost: location.pathname === "/mypage/teach" ? true : false,
-                },
-              })
-            : ""
-        }
-      />
+      <div>
+        <Button
+          text={timeRemaining}
+          type={timeRemaining === "입장" ? "orange-sqr" : "gray-sqr"}
+          onClick={() =>
+            timeRemaining === "입장"
+              ? nav(`/classwaiting/${classInfo.uuid}`, {
+                  state: {
+                    classData: classInfo,
+                    isHost:
+                      location.pathname === "/mypage/teach" ? true : false,
+                  },
+                })
+              : ""
+          }
+          // className="size-8"
+        />
+      </div>
     </div>
   );
 };

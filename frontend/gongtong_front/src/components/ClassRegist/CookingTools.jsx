@@ -7,12 +7,11 @@ const CookingTools = ({ cookingTools, setCookingTools }) => {
     if ((e.key === "Enter" || e.keyCode === 13) && inputValue.trim()) {
       setCookingTools([...cookingTools, inputValue.trim()]);
       setInputValue("");
-      e.preventDefault(); // 엔터가 form태그 제출하는 것을 막기 위함
+      e.preventDefault();
     }
   };
   return (
     <div className="regist-component-box">
-      <div className="title-box">조리도구</div>
       <div className="input-box">
         <div>
           <input
@@ -21,11 +20,17 @@ const CookingTools = ({ cookingTools, setCookingTools }) => {
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="조리 도구를 입력해주세요"
+            placeholder="조리 도구를 입력하고 Enter키를 눌러주세요"
+            className="w-full border p-2 rounded"
           />
-          <div>
+          <div className="mt-3">
             {cookingTools.map((tool, index) => (
-              <span key={index}>{tool}</span>
+              <span
+                key={index}
+                className="mr-3 rounded-3xl px-2 py-1 bg-second-600 text-white"
+              >
+                {tool}
+              </span>
             ))}
           </div>
         </div>

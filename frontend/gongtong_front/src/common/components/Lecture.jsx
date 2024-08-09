@@ -1,4 +1,5 @@
 import { useParams } from "react-router-dom";
+import CountryFlags from "./CountryFlags";
 
 const Lecture = ({ classInfo }) => {
   const { username } = useParams();
@@ -18,15 +19,25 @@ const Lecture = ({ classInfo }) => {
 
   return (
     <div className="flex flex-col">
-      <p>
-        <img src={classInfo.mainImage} alt="클래스메인사진" />
-        {classInfo.classCountry.alpha2}
-      </p>
-      <p>{classInfo.title}</p>
-      <div className="flex">
-        <p>
-          강의 일자:{date} {startTime}~{endTime}
-        </p>
+      <div className="relative">
+        <img
+          src={classInfo.mainImage}
+          alt="클래스메인사진"
+          className="w-60 h-40 rounded-xl"
+        />
+        <span className="absolute right-1 top-1">
+          <CountryFlags
+            countryCode={classInfo.classCountry.alpha2}
+            size="w-9"
+          />
+        </span>
+      </div>
+
+      <div className="font-bold text-base mt-2">{classInfo.title}</div>
+      <div className="flex space-x-3 text-sm">
+        <div>
+          {date} {startTime}~{endTime}
+        </div>
         <p>{classInfo.hostName}</p>
       </div>
     </div>

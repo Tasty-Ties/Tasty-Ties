@@ -40,36 +40,22 @@ const ClassImageCarousel = ({ classDetail }) => {
     slidesToScroll: 1,
     prevArrow: <CustomPrevArrow />,
     nextArrow: <CustomNextArrow />,
-    adaptiveHeight: true,
-    responsive: [
-      {
-        breakpoint: 1024,
-        settings: {
-          slidesToShow: 1,
-          slidesToScroll: 1,
-        },
-      },
-    ],
   };
 
   return (
-    <div className="container mx-auto relative mb-8">
-      <div className="overflow-hidden">
-        <Slider {...settings} className="-mx-2">
-          {classDetail.imageUrls &&
-            classDetail.imageUrls.map((imageUrl, index) => (
-              <div key={index} className="px-2">
-                <div className="aspect-w-16 aspect-h-9">
-                  <img
-                    src={imageUrl}
-                    alt={`Slide ${index + 1}`}
-                    className="w-full h-full object-cover rounded-lg"
-                  />
-                </div>
-              </div>
-            ))}
-        </Slider>
-      </div>
+    <div className="container mx-auto relative w-full h-3/4 rounded-lg">
+      <Slider {...settings}>
+        {classDetail.imageUrls &&
+          classDetail.imageUrls.map((imageUrl, index) => (
+            <div key={index} className="bg-contain">
+              <img
+                src={imageUrl}
+                alt={`Slide ${index + 1}`}
+                className="w-full h-96 object-contain rounded-lg"
+              />
+            </div>
+          ))}
+      </Slider>
     </div>
   );
 };
