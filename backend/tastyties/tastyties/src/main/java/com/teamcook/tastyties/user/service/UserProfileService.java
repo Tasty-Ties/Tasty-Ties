@@ -79,7 +79,8 @@ public class UserProfileService {
                 ,uc.getCountry().getCountryImageUrl()))
                 .toList();
 
-        return new UserProfileDto(user.getUserId(), user.getProfileImageUrl(), user.getNickname(), user.getDescription(),
+        return new UserProfileDto(user.getUserId(), user.getProfileImageUrl(),
+                user.getUsername(), user.getNickname(), user.getDescription(),
                 new CountryResponseDto(country.getAlpha2(), country.getEnglishName(),
                         country.getKoreanName(), country.getCountryImageUrl()),
                 collectedFlags,
