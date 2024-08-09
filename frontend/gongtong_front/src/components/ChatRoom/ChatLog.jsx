@@ -4,6 +4,7 @@ import axios from "axios";
 import ChatMessage from "./ChatMessage";
 import Cookies from "js-cookie";
 import AttendeeList from "./AttendeeList";
+import { convertFieldResponseIntoMuiTextFieldProps } from "@mui/x-date-pickers/internals";
 
 // import "./../../styles/LiveClass/LiveClass.css";
 
@@ -14,7 +15,7 @@ const ChatLog = ({
   chatRoomId,
   chatRoomTitle,
   stompClient,
-  userId,
+  username,
   nickname,
   userLang,
 }) => {
@@ -22,17 +23,15 @@ const ChatLog = ({
   const [originalMessage, setOriginalMessage] = useState("");
 
   const chatInputRef = useRef();
-  const topScrollRef = useRef();
   const scrollBoxRef = useRef();
   const endScrollRef = useRef();
   const chatLogIndexRef = useRef(0);
-  //   const [chatLogIndex, setChatLogIndex] = useState(0);
+
   const [messageLog, setMessageLog] = useState([]);
   const [previousLog, setPreviousLog] = useState([]);
   const [receivedType, setReceivedType] = useState([]);
   const [open, setOpen] = useState(false);
   const [isTranslatorOn, setIsTranslatorOn] = useState(true);
-  const [usersList, setUsersList] = useState();
   const [userProfileList, setUserProfileList] = useState({});
 
   useEffect(() => {
@@ -51,21 +50,15 @@ const ChatLog = ({
   }, [chatRoomId]);
 
   useEffect(() => {
-    console.log("스크롤을 맨 마지막으로 이동합니다.");
     endScrollRef.current.scrollIntoView();
   }, [chatRoomId, previousLog, messageLog]);
 
-  useEffect(() => {
-    userProfileSetting();
-  }, [previousLog]);
-
-  console.log("유저의 프로필을 정리했습니다. : ", userProfileList);
   const subscribeChatRoom = async () => {
     await stompClient.current.subscribe(
       `/sub/chat/rooms/${chatRoomId}`,
       async (message) => {
         receivedMessage(JSON.parse(message.body));
-        console.log(JSON.parse(message.body));
+        console.log("새롭게 받아온 메시지입니다.", JSON.parse(message.body));
       }
     );
     console.log(`${chatRoomTitle} 채팅방 구독이 활성화되었습니다.`);
@@ -88,7 +81,21 @@ const ChatLog = ({
       );
       console.log("기존 채팅 목록", response.data.data);
       setPreviousLog((prev) => [...prev, ...response.data.data.chatMessages]);
-      setUsersList(response.data.data.users);
+
+      response.data.data.users.forEach((user) => {
+        console.log(user);
+        setUserProfileList((prev) => ({
+          ...prev,
+          [user.username]: [
+            user.nickname,
+            user.profileImageUrl,
+            user.type,
+            user.username,
+          ],
+        }));
+      });
+
+      console.log("user의 프로필을 정리했습니다.", userProfileList);
     } catch (error) {
       console.error;
       return;
@@ -96,8 +103,9 @@ const ChatLog = ({
   };
 
   const receivedMessage = (chatMessage) => {
+    console.log(chatMessage.username, username);
     if (chatMessage.type === "USER") {
-      if (chatMessage.userId === userId) {
+      if (chatMessage.username === username) {
         setReceivedType("ME");
       } else {
         setReceivedType("USER");
@@ -105,23 +113,17 @@ const ChatLog = ({
     } else {
       setReceivedType("HOST");
     }
-    setUserNickname(chatMessage.userNickname);
+    console.log(JSON.stringify(userProfileList));
+    setUserNickname(userProfileList[chatMessage.username]?.[0]);
     setOriginalMessage(chatMessage.messages);
   };
 
   const sendMessage = (e) => {
     e.preventDefault();
 
-    const messageObject = {
-      userId: parseInt(userId),
-      message: chatInputRef.current.value,
-    };
-
-    console.log(JSON.stringify(messageObject));
-
     stompClient.current.publish({
       destination: `/pub/chat/text/rooms/${chatRoomId}`,
-      body: JSON.stringify(messageObject),
+      body: chatInputRef.current.value,
     });
 
     chatInputRef.current.value = "";
@@ -140,20 +142,14 @@ const ChatLog = ({
     console.log("새롭게 저장된 메시지 목록", messageLog);
   }, [originalMessage]);
 
-  const userProfileSetting = () => {
-    if (!usersList) return;
-    usersList.forEach((user) => {
-      setUserProfileList((prev) => ({
-        ...prev,
-        [user.username]: user.profileImageUrl,
-      }));
-    });
-  };
-
   return (
     <div className="relative flex flex-col h-full">
       {open ? (
-        <AttendeeList setOpen={setOpen} nickname={nickname} users={usersList} />
+        <AttendeeList
+          setOpen={setOpen}
+          nickname={nickname}
+          users={userProfileList}
+        />
       ) : (
         <></>
       )}
@@ -223,13 +219,13 @@ const ChatLog = ({
                   <ChatMessage
                     type={
                       previous.type === "USER"
-                        ? previous.userId === userId
+                        ? previous.username === username
                           ? "ME"
                           : previous.userType
                         : previous.type
                     }
-                    imgSrc="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRF1IwK6-SxM83UpFVY6WtUZxXx-phss_gAUfdKbkTfau6VWVkt"
-                    nickname={previous.userNickname}
+                    imgSrc={userProfileList?.[previous.username]?.[1]}
+                    nickname={userProfileList?.[previous.username]?.[0]}
                     message={
                       isTranslatorOn && previous.type !== "SYSTEM"
                         ? previous.messages?.[userLang]
@@ -254,7 +250,6 @@ const ChatLog = ({
                     nickname={message.userNickname}
                     message={message.translation}
                     chatTime={new Date()}
-                    usersList={usersList}
                   />
                 }
               </div>

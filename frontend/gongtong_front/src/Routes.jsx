@@ -27,7 +27,7 @@ import ClassRegist from "./pages/ClassRegist";
 import ClassWaiting from "./pages/ClassWaiting";
 import LiveClass from "./pages/LiveClass";
 import AlbumPage from "./pages/AlbumPage";
-import { Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 import ChatRoom from "./pages/ChatRoom";
 
 const AppRoutes = () => {
@@ -55,7 +55,8 @@ const AppRoutes = () => {
       </Route>
       <Route path="/class" element={<ClassList />} />
       <Route path="/class/:id" element={<ClassDetail />}>
-        <Route path="" element={<ClassDescription />} />
+        <Route path="" element={<Navigate to="description" />} />
+        <Route path="description" element={<ClassDescription />} />
         <Route path="ingredient" element={<ClassIngredient />} />
         <Route path="cookingTools" element={<ClassCookingTools />} />
         <Route path="recipes" element={<ClassRecipes />} />

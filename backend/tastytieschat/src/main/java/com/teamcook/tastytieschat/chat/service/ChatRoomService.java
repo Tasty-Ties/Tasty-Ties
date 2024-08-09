@@ -7,6 +7,6 @@ import java.util.List;
 import java.util.Map;
 
 public interface ChatRoomService {
-    Map<String, Object> getUserAndTranslatedLanguages(String chatRoomId, int userId);
-    List<ChatRoomDto> getChatRooms(int userId);
+    Map<String, Object> getChatRoomInfoForChatMessage(String chatRoomId, String username);
+    List<ChatRoomDto> getChatRooms(String username);
 }

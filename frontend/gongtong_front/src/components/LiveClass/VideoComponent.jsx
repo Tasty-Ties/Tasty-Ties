@@ -2,7 +2,6 @@ const MAIN_SERVER_URL = import.meta.env.VITE_MAIN_SERVER;
 const CHAT_SERVER_URL = import.meta.env.VITE_CHAT_SERVER;
 
 import { useEffect, useState, useRef, useCallback } from "react";
-import { useLocation } from "react-router-dom";
 import axios from "axios";
 import Cookies from "js-cookie";
 
@@ -11,8 +10,8 @@ import StreamComponent from "./StreamComponent";
 import ToolbarComponent from "./ToolbarComponent";
 import UserModel from "./UserModel";
 
-import { Hands } from "@mediapipe/hands";
-import { Camera } from "@mediapipe/camera_utils";
+import { FilesetResolver, GestureRecognizer } from "@mediapipe/tasks-vision";
+
 import { Client } from "@stomp/stompjs";
 import MediaDeviceSetting from "./MediaDeviceSetting";
 import useMyPageStore from "../../store/MyPageStore";
@@ -25,11 +24,8 @@ import {
   DialogPanel,
   DialogTitle,
 } from "@headlessui/react";
-import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
 
 import "./../../styles/LiveClass/LiveClass.css";
-import { Stream } from "openvidu-browser";
-import Button from "../../common/components/Button";
 import IconButton from "../../common/components/IconButton";
 
 const localUserSetting = new UserModel();
@@ -60,6 +56,9 @@ const VideoComponent = ({ isHost, title, hostName }) => {
 
   const [hostUser, setHostUser] = useState(null);
   const [partUser, setPartUser] = useState();
+
+  const videoRef = useRef(null);
+  const canvasRef = useRef(null);
 
   useEffect(() => {
     console.log(subscribers);
@@ -97,8 +96,6 @@ const VideoComponent = ({ isHost, title, hostName }) => {
   const isRecording = useRef(false);
   const raiseTimeout = useRef(null);
   const lowerTimeout = useRef(null);
-  const hands = useRef(null);
-  const camera = useRef(null);
   const audioStream = useRef(null);
 
   //채팅 관련
@@ -107,7 +104,8 @@ const VideoComponent = ({ isHost, title, hostName }) => {
   useEffect(() => {
     window.addEventListener("beforeunload", onbeforeunload);
     joinSession();
-    initializeMediapipe();
+    // initializeMediapipe();
+    initializeGestureRecognizer();
 
     stompClient.current = new Client({
       brokerURL: CHAT_SERVER_URL,
@@ -173,32 +171,46 @@ const VideoComponent = ({ isHost, title, hostName }) => {
   };
 
   const connectWebCam = async (session) => {
-    const publisher = OV.initPublisher(undefined, {
-      audioSource: selectedAudioDevice,
-      videoSource: selectedVideoDevice.deviceId,
-      publishAudio: isAudioActive,
-      publishVideo: isVideoActive,
-      resolution: "1280x720",
-      frameRate: 30,
-      insertMode: "APPEND",
-    });
-    currentPublisher.current = publisher;
-    if (session.capabilities.publish) {
-      publisher.on("accessAllowed", () => {
-        session.publish(publisher).then(() => {
-          updateSubscribers();
-          localUserAccessAllowed.current = true;
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+            audio: true, // 여기서 오디오 스트림도 가져옵니다.
+            video: { deviceId: selectedVideoDevice.deviceId },
         });
-      });
-    }
+        
+        const publisher = OV.initPublisher(undefined, {
+            audioSource: stream.getAudioTracks()[0], // 오디오 트랙을 사용합니다.
+            videoSource: stream.getVideoTracks()[0],
+            publishAudio: isAudioActive,
+            publishVideo: isVideoActive,
+            resolution: "1280x720",
+            frameRate: 30,
+            insertMode: "APPEND",
+        });
+        
+        currentPublisher.current = publisher;
+        audioStream.current = stream; // 오디오 스트림을 저장합니다.
 
-    localUserSetting.setNickname(userInfo.nickname);
-    localUserSetting.setConnectionId(session.connection.connectionId);
-    localUserSetting.setScreenShareActive(false);
-    localUserSetting.setStreamManager(publisher);
-    setLocalUser(localUserSetting);
-    subscribeToUserChanged(session);
-    subscribeToStreamDestroyed(session);
+        if (session.capabilities.publish) {
+            publisher.on("accessAllowed", () => {
+                session.publish(publisher).then(() => {
+                    updateSubscribers();
+                    localUserAccessAllowed.current = true;
+                });
+            });
+        }
+
+        localUserSetting.setNickname(userInfo.nickname);
+        localUserSetting.setConnectionId(session.connection.connectionId);
+        localUserSetting.setScreenShareActive(false);
+        localUserSetting.setStreamManager(publisher);
+        setLocalUser(localUserSetting);
+        subscribeToUserChanged(session);
+        subscribeToStreamDestroyed(session);
+
+    } catch (error) {
+        console.error("Error accessing media devices:", error);
+        alert("오디오 또는 비디오 장치에 접근할 수 없습니다: " + error.message);
+    }
   };
 
   const subscribeToUserChanged = (session) => {
@@ -315,90 +327,140 @@ const VideoComponent = ({ isHost, title, hostName }) => {
     return response.data.data;
   }, []);
 
-  //미디어파이프 관련
-  const initializeMediapipe = () => {
-    const videoElement = document.querySelector(".input_video");
+  //GestureRecognizer
+  const initializeGestureRecognizer = async () => {
+    const videoElement = videoRef.current;
+    videoElement.style.display = "block"; // 비디오를 화면에 표시
+    videoElement.style.position = "absolute"; //화면 밖으로
+    videoElement.style.top = "-9999px";
+    videoElement.style.left = "-9999px";
 
+    // 카메라 스트림을 가져와서 비디오 엘리먼트에 연결
     navigator.mediaDevices
-      .getUserMedia({ audio: true, video: true })
+      .getUserMedia({
+        video: true,
+        audio: false,
+      })
       .then((stream) => {
         videoElement.srcObject = stream;
         videoElement.play();
-        audioStream.current = stream;
       })
       .catch((error) => {
-        console.error("Error accessing the camera: ", error);
+        console.error("카메라 접근 오류:", error);
       });
 
-    hands.current = new Hands({
-      locateFile: (file) =>
-        `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`,
-    });
+    try {
+      const vision = await FilesetResolver.forVisionTasks(
+        "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/wasm"
+      );
 
-    hands.current.setOptions({
-      maxNumHands: 1,
-      modelComplexity: 1,
-      minDetectionConfidence: 0.7,
-      minTrackingConfidence: 0.7,
-    });
+      const gestureRecognizer = await GestureRecognizer.createFromModelPath(
+        vision,
+        "https://storage.googleapis.com/mediapipe-models/gesture_recognizer/gesture_recognizer/float16/1/gesture_recognizer.task"
+      );
 
-    hands.current.onResults(onResults);
+      if (!gestureRecognizer) {
+        console.error("Gesture Recognizer 초기화 실패");
+        return;
+      }
 
-    camera.current = new Camera(videoElement, {
-      onFrame: async () => {
-        await hands.current.send({ image: videoElement });
-      },
-      width: 1280,
-      height: 720,
-    });
+      // Running mode를 video로 설정
+      await gestureRecognizer.setOptions({ runningMode: "video" });
 
-    camera.current.start();
+      // console.log("Gesture Recognizer 초기화 성공");
+      console.log("videoElement.readyState " + videoElement.readyState);
+      console.log("외안되?");
+
+      if (videoElement) {
+        console.log("비디오 엘리먼트 존재 확인:", videoElement);
+
+        //loadedmetadata, loadeddata
+        // videoElement.addEventListener("canplay", () => {
+        //   console.log("렌더 루프 시작");
+        //   renderLoop(videoElement, gestureRecognizer);
+        // });
+
+        if (videoElement.readyState >= 4) {
+          console.log("렌더 루프 시작");
+          renderLoop(videoElement, gestureRecognizer);
+        }
+      } else {
+        console.error("비디오 엘리먼트를 찾을 수 없음");
+      }
+    } catch (error) {
+      console.error("Gesture Recognizer 초기화 중 오류 발생:", error);
+    }
   };
 
-  const onResults = (results) => {
-    if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
-      for (const landmarks of results.multiHandLandmarks) {
-        const wrist = landmarks[0]; // 손목 위치
-        const indexFingerTip = landmarks[8]; // 검지 손가락 끝 위치
-        const middleFingerTip = landmarks[12]; // 중지 손가락 끝 위치
+  let lastVideoTime = -1;
 
-        // 손목보다 손가락 끝이 높으면 손을 든 것으로 간주 (y값이 작을수록 더 높음)
-        if (
-          indexFingerTip.y < wrist.y &&
-          middleFingerTip.y < wrist.y &&
-          isHandOpen(landmarks)
-        ) {
-          console.log("손을 들었음");
-          if (!isRecording.current && !raiseTimeout.current) {
-            // 손이 올라갔을 때 타이머
-            console.log("2초 동안 손 들고 있으면, 이후 녹화 시작");
-            raiseTimeout.current = setTimeout(() => {
-              startRecording();
-              raiseTimeout.current = null;
-            }, 2000);
-          }
-          if (lowerTimeout.current) {
-            // 손이 내려갔을 때 타이머 초기화
-            clearTimeout(lowerTimeout.current);
-            lowerTimeout.current = null;
-          }
-        } else {
-          if (raiseTimeout.current) {
-            // 손이 2초 동안 들리지 않으면 타이머 취소
-            console.log("녹화 취소");
-            clearTimeout(raiseTimeout.current);
+  const renderLoop = (videoElement, gestureRecognizer) => {
+    // 현재 비디오 타임스탬프를 확인하여 이미 처리된 프레임인지 확인
+    if (videoElement.currentTime !== lastVideoTime) {
+      const gestureRecognitionResult = gestureRecognizer.recognizeForVideo(
+        videoElement,
+        Date.now()
+      );
+
+      // 결과를 처리하는 함수 호출
+      // processResult(gestureRecognitionResult);
+      processVideoFrame(videoElement, gestureRecognizer);
+
+      // 타임스탬프 업데이트
+      lastVideoTime = videoElement.currentTime;
+    }
+
+    // 다음 프레임을 처리하도록 루프를 계속 실행
+    requestAnimationFrame(() => {
+      renderLoop(videoElement, gestureRecognizer);
+    });
+  };
+
+  const processVideoFrame = async (videoElement, gestureRecognizer) => {
+    const results = await gestureRecognizer.recognizeForVideo(
+      videoElement,
+      Date.now()
+    );
+
+    onGestureResults(results);
+    requestAnimationFrame(() => {
+      processVideoFrame(videoElement, gestureRecognizer);
+    });
+  };
+
+  const onGestureResults = (results) => {
+    if (results.gestures && results.gestures.length > 0) {
+      const gesture = results.gestures[0][0].categoryName; // 가장 높은 확률의 제스처
+
+      if (gesture === "Open_Palm") {
+        console.log("손을 들었음");
+        if (!isRecording.current && !raiseTimeout.current) {
+          console.log("1초 동안 손 들고 있으면, 이후 녹화 시작");
+          raiseTimeout.current = setTimeout(() => {
+            startRecording();
             raiseTimeout.current = null;
-          }
+          }, 1000);
+        }
+        if (lowerTimeout.current) {
+          clearTimeout(lowerTimeout.current);
+          lowerTimeout.current = null;
+        }
+      } else {
+        // 손을 내린 상태 인식 (주먹을 쥔 제스처로 가정)
+        if (raiseTimeout.current) {
+          console.log("녹화 취소");
+          clearTimeout(raiseTimeout.current);
+          raiseTimeout.current = null;
         }
       }
     } else {
       if (isRecording.current) {
         if (!lowerTimeout.current) {
-          console.log("2초 동안 손 내리고 있으면, 이후 녹화 종료");
+          console.log("1초 동안 손 내리고 있으면, 이후 녹화 종료");
           lowerTimeout.current = setTimeout(() => {
             stopRecording();
             lowerTimeout.current = null;
-          }, 2000);
+          }, 1000);
         }
       } else {
         if (raiseTimeout.current) {
@@ -407,26 +469,6 @@ const VideoComponent = ({ isHost, title, hostName }) => {
         }
       }
     }
-  };
-
-  const isHandOpen = (landmarks) => {
-    const thumbTip = landmarks[4];
-    const indexFingerTip = landmarks[8];
-    const pinkyTip = landmarks[20];
-
-    const thumbIndexDistance = Math.sqrt(
-      Math.pow(thumbTip.x - indexFingerTip.x, 2) +
-        Math.pow(thumbTip.y - indexFingerTip.y, 2) +
-        Math.pow(thumbTip.z - indexFingerTip.z, 2)
-    );
-
-    const thumbPinkyDistance = Math.sqrt(
-      Math.pow(thumbTip.x - pinkyTip.x, 2) +
-        Math.pow(thumbTip.y - pinkyTip.y, 2) +
-        Math.pow(thumbTip.z - pinkyTip.z, 2)
-    );
-
-    return thumbIndexDistance > 0.1 && thumbPinkyDistance > 0.1;
   };
 
   const startRecording = () => {
@@ -482,6 +524,7 @@ const VideoComponent = ({ isHost, title, hostName }) => {
   };
 
   const stopRecording = () => {
+    console.log("녹화 중지 함수 들어옴");
     isRecording.current = false;
     if (mediaRecorder.current) {
       mediaRecorder.current.stop();
@@ -538,8 +581,16 @@ const VideoComponent = ({ isHost, title, hostName }) => {
   };
 
   useEffect(() => {
-    setVideoClassName(displaySetting(displayMode));
-  }, [isChatOpen, isPeopleListOpen]);
+    return () => {
+        if (raiseTimeout.current) {
+            clearTimeout(raiseTimeout.current);
+        }
+        if (lowerTimeout.current) {
+            clearTimeout(lowerTimeout.current);
+        }
+    };
+}, []);
+
 
   const displayChange = () => {
     const newMode = (displayMode + 1) % 3;
@@ -557,8 +608,6 @@ const VideoComponent = ({ isHost, title, hostName }) => {
 
   const liveClassImage = useVideoStore((state) => state.liveClassImage);
   const setLiveClassImage = useVideoStore((state) => state.setLiveClassImage);
-
-  const canvasRef = useRef();
 
   const takePhoto = (e) => {
     if (
@@ -772,7 +821,7 @@ const VideoComponent = ({ isHost, title, hostName }) => {
                 ))}
             </div>
           )}
-          {isChatOpen && <ChatComponent />}
+          {isChatOpen && <ChatComponent stompClient={stompClient} />}
           {isPeopleListOpen && <PeopleListComponent />}
         </div>
 
@@ -787,8 +836,8 @@ const VideoComponent = ({ isHost, title, hostName }) => {
           />
         </div>
       </div>
-      <video className="input_video" style={{ display: "none" }}></video>
-      <canvas ref={canvasRef} style={{ display: "none" }}></canvas>
+      <video ref={videoRef} className="input_video" style={{ display: "none" }}></video>
+        <canvas ref={canvasRef} style={{ display: "none" }}></canvas>
     </>
   );
 };

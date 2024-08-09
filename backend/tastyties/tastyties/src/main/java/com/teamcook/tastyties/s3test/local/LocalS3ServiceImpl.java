@@ -24,11 +24,13 @@ public class LocalS3ServiceImpl implements S3Service {
 
     private final Path imageStorageLocation;
     private final Path videoStorageLocation;
-
+    private final String baseUrl;
     public LocalS3ServiceImpl(@Value("${file.upload-image-dir}") String imageUploadDir,
-                              @Value("${file.upload-video-dir}") String videoUploadDir) {
+                              @Value("${file.upload-video-dir}") String videoUploadDir,
+                              @Value("${file.base-url}") String baseUrl) {
         this.imageStorageLocation = Paths.get(imageUploadDir).toAbsolutePath().normalize();
         this.videoStorageLocation = Paths.get(videoUploadDir).toAbsolutePath().normalize();
+        this.baseUrl = baseUrl;
         try {
             Files.createDirectories(this.imageStorageLocation);
         } catch (Exception ex) {
@@ -43,10 +45,10 @@ public class LocalS3ServiceImpl implements S3Service {
         }
         String originName = image.getOriginalFilename();
         String storedImagePath = uploadImageToLocal(image);
-
+        String imageUrl = baseUrl + "/local/images/" + Paths.get(storedImagePath).getFileName().toString();
         return Image.builder() //이미지에 대한 정보를 담아서 반환
                 .originName(originName)
-                .storedImagePath(storedImagePath)
+                .storedImagePath(imageUrl)
                 .build();
     }
 
@@ -84,10 +86,10 @@ public class LocalS3ServiceImpl implements S3Service {
         }
         String originName = video.getOriginalFilename();
         String storedVideoPath = uploadFileToLocal(video);
-
+        String videoUrl = baseUrl + "/local/videos/" + Paths.get(storedVideoPath).getFileName().toString();
         return Video.builder() // 비디오에 대한 정보를 담아서 반환
                 .originName(originName)
-                .storedVideoPath(storedVideoPath)
+                .storedVideoPath(videoUrl)
                 .build();
     }
 

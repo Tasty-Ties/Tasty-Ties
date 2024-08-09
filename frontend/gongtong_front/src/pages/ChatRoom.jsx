@@ -45,6 +45,10 @@ const ChatRoom = () => {
         console.error("Broker reported error: " + frame.headers["message"]);
         console.error("Additional details: " + frame.body);
       },
+
+      connectHeaders: {
+        Authorization: `Bearer ${Cookies.get("accessToken")}`,
+      },
     });
 
     stompClient.current.activate();
@@ -67,7 +71,7 @@ const ChatRoom = () => {
       return;
     }
     try {
-      console.log(userInfo);
+      console.log("유저의 정보입니다.", userInfo);
       const response = await axios.get(CHAT_SERVER_URL + `/chats/rooms`, {
         headers: {
           Authorization: `Bearer ${Cookies.get("accessToken")}`,
@@ -76,11 +80,9 @@ const ChatRoom = () => {
       console.log("유저의 채팅방 목록입니다.", response);
       setChatRoomList(response.data.data.chatRooms);
     } catch (error) {
-      console.log(error);
       if (error.response.status === 404) {
         setIsEmpty(true);
       }
-      console.log();
       console.error(error);
       return;
     }
@@ -130,7 +132,7 @@ const ChatRoom = () => {
             chatRoomId={chatRoomId}
             chatRoomTitle={chatRoomTitle}
             stompClient={stompClient}
-            userId={userInfo.userId}
+            username={userInfo.username}
             nickname={userInfo.nickname}
             userLang={userInfo.language.englishName}
           />

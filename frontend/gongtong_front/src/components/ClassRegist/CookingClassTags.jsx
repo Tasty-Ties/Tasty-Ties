@@ -13,9 +13,6 @@ const CookingClassTags = ({ hashtags, setHashtags }) => {
   };
   return (
     <div className="regist-component-box">
-      <div className="title-box">
-        <label htmlFor="hashtage">해쉬태그</label>
-      </div>
       <div className="input-box">
         <input
           type="text"
@@ -23,11 +20,17 @@ const CookingClassTags = ({ hashtags, setHashtags }) => {
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="해시태그를 입력해주세요"
+          placeholder="해시태그를 입력하고 Enter키를 눌러주세요"
+          className="w-full border p-2 rounded"
         />
-        <div>
+        <div className="mt-3">
           {hashtags.map((tag, index) => (
-            <span key={index}>{tag}</span>
+            <span
+              key={index}
+              className="mr-3 rounded-3xl px-2 py-1 bg-second-600 text-white"
+            >
+              {tag}
+            </span>
           ))}
         </div>
       </div>

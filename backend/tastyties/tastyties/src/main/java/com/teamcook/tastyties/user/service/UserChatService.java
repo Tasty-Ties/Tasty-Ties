@@ -18,11 +18,11 @@ public class UserChatService {
     }
 
     @Transactional
-    public ChatUserDto getUser(Integer userId) {
-        User user = userRepository.findUserWithLanguage(userId);
+    public ChatUserDto getUser(String username) {
+        User user = userRepository.findUserWithLanguage(username);
 
         return ChatUserDto.builder()
-                .id(userId)
+                .username(user.getUsername())
                 .nickname(user.getNickname())
                 .profileImageUrl(user.getProfileImageUrl())
                 .language(user.getLanguage().getEnglish())

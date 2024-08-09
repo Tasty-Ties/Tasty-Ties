@@ -20,8 +20,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.net.URI;
-
 @RestController
 @RequestMapping("/users")
 public class UserController {
@@ -169,6 +167,21 @@ public class UserController {
                         .build());
     }
 
+    // 내가 참여한 클래스
+    @GetMapping("/me/participated")
+    public ResponseEntity<CommonResponseDto> getParticipatedClass(@AuthenticationPrincipal CustomUserDetails userDetails, Pageable pageable) {
+        if (userDetails == null) {
+            throw new UserDetailsNotFoundException("인증 정보를 찾을 수 없습니다.");
+        }
+        Page<CookingClassListDto> participatingClasses = userProfileService.getParticipatedClasses(userDetails.getUsername(), pageable);
+        return ResponseEntity.ok()
+                .body(CommonResponseDto.builder()
+                        .stateCode(200)
+                        .message("수업할 클래스가 정상적으로 조회되었습니다.")
+                        .data(participatingClasses)
+                        .build());
+    }
+
     // {username}의 프로필 조회
     @GetMapping("/profile/{username}")
     public ResponseEntity<CommonResponseDto> viewUserProfile(@PathVariable String username) {
@@ -181,9 +194,10 @@ public class UserController {
                         .build());
     }
 
+    // {username}이 참여한 클래스 조회
     @GetMapping("/profile/{username}/participated")
     public ResponseEntity<CommonResponseDto> viewUserParticipated(@PathVariable String username, Pageable pageable) {
-        Page<CookingClassListDto> reservedClasses = userProfileService.getReservedClasses(username, pageable);
+        Page<CookingClassListDto> reservedClasses = userProfileService.getParticipatedClasses(username, pageable);
 
         return ResponseEntity.ok()
                 .body(CommonResponseDto.builder()
@@ -196,7 +210,7 @@ public class UserController {
     // {username}이 강의한 클래스
     @GetMapping("/profile/{username}/hosting")
     public ResponseEntity<CommonResponseDto> viewUserHosting(@PathVariable String username, Pageable pageable) {
-        Page<CookingClassListDto> hostingClasses = userProfileService.getHostingClasses(username, pageable);
+        Page<CookingClassListDto> hostingClasses = userProfileService.getHostedClasses(username, pageable);
         return ResponseEntity.ok()
                 .body(CommonResponseDto.builder()
                         .stateCode(200)

@@ -3,9 +3,55 @@
 @tailwind utilities;
 
 @font-face {
-  font-family: "Cafe24Ssurround";
-  src: url("https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2105_2@1.0/Cafe24Ssurround.woff")
+  font-family: "IBM Plex Sans KR";
+  src: url("https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR&display=swap");
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Noto Sans KR";
+  src: url("https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100..900&display=swap");
+  font-optical-sizing: auto;
+  font-weight: <weight>;
+  font-style: normal;
+}
+@font-face {
+  font-family: "PTBandocheB";
+  src: url("https://fastly.jsdelivr.net/gh/projectnoonnu/2408@1.0/PTBandocheB.woff2")
+    format("woff2");
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Pretendard-Regular";
+  src: url("https://fastly.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard-Regular.woff")
+    format("woff");
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "NanumSquareRound";
+  src: url("https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_two@1.0/NanumSquareRound.woff")
     format("woff");
   font-weight: normal;
   font-style: normal;
+}
+@font-face {
+  font-family: "Dovemayo_gothic";
+  src: url("https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2302@1.1/Dovemayo_gothic.woff2")
+    format("woff2");
+  font-weight: normal;
+  font-style: normal;
+}
+
+* {
+  /* font-family: "IBM Plex Sans KR"; */
+  /* font-family: "Noto Sans KR"; */
+  /* font-family: "PTBandocheB"; */
+  /* font-family: "Pretendard-Regular"; */
+  /* font-family: "NanumSquareRound"; */
+  /* font-family: "Dovemayo_gothic"; */
 }

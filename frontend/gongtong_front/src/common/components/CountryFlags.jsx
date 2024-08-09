@@ -111,7 +111,7 @@ const CountryFlags = ({ countryCode, countryName, size }) => {
   return (
     <div className="text-3xl font-extrabold flex items-baseline gap-x-2 ">
       <p>{countryName}</p>
-      <p className="self-end">{countrySVGLists[countryCode]}</p>
+      <p className="self-end mr-1">{countrySVGLists[countryCode]}</p>
     </div>
   );
 };

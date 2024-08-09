@@ -9,6 +9,6 @@ public interface ChatMessageService {
 
     void createChatMessage(ChatMessage ChatMessage);
     ChatMessageDto getLastChatMessageByChatRoomId(String chatRoomId);
-    Map<String, Object> getChatMessagesByChatRoomId(Map<String, Object> requestParams);
+    Map<String, Object> getChatMessagesByChatRoomId(String username, Map<String, Object> requestParams);
 
 }

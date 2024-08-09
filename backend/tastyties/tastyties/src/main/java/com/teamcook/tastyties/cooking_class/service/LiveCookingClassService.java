@@ -67,7 +67,7 @@ public class LiveCookingClassService {
         if (!ccRepository.isCookingClassGuest(userId, uuid)) {
             throw new AccessDeniedException("게스트가 아닙니다.");
         }
-        String sessionId = ccRepository.findSessionIdWidthUuid(uuid);
+        String sessionId = ccRepository.findSessionIdWithUuid(uuid);
         if (sessionId == null) {
             throw new LiveClassNotFoundException("아직 클래스가 생성되지 않았습니다.");
         }

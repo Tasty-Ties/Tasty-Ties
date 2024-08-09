@@ -33,7 +33,7 @@ public class ShortFormServiceImpl implements ShortFormService {
     private final ShortFormLikeRepository shortFormLikeRepository;
 
     public ShortFormServiceImpl(ShortFormRepository shortFormRepository,
-                                @Qualifier("Local") S3Service s3Service,
+                                @Qualifier("S3") S3Service s3Service,
                                 ShortFormTagRepository shortFormTagRepository,
                                 ShortFormAndShortFormTagRepository shortFormAndShortFormTagRepository, ShortFormLikeRepository shortFormLikeRepository) {
         this.shortFormRepository = shortFormRepository;
