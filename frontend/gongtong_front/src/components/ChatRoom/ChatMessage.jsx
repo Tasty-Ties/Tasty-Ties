@@ -8,6 +8,7 @@ const ChatMessage = ({ type, imgSrc, nickname, message, chatTime }) => {
   const [nicknamePlace, setNicknamePlace] = useState();
   const [messageBox, setMessageBox] = useState();
   const [textBox, setTextBox] = useState();
+  const [timeMessageBox, setTimeMessageBox] = useState();
 
   useEffect(() => {
     typeInput(type);
@@ -15,6 +16,7 @@ const ChatMessage = ({ type, imgSrc, nickname, message, chatTime }) => {
 
   const typeInput = (type) => {
     setTextBox("p-3 break-words");
+    setTimeMessageBox("flex flex-row");
     switch (type) {
       case "ME":
         setMessageDirection("flex flex-row-reverse px-4 py-2");
@@ -22,6 +24,7 @@ const ChatMessage = ({ type, imgSrc, nickname, message, chatTime }) => {
         setMessageBox(
           "bg-yellow-300 rounded-l-2xl rounded-br-2xl border-solid border-2"
         );
+        setTimeMessageBox("flex flex-row-reverse");
         break;
       case "HOST":
         setMessageDirection("flex flex-row px-4 py-2");
@@ -65,28 +68,36 @@ const ChatMessage = ({ type, imgSrc, nickname, message, chatTime }) => {
               ? `${nickname} (HOST)`
               : nickname}
           </div>
-          <div className={messageBox}>
-            <p className={textBox}>{message}</p>
+          <div className={timeMessageBox}>
+            <div className={messageBox}>
+              <p className={textBox}>{message}</p>
+            </div>
+            {type === "SYSTEM" ? (
+              <></>
+            ) : (
+              <div className="self-end my-2 tex t-xs px-2">
+                {chatTime
+                  ? new Date().getDate() > new Date(chatTime).getDate() &&
+                    new Date().getMonth() >= new Date(chatTime).getMonth()
+                    ? new Date(chatTime).getMonth() +
+                      1 +
+                      "월 " +
+                      new Date(chatTime).getDate() +
+                      "일"
+                    : new Date(chatTime)
+                        .getHours()
+                        .toString()
+                        .padStart(2, "0") +
+                      " : " +
+                      new Date(chatTime)
+                        .getMinutes()
+                        .toString()
+                        .padStart(2, "0")
+                  : ""}
+              </div>
+            )}
           </div>
         </div>
-        {type === "SYSTEM" ? (
-          <></>
-        ) : (
-          <div className="self-end my-2 tex t-xs">
-            {chatTime
-              ? new Date().getDate() > new Date(chatTime).getDate() &&
-                new Date().getMonth() >= new Date(chatTime).getMonth()
-                ? new Date(chatTime).getMonth() +
-                  1 +
-                  "월 " +
-                  new Date(chatTime).getDate() +
-                  "일"
-                : new Date(chatTime).getHours().toString().padStart(2, "0") +
-                  " : " +
-                  new Date(chatTime).getMinutes().toString().padStart(2, "0")
-              : ""}
-          </div>
-        )}
       </div>
     </>
   );
