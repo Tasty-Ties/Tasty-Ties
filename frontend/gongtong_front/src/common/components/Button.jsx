@@ -31,6 +31,13 @@ const Button = ({ text, type, onClick }) => {
     "edit-cancle":
       "bg-transparent hover:bg-transparent text-first-800 text-xs hover:text-first-500 py-2 px-4 border border-first hover:border-first-500 rounded",
     "delete-id": "hover:bg-white text-gray-400 text-xs font py-2 px-2 rounded",
+    "replay-button":
+      "bg-transparent text-third font-semibold text-sm border border-third rounded px-2 w-12 h-12",
+    "expired-button":
+      "bg-gray-400 text-black font-semibold text-sm rounded w-12 h-12",
+    "enter-button": "bg-third text-white font-bold text-sm rounded w-12 h-12",
+    "time-button":
+      "bg-gray-400 text-black font-semibold text-sm rounded w-12 h-12",
   };
   return (
     <button className={`${typeList[type]}`} onClick={onClick}>

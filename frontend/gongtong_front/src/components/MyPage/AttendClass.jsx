@@ -33,15 +33,19 @@ const AttendClass = () => {
   return (
     <div>
       <p className="text-xl">참여한 클래스</p>
-      {attendClasses.map((attendClass, index) => (
-        <ClassForm key={index} classInfo={attendClass} classType="attend" />
-      ))}
-      <Pagination
-        totalItems={totalItems}
-        itemCountPerPage={itemCountPerPage}
-        pageCount={5}
-        currentPage={currentPage}
-      />
+      <div className="grid grid-rows-4 gap-3">
+        {attendClasses.map((attendClass, index) => (
+          <ClassForm key={index} classInfo={attendClass} classType="attend" />
+        ))}
+      </div>
+      <div className="fixed bottom-10 left-1/2 transform -translate-x-1/2">
+        <Pagination
+          totalItems={totalItems}
+          itemCountPerPage={itemCountPerPage}
+          pageCount={pageCount}
+          currentPage={currentPage}
+        />
+      </div>
     </div>
   );
 };

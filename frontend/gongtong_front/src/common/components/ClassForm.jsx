@@ -49,14 +49,14 @@ const ClassForm = ({ classInfo, classType }) => {
     let replayEndTime = new Date(classInfo.replayEndTime);
     if (replayEndTime > now) {
       buttonText = "다시보기";
-      buttonType = "orange-border-sqr";
+      buttonType = "replay-button";
     } else {
       buttonText = "기간만료";
-      buttonType = "gray-sqr";
+      buttonType = "expired-button";
     }
   } else {
     buttonText = timeRemaining;
-    buttonType = timeRemaining === "입장" ? "orange-sqr" : "gray-sqr";
+    buttonType = timeRemaining === "입장" ? "enter-button" : "time-button";
   }
 
   const handleButtonClick = () => {
@@ -73,20 +73,32 @@ const ClassForm = ({ classInfo, classType }) => {
   };
 
   return (
-    <div className="flex">
-      <div>
-        <img src={classInfo.mainImage} alt="클래스사진" className="w-60 h-40" />
+    <div className="flex w-auto">
+      <div className="flex">
+        <div className="w-40 h-20 overflow-hidden">
+          <img
+            src={classInfo.mainImage}
+            alt="클래스사진"
+            className="w-full h-full object-cover rounded-lg"
+          />
+        </div>
+        <div className="ml-6">
+          <p className="font-bold mb-2 w-auto">{classInfo.title}</p>
+          <div className="flex w-48">
+            <p className="text-xs">{date}</p>&nbsp;
+            <p className="text-xs">
+              {startTime}~{endTime}
+            </p>
+          </div>
+          <button
+            className="font-bold text-xs text-first"
+            onClick={() => nav(`/class/${classInfo.uuid}`)}
+          >
+            상세 보기 {">"}
+          </button>
+        </div>
       </div>
-      <div>
-        <h3>{classInfo.title}</h3>
-        <p>
-          {date} {startTime}~{endTime}
-        </p>
-        <button onClick={() => nav(`/class/${classInfo.uuid}`)}>
-          상세 보기
-        </button>
-      </div>
-      <div>
+      <div className="m-3">
         <Button
           text={buttonText}
           type={buttonType}

@@ -35,20 +35,27 @@ const Category = () => {
               />
 
               <p className="text-sm ml-1 mt-1">{informations.nickname}</p>
-              <p className="text-sm ml-1 mt-1">{informations.description}</p>
+              <p className="text-sm text-gray-500 ml-1 mt-1">
+                {informations.description ||
+                  "아직 자기소개를 입력하지 않았어요."}
+              </p>
             </div>
           </div>
           <div className="flex mt-1">
             <p className="flex">
               <img src={instalogo} alt="인스타로고" className="size-6" />
               &nbsp;
-              <p className="text-sm">{informations.instagramHandle}</p>
+              <p className="text-sm text-gray-500">
+                {informations.instagramHandle || "연결된 계정이 없습니다."}
+              </p>
             </p>
             &nbsp;&nbsp;&nbsp;&nbsp;
             <p className="flex">
               <img src={youtubelogo} alt="유튜브로고" className="size-6" />
               &nbsp;
-              <p className="text-sm">{informations.youtubeHandle}</p>
+              <p className="text-sm text-gray-500">
+                {informations.youtubeHandle || "연결된 계정이 없습니다."}
+              </p>
             </p>
           </div>
         </div>

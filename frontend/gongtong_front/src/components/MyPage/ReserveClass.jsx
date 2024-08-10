@@ -32,15 +32,23 @@ const ReserveClass = () => {
   return (
     <div>
       <p className="text-xl">예약한 클래스</p>
-      {reserveClasses.map((reserveClasses, index) => (
-        <ClassForm key={index} classInfo={reserveClasses} classType="reserve" />
-      ))}
-      <Pagination
-        totalItems={totalItems}
-        itemCountPerPage={itemCountPerPage}
-        pageCount={5}
-        currentPage={currentPage}
-      />
+      <div className="grid grid-rows-4 gap-3">
+        {reserveClasses.map((reserveClasses, index) => (
+          <ClassForm
+            key={index}
+            classInfo={reserveClasses}
+            classType="reserve"
+          />
+        ))}
+      </div>
+      <div className="fixed bottom-10 left-1/2 transform -translate-x-1/2">
+        <Pagination
+          totalItems={totalItems}
+          itemCountPerPage={itemCountPerPage}
+          pageCount={pageCount}
+          currentPage={currentPage}
+        />
+      </div>
     </div>
   );
 };

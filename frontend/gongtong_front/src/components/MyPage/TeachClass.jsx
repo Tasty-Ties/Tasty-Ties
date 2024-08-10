@@ -30,15 +30,19 @@ const TeachClass = () => {
   return (
     <div>
       <p className="text-xl">수업할 클래스</p>
-      {teachClasses.map((teachClass, index) => (
-        <ClassForm key={index} classInfo={teachClass} classType="teach" />
-      ))}
-      <Pagination
-        totalItems={totalItems}
-        itemCountPerPage={itemCountPerPage}
-        pageCount={pageCount}
-        currentPage={currentPage}
-      />
+      <div className="grid grid-rows-4 gap-3">
+        {teachClasses.map((teachClass, index) => (
+          <ClassForm key={index} classInfo={teachClass} classType="teach" />
+        ))}
+      </div>
+      <div className="fixed bottom-10 left-1/2 transform -translate-x-1/2">
+        <Pagination
+          totalItems={totalItems}
+          itemCountPerPage={itemCountPerPage}
+          pageCount={pageCount}
+          currentPage={currentPage}
+        />
+      </div>
     </div>
   );
 };
