@@ -76,7 +76,7 @@ const ClassList = () => {
           className="fixed bottom-48 right-36 float-right"
         >
           <img
-            src={`${FRONT_SERVER_URL}/images/classImages/add-icon.svg`}
+            src={"/images/classImages/add-icon.svg"}
             alt="요리클래스 등록하기"
           />
         </Link>
