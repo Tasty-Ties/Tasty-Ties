@@ -101,7 +101,7 @@ const MediaDeviceSetting = ({ currentPublisher }) => {
 
   return (
     <>
-      <div className="flex flex-row space-x-2 pr-2">
+      <div className="flex flex-row space-x-2 pr-2 self-start">
         <div className="relative" ref={videoRef}>
           {isSelectingVideo && (
             <div className="absolute bottom-12 right-0 flex flex-col bg-white p-2 rounded-2xl border-solid border-4 z-10">

@@ -7,11 +7,13 @@ const useVideoStore = create((set) => ({
   selectedAudioDevice: null,
   selectedVideoDevice: null,
   setSelectedAudioDevice: (audioDevice) => {
-    console.log("오디오 디바이스 변경 호출됨");
+    console.log("오디오 디바이스 변경 호출됨", audioDevice);
     set({ selectedAudioDevice: audioDevice });
   },
-  setSelectedVideoDevice: (videoDevice) =>
-    set({ selectedVideoDevice: videoDevice }),
+  setSelectedVideoDevice: (videoDevice) => {
+    console.log("비디오 디바이스 변경 호출됨", videoDevice);
+    set({ selectedVideoDevice: videoDevice });
+  },
 
   sessionId: null,
   setSessionId: (id) => set({ sessionId: id }),

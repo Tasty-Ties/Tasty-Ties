@@ -172,44 +172,43 @@ const VideoComponent = ({ isHost, title, hostName }) => {
 
   const connectWebCam = async (session) => {
     try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-            audio: true, // 여기서 오디오 스트림도 가져옵니다.
-            video: { deviceId: selectedVideoDevice.deviceId },
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: true, // 여기서 오디오 스트림도 가져옵니다.
+        video: { deviceId: selectedVideoDevice.deviceId },
+      });
+
+      const publisher = OV.initPublisher(undefined, {
+        audioSource: stream.getAudioTracks()[0], // 오디오 트랙을 사용합니다.
+        videoSource: stream.getVideoTracks()[0],
+        publishAudio: isAudioActive,
+        publishVideo: isVideoActive,
+        resolution: "1280x720",
+        frameRate: 30,
+        insertMode: "APPEND",
+      });
+
+      currentPublisher.current = publisher;
+      audioStream.current = stream; // 오디오 스트림을 저장합니다.
+
+      if (session.capabilities.publish) {
+        publisher.on("accessAllowed", () => {
+          session.publish(publisher).then(() => {
+            updateSubscribers();
+            localUserAccessAllowed.current = true;
+          });
         });
-        
-        const publisher = OV.initPublisher(undefined, {
-            audioSource: stream.getAudioTracks()[0], // 오디오 트랙을 사용합니다.
-            videoSource: stream.getVideoTracks()[0],
-            publishAudio: isAudioActive,
-            publishVideo: isVideoActive,
-            resolution: "1280x720",
-            frameRate: 30,
-            insertMode: "APPEND",
-        });
-        
-        currentPublisher.current = publisher;
-        audioStream.current = stream; // 오디오 스트림을 저장합니다.
+      }
 
-        if (session.capabilities.publish) {
-            publisher.on("accessAllowed", () => {
-                session.publish(publisher).then(() => {
-                    updateSubscribers();
-                    localUserAccessAllowed.current = true;
-                });
-            });
-        }
-
-        localUserSetting.setNickname(userInfo.nickname);
-        localUserSetting.setConnectionId(session.connection.connectionId);
-        localUserSetting.setScreenShareActive(false);
-        localUserSetting.setStreamManager(publisher);
-        setLocalUser(localUserSetting);
-        subscribeToUserChanged(session);
-        subscribeToStreamDestroyed(session);
-
+      localUserSetting.setNickname(userInfo.nickname);
+      localUserSetting.setConnectionId(session.connection.connectionId);
+      localUserSetting.setScreenShareActive(false);
+      localUserSetting.setStreamManager(publisher);
+      setLocalUser(localUserSetting);
+      subscribeToUserChanged(session);
+      subscribeToStreamDestroyed(session);
     } catch (error) {
-        console.error("Error accessing media devices:", error);
-        alert("오디오 또는 비디오 장치에 접근할 수 없습니다: " + error.message);
+      console.error("Error accessing media devices:", error);
+      alert("오디오 또는 비디오 장치에 접근할 수 없습니다: " + error.message);
     }
   };
 
@@ -582,15 +581,14 @@ const VideoComponent = ({ isHost, title, hostName }) => {
 
   useEffect(() => {
     return () => {
-        if (raiseTimeout.current) {
-            clearTimeout(raiseTimeout.current);
-        }
-        if (lowerTimeout.current) {
-            clearTimeout(lowerTimeout.current);
-        }
+      if (raiseTimeout.current) {
+        clearTimeout(raiseTimeout.current);
+      }
+      if (lowerTimeout.current) {
+        clearTimeout(lowerTimeout.current);
+      }
     };
-}, []);
-
+  }, []);
 
   const displayChange = () => {
     const newMode = (displayMode + 1) % 3;
@@ -836,8 +834,12 @@ const VideoComponent = ({ isHost, title, hostName }) => {
           />
         </div>
       </div>
-      <video ref={videoRef} className="input_video" style={{ display: "none" }}></video>
-        <canvas ref={canvasRef} style={{ display: "none" }}></canvas>
+      <video
+        ref={videoRef}
+        className="input_video"
+        style={{ display: "none" }}
+      ></video>
+      <canvas ref={canvasRef} style={{ display: "none" }}></canvas>
     </>
   );
 };
