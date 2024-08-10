@@ -35,16 +35,16 @@ const Class = ({ classInfo }) => {
   let minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
   let seconds = Math.floor((diff % (1000 * 60)) / 1000);
 
-  // let timeRemaining = "";
-  // if (days > 0) {
-  //   timeRemaining += `D-${days}`;
-  // } else if (hours > 0) {
-  //   timeRemaining += `${hours}:${minutes < 10 ? `0${minutes}` : minutes}`;
-  // } else {
-  //   timeRemaining += "입장";
-  // }
+  let timeRemaining = "";
+  if (days > 0) {
+    timeRemaining += `D-${days}`;
+  } else if (hours > 0) {
+    timeRemaining += `${hours}:${minutes < 10 ? `0${minutes}` : minutes}`;
+  } else {
+    timeRemaining += "입장";
+  }
 
-  const timeRemaining = "입장";
+  // const timeRemaining = "입장";
 
   return (
     <div className="flex">
