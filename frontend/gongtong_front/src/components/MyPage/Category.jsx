@@ -17,7 +17,7 @@ const Category = () => {
 
   return (
     <div className="flex">
-      <div className="w-60">
+      <div className="w-56">
         <br />
         <div className="flex flex-col">
           <div className="flex">
@@ -29,16 +29,13 @@ const Category = () => {
             />
             &nbsp;&nbsp;
             <div className="flex flex-col mt-2">
-              <p>
-                <CountryFlags
-                  countryCode={informations.country?.countryCode}
-                  size="w-5"
-                />
-              </p>
-              <p className="text-sm ml-1 mt-1">이름:{informations.nickname}</p>
-              <p className="text-sm ml-1 mt-1">
-                자기소개:{informations.description}
-              </p>
+              <CountryFlags
+                countryCode={informations.country?.countryCode}
+                size="w-5"
+              />
+
+              <p className="text-sm ml-1 mt-1">{informations.nickname}</p>
+              <p className="text-sm ml-1 mt-1">{informations.description}</p>
             </div>
           </div>
           <div className="flex mt-1">
@@ -47,7 +44,7 @@ const Category = () => {
               &nbsp;
               <p className="text-sm">{informations.instagramHandle}</p>
             </p>
-            &nbsp;&nbsp;
+            &nbsp;&nbsp;&nbsp;&nbsp;
             <p className="flex">
               <img src={youtubelogo} alt="유튜브로고" className="size-6" />
               &nbsp;
@@ -56,7 +53,6 @@ const Category = () => {
           </div>
         </div>
         <br />
-        <hr />
         <ul>
           <li className="font-bold text-xl">클래스</li>
           <hr className="border border-first" />
@@ -118,7 +114,7 @@ const Category = () => {
           </li>
         </ul>
       </div>
-      <div>
+      <div className="m-8">
         <Outlet />
       </div>
     </div>

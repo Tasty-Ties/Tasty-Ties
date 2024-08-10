@@ -13,7 +13,7 @@ const TeachClass = () => {
   console.log(teachClasses);
 
   if (teachClasses.length === 0) {
-    return <div>수업할 클래스가 없습니다.</div>;
+    return <div className="text-xl">수업할 클래스가 없습니다.</div>;
   }
 
   return (

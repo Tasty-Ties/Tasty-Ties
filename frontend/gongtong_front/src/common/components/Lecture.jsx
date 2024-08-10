@@ -28,7 +28,7 @@ const Lecture = ({ classInfo }) => {
         <span className="absolute right-1 top-1">
           <CountryFlags
             countryCode={classInfo.classCountry.alpha2}
-            size="w-9"
+            size="w-7"
           />
         </span>
       </div>
