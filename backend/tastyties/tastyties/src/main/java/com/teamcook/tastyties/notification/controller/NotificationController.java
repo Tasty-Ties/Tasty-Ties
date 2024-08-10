@@ -10,11 +10,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -40,6 +38,21 @@ public class NotificationController {
                         .stateCode(200)
                         .message("알림을 성공적으로 조회했습니다.")
                         .data(responseData)
+                        .build());
+    }
+
+    @PostMapping("/check")
+    public ResponseEntity<CommonResponseDto> checkNotifications(@AuthenticationPrincipal CustomUserDetails userDetails, @RequestBody Map<String, Object> requestParams) {
+        if (userDetails == null) {
+            throw new AuthenticationFailureException();
+        }
+
+        notificationService.checkReadNotifications(userDetails.user(), requestParams);
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(CommonResponseDto.builder()
+                        .stateCode(200)
+                        .message("알림 읽음을 성공적으로 체크했습니다.")
                         .build());
     }
 }
