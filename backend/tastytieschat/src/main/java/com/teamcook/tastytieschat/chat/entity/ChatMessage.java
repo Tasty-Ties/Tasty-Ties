@@ -47,6 +47,10 @@ public class ChatMessage {
         translatedMessages.put(key, value);
     }
 
+    public void clearTranslatedMessages() {
+        translatedMessages.clear();
+    }
+
     public boolean containTranslatedLanguage(String translatedLanguage) {
         return translatedMessages.containsKey(translatedLanguage);
     }

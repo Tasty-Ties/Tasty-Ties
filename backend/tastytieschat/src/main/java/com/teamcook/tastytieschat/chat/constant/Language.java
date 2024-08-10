@@ -30,4 +30,14 @@ public enum Language {
     public boolean equals(String language) {
         return this.name.equals(language);
     }
+
+    public static boolean contains(String language) {
+        for (Language l: Language.values()) {
+            if (l.getName().equals(language)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }
