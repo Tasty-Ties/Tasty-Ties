@@ -37,7 +37,7 @@ const ClassRegist = () => {
     languageCode: "",
     languageName: "",
     level: 0,
-    cookingClassStartTime: new Date().toISOString(),
+    cookingClassStartTime: "",
     cookingClassEndTime: "",
     dishCookingTime: 0,
     ingredients: [],
@@ -52,6 +52,10 @@ const ClassRegist = () => {
     fetchLanguages();
   }, [classInformation]);
   console.log(classInformation);
+
+  useEffect(() => {
+    console.log(classInformation);
+  }, [classInformation]);
 
   const onChange = (e) => {
     // 주류 체크박스
@@ -354,12 +358,14 @@ const ClassRegist = () => {
             <input
               aria-label="Date and time"
               type="datetime-local"
-              // value={dayjs(classInformation.cookingClassStartTime)}
+              value={new Date()}
               name="cookingClassStartTime"
-              onChange={(value) => {
+              onChange={(e) => {
                 setClassInformation({
                   ...classInformation,
-                  cookingClassStartTime: convertToSeoulTime(new Date(value)),
+                  cookingClassStartTime: convertToSeoulTime(
+                    new Date(e.target.value)
+                  ),
                 });
               }}
             />
@@ -367,10 +373,13 @@ const ClassRegist = () => {
               aria-label="Date and time"
               type="datetime-local"
               name="cookingClassEndTime"
-              onChange={(value) => {
+              value={new Date()}
+              onChange={(e) => {
                 setClassInformation({
                   ...classInformation,
-                  cookingClassEndTime: convertToSeoulTime(new Date(value)),
+                  cookingClassEndTime: convertToSeoulTime(
+                    new Date(e.target.value)
+                  ),
                 });
               }}
             />
