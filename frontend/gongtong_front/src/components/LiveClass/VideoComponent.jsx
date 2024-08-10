@@ -110,7 +110,7 @@ const VideoComponent = ({ isHost, title, hostName }) => {
     window.addEventListener("beforeunload", onbeforeunload);
     joinSession();
     // initializeMediapipe();
-    // initializeGestureRecognizer();
+    initializeGestureRecognizer();
 
     stompClient.current = new Client({
       brokerURL: CHAT_SERVER_URL,
@@ -139,8 +139,10 @@ const VideoComponent = ({ isHost, title, hostName }) => {
 
   useEffect(() => {
     switchCamera();
-    // displayChange();
   }, [selectedVideoDevice]);
+  useEffect(() => {
+    switchMic();
+  }, [selectedAudioDevice]);
 
   const joinSession = async () => {
     const newSession = OV.initSession();
@@ -182,9 +184,10 @@ const VideoComponent = ({ isHost, title, hostName }) => {
 
   const connectWebCam = async (session) => {
     try {
+      console.log(selectedVideoDevice.deviceId);
       const publisher = OV.initPublisher(undefined, {
-        audioSource: selectedAudioDevice, // 오디오 트랙을 사용합니다.
-        videoSource: selectedVideoDevice,
+        audioSource: selectedAudioDevice?.deviceId, // 오디오 트랙을 사용합니다.
+        videoSource: selectedVideoDevice.deviceId,
         publishAudio: isAudioActive,
         publishVideo: isVideoActive,
         resolution: "1280x720",
@@ -220,7 +223,7 @@ const VideoComponent = ({ isHost, title, hostName }) => {
   const switchCamera = async () => {
     if (currentPublisher.current) {
       const newPublisher = await OV.initPublisher(undefined, {
-        audioSource: selectedAudioDevice,
+        audioSource: selectedAudioDevice?.deviceId,
         videoSource: selectedVideoDevice.deviceId,
         publishAudio: isAudioActive,
         publishVideo: isVideoActive,
@@ -234,15 +237,36 @@ const VideoComponent = ({ isHost, title, hostName }) => {
         newPublisher.once("accessDenied", reject);
       });
 
-      const newVideoTrack = await navigator.mediaDevices
-        .getUserMedia({
-          video: { deviceId: selectedVideoDevice.deviceId },
-        })
-        .then((stream) => stream.getVideoTracks()[0]);
-
       currentPublisher.current.replaceTrack(
         newPublisher.stream.mediaStream.getVideoTracks()[0]
       );
+      audioStream.current = newPublisher.stream.mediaStream;
+
+      localUserSetting.setStreamManager(newPublisher);
+      setLocalUser(localUserSetting);
+    }
+  };
+  const switchMic = async () => {
+    if (currentPublisher.current) {
+      const newPublisher = await OV.initPublisher(undefined, {
+        audioSource: selectedAudioDevice?.deviceId,
+        videoSource: selectedVideoDevice.deviceId,
+        publishAudio: isAudioActive,
+        publishVideo: isVideoActive,
+        resolution: "1280x720",
+        frameRate: 30,
+        insertMode: "APPEND",
+      });
+
+      await new Promise((resolve, reject) => {
+        newPublisher.once("accessAllowed", resolve);
+        newPublisher.once("accessDenied", reject);
+      });
+
+      currentPublisher.current.replaceTrack(
+        newPublisher.stream.mediaStream.getAudioTracks()[0]
+      );
+      audioStream.current = newPublisher.stream.mediaStream;
 
       localUserSetting.setStreamManager(newPublisher);
       setLocalUser(localUserSetting);

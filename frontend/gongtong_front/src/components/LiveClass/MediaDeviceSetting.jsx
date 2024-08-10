@@ -64,7 +64,7 @@ const MediaDeviceSetting = ({ currentPublisher }) => {
 
   useEffect(() => {
     if (audioDevices.length > 0 && audioDevices.length > 0) {
-      setSelectedAudioDevice(audioDevices[0].deviceId);
+      setSelectedAudioDevice(audioDevices[0]?.deviceId);
       setSelectedVideoDevice(videoDevices[0].deviceId);
     }
   }, [videoDevices, audioDevices]);
