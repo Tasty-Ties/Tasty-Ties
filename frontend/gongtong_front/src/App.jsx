@@ -13,6 +13,8 @@ import {
 } from "./firebase/firebaseCloudMessaging";
 import { getFcmToken } from "./firebase/firebaseCloudMessaging";
 
+import Toast from "./components/common/Toast";
+
 // FCM permission & token
 if (Notification.permission !== "granted") {
   requestPermission();
@@ -40,6 +42,7 @@ function App() {
       {/* <LocalizationProvider dateAdapter={AdapterDayjs}> */}
       {isHeaderVisible && <Header />}
       <AppRoutes />
+      <Toast />
       {/* </LocalizationProvider> */}
     </>
   );
