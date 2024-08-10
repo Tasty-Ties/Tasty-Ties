@@ -41,7 +41,13 @@ public class JwtTokenProvider {
     public String generateAccessToken(Authentication authentication) {
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         Date now = new Date();
-        Date expiryDate = new Date(now.getTime() + accessTokenExpirationInMs);
+
+        long expirationTime = userDetails.getAuthorities().stream()
+                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_ADMIN"))
+                ? accessTokenExpirationInMs*10
+                : accessTokenExpirationInMs;
+
+        Date expiryDate = new Date(now.getTime() + expirationTime);
 
         return Jwts.builder()
                 .setSubject(userDetails.getUsername())

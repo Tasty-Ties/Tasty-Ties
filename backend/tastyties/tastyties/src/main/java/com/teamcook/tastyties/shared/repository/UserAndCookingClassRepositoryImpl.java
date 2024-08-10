@@ -139,7 +139,8 @@ public class UserAndCookingClassRepositoryImpl implements UserAndCookingClassCus
                                         countryByClass.alpha2,
                                         countryByClass.countryImageUrl
                                 ),
-                                cookingClass.countryCode.eq(country.alpha2)
+                                cookingClass.countryCode.eq(country.alpha2),
+                                cookingClass.chatRoomId
                 ))
                 .from(userAndCookingClass)
                 .join(userAndCookingClass.cookingClass, cookingClass)
@@ -229,7 +230,8 @@ public class UserAndCookingClassRepositoryImpl implements UserAndCookingClassCus
                                         countryByClass.alpha2,
                                         countryByClass.countryImageUrl
                                 ),
-                                cookingClass.countryCode.eq(country.alpha2)
+                                cookingClass.countryCode.eq(country.alpha2),
+                                cookingClass.chatRoomId
                         ))
                 .from(userAndCookingClass)
                 .join(userAndCookingClass.cookingClass, cookingClass)
