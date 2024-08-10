@@ -188,6 +188,15 @@ const ClassRegist = () => {
     }
   };
 
+  const handleKeyDown = (e, fieldName) => {
+    if (e.key === "Enter") {
+      if (["cookingClassTags", "cookingTools"].includes(fieldName)) {
+        return;
+      }
+      e.preventDefault();
+    }
+  };
+
   return (
     <div className="w-3/6 mx-auto justify-center">
       <div className="mt-8 mb-4 text-center text-first-800 font-bold border-b-2 border-first-800 pb-4 text-2xl">
@@ -207,6 +216,7 @@ const ClassRegist = () => {
               onChange={onChange}
               placeholder="클래스명을 입력해주세요"
               className="w-full border p-2 rounded"
+              onKeyDown={(e) => handleKeyDown(e, "title")}
             />
           </div>
         </div>
@@ -225,6 +235,7 @@ const ClassRegist = () => {
               onChange={onChange}
               placeholder="음식명을 입력해주세요"
               className="w-full border p-2 rounded"
+              onKeyDown={(e) => handleKeyDown(e, "dishName")}
             />
             <div className="flex items-center mt-2">
               <input
@@ -298,6 +309,7 @@ const ClassRegist = () => {
               value={classInformation.description}
               onChange={handleTextChange}
               className="w-full resize-none h-48 border p-2 rounded"
+              onKeyDown={(e) => handleKeyDown(e, "description")}
             ></textarea>
             <div className="text-right text-sm text-gray-500">
               {classInformation.description.length} / {MAX_LENGTH}
@@ -379,6 +391,7 @@ const ClassRegist = () => {
                   ),
                 });
               }}
+              onKeyDown={(e) => handleKeyDown(e, "cookingClassStartTime")}
             />
             <input
               aria-label="Date and time"
@@ -395,6 +408,7 @@ const ClassRegist = () => {
                   ),
                 });
               }}
+              onKeyDown={(e) => handleKeyDown(e, "cookingClassEndTime")}
             />
           </div>
         </div>
@@ -417,8 +431,13 @@ const ClassRegist = () => {
               type="number"
               id="dishCookingTime"
               name="dishCookingTime"
-              onChange={onChange}
+              onChange={(e) => {
+                let value = parseInt(e.target.value);
+                if (value < 0) value = 0;
+                onChange(e);
+              }}
               className="w-1/2 border p-2 rounded"
+              onKeyDown={(e) => handleKeyDown(e, "dishCookingTime")}
             />
             <span className="ml-2">분</span>
           </div>
@@ -468,9 +487,15 @@ const ClassRegist = () => {
               type="number"
               id="quota"
               name="quota"
-              onChange={onChange}
+              onChange={(e) => {
+                let value = parseInt(e.target.value);
+                if (value < 1) value = 1;
+                if (value > 5) value = 5;
+                onChange(e);
+              }}
               className="w-1/2 border p-2 rounded"
               placeholder="클래스 정원을 입력해주세요"
+              onKeyDown={(e) => handleKeyDown(e, "quota")}
             />
             <span className="ml-2">명</span>
           </div>
@@ -485,9 +510,15 @@ const ClassRegist = () => {
               type="number"
               id="replayEndTime"
               name="replayEndTime"
-              onChange={handleReplayEndTime}
+              onChange={(e) => {
+                let value = parseInt(e.target.value);
+                if (value < 1) value = 1;
+                if (value > 31) value = 31;
+                onChange(e);
+              }}
               className="w-1/2 border p-2 rounded"
               placeholder="다시보기 기간을 입력해주세요"
+              onKeyDown={(e) => handleKeyDown(e, "replayEndTime")}
             />
             <span className="ml-2">일</span>
           </div>

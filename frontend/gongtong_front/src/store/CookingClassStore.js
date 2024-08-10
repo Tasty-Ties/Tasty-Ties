@@ -5,7 +5,6 @@ import {
   getClassLists,
   getClassDetail,
   getClassReviews,
-  getSearchLists,
 } from "./../service/CookingClassAPI";
 
 const useCookingClassStore = create((set) => ({
@@ -23,13 +22,14 @@ const useCookingClassStore = create((set) => ({
 
   classLists: [],
   hasMoreContent: true,
-  fetchClassLists: async (page) => {
-    const classLists = await getClassLists(page);
+  fetchClassLists: async (page, searchParams) => {
+    const classLists = await getClassLists(page, searchParams);
     if (classLists.length === 0) {
       set({ hasMoreContent: false });
     } else {
       set((state) => ({
-        classLists: [...state.classLists, ...classLists],
+        classLists:
+          page === 0 ? classLists : [...state.classLists, ...classLists],
       }));
     }
   },
@@ -50,6 +50,11 @@ const useCookingClassStore = create((set) => ({
   fetchSearchLists: async () => {
     const classSearchLists = await getSearchLists();
     set({ classSearchLists });
+  },
+
+  getClassLists: async (page, searchParams) => {
+    const classLists = await getClassLists(page, searchParams);
+    return classLists;
   },
 }));
 

@@ -52,8 +52,11 @@ const validationSchema = yup.object().shape({
     ),
   dishCookingTime: yup
     .number()
-    .positive("조리 시간은 0보다 커야 합니다")
-    .required("조리 시간은 필수입니다"),
+    .required("조리 시간은 필수입니다")
+    .transform((value) => {
+      if (value < 0) return 1;
+      return value;
+    }),
   ingredients: yup
     .array()
     .of(
@@ -68,7 +71,7 @@ const validationSchema = yup.object().shape({
     .array()
     .of(
       yup.object().shape({
-        step: yup.number().required("레시피 순서는 필수입니다"),
+        step: yup.number(),
         description: yup
           .string()
           .required("레시피 설명은 필수입니다")
@@ -87,8 +90,6 @@ const validationSchema = yup.object().shape({
     }),
   replayEndTime: yup
     .number()
-    .min(1)
-    .max(31)
     .required("다시보기 종료 시간은 필수입니다")
     .transform((value) => {
       if (value < 1) return 1;
@@ -112,7 +113,7 @@ const ClassRegist = () => {
     trigger,
   } = useForm({
     resolver: yupResolver(validationSchema),
-    mode: "onBlur",
+    mode: "onChange",
     defaultValues: {
       title: "",
       dishName: "",
@@ -123,7 +124,7 @@ const ClassRegist = () => {
       description: "",
       languageCode: "",
       languageName: "",
-      level: 0,
+      level: 1,
       cookingClassStartTime: dayjs().format("YYYY-MM-DDTHH:mm"),
       cookingClassEndTime: dayjs().add(1, "hour").format("YYYY-MM-DDTHH:mm"),
       dishCookingTime: 0,
@@ -163,24 +164,16 @@ const ClassRegist = () => {
     );
   }, [languages]);
 
-  const handleFormSubmit = (e) => {
-    e.preventDefault(); // 폼의 기본 제출 동작을 방지
-  };
-
   const handleKeyDown = (e, fieldName) => {
-    if (e.key === "Enter") {
-      // 특별한 필드들은 엔터키 동작을 허용
+    if (e.key === "Enter" || e.keyCode === "13") {
       if (["cookingClassTags", "cookingTools"].includes(fieldName)) {
         return;
       }
-      e.preventDefault(); // 일반 필드에서는 엔터키 기본 동작을 방지
+      e.preventDefault();
     }
   };
 
-  const onSubmit = async (data, e) => {
-    e.preventDefault();
-    console.log("제출된 데이터:", data);
-    console.log("파일:", files);
+  const onSubmit = async (data) => {
     if (!isValid) {
       alert("모든 필수 항목을 올바르게 입력해주세요.");
       return;
@@ -189,20 +182,27 @@ const ClassRegist = () => {
       alert("최소 한 개의 이미지를 업로드해주세요.");
       return;
     }
+
+    // replayEndTime 계산
+    const calculatedReplayEndTime = calculateReplayEndTime(
+      data.cookingClassStartTime,
+      data.replayEndTime
+    );
+
+    // 계산된 replayEndTime으로 데이터 업데이트
+    const updatedData = {
+      ...data,
+      replayEndTime: calculatedReplayEndTime,
+    };
+
     try {
-      await setClassRegist(data, files);
+      await setClassRegist(updatedData, files);
       alert("성공적으로 등록되었습니다.");
-      navigate("/class");
+      // navigate("/class");
     } catch (error) {
       console.error("클래스 등록 실패:", error);
       alert("클래스 등록에 실패했습니다. 다시 시도해주세요.");
     }
-  };
-
-  const handleReplayEndTime = (days) => {
-    const startTime = watch("cookingClassStartTime");
-    const newReplayEndTime = calculateReplayEndTime(startTime, days);
-    setValue("replayEndTime", newReplayEndTime);
   };
 
   const calculateReplayEndTime = (startTime, days) => {
@@ -222,11 +222,7 @@ const ClassRegist = () => {
       <div className="mt-8 mb-4 text-center text-first-800 font-bold border-b-2 border-first-800 pb-4 text-2xl">
         클래스 등록
       </div>
-      <form
-        onSubmit={handleFormSubmit}
-        onChange={() => trigger()}
-        encType="multipart/form-data"
-      >
+      <form onSubmit={onSubmit} encType="multipart/form-data">
         <div className="grid grid-cols-8">
           <div className="col-span-2">
             <label htmlFor="title">클래스명</label>
@@ -485,6 +481,11 @@ const ClassRegist = () => {
                   type="number"
                   className="w-1/2 border p-2 rounded"
                   onKeyDown={(e) => handleKeyDown(e, "dishCookingTime")}
+                  onChange={(e) => {
+                    let value = parseInt(e.target.value);
+                    if (value < 0) value = 0;
+                    field.onChange(value);
+                  }}
                 />
               )}
             />
@@ -631,11 +632,7 @@ const ClassRegist = () => {
             />
           </div>
           <div>
-            <Button
-              text="등록"
-              type="green-semi-long"
-              onClick={handleSubmit(onSubmit)}
-            />
+            <Button text="등록" type="green-semi-long" onClick={onSubmit} />
           </div>
         </div>
         <div className="h-36"></div>

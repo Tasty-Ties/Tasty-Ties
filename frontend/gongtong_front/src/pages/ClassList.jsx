@@ -1,30 +1,38 @@
 import { useEffect, useState, useRef } from "react";
-import { Link, useNavigate } from "react-router-dom";
-
+import { Link } from "react-router-dom";
 import ClassListItem from "./../components/ClassList/ClassListItem";
 import SearchBar from "./../components/ClassList/SearchBar";
 import useCookingClassStore from "./../store/CookingClassStore";
-import useAuthStore from "./../store/AuthStore";
 import Cookies from "js-cookie";
 
-const FRONT_SERVER_URL = import.meta.env.VITE_FRONT_SERVER;
-
 const ClassList = () => {
-  const navigate = useNavigate();
-  const { classLists, fetchClassLists, hasMoreContent } =
+  const { classLists, fetchClassLists, hasMoreContent, getClassLists } =
     useCookingClassStore();
   const [page, setPage] = useState(0);
   const observerRef = useRef(null);
+  const [searchParams, setSearchParams] = useState(null);
 
   let cookie = Cookies.get("accessToken");
 
+  const handleSearch = (searchParams) => {
+    setSearchParams(searchParams);
+    setPage(0);
+    fetchClassListData(0, searchParams);
+  };
+
+  const fetchClassListData = async (page, params) => {
+    const searchResults = await getClassLists(page, params);
+    useCookingClassStore.setState((state) => ({
+      classLists:
+        page === 0 ? searchResults : [...state.classLists, ...searchResults],
+      hasMoreContent: searchResults.length === 12,
+    }));
+  };
+
   useEffect(() => {
-    const fetchClassListData = async () => {
-      if (hasMoreContent) {
-        fetchClassLists(page);
-      }
-    };
-    fetchClassListData();
+    if (hasMoreContent) {
+      fetchClassListData(page, searchParams);
+    }
   }, [page]);
 
   useEffect(() => {
@@ -56,7 +64,7 @@ const ClassList = () => {
   return (
     <>
       <div className="w-2/3 mt-16 mx-auto content-center relative">
-        <SearchBar page={page} />
+        <SearchBar onSearch={handleSearch} />
         <hr className="mt-10" />
         <div className="mt-10 grid grid-cols-4 gap-6">
           {classLists &&
