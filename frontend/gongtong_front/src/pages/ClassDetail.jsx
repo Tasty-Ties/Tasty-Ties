@@ -84,7 +84,7 @@ const ClassDetail = () => {
   console.log(classDetail);
 
   return (
-    <div className="justify-center mt-8">
+    <div className="w-3/6 mx-auto justify-center mt-8">
       <ClassImageCarousel classDetail={classDetail} />
       <div className="mt-6">
         <div className="text-4xl font-extrabold">{classDetail.title}</div>
