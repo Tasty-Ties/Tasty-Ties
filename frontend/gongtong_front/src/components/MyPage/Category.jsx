@@ -114,7 +114,7 @@ const Category = () => {
           </li>
         </ul>
       </div>
-      <div className="m-8">
+      <div className="m-8 ml-36">
         <Outlet />
       </div>
     </div>

@@ -1,9 +1,7 @@
-import "../../styles/MyPage/Class.css";
-import { Link, useNavigate, useLocation } from "react-router-dom";
-import { useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import Button from "./Button";
 
-const Class = ({ classInfo }) => {
+const ClassForm = ({ classInfo, classType }) => {
   const nav = useNavigate();
   const location = useLocation();
 
@@ -44,6 +42,36 @@ const Class = ({ classInfo }) => {
     timeRemaining += "입장";
   }
 
+  let buttonText = "";
+  let buttonType = "";
+
+  if (classType === "attend") {
+    let replayEndTime = new Date(classInfo.replayEndTime);
+    if (replayEndTime > now) {
+      buttonText = "다시보기";
+      buttonType = "orange-border-sqr";
+    } else {
+      buttonText = "기간만료";
+      buttonType = "gray-sqr";
+    }
+  } else {
+    buttonText = timeRemaining;
+    buttonType = timeRemaining === "입장" ? "orange-sqr" : "gray-sqr";
+  }
+
+  const handleButtonClick = () => {
+    if (classType === "attend" && buttonText === "다시보기") {
+      nav(`/classreplay/${classInfo.uuid}`);
+    } else if (buttonText === "입장") {
+      nav(`/classwaiting/${classInfo.uuid}`, {
+        state: {
+          classData: classInfo,
+          isHost: location.pathname === "/mypage/teach",
+        },
+      });
+    }
+  };
+
   return (
     <div className="flex">
       <div>
@@ -51,7 +79,6 @@ const Class = ({ classInfo }) => {
       </div>
       <div>
         <h3>{classInfo.title}</h3>
-
         <p>
           {date} {startTime}~{endTime}
         </p>
@@ -61,24 +88,13 @@ const Class = ({ classInfo }) => {
       </div>
       <div>
         <Button
-          text={timeRemaining}
-          type={timeRemaining === "입장" ? "orange-sqr" : "gray-sqr"}
-          onClick={() =>
-            timeRemaining === "입장"
-              ? nav(`/classwaiting/${classInfo.uuid}`, {
-                  state: {
-                    classData: classInfo,
-                    isHost:
-                      location.pathname === "/mypage/teach" ? true : false,
-                  },
-                })
-              : ""
-          }
-          // className="size-8"
+          text={buttonText}
+          type={buttonType}
+          onClick={handleButtonClick}
         />
       </div>
     </div>
   );
 };
 
-export default Class;
+export default ClassForm;

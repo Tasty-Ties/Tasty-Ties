@@ -26,6 +26,11 @@ const Button = ({ text, type, onClick }) => {
       "bg-gray-900 hover:bg-gray-800 text-white font-bold py-2 px-3 rounded",
     "black-short":
       "bg-gray-900 hover:bg-gray-800 text-white font-bold py-2 px-40 rounded",
+    "edit-complete":
+      "bg-first hover:bg-first-800 text-white text-xs py-2 px-4 rounded",
+    "edit-cancle":
+      "bg-transparent hover:bg-transparent text-first-800 text-xs hover:text-first-500 py-2 px-4 border border-first hover:border-first-500 rounded",
+    "delete-id": "hover:bg-white text-gray-400 text-xs font py-2 px-2 rounded",
   };
   return (
     <button className={`${typeList[type]}`} onClick={onClick}>
