@@ -37,7 +37,7 @@ const ClassRegist = () => {
     languageCode: "",
     languageName: "",
     level: 0,
-    cookingClassStartTime: new Date().toISOString(),
+    cookingClassStartTime: "",
     cookingClassEndTime: "",
     dishCookingTime: 0,
     ingredients: [],
@@ -51,6 +51,10 @@ const ClassRegist = () => {
     fetchCountries();
     fetchLanguages();
   }, []);
+
+  useEffect(() => {
+    console.log(classInformation);
+  }, [classInformation]);
 
   const onChange = (e) => {
     // 주류 체크박스
@@ -117,6 +121,9 @@ const ClassRegist = () => {
     }
   };
 
+  const formatDateForInput = (date) => {
+    return dayjs(date).format("YYYY-MM-DDTHH:mm");
+  };
   const convertToSeoulTime = (date) => {
     const tzoffset = new Date().getTimezoneOffset() * 60000;
     const localIOSTime = new Date(date - tzoffset).toISOString().slice(0, -1);
@@ -353,12 +360,15 @@ const ClassRegist = () => {
             <input
               aria-label="Date and time"
               type="datetime-local"
-              // value={dayjs(classInformation.cookingClassStartTime)}
+              value={formatDateForInput(classInformation.cookingClassStartTime)}
               name="cookingClassStartTime"
-              onChange={(value) => {
+              min={formatDateForInput(new Date())}
+              onChange={(e) => {
                 setClassInformation({
                   ...classInformation,
-                  cookingClassStartTime: convertToSeoulTime(new Date(value)),
+                  cookingClassStartTime: convertToSeoulTime(
+                    new Date(e.target.value)
+                  ),
                 });
               }}
             />
@@ -366,44 +376,17 @@ const ClassRegist = () => {
               aria-label="Date and time"
               type="datetime-local"
               name="cookingClassEndTime"
-              onChange={(value) => {
+              value={formatDateForInput(classInformation.cookingClassEndTime)}
+              min={formatDateForInput(classInformation.cookingClassStartTime)}
+              onChange={(e) => {
                 setClassInformation({
                   ...classInformation,
-                  cookingClassEndTime: convertToSeoulTime(new Date(value)),
+                  cookingClassEndTime: convertToSeoulTime(
+                    new Date(e.target.value)
+                  ),
                 });
               }}
             />
-            {/* <DateTimePicker
-                label="수업 시작시간"
-                id="classStartTime"
-                value={dayjs(classInformation.cookingClassStartTime)}
-                name="cookingClassStartTime"
-                minDate={dayjs(new Date())}
-                minTime={dayjs(new Date())}
-                onChange={(value) => {
-                  setClassInformation({
-                    ...classInformation,
-                    cookingClassStartTime: convertToSeoulTime(new Date(value)),
-                  });
-                }}
-              /> */}
-            {/* <DateTimePicker
-                label="수업 종료 시간"
-                value={dayjs(classInformation.cookingClassEndTime)}
-                name="cookingClassEndTime"
-                minDate={dayjs(classInformation.cookingClassStartTime)}
-                maxDate={dayjs(classInformation.cookingClassStartTime).add(
-                  1,
-                  "day"
-                )}
-                s
-                onChange={(value) => {
-                  setClassInformation({
-                    ...classInformation,
-                    cookingClassEndTime: convertToSeoulTime(new Date(value)),
-                  });
-                }}
-              /> */}
           </div>
         </div>
         <hr className="my-4" />

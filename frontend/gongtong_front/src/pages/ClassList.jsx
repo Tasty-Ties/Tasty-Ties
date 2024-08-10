@@ -55,7 +55,7 @@ const ClassList = () => {
 
   return (
     <>
-      <div className="w-2/3 mt-16 mx-auto content-center relative">
+      <div className="content-center relative">
         <SearchBar page={page} />
         <hr className="mt-10" />
         <div className="mt-10 grid grid-cols-4 gap-6">
@@ -76,7 +76,7 @@ const ClassList = () => {
           className="fixed bottom-48 right-36 float-right"
         >
           <img
-            src={`${FRONT_SERVER_URL}/images/classImages/add-icon.svg`}
+            src={"/images/classImages/add-icon.svg"}
             alt="요리클래스 등록하기"
           />
         </Link>

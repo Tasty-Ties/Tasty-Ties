@@ -15,12 +15,12 @@ const AttendClass = () => {
   console.log(attendClasses);
 
   if (attendClasses.length === 0) {
-    return <div>참여한 클래스가 없습니다.</div>;
+    return <div className="text-xl">참여한 클래스가 없습니다.</div>;
   }
 
   return (
     <div>
-      <p>참여한 클래스</p>
+      <p className="text-xl">참여한 클래스</p>
       {attendClasses.map((attendClass, index) => (
         <ClassForm key={index} classInfo={attendClass} />
       ))}

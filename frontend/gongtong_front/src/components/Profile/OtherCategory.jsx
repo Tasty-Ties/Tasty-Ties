@@ -9,7 +9,7 @@ const OtherCategory = (informations) => {
 
   return (
     <div className="flex">
-      <div className="w-60">
+      <div className="w-56">
         <br />
         <div className="flex flex-col">
           {information.userProfileDto && (
@@ -19,7 +19,7 @@ const OtherCategory = (informations) => {
                 alt="프로필사진"
                 className="size-16 rounded-lg bg-gray-50"
               />
-              &nbsp;&nbsp;
+              &nbsp;&nbsp;&nbsp;&nbsp;
               <div className="flex flex-col mt-2">
                 <p>
                   <CountryFlags

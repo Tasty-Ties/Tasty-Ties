@@ -14,7 +14,7 @@ const ReserveClass = () => {
   }, []);
 
   if (reserveClasses.length === 0) {
-    return <div>예약한 클래스가 없습니다.</div>;
+    return <div className="text-xl">예약한 클래스가 없습니다.</div>;
   }
 
   return (
