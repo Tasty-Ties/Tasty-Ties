@@ -60,6 +60,11 @@ const VideoComponent = ({ isHost, title, hostName }) => {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
 
+  const [, forceUpdate] = useState(0);
+  const triggerRerender = () => {
+    forceUpdate((n) => n + 1);
+  };
+
   useEffect(() => {
     console.log(subscribers);
     if (!subscribers) {
@@ -82,7 +87,7 @@ const VideoComponent = ({ isHost, title, hostName }) => {
         }
       });
     }
-  }, [subscribers, localUser]);
+  }, [subscribers, localUser?.streamManager]);
 
   const remotes = useRef([]);
   const localUserAccessAllowed = useRef(false);
@@ -105,7 +110,7 @@ const VideoComponent = ({ isHost, title, hostName }) => {
     window.addEventListener("beforeunload", onbeforeunload);
     joinSession();
     // initializeMediapipe();
-    initializeGestureRecognizer();
+    // initializeGestureRecognizer();
 
     stompClient.current = new Client({
       brokerURL: CHAT_SERVER_URL,
@@ -131,6 +136,11 @@ const VideoComponent = ({ isHost, title, hostName }) => {
       leaveSession();
     };
   }, []);
+
+  useEffect(() => {
+    switchCamera();
+    // displayChange();
+  }, [selectedVideoDevice]);
 
   const joinSession = async () => {
     const newSession = OV.initSession();
@@ -172,14 +182,9 @@ const VideoComponent = ({ isHost, title, hostName }) => {
 
   const connectWebCam = async (session) => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        audio: true, // 여기서 오디오 스트림도 가져옵니다.
-        video: { deviceId: selectedVideoDevice.deviceId },
-      });
-
       const publisher = OV.initPublisher(undefined, {
-        audioSource: stream.getAudioTracks()[0], // 오디오 트랙을 사용합니다.
-        videoSource: stream.getVideoTracks()[0],
+        audioSource: selectedAudioDevice, // 오디오 트랙을 사용합니다.
+        videoSource: selectedVideoDevice,
         publishAudio: isAudioActive,
         publishVideo: isVideoActive,
         resolution: "1280x720",
@@ -188,7 +193,7 @@ const VideoComponent = ({ isHost, title, hostName }) => {
       });
 
       currentPublisher.current = publisher;
-      audioStream.current = stream; // 오디오 스트림을 저장합니다.
+      audioStream.current = publisher.stream.mediaStream; // 오디오 스트림을 저장합니다.
 
       if (session.capabilities.publish) {
         publisher.on("accessAllowed", () => {
@@ -209,6 +214,38 @@ const VideoComponent = ({ isHost, title, hostName }) => {
     } catch (error) {
       console.error("Error accessing media devices:", error);
       alert("오디오 또는 비디오 장치에 접근할 수 없습니다: " + error.message);
+    }
+  };
+
+  const switchCamera = async () => {
+    if (currentPublisher.current) {
+      const newPublisher = await OV.initPublisher(undefined, {
+        audioSource: selectedAudioDevice,
+        videoSource: selectedVideoDevice.deviceId,
+        publishAudio: isAudioActive,
+        publishVideo: isVideoActive,
+        resolution: "1280x720",
+        frameRate: 30,
+        insertMode: "APPEND",
+      });
+
+      await new Promise((resolve, reject) => {
+        newPublisher.once("accessAllowed", resolve);
+        newPublisher.once("accessDenied", reject);
+      });
+
+      const newVideoTrack = await navigator.mediaDevices
+        .getUserMedia({
+          video: { deviceId: selectedVideoDevice.deviceId },
+        })
+        .then((stream) => stream.getVideoTracks()[0]);
+
+      currentPublisher.current.replaceTrack(
+        newPublisher.stream.mediaStream.getVideoTracks()[0]
+      );
+
+      localUserSetting.setStreamManager(newPublisher);
+      setLocalUser(localUserSetting);
     }
   };
 

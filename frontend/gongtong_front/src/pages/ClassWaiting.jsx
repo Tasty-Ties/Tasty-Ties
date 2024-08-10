@@ -124,7 +124,7 @@ const ClassWaiting = () => {
             ref={videoPreviewRef}
             autoPlay
             playsInline
-            className=""
+            className="transform scale-x-[-1]"
           ></video>
         ) : (
           <img
