@@ -33,6 +33,12 @@ const Recipe = ({ onChange }) => {
     }
   };
 
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault(); // 엔터 키 기본 동작 방지
+    }
+  };
+
   useEffect(() => {}, [recipes]);
 
   return (
@@ -46,6 +52,7 @@ const Recipe = ({ onChange }) => {
               name="description"
               value={field.description}
               onChange={(e) => handleInputChange(index, e)}
+              onKeyDown={handleKeyDown}
               className="w-full border p-2 rounded"
               placeholder="레시피를 작성해주세요"
             />

@@ -4,12 +4,15 @@ const CookingTools = ({ cookingTools, setCookingTools }) => {
   const [inputValue, setInputValue] = useState("");
 
   const handleKeyDown = (e) => {
-    if ((e.key === "Enter" || e.keyCode === 13) && inputValue.trim()) {
-      setCookingTools([...cookingTools, inputValue.trim()]);
-      setInputValue("");
-      e.preventDefault();
+    if (e.key === "Enter" || e.keyCode === 13) {
+      e.preventDefault(); // 항상 기본 동작을 방지
+      if (inputValue.trim()) {
+        setCookingTools([...cookingTools, inputValue.trim()]);
+        setInputValue("");
+      }
     }
   };
+
   return (
     <div className="regist-component-box">
       <div className="input-box">

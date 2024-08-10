@@ -44,6 +44,12 @@ const Ingredient = ({ onChange }) => {
     onChange(values);
   };
 
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter" || e.keyCode === 13) {
+      e.preventDefault(); // 엔터 키 기본 동작 방지
+    }
+  };
+
   useEffect(() => {}, [ingredients]);
 
   return (
@@ -56,6 +62,7 @@ const Ingredient = ({ onChange }) => {
               name="ingredientName"
               value={field.ingredientName}
               onChange={(e) => handleInputChange(index, e)}
+              onKeyDown={handleKeyDown}
               className="w-1/4 border p-2 rounded mr-2"
               placeholder="재료명"
             />
@@ -63,7 +70,9 @@ const Ingredient = ({ onChange }) => {
               type="number"
               name="quantity"
               value={field.quantity}
+              min="1"
               onChange={(e) => handleInputChange(index, e)}
+              onKeyDown={handleKeyDown}
               className="w-1/4 border p-2 rounded mr-2"
               placeholder="개수"
             />
@@ -72,6 +81,7 @@ const Ingredient = ({ onChange }) => {
               name="quantityUnit"
               value={field.quantityUnit}
               onChange={(e) => handleInputChange(index, e)}
+              onKeyDown={handleKeyDown}
               className="w-1/4 border p-2 rounded mr-2"
               placeholder="단위"
             />
