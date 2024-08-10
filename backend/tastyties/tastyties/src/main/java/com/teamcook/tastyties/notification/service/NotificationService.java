@@ -16,6 +16,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @Slf4j
@@ -159,10 +161,20 @@ public class NotificationService {
     public void checkReadNotifications(User user, Map<String, Object> requestParams) {
         List<Integer> notificationIds = (List<Integer>) requestParams.get("notificationIds");
 
-        log.debug(notificationIds.toString());
-
         if (!notificationIds.isEmpty()) {
             fcmNotificationRepository.checkReadNotification(user, notificationIds);
+        }
+    }
+
+    @Transactional
+    public void deleteNotifications(User user, Map<String, Object> requestParams) {
+        String notificationId = (String) requestParams.get("notificationIds");
+        List<Integer> notificationIds = Stream.of(notificationId.split(","))
+                .map(Integer::parseInt)
+                .collect(Collectors.toList());
+
+        if (!notificationIds.isEmpty()) {
+            fcmNotificationRepository.deleteNotification(user, notificationIds);
         }
     }
 

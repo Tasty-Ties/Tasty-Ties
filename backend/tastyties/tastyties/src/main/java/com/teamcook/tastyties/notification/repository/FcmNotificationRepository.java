@@ -1,6 +1,5 @@
 package com.teamcook.tastyties.notification.repository;
 
-import com.teamcook.tastyties.notification.dto.NotificationDto;
 import com.teamcook.tastyties.notification.entity.FcmNotification;
 import com.teamcook.tastyties.user.entity.User;
 import org.springframework.data.domain.Page;
@@ -20,5 +19,8 @@ public interface FcmNotificationRepository extends JpaRepository<FcmNotification
     @Modifying(clearAutomatically = true)
     @Query("UPDATE FcmNotification f SET f.isRead = TRUE WHERE f.user = :user AND f.id IN :notificationIds")
     void checkReadNotification(@Param("user") User user, @Param("notificationIds") List<Integer> notificationIds);
+    @Modifying
+    @Query("DELETE FcmNotification f WHERE f.user = :user AND f.id IN :notificationIds")
+    void deleteNotification(@Param("user") User user, @Param("notificationIds") List<Integer> notificationIds);
 
 }
