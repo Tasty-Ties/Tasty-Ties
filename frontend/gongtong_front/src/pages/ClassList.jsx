@@ -55,7 +55,7 @@ const ClassList = () => {
 
   return (
     <>
-      <div className="content-center relative">
+      <div className="w-2/3 mt-16 mx-auto content-center relative">
         <SearchBar page={page} />
         <hr className="mt-10" />
         <div className="mt-10 grid grid-cols-4 gap-6">

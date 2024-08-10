@@ -39,9 +39,7 @@ function App() {
     <>
       {/* <LocalizationProvider dateAdapter={AdapterDayjs}> */}
       {isHeaderVisible && <Header />}
-      <div className="w-2/3 mt-10 mx-auto">
-        <AppRoutes />
-      </div>
+      <AppRoutes />
       {/* </LocalizationProvider> */}
     </>
   );
