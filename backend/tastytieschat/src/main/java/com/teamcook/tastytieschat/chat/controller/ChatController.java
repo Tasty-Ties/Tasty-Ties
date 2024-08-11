@@ -6,7 +6,6 @@ import com.teamcook.tastytieschat.chat.service.ChatMessageService;
 import com.teamcook.tastytieschat.chat.service.ChatRoomService;
 import com.teamcook.tastytieschat.common.dto.CommonResponseDTO;
 import com.teamcook.tastytieschat.security.userdetails.CustomUserDetails;
-import com.teamcook.tastytieschat.user.entity.User;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,15 +13,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/v1/chats")
-@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
+@RequestMapping("/chatapi/chats")
 public class ChatController {
 
     private final ChatRoomService chatRoomService;

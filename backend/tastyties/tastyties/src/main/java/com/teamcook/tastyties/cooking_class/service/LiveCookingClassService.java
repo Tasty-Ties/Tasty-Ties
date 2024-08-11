@@ -19,10 +19,10 @@ import java.util.Map;
 public class LiveCookingClassService {
 
 
-    @Value("${OPENVIDU_URL}")
+    @Value("${openvidu_url}")
     private String OPENVIDU_URL;
 
-    @Value("${OPENVIDU_SECRET}")
+    @Value("${openvidu_secret}")
     private String OPENVIDU_SECRET;
 
     private OpenVidu openvidu;
