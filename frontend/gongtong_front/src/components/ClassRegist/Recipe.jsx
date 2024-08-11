@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, forwardRef } from "react";
 
-const Recipe = ({ onChange }) => {
+const Recipe = forwardRef(function Recipe({ onChange }, ref) {
   const [recipes, setRecipes] = useState([{ step: 1, description: "" }]);
 
   const handleAddFields = () => {
@@ -89,5 +89,8 @@ const Recipe = ({ onChange }) => {
       </div>
     </div>
   );
-};
+});
+
+Recipe.displayName = "Recipe";
+
 export default Recipe;

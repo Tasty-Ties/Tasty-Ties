@@ -76,8 +76,6 @@ export const setDeleteClass = async (id) => {
 
 // 클래스 등록
 export const setClassRegist = async (data, files) => {
-  console.log(data);
-  console.log(files);
   const formData = new FormData();
   formData.append(
     "registerDto",

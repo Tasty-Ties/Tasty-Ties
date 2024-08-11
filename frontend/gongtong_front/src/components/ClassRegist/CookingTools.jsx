@@ -1,6 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, forwardRef } from "react";
 
-const CookingTools = ({ cookingTools, setCookingTools }) => {
+const CookingTools = forwardRef(function CookingTools(
+  { cookingTools, setCookingTools },
+  ref
+) {
   const [inputValue, setInputValue] = useState("");
 
   const handleKeyDown = (e) => {
@@ -40,6 +43,8 @@ const CookingTools = ({ cookingTools, setCookingTools }) => {
       </div>
     </div>
   );
-};
+});
+
+CookingTools.displayName = "CookingTools";
 
 export default CookingTools;

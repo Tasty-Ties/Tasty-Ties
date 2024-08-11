@@ -1,8 +1,7 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { useForm, Controller } from "react-hook-form";
-import * as yup from "yup";
+import React, { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import axios from "axios";
+import * as yup from "yup";
 import dayjs from "dayjs";
 import { useNavigate } from "react-router-dom";
 
@@ -21,23 +20,30 @@ const validationSchema = yup.object().shape({
   title: yup
     .string()
     .required("클래스명은 필수입니다")
-    .max(50, "클래스명은 50자 이내여야 합니다"),
+    .min(2, "클래스명은 최소 2글자입니다.")
+    .max(50, "클래스명은 최대 50자입니다.")
+    .matches(
+      /^[a-zA-Zㄱ-ㅎㅏ-ㅣ가-힣0-9\s]{1,50}$/,
+      "클래스명은 한글,영어,숫자 조합만 가능합니다."
+    ),
   dishName: yup
     .string()
     .required("음식명은 필수입니다")
-    .max(50, "음식명은 50자 이내여야 합니다"),
+    .max(50, "음식명은 최대 50자입니다")
+    .matches(
+      /^[a-zA-Zㄱ-ㅎㅏ-ㅣ가-힣0-9\s]{1,50}$/,
+      "음식명은 한글,영어,숫자 조합만 가능합니다."
+    ),
   isLimitedAge: yup.boolean(),
-  countryCode: yup.string().required("음식 문화권은 필수입니다"),
-  countryName: yup.string(),
-  cookingClassTags: yup.array(),
+  countryCode: yup.string().required("음식 문화권 선택은 필수입니다"),
+  cookingClassTags: yup.array().min(1, "해시태그를 입력해주세요."),
   description: yup.string().required("클래스 소개는 필수입니다"),
   languageCode: yup.string().required("클래스 진행 언어는 필수입니다"),
-  languageName: yup.string(),
-  level: yup.number().required("난이도는 필수입니다").min(1).max(5),
-  cookingClassStartTime: yup.date().required("시작 시간은 필수입니다"),
+  level: yup.number().required("난이도를 설정해주세요").min(1).max(5),
+  cookingClassStartTime: yup.date().required("시작 시간을 입력해주세요"),
   cookingClassEndTime: yup
     .date()
-    .required("종료 시간은 필수입니다")
+    .required("종료 시간을 입력해주세요")
     .min(
       yup.ref("cookingClassStartTime"),
       "종료 시간은 시작 시간 이후여야 합니다"
@@ -61,9 +67,9 @@ const validationSchema = yup.object().shape({
     .array()
     .of(
       yup.object().shape({
-        name: yup.string().required("식재료명은 필수입니다"),
-        quantity: yup.string().required("수량은 필수입니다"),
-        unit: yup.string().required("단위는 필수입니다"),
+        ingredientName: yup.string().required("식재료명은 필수입니다"),
+        quantity: yup.number().required("수량은 필수입니다"),
+        quantityUnit: yup.string().required("단위는 필수입니다"),
       })
     )
     .min(1, "최소 1개의 식재료가 필요합니다"),
@@ -74,11 +80,10 @@ const validationSchema = yup.object().shape({
         step: yup.number(),
         description: yup
           .string()
-          .required("레시피 설명은 필수입니다")
           .max(500, "레시피 설명은 500자 이내여야 합니다"),
       })
     )
-    .min(1, "최소 1개의 레시피 단계가 필요합니다"),
+    .min(1, "레시피를 입력해주세요"),
   cookingTools: yup.array().min(1, "최소 1개의 조리 도구가 필요합니다"),
   quota: yup
     .number()
@@ -105,11 +110,11 @@ const ClassRegist = () => {
   const [files, setFiles] = useState([]);
 
   const {
-    control,
+    register,
     handleSubmit,
+    formState: { errors, isSubmitting },
     setValue,
     watch,
-    formState: { errors, isValid, isDirty },
     trigger,
   } = useForm({
     resolver: yupResolver(validationSchema),
@@ -127,7 +132,7 @@ const ClassRegist = () => {
       level: 1,
       cookingClassStartTime: dayjs().format("YYYY-MM-DDTHH:mm"),
       cookingClassEndTime: dayjs().add(1, "hour").format("YYYY-MM-DDTHH:mm"),
-      dishCookingTime: 0,
+      dishCookingTime: 1,
       ingredients: [],
       recipe: [],
       cookingTools: [],
@@ -139,57 +144,21 @@ const ClassRegist = () => {
   useEffect(() => {
     fetchCountries();
     fetchLanguages();
-    trigger();
-  }, []);
-
-  const memoizedCountries = useMemo(() => {
-    return (
-      countries &&
-      countries.map((country) => (
-        <option key={country.countryCode} value={country.countryCode}>
-          {country.koreanName}
-        </option>
-      ))
-    );
-  }, [countries]);
-
-  const memoizedLanguages = useMemo(() => {
-    return (
-      languages &&
-      languages.map((language) => (
-        <option key={language.languageCode} value={language.languageCode}>
-          {language.koreanName}
-        </option>
-      ))
-    );
-  }, [languages]);
-
-  const handleKeyDown = (e, fieldName) => {
-    if (e.key === "Enter" || e.keyCode === "13") {
-      if (["cookingClassTags", "cookingTools"].includes(fieldName)) {
-        return;
-      }
-      e.preventDefault();
-    }
-  };
+  }, [fetchCountries, fetchLanguages]);
 
   const onSubmit = async (data) => {
-    if (!isValid) {
-      alert("모든 필수 항목을 올바르게 입력해주세요.");
-      return;
-    }
+    const isValid = await trigger();
+
     if (files.length === 0) {
       alert("최소 한 개의 이미지를 업로드해주세요.");
       return;
     }
 
-    // replayEndTime 계산
     const calculatedReplayEndTime = calculateReplayEndTime(
       data.cookingClassStartTime,
       data.replayEndTime
     );
 
-    // 계산된 replayEndTime으로 데이터 업데이트
     const updatedData = {
       ...data,
       replayEndTime: calculatedReplayEndTime,
@@ -198,7 +167,7 @@ const ClassRegist = () => {
     try {
       await setClassRegist(updatedData, files);
       alert("성공적으로 등록되었습니다.");
-      // navigate("/class");
+      navigate("/class");
     } catch (error) {
       console.error("클래스 등록 실패:", error);
       alert("클래스 등록에 실패했습니다. 다시 시도해주세요.");
@@ -217,29 +186,33 @@ const ClassRegist = () => {
     return endDay.toISOString();
   };
 
+  const handleKeyDown = (e, fieldName) => {
+    if (e.key === "Enter") {
+      if (["cookingClassTags", "cookingTools"].includes(fieldName)) {
+        return;
+      }
+      e.preventDefault();
+    }
+  };
+
   return (
     <div className="w-3/6 mx-auto justify-center">
       <div className="mt-8 mb-4 text-center text-first-800 font-bold border-b-2 border-first-800 pb-4 text-2xl">
         클래스 등록
       </div>
-      <form onSubmit={onSubmit} encType="multipart/form-data">
+      <form onSubmit={handleSubmit(onSubmit)} encType="multipart/form-data">
         <div className="grid grid-cols-8">
           <div className="col-span-2">
             <label htmlFor="title">클래스명</label>
           </div>
           <div className="col-span-6">
-            <Controller
-              name="title"
-              control={control}
-              render={({ field }) => (
-                <input
-                  {...field}
-                  type="text"
-                  placeholder="클래스명을 입력해주세요"
-                  className="w-full border p-2 rounded"
-                  onKeyDown={(e) => handleKeyDown(e, "title")}
-                />
-              )}
+            <input
+              {...register("title")}
+              type="text"
+              placeholder="클래스명을 입력해주세요"
+              className="w-full border p-2 rounded"
+              onBlur={() => trigger("title")}
+              onKeyDown={(e) => handleKeyDown(e, "title")}
             />
             {errors.title && (
               <p className="text-red-500">{errors.title.message}</p>
@@ -253,26 +226,19 @@ const ClassRegist = () => {
             <label htmlFor="dishName">음식명</label>
           </div>
           <div className="col-span-6">
-            <Controller
-              name="dishName"
-              control={control}
-              render={({ field }) => (
-                <input
-                  {...field}
-                  type="text"
-                  placeholder="음식명을 입력해주세요"
-                  className="w-full border p-2 rounded"
-                  onKeyDown={(e) => handleKeyDown(e, "dishName")}
-                />
-              )}
+            <input
+              {...register("dishName")}
+              type="text"
+              placeholder="음식명을 입력해주세요"
+              className="w-full border p-2 rounded"
+              onBlur={() => trigger("dishName")}
+              onKeyDown={(e) => handleKeyDown(e, "dishName")}
             />
             <div className="flex items-center mt-2">
-              <Controller
-                name="isLimitedAge"
-                control={control}
-                render={({ field }) => (
-                  <input {...field} type="checkbox" className="mr-1" />
-                )}
+              <input
+                {...register("isLimitedAge")}
+                type="checkbox"
+                className="mr-1"
               />
               <label htmlFor="isLimitedAge" className="text-gray-500 text-sm">
                 성인 인증이 필요한 경우(주류 사용 등) 체크해주세요.
@@ -290,16 +256,31 @@ const ClassRegist = () => {
             <label htmlFor="countryCode">국가명</label>
           </div>
           <div className="col-span-6">
-            <Controller
-              name="countryCode"
-              control={control}
-              render={({ field }) => (
-                <select {...field} className="w-1/2 border p-2 rounded">
-                  <option value="">선택</option>
-                  {memoizedCountries}
-                </select>
-              )}
-            />
+            <select
+              {...register("countryCode")}
+              className="w-1/2 border p-2 rounded"
+              onChange={(e) => {
+                const selectedCountry = countries.find(
+                  (c) => c.countryCode === e.target.value
+                );
+                setValue("countryCode", e.target.value);
+                setValue(
+                  "countryName",
+                  selectedCountry ? selectedCountry.koreanName : ""
+                );
+                setTimeout(() => trigger("countryCode"), 0);
+              }}
+            >
+              <option value="">선택</option>
+              {countries &&
+                countries.length > 0 &&
+                countries.map((country) => (
+                  <option key={country.countryCode} value={country.countryCode}>
+                    {country.koreanName}
+                  </option>
+                ))}
+            </select>
+            <input type="hidden" {...register("countryName")} />
             {errors.countryCode && (
               <p className="text-red-500">{errors.countryCode.message}</p>
             )}
@@ -309,19 +290,19 @@ const ClassRegist = () => {
 
         <div className="grid grid-cols-8">
           <div className="col-span-2">
-            <label htmlFor="hashtage">해시태그</label>
+            <label htmlFor="cookingClassTags">해시태그</label>
           </div>
           <div className="col-span-6">
-            <Controller
-              name="cookingClassTags"
-              control={control}
-              render={({ field }) => (
-                <CookingClassTags
-                  hashtags={field.value}
-                  setHashtags={(tags) => field.onChange(tags)}
-                />
-              )}
+            <CookingClassTags
+              hashtags={watch("cookingClassTags")}
+              setHashtags={(tags) => {
+                setValue("cookingClassTags", tags);
+                trigger("cookingClassTags");
+              }}
             />
+            {errors.cookingClassTags && (
+              <p className="text-red-500">{errors.cookingClassTags.message}</p>
+            )}
           </div>
         </div>
         <hr className="my-4" />
@@ -331,17 +312,12 @@ const ClassRegist = () => {
             <label htmlFor="description">소개글</label>
           </div>
           <div className="col-span-6">
-            <Controller
-              name="description"
-              control={control}
-              render={({ field }) => (
-                <textarea
-                  {...field}
-                  placeholder="클래스 소개를 입력해주세요"
-                  className="w-full resize-none h-48 border p-2 rounded"
-                  onKeyDown={(e) => handleKeyDown(e, "description")}
-                />
-              )}
+            <textarea
+              {...register("description")}
+              placeholder="클래스 소개를 입력해주세요"
+              className="w-full resize-none h-48 border p-2 rounded"
+              onBlur={() => trigger("description")}
+              onKeyDown={(e) => handleKeyDown(e, "description")}
             />
             <div className="text-right text-sm text-gray-500">
               {watch("description").length} / 1000
@@ -358,16 +334,34 @@ const ClassRegist = () => {
             <label htmlFor="languageCode">수업 진행할 언어</label>
           </div>
           <div className="col-span-6">
-            <Controller
-              name="languageCode"
-              control={control}
-              render={({ field }) => (
-                <select {...field} className="w-1/2 border p-2 rounded">
-                  <option value="">선택</option>
-                  {memoizedLanguages}
-                </select>
-              )}
-            />
+            <select
+              {...register("languageCode")}
+              className="w-1/2 border p-2 rounded"
+              onChange={(e) => {
+                const selectedLanguage = languages.find(
+                  (l) => l.languageCode === e.target.value
+                );
+                setValue("languageCode", e.target.value);
+                setValue(
+                  "languageName",
+                  selectedLanguage ? selectedLanguage.koreanName : ""
+                );
+                setTimeout(() => trigger("languageCode"), 0);
+              }}
+            >
+              <option value="">선택</option>
+              {languages &&
+                languages.length > 0 &&
+                languages.map((language) => (
+                  <option
+                    key={language.languageCode}
+                    value={language.languageCode}
+                  >
+                    {language.koreanName}
+                  </option>
+                ))}
+            </select>
+            <input type="hidden" {...register("languageName")} />
             {errors.languageCode && (
               <p className="text-red-500">{errors.languageCode.message}</p>
             )}
@@ -380,32 +374,26 @@ const ClassRegist = () => {
             <label htmlFor="level">수업 난이도</label>
           </div>
           <div className="col-span-6">
-            <Controller
-              name="level"
-              control={control}
-              render={({ field }) => (
-                <div className="review-rating-box">
-                  <div className="rating">
-                    <div className="rating-status">
-                      {[5, 4, 3, 2, 1].map((rating) => (
-                        <React.Fragment key={`rating-${rating}`}>
-                          <input
-                            type="radio"
-                            className="rating"
-                            name="rating1"
-                            value={rating}
-                            id={`rate1-${rating}`}
-                            checked={field.value === rating}
-                            onChange={() => field.onChange(rating)}
-                          />
-                          <label htmlFor={`rate1-${rating}`}>⭐</label>
-                        </React.Fragment>
-                      ))}
-                    </div>
-                  </div>
+            <div className="review-rating-box">
+              <div className="rating">
+                <div className="rating-status">
+                  {[5, 4, 3, 2, 1].map((rating) => (
+                    <React.Fragment key={`rating-${rating}`}>
+                      <input
+                        type="radio"
+                        className="rating"
+                        name="rating1"
+                        value={rating}
+                        id={`rate1-${rating}`}
+                        checked={watch("level") === rating}
+                        onChange={() => setValue("level", rating)}
+                      />
+                      <label htmlFor={`rate1-${rating}`}>⭐</label>
+                    </React.Fragment>
+                  ))}
                 </div>
-              )}
-            />
+              </div>
+            </div>
             {errors.level && (
               <p className="text-red-500">{errors.level.message}</p>
             )}
@@ -418,34 +406,30 @@ const ClassRegist = () => {
             <label htmlFor="cookingClassStartTime">수업일정</label>
           </div>
           <div className="col-span-6">
-            <Controller
-              name="cookingClassStartTime"
-              control={control}
-              render={({ field }) => (
-                <input
-                  {...field}
-                  type="datetime-local"
-                  className="w-1/2 px-4 py-2 mb-4 border rounded-lg shadow-sm bg-white text-gray-700 border-gray-300 focus:outline-none focus:ring-2 focus:ring-first focus:border-first"
-                  onKeyDown={(e) => handleKeyDown(e, "cookingClassStartTime")}
-                />
-              )}
+            <input
+              {...register("cookingClassStartTime")}
+              type="datetime-local"
+              className="w-1/2 px-4 py-2 mb-4 border rounded-lg shadow-sm bg-white text-gray-700 border-gray-300 focus:outline-none focus:ring-2 focus:ring-first focus:border-first"
+              onChange={(e) => {
+                setValue("cookingClassStartTime", e.target.value);
+                trigger("cookingClassStartTime");
+              }}
+              onKeyDown={(e) => handleKeyDown(e, "cookingClassStartTime")}
             />
             {errors.cookingClassStartTime && (
               <p className="text-red-500">
                 {errors.cookingClassStartTime.message}
               </p>
             )}
-            <Controller
-              name="cookingClassEndTime"
-              control={control}
-              render={({ field }) => (
-                <input
-                  {...field}
-                  type="datetime-local"
-                  className="w-1/2 px-4 py-2 mb-4 border rounded-lg shadow-sm bg-white text-gray-700 border-gray-300 focus:outline-none focus:ring-2 focus:ring-first focus:border-first"
-                  onKeyDown={(e) => handleKeyDown(e, "cookingClassEndTime")}
-                />
-              )}
+            <input
+              {...register("cookingClassEndTime")}
+              type="datetime-local"
+              className="w-1/2 px-4 py-2 mb-4 border rounded-lg shadow-sm bg-white text-gray-700 border-gray-300 focus:outline-none focus:ring-2 focus:ring-first focus:border-first"
+              onChange={(e) => {
+                setValue("cookingClassEndTime", e.target.value);
+                trigger("cookingClassEndTime");
+              }}
+              onKeyDown={(e) => handleKeyDown(e, "cookingClassEndTime")}
             />
             {errors.cookingClassEndTime && (
               <p className="text-red-500">
@@ -471,23 +455,19 @@ const ClassRegist = () => {
             <label htmlFor="dishCookingTime">조리 시간</label>
           </div>
           <div className="col-span-6">
-            <Controller
-              name="dishCookingTime"
-              control={control}
-              min="0"
-              render={({ field }) => (
-                <input
-                  {...field}
-                  type="number"
-                  className="w-1/2 border p-2 rounded"
-                  onKeyDown={(e) => handleKeyDown(e, "dishCookingTime")}
-                  onChange={(e) => {
-                    let value = parseInt(e.target.value);
-                    if (value < 0) value = 0;
-                    field.onChange(value);
-                  }}
-                />
-              )}
+            <input
+              {...register("dishCookingTime")}
+              type="number"
+              className="w-1/2 border p-2 rounded"
+              min="1"
+              onBlur={() => trigger("dishCookingTime")}
+              onKeyDown={(e) => handleKeyDown(e, "dishCookingTime")}
+              onChange={(e) => {
+                let value = parseInt(e.target.value);
+                if (value < 1) value = 1;
+                setValue("dishCookingTime", value);
+                trigger("dishCookingTime");
+              }}
             />
             <span className="ml-2">분</span>
             {errors.dishCookingTime && (
@@ -499,14 +479,15 @@ const ClassRegist = () => {
 
         <div className="grid grid-cols-8">
           <div className="col-span-2">
-            <label htmlFor="">식재료</label>
+            <label htmlFor="ingredients">식재료</label>
             <div className="text-sm text-gray-400 mt-1">* 필수여부 체크</div>
           </div>
           <div className="col-span-6">
-            <Controller
-              name="ingredients"
-              control={control}
-              render={({ field }) => <Ingredient onChange={field.onChange} />}
+            <Ingredient
+              onChange={(ingredients) => {
+                setValue("ingredients", ingredients);
+                trigger("ingredients");
+              }}
             />
             {errors.ingredients && (
               <p className="text-red-500">{errors.ingredients.message}</p>
@@ -517,14 +498,15 @@ const ClassRegist = () => {
 
         <div className="grid grid-cols-8">
           <div className="col-span-2">
-            <label htmlFor="">레시피</label>
+            <label htmlFor="recipe">레시피</label>
             <div className="text-sm text-gray-400 mt-1">* 단계별로 작성</div>
           </div>
           <div className="col-span-6">
-            <Controller
-              name="recipe"
-              control={control}
-              render={({ field }) => <Recipe onChange={field.onChange} />}
+            <Recipe
+              onChange={(recipe) => {
+                setValue("recipe", recipe);
+                trigger("recipe");
+              }}
             />
             {errors.recipe && (
               <p className="text-red-500">{errors.recipe.message}</p>
@@ -538,15 +520,12 @@ const ClassRegist = () => {
             <label htmlFor="cookingTools">조리도구</label>
           </div>
           <div className="col-span-6">
-            <Controller
-              name="cookingTools"
-              control={control}
-              render={({ field }) => (
-                <CookingTools
-                  cookingTools={field.value}
-                  setCookingTools={field.onChange}
-                />
-              )}
+            <CookingTools
+              cookingTools={watch("cookingTools")}
+              setCookingTools={(tools) => {
+                setValue("cookingTools", tools);
+                trigger("cookingTools");
+              }}
             />
             {errors.cookingTools && (
               <p className="text-red-500">{errors.cookingTools.message}</p>
@@ -560,26 +539,21 @@ const ClassRegist = () => {
             <label htmlFor="quota">클래스 정원</label>
           </div>
           <div className="col-span-6">
-            <Controller
-              name="quota"
-              control={control}
-              render={({ field }) => (
-                <input
-                  {...field}
-                  type="number"
-                  className="w-1/2 border p-2 rounded"
-                  min="1"
-                  max="5"
-                  placeholder="클래스 정원을 입력해주세요"
-                  onKeyDown={(e) => handleKeyDown(e, "quota")}
-                  onChange={(e) => {
-                    let value = parseInt(e.target.value);
-                    if (value < 1) value = 1;
-                    if (value > 5) value = 5;
-                    field.onChange(value);
-                  }}
-                />
-              )}
+            <input
+              {...register("quota")}
+              type="number"
+              className="w-1/2 border p-2 rounded"
+              min="1"
+              max="5"
+              placeholder="클래스 정원을 입력해주세요"
+              onBlur={() => trigger("quota")}
+              onKeyDown={(e) => handleKeyDown(e, "quota")}
+              onChange={(e) => {
+                let value = parseInt(e.target.value);
+                if (value < 1) value = 1;
+                if (value > 5) value = 5;
+                setValue("quota", value);
+              }}
             />
             <span className="ml-2">명</span>
             {errors.quota && (
@@ -594,26 +568,21 @@ const ClassRegist = () => {
             <label htmlFor="replayEndTime">다시보기 기간</label>
           </div>
           <div className="col-span-6">
-            <Controller
-              name="replayEndTime"
-              control={control}
-              render={({ field }) => (
-                <input
-                  {...field}
-                  type="number"
-                  className="w-1/2 border p-2 rounded"
-                  placeholder="다시보기 기간을 입력해주세요"
-                  min="1"
-                  max="31"
-                  onKeyDown={(e) => handleKeyDown(e, "replayEndTime")}
-                  onChange={(e) => {
-                    let value = parseInt(e.target.value);
-                    if (value < 1) value = 1;
-                    if (value > 31) value = 31;
-                    field.onChange(value);
-                  }}
-                />
-              )}
+            <input
+              {...register("replayEndTime")}
+              type="number"
+              className="w-1/2 border p-2 rounded"
+              placeholder="다시보기 기간을 입력해주세요"
+              min="1"
+              max="31"
+              onBlur={() => trigger("replayEndTime")}
+              onKeyDown={(e) => handleKeyDown(e, "replayEndTime")}
+              onChange={(e) => {
+                let value = parseInt(e.target.value);
+                if (value < 1) value = 1;
+                if (value > 31) value = 31;
+                setValue("replayEndTime", value);
+              }}
             />
             <span className="ml-2">일</span>
             {errors.replayEndTime && (
@@ -632,7 +601,12 @@ const ClassRegist = () => {
             />
           </div>
           <div>
-            <Button text="등록" type="green-semi-long" onClick={onSubmit} />
+            <Button
+              text="등록"
+              type="green-semi-long"
+              onClick={handleSubmit(onSubmit)}
+              disabled={isSubmitting}
+            />
           </div>
         </div>
         <div className="h-36"></div>

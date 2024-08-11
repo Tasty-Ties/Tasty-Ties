@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, forwardRef } from "react";
 
-const Ingredient = ({ onChange }) => {
+const Ingredient = forwardRef(function Ingredient({ onChange }, ref) {
   const [ingredients, setIngredients] = useState([
     {
       ingredientName: "",
@@ -127,6 +127,8 @@ const Ingredient = ({ onChange }) => {
       </div>
     </div>
   );
-};
+});
+
+Ingredient.displayName = "Ingredient";
 
 export default Ingredient;
