@@ -37,6 +37,13 @@ const useVideoStore = create((set) => ({
       newImage[index] = value;
       return { liveClassImage: newImage };
     }),
+  setEmptyLiveClassImage: () =>
+    set((state) => {
+      state.liveClassImage.map((image, i) => image.revokeObjectURL());
+    }),
+
+  classData: null,
+  setClassData: (data) => set({ classData: data }),
 }));
 
 export default useVideoStore;

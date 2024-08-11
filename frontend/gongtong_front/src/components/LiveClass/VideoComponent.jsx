@@ -27,6 +27,8 @@ import {
 
 import "./../../styles/LiveClass/LiveClass.css";
 import IconButton from "../../common/components/IconButton";
+import ChatLog from "../ChatRoom/ChatLog";
+import AttendeeList from "../ChatRoom/AttendeeList";
 
 const localUserSetting = new UserModel();
 
@@ -36,7 +38,7 @@ const userId = 1;
 const userLang = "Japanese";
 const CHUNK_SIZE = 16000;
 
-const VideoComponent = ({ isHost, title, hostName }) => {
+const VideoComponent = ({ isHost }) => {
   const OV = useVideoStore((state) => state.OV);
   const setOV = useVideoStore((state) => state.setOV);
   const selectedAudioDevice = useVideoStore(
@@ -49,6 +51,8 @@ const VideoComponent = ({ isHost, title, hostName }) => {
   const isAudioActive = useVideoStore((state) => state.isAudioActive);
 
   const userInfo = useMyPageStore((state) => state.informations);
+  const classData = useVideoStore((state) => state.classData);
+  console.log(classData);
 
   const [localUser, setLocalUser] = useState(null);
   const session = useRef(null);
@@ -56,15 +60,18 @@ const VideoComponent = ({ isHost, title, hostName }) => {
 
   const [hostUser, setHostUser] = useState(null);
   const [partUser, setPartUser] = useState();
+  const [userProfileList, setUserProfileList] = useState({});
 
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
 
-  const [, forceUpdate] = useState(0);
-  const triggerRerender = () => {
-    forceUpdate((n) => n + 1);
-  };
+  const remotes = useRef([]);
+  const localUserAccessAllowed = useRef(false);
 
+  const sessionId = useVideoStore((state) => state.sessionId);
+  const currentPublisher = useRef();
+
+  // 비디오 레이아웃 순서 정렬하는 코드
   useEffect(() => {
     console.log(subscribers);
     if (!subscribers) {
@@ -80,7 +87,7 @@ const VideoComponent = ({ isHost, title, hostName }) => {
         prev && prev.length > 0 ? [...prev, localUser] : [localUser]
       );
       subscribers.map((data) => {
-        if (data.nickname === hostName) {
+        if (data.nickname === classData.hostProfile.nickname) {
           setHostUser(data);
         } else {
           setPartUser((prev) => [...prev, data]);
@@ -89,11 +96,35 @@ const VideoComponent = ({ isHost, title, hostName }) => {
     }
   }, [subscribers, localUser?.streamManager]);
 
-  const remotes = useRef([]);
-  const localUserAccessAllowed = useRef(false);
-
-  const sessionId = useVideoStore((state) => state.sessionId);
-  const currentPublisher = useRef();
+  // 참여자 목록 정리하는 코드
+  useEffect(() => {
+    console.log(partUser);
+    console.log(userInfo);
+    if (!classData || !localUser) return;
+    const host = classData.hostProfile;
+    const parts = classData.userProfiles;
+    setUserProfileList({
+      [host.username]: [
+        host.nickname,
+        host.profileImageUrl,
+        "HOST",
+        host.username,
+      ],
+    });
+    if (parts) {
+      parts.forEach((part) => {
+        setUserProfileList((prev) => ({
+          ...prev,
+          [part.username]: [
+            part.nickname,
+            part.profileImageUrl,
+            "ATTENDEE",
+            part.username,
+          ],
+        }));
+      });
+    }
+  }, [partUser, localUser]);
 
   //미디어 파이프 및 영상 녹화 관련
   const mediaRecorder = useRef(null);
@@ -108,6 +139,8 @@ const VideoComponent = ({ isHost, title, hostName }) => {
 
   useEffect(() => {
     window.addEventListener("beforeunload", onbeforeunload);
+    console.log(userInfo.length);
+
     joinSession();
     // initializeMediapipe();
     initializeGestureRecognizer();
@@ -127,9 +160,23 @@ const VideoComponent = ({ isHost, title, hostName }) => {
         console.error("Broker reported error: " + frame.headers["message"]);
         console.error("Additional details: " + frame.body);
       },
+
+      connectHeaders: {
+        Authorization: `Bearer ${Cookies.get("accessToken")}`,
+      },
     });
 
     connectStompClient();
+
+    const host = classData.hostProfile;
+    setUserProfileList({
+      [host.username]: [
+        host.nickname,
+        host.profileImageUrl,
+        "HOST",
+        host.username,
+      ],
+    });
 
     return () => {
       window.removeEventListener("beforeunload", onbeforeunload);
@@ -242,7 +289,7 @@ const VideoComponent = ({ isHost, title, hostName }) => {
       );
       audioStream.current = newPublisher.stream.mediaStream;
 
-      localUserSetting.setStreamManager(newPublisher);
+      localUserSetting.setStreamManager({ ...newPublisher });
       setLocalUser(localUserSetting);
     }
   };
@@ -268,7 +315,7 @@ const VideoComponent = ({ isHost, title, hostName }) => {
       );
       audioStream.current = newPublisher.stream.mediaStream;
 
-      localUserSetting.setStreamManager(newPublisher);
+      localUserSetting.setStreamManager({ ...newPublisher });
       setLocalUser(localUserSetting);
     }
   };
@@ -336,7 +383,6 @@ const VideoComponent = ({ isHost, title, hostName }) => {
         isScreenShareActive: localUser.screenShareActive,
       });
     }
-    console.log(document.getElementsByTagName("StreamComponent").length);
   };
 
   const sendSignalUserChanged = (session, data) => {
@@ -611,10 +657,10 @@ const VideoComponent = ({ isHost, title, hostName }) => {
   };
 
   const [isChatOpen, setIsChatOpen] = useState(false);
-  const [isHostOnly, setIsHostOnly] = useState(false);
+  const [isHostOnly, setIsHostOnly] = useState(true);
   const [isCaptureOpen, setIsCaptureOpen] = useState(false);
   const [isPeopleListOpen, setIsPeopleListOpen] = useState(false);
-  const [isSliderOn, setIsSliderOn] = useState(true);
+  const [isSliderOn, setIsSliderOn] = useState(false);
   const [displayMode, setDisplayMode] = useState(0);
 
   const displaySetting = (modeNumber) => {
@@ -668,6 +714,19 @@ const VideoComponent = ({ isHost, title, hostName }) => {
   const liveClassImage = useVideoStore((state) => state.liveClassImage);
   const setLiveClassImage = useVideoStore((state) => state.setLiveClassImage);
 
+  // dataURL을 Blob으로 변환하는 함수
+  const dataURLToBlob = (dataURL) => {
+    const binaryString = window.atob(dataURL.split(",")[1]);
+    const arrayBuffer = new ArrayBuffer(binaryString.length);
+    const uint8Array = new Uint8Array(arrayBuffer);
+
+    for (let i = 0; i < binaryString.length; i++) {
+      uint8Array[i] = binaryString.charCodeAt(i);
+    }
+
+    return new Blob([uint8Array], { type: "image/jpeg" });
+  };
+
   const takePhoto = (e) => {
     if (
       isCaptureOpen &&
@@ -675,11 +734,6 @@ const VideoComponent = ({ isHost, title, hostName }) => {
         "video-" + localUser.getStreamManager().stream.streamId
       )
     ) {
-      console.log(
-        document.getElementById(
-          "video-" + localUser.getStreamManager().stream.streamId
-        )
-      );
       const canvas = canvasRef.current;
       const video = document.getElementById(
         "video-" + localUser.getStreamManager().stream.streamId
@@ -691,7 +745,10 @@ const VideoComponent = ({ isHost, title, hostName }) => {
       context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
       const dataUrl = canvas.toDataURL("image/jpeg");
-      setLiveClassImage(e.target.value, dataUrl);
+      const blob = dataURLToBlob(dataUrl);
+      const objectURL = URL.createObjectURL(blob);
+
+      setLiveClassImage(e.target.value, objectURL);
 
       const link = document.createElement("a");
       link.href = dataUrl;
@@ -723,7 +780,7 @@ const VideoComponent = ({ isHost, title, hostName }) => {
     if (ref.current) ref.current.scrollLeft += 200;
   };
 
-  const [videoClassName, setVideoClassName] = useState("");
+  const [videoClassName, setVideoClassName] = useState("w-2/3 mx-8");
 
   return (
     <>
@@ -827,7 +884,7 @@ const VideoComponent = ({ isHost, title, hostName }) => {
       </Dialog>
       <div className="min-h-screen min-w-screen flex flex-col items-center justify-center">
         <div className="h-20 w-full flex justify-center items-center">
-          <div className="text-2xl">{title}</div>
+          <div className="text-2xl">{classData.title}</div>
         </div>
         <div className="h-2/3 w-full items-center justify-center flex-auto flex flex-row">
           {isSliderOn ? (
@@ -880,8 +937,29 @@ const VideoComponent = ({ isHost, title, hostName }) => {
                 ))}
             </div>
           )}
-          {isChatOpen && <ChatComponent stompClient={stompClient} />}
-          {isPeopleListOpen && <PeopleListComponent />}
+          {isChatOpen && (
+            <div className="w-1/3 self-stretch mx-3 my-3 border-solid border-2">
+              <ChatLog
+                userProfile={userInfo.profileImageUrl}
+                chatRoomId={classData.chatRoomId}
+                chatRoomTitle={"채팅방"}
+                stompClient={stompClient}
+                username={userInfo.username}
+                nickname={userInfo.nickname}
+                userLang={userInfo.language.englishName}
+              />
+            </div>
+          )}
+          {isPeopleListOpen && (
+            <div className="w-1/3 self-stretch mx-3 my-3 border-solid border-2">
+              <AttendeeList
+                setOpen={setIsPeopleListOpen}
+                nickname={userInfo.nickname}
+                users={userProfileList}
+                subscribers={subscribers}
+              />
+            </div>
+          )}
         </div>
 
         <div className="h-20 flex">

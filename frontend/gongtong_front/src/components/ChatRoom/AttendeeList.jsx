@@ -1,12 +1,22 @@
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 
-const AttendeeList = ({ setOpen, users, nickname }) => {
+const AttendeeList = ({ setOpen, users, nickname, subscribers }) => {
   const defaultImage =
     "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRF1IwK6-SxM83UpFVY6WtUZxXx-phss_gAUfdKbkTfau6VWVkt";
 
-  console.log("이동경로 확인이요", users);
+  console.log(subscribers);
 
   const nav = useNavigate();
+  const location = useLocation();
+
+  const [isInLiveClass, setIsInLiveClass] = useState(false);
+
+  useEffect(() => {
+    if (location.pathname === "/liveclass") {
+      setIsInLiveClass(true);
+    }
+  }, []);
 
   const toProfilePage = (user) => {
     nav(`/otherpage/${user}`);
@@ -16,14 +26,22 @@ const AttendeeList = ({ setOpen, users, nickname }) => {
 
   return (
     <>
-      <div className="absolute w-full h-full flex flex-row">
+      <div
+        className={`${
+          isInLiveClass ? "" : "absolute"
+        } w-full h-full flex flex-row`}
+      >
+        {!isInLiveClass && (
+          <div
+            className="w-2/3 h-full bg-gray-500 bg-opacity-75"
+            onClick={() => setOpen(false)}
+          ></div>
+        )}
         <div
-          className="w-2/3 h-full bg-gray-500 bg-opacity-75"
-          onClick={() => setOpen(false)}
-        ></div>
-        <div className="w-1/3 h-full bg-white">
+          className={`${isInLiveClass ? "w-full" : "w-1/3"} h-full bg-white`}
+        >
           <div className="bg-yellow-200 text-xl pl-5 py-2 flex flex-row justify-between">
-            <p>참가자 ({users?.length})</p>
+            <p>참가자 ({users ? Object.keys(users).length : 0})</p>
             <button className="px-2" onClick={() => setOpen(false)}>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
