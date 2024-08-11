@@ -4,7 +4,6 @@ import { Link, useNavigate } from "react-router-dom";
 import ClassListItem from "./../components/ClassList/ClassListItem";
 import SearchBar from "./../components/ClassList/SearchBar";
 import useCookingClassStore from "./../store/CookingClassStore";
-import useAuthStore from "./../store/AuthStore";
 import Cookies from "js-cookie";
 
 const FRONT_SERVER_URL = import.meta.env.VITE_FRONT_SERVER;

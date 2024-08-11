@@ -1,12 +1,10 @@
 import { useEffect, useState } from "react";
-import useAuthStore from "../store/AuthStore";
 import { useNavigate } from "react-router-dom";
 import api from "../service/Api";
 import Cookies from "js-cookie";
 import { getFcmToken } from "../firebase/firebaseCloudMessaging";
 
 const Login = () => {
-  const { login } = useAuthStore();
   const nav = useNavigate();
 
   const [input, setInput] = useState({
@@ -22,7 +20,10 @@ const Login = () => {
   };
 
   useEffect(() => {
-    if (Cookies.get("fcmToken") === undefined && Notification.permission === 'granted') {
+    if (
+      Cookies.get("fcmToken") === undefined &&
+      Notification.permission === "granted"
+    ) {
       getFcmToken();
     }
   }, []);
@@ -42,7 +43,6 @@ const Login = () => {
         const refreshToken = response.data.data.refreshToken;
         document.cookie = `accessToken=${accessToken}; path=/; SameSite=Lax`;
         document.cookie = `refreshToken=${refreshToken}; path=/; SameSite=Lax`;
-        login(accessToken, refreshToken);
         nav("/");
       }
     } catch (error) {

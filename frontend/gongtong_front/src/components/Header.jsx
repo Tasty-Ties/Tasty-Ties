@@ -1,19 +1,25 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import useAuthStore from "../store/AuthStore";
 import logo from "../assets/맛잇다로고.png";
 import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
+import api from "../service/Api";
 
 const Header = () => {
   const nav = useNavigate();
-  const { logout } = useAuthStore();
-  const handleLogout = () => {
-    // Remove FCM token
-    Cookies.remove("fcmToken");
+  const handleLogout = async () => {
+    try {
+      const response = await api.post("/auth/logout");
+      console.log(response);
+    } catch (error) {
+      console.log(error);
+    }
 
-    logout();
-    nav("/");
+    Cookies.remove("accessToken"),
+      Cookies.remove("refreshToken"),
+      // Remove FCM token
+      Cookies.remove("fcmToken"),
+      nav("/");
   };
 
   return (
