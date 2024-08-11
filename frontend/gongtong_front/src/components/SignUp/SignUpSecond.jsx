@@ -26,7 +26,14 @@ const SignUpSecond = () => {
     }
   };
 
-  const { userForm, setForm } = userStore();
+  const { userForm, setForm, resetForm } = userStore();
+
+  useEffect(() => {
+    return () => {
+      resetForm();
+    };
+  }, [resetForm]);
+
   const [isNicknameAvailable, setIsNicknameAvailable] = useState("");
 
   const onChangeInput = (e) => {

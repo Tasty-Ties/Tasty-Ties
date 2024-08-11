@@ -1,11 +1,17 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import userStore from "../../store/UserStore";
 import api from "../../service/Api";
 
 const SignUpFirst = () => {
   const nav = useNavigate();
-  const { userForm, setForm } = userStore();
+  const { userForm, setForm, resetForm } = userStore();
+
+  useEffect(() => {
+    return () => {
+      resetForm();
+    };
+  }, [resetForm]);
 
   const [lengthValid, setLengthValid] = useState(null);
   const [charValid, setCharValid] = useState(null);

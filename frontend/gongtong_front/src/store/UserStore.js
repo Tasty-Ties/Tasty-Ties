@@ -20,6 +20,19 @@ const userStore = create((set) => ({
         [key]: value,
       },
     })),
+  resetForm: () =>
+    set({
+      userForm: {
+        email: "",
+        username: "",
+        password: "",
+        verifyPassword: "",
+        nickname: "",
+        countryCode: "",
+        languageCode: "",
+        birth: "",
+      },
+    }),
 
   // 마일리지 100p 제공
 }));
