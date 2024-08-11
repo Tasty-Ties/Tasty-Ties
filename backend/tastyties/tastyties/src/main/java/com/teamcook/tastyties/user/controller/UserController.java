@@ -4,6 +4,7 @@ import com.teamcook.tastyties.common.dto.CommonResponseDto;
 import com.teamcook.tastyties.cooking_class.dto.CookingClassListDto;
 import com.teamcook.tastyties.cooking_class.dto.CookingClassParticipatedListDto;
 import com.teamcook.tastyties.security.userdetails.CustomUserDetails;
+import com.teamcook.tastyties.shared.dto.ReviewResponseDto;
 import com.teamcook.tastyties.user.dto.UserInfoDto;
 import com.teamcook.tastyties.user.dto.UserProfileDto;
 import com.teamcook.tastyties.user.dto.UserRegistrationDto;
@@ -217,6 +218,19 @@ public class UserController {
                         .stateCode(200)
                         .message("강의한 클래스가 정상적으로 조회되었습니다.")
                         .data(hostingClasses)
+                        .build());
+    }
+
+    // {username} 에게 달린 수강평
+    @GetMapping("/profile/{username}/reviews")
+    public ResponseEntity<CommonResponseDto> viewUserReview(@PathVariable String username, Pageable pageable) {
+        Page<ReviewResponseDto> reviews = userProfileService.getReviews(username, pageable);
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(CommonResponseDto.builder()
+                        .stateCode(200)
+                        .message("강의한 클래스가 정상적으로 조회되었습니다.")
+                        .data(reviews)
                         .build());
     }
 }

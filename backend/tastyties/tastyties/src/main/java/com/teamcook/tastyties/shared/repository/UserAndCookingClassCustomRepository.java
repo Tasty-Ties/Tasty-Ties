@@ -33,7 +33,7 @@ public interface UserAndCookingClassCustomRepository {
 
     Page<ReviewResponseDto> findReviewsForCookingClass(String uuid, Pageable pageable);
     List<ReviewResponseDto> findReviewsForCookingClass(int userId);
-
+    Page<ReviewResponseDto> findReviewsForProfile(int userId, Pageable pageable);
 
     UserAndCookingClass findReservationByUsernameAndClassUuid(int userId, String uuid);
 }

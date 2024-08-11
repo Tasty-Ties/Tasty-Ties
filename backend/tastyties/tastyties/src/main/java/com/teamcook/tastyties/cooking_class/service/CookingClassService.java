@@ -287,6 +287,8 @@ public class CookingClassService {
     @Transactional
     public ReservedCookingClassDto reserveClass(User user, String uuid) {
         // TODO: 쿠킹 클래스 정보 가지고 올 때 호스트 정보도 가져오기 why? 호스트의 id와 fcm token이 필요함 (current)
+        log.debug("uuid: {}", uuid);
+
         CookingClass cc = cookingClassRepository.findWithUuid(uuid);
         if (cc == null) {
             throw new CookingClassNotFoundException("존재하지 않는 클래스입니다.");
@@ -350,6 +352,7 @@ public class CookingClassService {
 
     @Transactional
     public void saveReview(CustomUserDetails userDetails, ReviewRequestDto reviewRequestDto) {
+        log.debug("reviewRequestDto: {}", reviewRequestDto);
         UserAndCookingClass reservation = userAndCookingClassRepository.findReservationByUsernameAndClassUuid(
                 userDetails.getUserId(), reviewRequestDto.getUuid());
 

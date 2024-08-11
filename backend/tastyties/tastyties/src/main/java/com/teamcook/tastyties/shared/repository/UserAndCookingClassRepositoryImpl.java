@@ -290,6 +290,33 @@ public class UserAndCookingClassRepositoryImpl implements UserAndCookingClassCus
                 .fetch();
     }
 
+    @Override
+    public Page<ReviewResponseDto> findReviewsForProfile(int hostId, Pageable pageable) {
+        QUser host = new QUser("host");
+        List<ReviewResponseDto> results = queryFactory
+                .select(new QReviewResponseDto(
+                        cookingClass.title, userAndCookingClass.cookingClassReview,
+                        userAndCookingClass.cookingClassReviewCreateTime,
+                        cookingClass.mainImage, country.countryImageUrl, user.nickname
+                )).from(userAndCookingClass)
+                .join(userAndCookingClass.user, user)
+                .join(userAndCookingClass.cookingClass, cookingClass)
+                .join(cookingClass.host, host)
+                .leftJoin(country).on(cookingClass.countryCode.eq(country.alpha2))
+                .where(host.userId.eq(hostId), userAndCookingClass.cookingClassReview.isNotNull())
+                .orderBy(userAndCookingClass.cookingClassReviewCreateTime.desc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        JPAQuery<Long> countQuery = queryFactory.select(userAndCookingClass.count())
+                .from(userAndCookingClass)
+                .leftJoin(userAndCookingClass.cookingClass, cookingClass)
+                .where(host.userId.eq(hostId), userAndCookingClass.cookingClassReview.isNotNull());
+
+        return PageableExecutionUtils.getPage(results, pageable, countQuery::fetchOne);
+    }
+
     // 예약정보 조회
     @Override
     public UserAndCookingClass findReservationByUsernameAndClassUuid(int userId, String uuid) {

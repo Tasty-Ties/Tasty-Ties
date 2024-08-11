@@ -107,6 +107,7 @@ public class UserProfileService {
         return userAndClassRepository.findParticipatedClassesByUserId(user.get().getUserId(), pageable);
     }
 
+
     @Transactional
     public Page<CookingClassListDto> getHostingClasses(int hostId, Pageable pageable) {
         return cookingClassRepository.getHostingClassByHostId(hostId, pageable);
@@ -119,5 +120,14 @@ public class UserProfileService {
             throw new UsernameNotFoundException("존재하지 않는 유저입니다.");
         }
         return cookingClassRepository.getHostedClassByHostId(user.get().getUserId(), pageable);
+    }
+
+    @Transactional
+    public Page<ReviewResponseDto> getReviews(String username, Pageable pageable) {
+        Optional<User> user = userRepository.findByUsername(username);
+        if (user.isEmpty()) {
+            throw new UsernameNotFoundException("존재하지 않는 유저입니다.");
+        }
+        return userAndCookingClassRepository.findReviewsForProfile(user.get().getUserId(), pageable);
     }
 }
