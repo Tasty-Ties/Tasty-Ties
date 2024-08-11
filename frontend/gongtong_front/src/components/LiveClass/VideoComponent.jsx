@@ -56,6 +56,7 @@ const VideoComponent = ({ isHost }) => {
   const [userProfileList, setUserProfileList] = useState({});
 
   const videoRef = useRef(null);
+  const canvasRef = useRef(null);
 
   const remotes = useRef([]);
   const localUserAccessAllowed = useRef(false);
@@ -230,16 +231,15 @@ const VideoComponent = ({ isHost }) => {
 
   const connectWebCam = async (session) => {
     try {
+      // 오디오와 비디오 스트림을 함께 가져옵니다.
       const stream = await navigator.mediaDevices.getUserMedia({
-        audio: true, // 여기서 오디오 스트림도 가져옵니다.
+        audio: true, 
         video: { deviceId: selectedVideoDevice.deviceId },
       });
-      
-      currentPublisher.current = publisher;
-      audioStream.current = stream; // 오디오 스트림을 저장합니다.
-      console.log(selectedVideoDevice.deviceId);
+  
+      // 퍼블리셔를 초기화합니다.
       const publisher = OV.initPublisher(undefined, {
-        audioSource: selectedAudioDevice?.deviceId, // 오디오 트랙을 사용합니다.
+        audioSource: selectedAudioDevice?.deviceId, // 오디오 소스를 설정
         videoSource: selectedVideoDevice.deviceId,
         publishAudio: isAudioActive,
         publishVideo: isVideoActive,
@@ -247,10 +247,10 @@ const VideoComponent = ({ isHost }) => {
         frameRate: 30,
         insertMode: "APPEND",
       });
-
+  
       currentPublisher.current = publisher;
-      audioStream.current = publisher.stream.mediaStream; // 오디오 스트림을 저장합니다.
-
+      audioStream.current = stream; // 오디오 스트림을 제대로 설정합니다.
+  
       if (session.capabilities.publish) {
         publisher.on("accessAllowed", () => {
           session.publish(publisher).then(() => {
@@ -259,7 +259,7 @@ const VideoComponent = ({ isHost }) => {
           });
         });
       }
-
+  
       localUserSetting.setNickname(userInfo.nickname);
       localUserSetting.setConnectionId(session.connection.connectionId);
       localUserSetting.setScreenShareActive(false);
@@ -810,7 +810,7 @@ const VideoComponent = ({ isHost }) => {
             className="input_video"
             style={{display: "none"}}
         ></video>
-        <canvas ref={canvasRef} style={{display: "none"}}></canvas>
+        {/* <canvas ref={canvasRef} style={{display: "none"}}></canvas> */}
       </>
   );
 };
