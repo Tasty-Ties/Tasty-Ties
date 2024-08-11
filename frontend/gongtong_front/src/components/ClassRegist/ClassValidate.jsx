@@ -4,7 +4,7 @@ const ClassValidate = ({ fieldName, value, classInformation }) => {
   const errors = {};
   let level, quota;
 
-  const titleRegex = /^[a-zA-Z가-힣0-9\s]{1,50}$/;
+  const titleRegex = /^[a-zA-Zㄱ-ㅎㅏ-ㅣ가-힣0-9\s]{1,50}$/;
   const dishNameRegex = /^[a-zA-Z가-힣0-9\s]{1,50}$/;
   const numberRegex = /^[0-9]+$/;
   const isoDateTimeRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/;
