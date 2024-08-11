@@ -28,7 +28,7 @@ public class TranslationServiceImpl implements TranslationService {
     private final ObjectMapper objectMapper;
     private final ChatGPTConfig chatGPTConfig;
 
-    private final int TRANSLATION_LIMIT_COUNT = 5;
+    private final int TRANSLATION_LIMIT_COUNT = 10;
     private final String DELIMITER = ": ";
 
     @Value("${openai.model}")
@@ -51,13 +51,13 @@ public class TranslationServiceImpl implements TranslationService {
                 handleApiResponse(chatMessage, response);
             } catch (Exception e) {
                 if (count < TRANSLATION_LIMIT_COUNT) {
-                    log.debug("clear translated messages: " + e.getMessage());
-                    chatMessage.clearTranslatedMessages();
                     count++;
                 } else {
                     throw new TranslationException();
                 }
             }
+
+            count++;
         }
     }
 
@@ -69,11 +69,10 @@ public class TranslationServiceImpl implements TranslationService {
 
     private String createGptRequestMessage(ChatMessage chatMessage, Set<String> translatedLanguages) {
         return "You are a translator with vast knowledge of human languages." +
-                "Please translate the following to " +
-                String.join(", ", translatedLanguages) +
-                " from the next sentences.\n" +
-                chatMessage.getOriginMessage() +
-                "\n\nOutput the translations in the format 'Language: Translated Text'";
+                "Please translate the following sentence into the specified languages, one by one.\n\n" +
+                chatMessage.getOriginMessage() + "\n\n" +
+                "Languages: " + String.join(", ", translatedLanguages) + "\n\n" +
+                "For each language, translate and output in the specified format 'Language: Translated Text'.";
     }
 
     private ResponseEntity<String> callGptApi(GptRequestDto gptRequestDto) throws Exception {
@@ -100,10 +99,11 @@ public class TranslationServiceImpl implements TranslationService {
         log.debug((String) message.get("content"));
 
         for (String content : contents) {
+            log.debug(content);
             String[] splitedContent = content.split(DELIMITER);
 
             if (!content.contains(DELIMITER) || splitedContent.length != 2) {
-                throw new TranslatedResultFormatException();
+                continue;
             }
 
             String language = splitedContent[0];
