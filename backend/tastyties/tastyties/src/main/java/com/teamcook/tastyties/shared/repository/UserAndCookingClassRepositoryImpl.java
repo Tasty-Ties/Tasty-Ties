@@ -5,7 +5,9 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.teamcook.tastyties.common.dto.country.QCountryProfileDto;
 import com.teamcook.tastyties.common.entity.QCountry;
 import com.teamcook.tastyties.cooking_class.dto.CookingClassListDto;
+import com.teamcook.tastyties.cooking_class.dto.CookingClassParticipatedListDto;
 import com.teamcook.tastyties.cooking_class.dto.QCookingClassListDto;
+import com.teamcook.tastyties.cooking_class.dto.QCookingClassParticipatedListDto;
 import com.teamcook.tastyties.cooking_class.entity.CookingClass;
 import com.teamcook.tastyties.shared.dto.QReviewResponseDto;
 import com.teamcook.tastyties.shared.dto.ReviewResponseDto;
@@ -137,7 +139,8 @@ public class UserAndCookingClassRepositoryImpl implements UserAndCookingClassCus
                                         countryByClass.alpha2,
                                         countryByClass.countryImageUrl
                                 ),
-                                cookingClass.countryCode.eq(country.alpha2)
+                                cookingClass.countryCode.eq(country.alpha2),
+                                cookingClass.chatRoomId
                 ))
                 .from(userAndCookingClass)
                 .join(userAndCookingClass.cookingClass, cookingClass)
@@ -162,16 +165,17 @@ public class UserAndCookingClassRepositoryImpl implements UserAndCookingClassCus
     }
 
     @Override
-    public Page<CookingClassListDto> findParticipatedClassesByUserId(int userId, Pageable pageable) {
+    public Page<CookingClassParticipatedListDto> findParticipatedClassesByUserId(int userId, Pageable pageable) {
         QUser host = new QUser("host");
         LocalDateTime now = LocalDateTime.now();
         QCountry countryByClass = new QCountry("countryByClass");
-        List<CookingClassListDto> results = queryFactory
+        List<CookingClassParticipatedListDto> results = queryFactory
                 .select(
-                        new QCookingClassListDto(
+                        new QCookingClassParticipatedListDto(
                                 cookingClass.title, cookingClass.mainImage,
                                 cookingClass.cookingClassStartTime.as("startTime"),
                                 cookingClass.cookingClassEndTime.as("endTime"),
+                                cookingClass.replayEndTime,
                                 host.username.as("hostUsername"),
                                 host.nickname.as("hostName"),
                                 cookingClass.uuid,
@@ -226,7 +230,8 @@ public class UserAndCookingClassRepositoryImpl implements UserAndCookingClassCus
                                         countryByClass.alpha2,
                                         countryByClass.countryImageUrl
                                 ),
-                                cookingClass.countryCode.eq(country.alpha2)
+                                cookingClass.countryCode.eq(country.alpha2),
+                                cookingClass.chatRoomId
                         ))
                 .from(userAndCookingClass)
                 .join(userAndCookingClass.cookingClass, cookingClass)

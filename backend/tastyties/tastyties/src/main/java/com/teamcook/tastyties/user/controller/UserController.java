@@ -2,6 +2,7 @@ package com.teamcook.tastyties.user.controller;
 
 import com.teamcook.tastyties.common.dto.CommonResponseDto;
 import com.teamcook.tastyties.cooking_class.dto.CookingClassListDto;
+import com.teamcook.tastyties.cooking_class.dto.CookingClassParticipatedListDto;
 import com.teamcook.tastyties.security.userdetails.CustomUserDetails;
 import com.teamcook.tastyties.user.dto.UserInfoDto;
 import com.teamcook.tastyties.user.dto.UserProfileDto;
@@ -173,7 +174,7 @@ public class UserController {
         if (userDetails == null) {
             throw new UserDetailsNotFoundException("인증 정보를 찾을 수 없습니다.");
         }
-        Page<CookingClassListDto> participatingClasses = userProfileService.getParticipatedClasses(userDetails.getUsername(), pageable);
+        Page<CookingClassParticipatedListDto> participatingClasses = userProfileService.getParticipatedClasses(userDetails.getUsername(), pageable);
         return ResponseEntity.ok()
                 .body(CommonResponseDto.builder()
                         .stateCode(200)
@@ -197,7 +198,7 @@ public class UserController {
     // {username}이 참여한 클래스 조회
     @GetMapping("/profile/{username}/participated")
     public ResponseEntity<CommonResponseDto> viewUserParticipated(@PathVariable String username, Pageable pageable) {
-        Page<CookingClassListDto> reservedClasses = userProfileService.getParticipatedClasses(username, pageable);
+        Page<CookingClassParticipatedListDto> reservedClasses = userProfileService.getParticipatedClasses(username, pageable);
 
         return ResponseEntity.ok()
                 .body(CommonResponseDto.builder()
