@@ -1,15 +1,21 @@
-import React, { useState } from "react";
+import React, { useState, forwardRef } from "react";
 
-const CookingTools = ({ cookingTools, setCookingTools }) => {
+const CookingTools = forwardRef(function CookingTools(
+  { cookingTools, setCookingTools },
+  ref
+) {
   const [inputValue, setInputValue] = useState("");
 
   const handleKeyDown = (e) => {
-    if ((e.key === "Enter" || e.keyCode === 13) && inputValue.trim()) {
-      setCookingTools([...cookingTools, inputValue.trim()]);
-      setInputValue("");
-      e.preventDefault();
+    if (e.key === "Enter" || e.keyCode === 13) {
+      e.preventDefault(); // 항상 기본 동작을 방지
+      if (inputValue.trim()) {
+        setCookingTools([...cookingTools, inputValue.trim()]);
+        setInputValue("");
+      }
     }
   };
+
   return (
     <div className="regist-component-box">
       <div className="input-box">
@@ -37,6 +43,8 @@ const CookingTools = ({ cookingTools, setCookingTools }) => {
       </div>
     </div>
   );
-};
+});
+
+CookingTools.displayName = "CookingTools";
 
 export default CookingTools;

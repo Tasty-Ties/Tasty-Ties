@@ -70,6 +70,7 @@ const EditInfo = () => {
     return (
       <div>
         <input type="file" accept="image/*" onChange={handleImageChange} />
+
         {profileImagePreview && (
           <img
             src={profileImagePreview}
@@ -124,36 +125,37 @@ const EditInfo = () => {
   return (
     <div>
       <p className="text-xl mb-4">내 정보 수정</p>
-      <p className="mb-1">
-        <IdImage setFiles={handleFileChange} className="mb-1" />
+      <p className="mb-1 text-sm">프로필사진</p>
+      <p className="mb-2">
+        <IdImage setFiles={handleFileChange} />
       </p>
       <p className="mb-1 text-sm">닉네임</p>
       <input
         type="text"
         value={nickname}
         onChange={(e) => setNickname(e.target.value)}
-        className="border border-slate-400 rounded-md mb-2"
+        className="border border-first-800 rounded-md mb-2"
       />
       <p className="mb-1 text-sm">비밀번호</p>
       <input
         type="password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
-        className="border border-slate-400 rounded-md mb-2"
+        className="border border-first-800 rounded-md mb-2"
       />
       <p className="mb-1 text-sm">비밀번호 확인</p>
       <input
         type="password"
         value={verifyPassword}
         onChange={(e) => setVerifyPassword(e.target.value)}
-        className="border border-slate-400 rounded-md mb-2"
+        className="border border-first-800 rounded-md mb-2"
       />
       <p className="mb-1 text-sm">이메일</p>
       <input
         type="email"
         value={email}
         onChange={handleEmailChange}
-        className="border border-slate-400 rounded-md mb-2"
+        className="border border-first-800 rounded-md mb-2"
       />
       <p className="mb-1 text-sm">자기소개</p>
 
@@ -161,29 +163,33 @@ const EditInfo = () => {
         type="textarea"
         value={description}
         onChange={(e) => setDescription(e.target.value)}
-        className="border border-slate-400 rounded-md mb-2"
+        className="border border-first-800 rounded-md mb-2"
       />
-
-      <p className="mb-1 text-sm">인스타 https://www.instagram.com/</p>
-      <input
-        type="text"
-        value={instaHandle}
-        onChange={(e) => setInstaHandle(e.target.value)}
-        className="border border-slate-400 rounded-md w-24 mb-2"
-      />
-      <p className="mb-1 text-sm">유튜브 https://www.youtube.com/@</p>
-      <input
-        type="text"
-        value={youtubeHandle}
-        onChange={(e) => setYoutubeHandle(e.target.value)}
-        className="border border-slate-400 rounded-md w-24 mb-2"
-      />
+      <div className="flex">
+        <p className="mb-1 text-sm">인스타 https://www.instagram.com/</p>
+        <input
+          type="text"
+          value={instaHandle}
+          onChange={(e) => setInstaHandle(e.target.value)}
+          className="border border-first-800 rounded-md w-24 mb-2 ml-1"
+        />
+      </div>
+      <div className="flex">
+        <p className="mb-1 text-sm">유튜브 https://www.youtube.com/@</p>
+        <input
+          type="text"
+          value={youtubeHandle}
+          onChange={(e) => setYoutubeHandle(e.target.value)}
+          className="border border-first-800 rounded-md w-24 mb-2 ml-1"
+        />
+      </div>
       <br />
+
       <div className="space-x-40">
-        <Button text="수정완료" type="green-sqr" onClick={handleSave} />
+        <Button text="수정완료" type="edit-complete" onClick={handleSave} />
         <Button
           text="수정취소"
-          type="gray-sqr"
+          type="edit-cancle"
           onClick={() => nav("/mypage")}
         />
       </div>

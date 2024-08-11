@@ -3,7 +3,7 @@ import CountryFlags from "./../../common/components/CountryFlags";
 const FRONT_SERVER_URL = import.meta.env.VITE_FRONT_SERVER;
 
 const ClassListItem = (content) => {
-  console.log(content.content);
+  // console.log(content.content);
   return (
     <>
       <div className="relative">
