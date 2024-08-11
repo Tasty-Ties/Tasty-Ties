@@ -1,32 +1,31 @@
 import React, { useState } from "react";
 import ClassListDropdown from "./ClassListDropdown";
-import useCookingClassStore from "../../store/CookingClassStore";
 
-const SearchBar = (page) => {
-  const { fetchSearchLists } = useCookingClassStore();
-  const [classification, setClassification] = useState(false);
-  const [sort, setSort] = useState(false);
+const SearchBar = ({ onSearch }) => {
+  const [classification, setClassification] = useState("클래스명");
+  const [sort, setSort] = useState("최신순");
   const [localFood, setLocalFood] = useState(false);
   const [searchWord, setSearchWord] = useState("");
-  const [searchCondition, setSearchCondition] = useState({
-    page: page,
-    sort: sort,
-    localFood: localFood,
-    searchWord: searchWord,
-  });
 
-  const getSearchLists = async () => {
-    await fetchSearchLists(page, sort, localFood, searchWord, classification);
-    console.log(page, sort, localFood, searchWord, classification);
+  const handleSearch = () => {
+    onSearch({
+      [classification === "클래스명" ? "title" : "username"]: searchWord,
+      useLocalFilter: localFood,
+      sort: sort === "최신순" ? "createTime,desc" : "createTime,asc",
+    });
   };
 
-  console.log(classification, sort, localFood, searchWord);
+  const handleKeyPress = (event) => {
+    if (event.key === "Enter") {
+      handleSearch();
+    }
+  };
 
   return (
     <div className="flex items-center p-2 bg-white rounded-full shadow-lg max-w-4xl mx-auto border border-gray-300">
       <div className="relative flex items-center left-2">
         <ClassListDropdown
-          title={"분류"}
+          title={classification}
           items={["클래스명", "닉네임"]}
           setClassification={setClassification}
         />
@@ -40,13 +39,14 @@ const SearchBar = (page) => {
         placeholder="검색어를 입력해주세요"
         value={searchWord}
         onChange={(e) => setSearchWord(e.target.value)}
+        onKeyPress={handleKeyPress}
       />
 
       <div className="h-6 border-l border-gray-300 mx-4"></div>
 
       <div className="relative flex items-center">
         <ClassListDropdown
-          title={"정렬"}
+          title={sort}
           items={["최신순", "오래된순"]}
           setSort={setSort}
         />
@@ -64,10 +64,7 @@ const SearchBar = (page) => {
         <span className="ml-2 text-gray-700">현지인 음식</span>
       </label>
 
-      <button
-        className="ml-8 p-1 bg-first rounded-full"
-        onClick={getSearchLists}
-      >
+      <button className="ml-8 p-1 bg-first rounded-full" onClick={handleSearch}>
         <svg
           width="40"
           height="41"

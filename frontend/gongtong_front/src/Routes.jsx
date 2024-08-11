@@ -56,7 +56,7 @@ const AppRoutes = () => {
       </Route>
       <Route path="/class" element={<ClassList />} />
       <Route path="/class/:id" element={<ClassDetail />}>
-        <Route path="" element={<Navigate to="description" />} />
+        <Route index element={<ClassDescription />} />
         <Route path="description" element={<ClassDescription />} />
         <Route path="ingredient" element={<ClassIngredient />} />
         <Route path="cookingTools" element={<ClassCookingTools />} />

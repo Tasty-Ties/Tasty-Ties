@@ -59,11 +59,11 @@ const ClassImageCarousel = ({ classDetail }) => {
           {classDetail.imageUrls &&
             classDetail.imageUrls.map((imageUrl, index) => (
               <div key={index} className="px-2">
-                <div className="aspect-w-16 aspect-h-9">
+                <div className="aspect-video bg-gray-200 rounded-2xl">
                   <img
                     src={imageUrl}
                     alt={`Slide ${index + 1}`}
-                    className="w-full h-full object-cover rounded-lg"
+                    className="w-full h-full object-contain rounded-2xl"
                   />
                 </div>
               </div>
