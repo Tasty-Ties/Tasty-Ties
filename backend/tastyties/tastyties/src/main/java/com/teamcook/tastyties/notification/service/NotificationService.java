@@ -133,7 +133,7 @@ public class NotificationService {
     public Map<String, Object> getNotifications(User user, Map<String, Object> requestParams) {
         Map<String, Object> result = new HashMap<>();
 
-        int pgNo = requestParams.get("pgNo") == null ? 0 : Integer.parseInt(requestParams.get("pgno").toString());
+        int pgNo = requestParams.get("pgNo") == null ? 0 : Integer.parseInt(requestParams.get("pgNo").toString());
 
         List<NotificationDto> notifications = getNotifications(user, pgNo);
 

@@ -1,6 +1,5 @@
 package com.teamcook.tastyties.notification.entity;
 
-import com.querydsl.core.types.dsl.BooleanExpression;
 import com.teamcook.tastyties.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
