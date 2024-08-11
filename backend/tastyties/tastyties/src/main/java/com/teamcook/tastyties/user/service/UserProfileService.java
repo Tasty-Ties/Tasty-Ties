@@ -5,6 +5,7 @@ import com.teamcook.tastyties.common.dto.LanguageResponseDto;
 import com.teamcook.tastyties.common.entity.Country;
 import com.teamcook.tastyties.common.entity.Language;
 import com.teamcook.tastyties.cooking_class.dto.CookingClassListDto;
+import com.teamcook.tastyties.cooking_class.dto.CookingClassParticipatedListDto;
 import com.teamcook.tastyties.cooking_class.repository.CookingClassRepository;
 import com.teamcook.tastyties.shared.dto.ReviewResponseDto;
 import com.teamcook.tastyties.shared.repository.UserAndCookingClassRepository;
@@ -79,7 +80,8 @@ public class UserProfileService {
                 ,uc.getCountry().getCountryImageUrl()))
                 .toList();
 
-        return new UserProfileDto(user.getUserId(), user.getProfileImageUrl(), user.getNickname(), user.getDescription(),
+        return new UserProfileDto(user.getUserId(), user.getProfileImageUrl(),
+                user.getUsername(), user.getNickname(), user.getDescription(),
                 new CountryResponseDto(country.getAlpha2(), country.getEnglishName(),
                         country.getKoreanName(), country.getCountryImageUrl()),
                 collectedFlags,
@@ -97,7 +99,7 @@ public class UserProfileService {
 
     // 참여한 클래스
     @Transactional
-    public Page<CookingClassListDto> getParticipatedClasses(String username, Pageable pageable) {
+    public Page<CookingClassParticipatedListDto> getParticipatedClasses(String username, Pageable pageable) {
         Optional<User> user = userRepository.findByUsername(username);
         if (user.isEmpty()) {
             throw new UsernameNotFoundException("존재하지 않는 유저입니다.");

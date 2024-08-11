@@ -2,6 +2,7 @@ package com.teamcook.tastytieschat.chat.controller;
 
 import com.teamcook.tastytieschat.chat.constant.Language;
 import com.teamcook.tastytieschat.chat.constant.MessageType;
+import com.teamcook.tastytieschat.chat.constant.SystemMessage;
 import com.teamcook.tastytieschat.chat.dto.ChatMessageRequestDto;
 import com.teamcook.tastytieschat.chat.dto.ChatMessageResponseDto;
 import com.teamcook.tastytieschat.chat.dto.UserDto;
@@ -14,16 +15,25 @@ import com.teamcook.tastytieschat.notification.service.NotificationService;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.event.EventListener;
+import org.springframework.messaging.Message;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.socket.messaging.SessionConnectedEvent;
+import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Controller
 @Slf4j
@@ -32,25 +42,71 @@ public class ChatMessageController {
     private final ChatMessageService chatMessageService;
     private final TranslationService translationService;
     private final ChatRoomService chatRoomService;
+    private final ChatUserService chatUserService;
     private final VoiceChatService voiceChatService;
     private final NotificationService notificationService;
 
+    private static final Map<String, String> sessions = new HashMap<>();
+
     @Autowired
-    public ChatMessageController(ChatMessageService chatMessageService, TranslationService translationService, ChatRoomService chatRoomService, VoiceChatService voiceChatService, NotificationService notificationService) {
+    public ChatMessageController(ChatMessageService chatMessageService, TranslationService translationService, ChatRoomService chatRoomService, ChatUserService chatUserService, VoiceChatService voiceChatService, NotificationService notificationService) {
         this.chatMessageService = chatMessageService;
         this.translationService = translationService;
         this.chatRoomService = chatRoomService;
+        this.chatUserService = chatUserService;
         this.voiceChatService = voiceChatService;
         this.notificationService = notificationService;
     }
 
+    @EventListener(SessionConnectedEvent.class)
+    public void onConnect(SessionConnectedEvent event) {
+        String sessionId = event.getMessage().getHeaders().get("simpSessionId").toString();
+
+        try {
+            Message<?> connectMessage = (Message<?>) event.getMessage().getHeaders().get("simpConnectMessage");
+            Map<String, List<String>> nativeHeaders = (Map<String, List<String>>) connectMessage.getHeaders().get("nativeHeaders");
+
+            String username = extractUsername(String.valueOf(nativeHeaders.get("username")));
+
+            if (username != null) {
+                sessions.put(sessionId, username);
+                chatUserService.setActiveChatUser(username);
+            }
+        } catch (NullPointerException e) {}
+    }
+
+    @EventListener(SessionDisconnectEvent.class)
+    public void onDisconnect(SessionDisconnectEvent event) {
+        String sessionId = event.getSessionId();
+        String username = sessions.get(sessionId);
+        chatUserService.setDeactiveChatUser(username);
+        sessions.remove(sessionId);
+    }
+
+    private String extractUsername(String input) {
+        String regex = "\\[(.*?)\\]";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(input);
+
+        while (matcher.find()) {
+            return matcher.group(1);
+        }
+
+        return null;
+    }
+
     @MessageMapping("/chat/text/rooms/{roomId}")
     @SendTo("/sub/chat/rooms/{roomId}")
-    public ChatMessageResponseDto sendMessage(@DestinationVariable String roomId, @Payload String message) {
+    public ChatMessageResponseDto sendMessage(@DestinationVariable String roomId, @Payload String message, SimpMessageHeaderAccessor headerAccessor) {
         try {
-            // TODO: session에서 username 가져오기
+            String sessionId = headerAccessor.getSessionId();
+            String username = sessions.get(sessionId);
+            if (username == null) {
+                return new ChatMessageResponseDto(SystemMessage.AUTHORIZATION_ERROR.getSystemChatMessage(roomId, "SYSTEM"));
+            }
+
             ChatMessageRequestDto chatMessageRequest = ChatMessageRequestDto.builder()
-                    .username("ssafy")
+                    .username(username)
                     .message(message)
                     .build();
             ChatMessage chatMessage = getTranslatedChatMessage(roomId, chatMessageRequest);
@@ -67,9 +123,12 @@ public class ChatMessageController {
 
     @MessageMapping("/chat/voice/rooms/{roomId}")
     @SendTo("/sub/chat/rooms/{roomId}")
-    public ChatMessageResponseDto processVoice(@DestinationVariable String roomId, @Payload VoiceChatRequestDto voiceChatRequestDTO) throws IOException, InterruptedException {
-        // TODO: session에서 username 가져오기
-        voiceChatRequestDTO.setUsername("ssafy");
+    public ChatMessageResponseDto processVoice(@DestinationVariable String roomId, @Payload VoiceChatRequestDto voiceChatRequestDTO, SimpMessageHeaderAccessor headerAccessor) throws IOException, InterruptedException {
+        String sessionId = headerAccessor.getSessionId();
+        String username = sessions.get(sessionId);
+        if (username == null) {
+            return new ChatMessageResponseDto(SystemMessage.AUTHORIZATION_ERROR.getSystemChatMessage(roomId, "SYSTEM"));
+        }
 
         long startTime = System.currentTimeMillis();
         voiceChatService.storeChunk(roomId, voiceChatRequestDTO.getUsername(), voiceChatRequestDTO.getChunkIndex(), voiceChatRequestDTO.getTotalChunks(), voiceChatRequestDTO.getFileContent());
@@ -135,8 +194,7 @@ public class ChatMessageController {
         try {
             translationService.translationChatMessage(chatMessage, translatedLanguages);
         } catch (Exception e) {
-            log.error("번역 실패: " + e.getMessage());
-            return null;
+            chatMessage.setTranslated(false);
         }
 
         String chatRoomTitle = (String) map.get("chatRoomTitle");

@@ -3,7 +3,10 @@ package com.teamcook.tastytieschat.chat.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.teamcook.tastytieschat.chat.constant.Language;
 import com.teamcook.tastytieschat.chat.entity.ChatMessage;
+import com.teamcook.tastytieschat.chat.exception.LanguageNotExistException;
+import com.teamcook.tastytieschat.chat.exception.TranslatedResultFormatException;
 import com.teamcook.tastytieschat.common.config.ChatGPTConfig;
 import com.teamcook.tastytieschat.chat.dto.GptRequestDto;
 import com.teamcook.tastytieschat.chat.dto.GptRequestMessageDto;
@@ -24,6 +27,8 @@ public class TranslationServiceImpl implements TranslationService {
     private final ObjectMapper objectMapper;
     private final ChatGPTConfig chatGPTConfig;
 
+    private final String DELIMITER = ": ";
+
     @Value("${openai.model}")
     private String model;
 
@@ -37,9 +42,14 @@ public class TranslationServiceImpl implements TranslationService {
         GptRequestDto gptRequestDto = setGptPrompt(chatMessage, translatedLanguages);
 
         while (validateTranslation(chatMessage, translatedLanguages)) {
-            log.debug("try translation");
             ResponseEntity<String> response = callGptApi(gptRequestDto);
-            handleApiResponse(chatMessage, response);
+
+            try {
+                handleApiResponse(chatMessage, response);
+            } catch (Exception e) {
+                log.debug("clear translated messages: " + e.getMessage());
+                chatMessage.clearTranslatedMessages();
+            }
         }
     }
 
@@ -53,10 +63,10 @@ public class TranslationServiceImpl implements TranslationService {
         return "You are a translator with vast knowledge of human languages." +
                 "Please translate the following to " +
                 String.join(", ", translatedLanguages) +
-                " from the next sentence. " +
+                " from the next sentences.\n" +
                 chatMessage.getOriginMessage() +
-                "Output the translations in the format 'Language: Translated Text' for each language, " +
-                "each on a new line.";
+                "\n\nOutput the translations in the format 'Language: Translated Text'\n" +
+                "For Example:\nEnglish: Hello. Nice to meet you.\nJapanese: こんにちは。お会いできて嬉しいです。\nChinese: 你好。很高兴见到你。\n";
     }
 
     private ResponseEntity<String> callGptApi(GptRequestDto gptRequestDto) throws Exception {
@@ -80,10 +90,22 @@ public class TranslationServiceImpl implements TranslationService {
         LinkedHashMap<String, Object> choices = (LinkedHashMap) ((ArrayList) parsedResponseBody.get("choices")).get(0);
         LinkedHashMap<String, Object> message = (LinkedHashMap) choices.get("message");
         String[] contents = ((String) message.get("content")).split("\n");
+        log.debug((String) message.get("content"));
 
         for (String content : contents) {
-            String[] splitedContent = content.split(": ");
-            chatMessage.addTranslatedMessage(splitedContent[0], splitedContent[1]);
+            String[] splitedContent = content.split(DELIMITER);
+
+            if (!content.contains(DELIMITER) || splitedContent.length != 2) {
+                throw new TranslatedResultFormatException();
+            }
+
+            String language = splitedContent[0];
+            String translatedMessage = splitedContent[1];
+            if (!Language.contains(language)) {
+                throw new LanguageNotExistException();
+            }
+
+            chatMessage.addTranslatedMessage(language, translatedMessage);
         }
     }
 
