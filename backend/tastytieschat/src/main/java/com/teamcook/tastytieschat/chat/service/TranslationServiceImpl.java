@@ -101,11 +101,9 @@ public class TranslationServiceImpl implements TranslationService {
         for (String content : contents) {
             log.debug(content);
             String[] splitedContent = content.split(DELIMITER);
-
             if (!content.contains(DELIMITER) || splitedContent.length != 2) {
                 continue;
             }
-
             String language = splitedContent[0];
             String translatedMessage = splitedContent[1];
             if (!Language.contains(language)) {
@@ -128,6 +126,8 @@ public class TranslationServiceImpl implements TranslationService {
     private boolean validateTranslation(ChatMessage chatMessage, Set<String> translatedLanguages) {
         // 번역한 언어 제외
         Iterator<String> iterator = translatedLanguages.iterator();
+        log.debug("translatedLanguages while 종료 전::"+translatedLanguages);
+
         while (iterator.hasNext()) {
             String translatedLanguage = iterator.next();
             if (chatMessage.containTranslatedLanguage(translatedLanguage)) {
@@ -135,6 +135,7 @@ public class TranslationServiceImpl implements TranslationService {
             }
         }
 
+        log.debug("translatedLanguages while 종료 후::"+translatedLanguages);
         return !translatedLanguages.isEmpty();
     }
 
