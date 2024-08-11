@@ -7,6 +7,7 @@ import com.teamcook.tastytieschat.chat.constant.Language;
 import com.teamcook.tastytieschat.chat.entity.ChatMessage;
 import com.teamcook.tastytieschat.chat.exception.LanguageNotExistException;
 import com.teamcook.tastytieschat.chat.exception.TranslatedResultFormatException;
+import com.teamcook.tastytieschat.chat.exception.TranslationException;
 import com.teamcook.tastytieschat.common.config.ChatGPTConfig;
 import com.teamcook.tastytieschat.chat.dto.GptRequestDto;
 import com.teamcook.tastytieschat.chat.dto.GptRequestMessageDto;
@@ -27,6 +28,7 @@ public class TranslationServiceImpl implements TranslationService {
     private final ObjectMapper objectMapper;
     private final ChatGPTConfig chatGPTConfig;
 
+    private final int TRANSLATION_LIMIT_COUNT = 5;
     private final String DELIMITER = ": ";
 
     @Value("${openai.model}")
@@ -41,14 +43,20 @@ public class TranslationServiceImpl implements TranslationService {
     public void translationChatMessage(ChatMessage chatMessage, Set<String> translatedLanguages) throws Exception {
         GptRequestDto gptRequestDto = setGptPrompt(chatMessage, translatedLanguages);
 
+        int count = 0;
         while (validateTranslation(chatMessage, translatedLanguages)) {
             ResponseEntity<String> response = callGptApi(gptRequestDto);
 
             try {
                 handleApiResponse(chatMessage, response);
             } catch (Exception e) {
-                log.debug("clear translated messages: " + e.getMessage());
-                chatMessage.clearTranslatedMessages();
+                if (count < TRANSLATION_LIMIT_COUNT) {
+                    log.debug("clear translated messages: " + e.getMessage());
+                    chatMessage.clearTranslatedMessages();
+                    count++;
+                } else {
+                    throw new TranslationException();
+                }
             }
         }
     }
@@ -65,8 +73,7 @@ public class TranslationServiceImpl implements TranslationService {
                 String.join(", ", translatedLanguages) +
                 " from the next sentences.\n" +
                 chatMessage.getOriginMessage() +
-                "\n\nOutput the translations in the format 'Language: Translated Text'\n" +
-                "For Example:\nEnglish: Hello. Nice to meet you.\nJapanese: こんにちは。お会いできて嬉しいです。\nChinese: 你好。很高兴见到你。\n";
+                "\n\nOutput the translations in the format 'Language: Translated Text'";
     }
 
     private ResponseEntity<String> callGptApi(GptRequestDto gptRequestDto) throws Exception {

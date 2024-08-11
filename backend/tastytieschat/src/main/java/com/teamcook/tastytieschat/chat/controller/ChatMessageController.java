@@ -194,16 +194,19 @@ public class ChatMessageController {
         try {
             translationService.translationChatMessage(chatMessage, translatedLanguages);
         } catch (Exception e) {
+            log.debug("번역 실패: " + e.getMessage());
             chatMessage.setTranslated(false);
         }
 
-        String chatRoomTitle = (String) map.get("chatRoomTitle");
-        Set<UserDto> listeners = (Set<UserDto>) map.get("listeners");
-        FcmNotificationDto notificationDto = FcmNotificationDto.builder()
-                .title(NotificationType.NEW_CHAT_MESSAGE.getTitle())
-                .body(NotificationType.NEW_CHAT_MESSAGE.generateBodyWittChatRoomTitle(chatRoomTitle))
-                .build();
-        notificationService.sendMessage(listeners, notificationDto);
+        if (chatMessage.isTranslated()) {
+            String chatRoomTitle = (String) map.get("chatRoomTitle");
+            Set<UserDto> listeners = (Set<UserDto>) map.get("listeners");
+            FcmNotificationDto notificationDto = FcmNotificationDto.builder()
+                    .title(NotificationType.NEW_CHAT_MESSAGE.getTitle())
+                    .body(NotificationType.NEW_CHAT_MESSAGE.generateBodyWittChatRoomTitle(chatRoomTitle))
+                    .build();
+            notificationService.sendMessage(listeners, notificationDto);
+        }
 
         return chatMessage;
     }
