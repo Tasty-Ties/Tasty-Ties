@@ -42,6 +42,7 @@ export const getClassDetail = async (classId) => {
     return response.data.data;
   } catch (error) {
     console.log("CookingClassAPI - getClassDetailError : " + error);
+    console.error(error);
   }
 };
 

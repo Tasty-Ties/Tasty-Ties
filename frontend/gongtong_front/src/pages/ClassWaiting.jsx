@@ -7,9 +7,7 @@ import { useNavigate, useLocation, useParams } from "react-router-dom";
 import useVideoStore from "./../store/useVideoStore";
 import MediaDeviceSetting from "./../components/LiveClass/MediaDeviceSetting";
 
-import axios from "axios";
 import api from "./../service/Api";
-import Cookies from "js-cookie";
 import Button from "../common/components/Button";
 import { getClassDetail } from "../service/CookingClassAPI";
 import useMyPageStore from "../store/MyPageStore";
@@ -43,7 +41,7 @@ const ClassWaiting = () => {
 
   const getClassInfo = async () => {
     setClassData(await getClassDetail(classId));
-    console.log("클래스 인포를 가져옵니다.", classData);
+    console.log("클래스 인포를 가져옵니다.", classId);
   };
 
   useEffect(() => {
@@ -80,7 +78,7 @@ const ClassWaiting = () => {
         );
         setSessionId(response.data.data);
       } catch (error) {
-        const status = error.response.data.status;
+        const status = error.response?.data.status;
         switch (status) {
           case 403:
             alert("해당 클래스의 호스트가 아닙니다.");
