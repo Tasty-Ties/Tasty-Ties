@@ -172,44 +172,43 @@ const VideoComponent = ({ isHost, title, hostName }) => {
 
   const connectWebCam = async (session) => {
     try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-            audio: true, // 여기서 오디오 스트림도 가져옵니다.
-            video: { deviceId: selectedVideoDevice.deviceId },
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: true, // 여기서 오디오 스트림도 가져옵니다.
+        video: { deviceId: selectedVideoDevice.deviceId },
+      });
+
+      const publisher = OV.initPublisher(undefined, {
+        audioSource: stream.getAudioTracks()[0], // 오디오 트랙을 사용합니다.
+        videoSource: stream.getVideoTracks()[0],
+        publishAudio: isAudioActive,
+        publishVideo: isVideoActive,
+        resolution: "1280x720",
+        frameRate: 30,
+        insertMode: "APPEND",
+      });
+
+      currentPublisher.current = publisher;
+      audioStream.current = stream; // 오디오 스트림을 저장합니다.
+
+      if (session.capabilities.publish) {
+        publisher.on("accessAllowed", () => {
+          session.publish(publisher).then(() => {
+            updateSubscribers();
+            localUserAccessAllowed.current = true;
+          });
         });
-        
-        const publisher = OV.initPublisher(undefined, {
-            audioSource: stream.getAudioTracks()[0], // 오디오 트랙을 사용합니다.
-            videoSource: stream.getVideoTracks()[0],
-            publishAudio: isAudioActive,
-            publishVideo: isVideoActive,
-            resolution: "1280x720",
-            frameRate: 30,
-            insertMode: "APPEND",
-        });
-        
-        currentPublisher.current = publisher;
-        audioStream.current = stream; // 오디오 스트림을 저장합니다.
+      }
 
-        if (session.capabilities.publish) {
-            publisher.on("accessAllowed", () => {
-                session.publish(publisher).then(() => {
-                    updateSubscribers();
-                    localUserAccessAllowed.current = true;
-                });
-            });
-        }
-
-        localUserSetting.setNickname(userInfo.nickname);
-        localUserSetting.setConnectionId(session.connection.connectionId);
-        localUserSetting.setScreenShareActive(false);
-        localUserSetting.setStreamManager(publisher);
-        setLocalUser(localUserSetting);
-        subscribeToUserChanged(session);
-        subscribeToStreamDestroyed(session);
-
+      localUserSetting.setNickname(userInfo.nickname);
+      localUserSetting.setConnectionId(session.connection.connectionId);
+      localUserSetting.setScreenShareActive(false);
+      localUserSetting.setStreamManager(publisher);
+      setLocalUser(localUserSetting);
+      subscribeToUserChanged(session);
+      subscribeToStreamDestroyed(session);
     } catch (error) {
-        console.error("Error accessing media devices:", error);
-        alert("오디오 또는 비디오 장치에 접근할 수 없습니다: " + error.message);
+      console.error("Error accessing media devices:", error);
+      alert("오디오 또는 비디오 장치에 접근할 수 없습니다: " + error.message);
     }
   };
 
@@ -327,15 +326,22 @@ const VideoComponent = ({ isHost, title, hostName }) => {
     return response.data.data;
   }, []);
 
-  //GestureRecognizer
+  // 전역 변수로 제스처 인식 상태 관리
+  let gestureRecognizer = null;
+  let isGestureActive = false;
+  let animationFrameId = null;
+
   const initializeGestureRecognizer = async () => {
     const videoElement = videoRef.current;
-    videoElement.style.display = "block"; // 비디오를 화면에 표시
-    videoElement.style.position = "absolute"; //화면 밖으로
+
+    videoElement.style.display = "block";
+    videoElement.style.position = "absolute";
     videoElement.style.top = "-9999px";
     videoElement.style.left = "-9999px";
+    videoElement.style.width = "1px"; //최소한의 로딩을 위해
+    videoElement.style.height = "1px";
+    videoElement.style.opacity = "0";
 
-    // 카메라 스트림을 가져와서 비디오 엘리먼트에 연결
     navigator.mediaDevices
       .getUserMedia({
         video: true,
@@ -354,7 +360,7 @@ const VideoComponent = ({ isHost, title, hostName }) => {
         "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/wasm"
       );
 
-      const gestureRecognizer = await GestureRecognizer.createFromModelPath(
+      gestureRecognizer = await GestureRecognizer.createFromModelPath(
         vision,
         "https://storage.googleapis.com/mediapipe-models/gesture_recognizer/gesture_recognizer/float16/1/gesture_recognizer.task"
       );
@@ -364,108 +370,72 @@ const VideoComponent = ({ isHost, title, hostName }) => {
         return;
       }
 
-      // Running mode를 video로 설정
       await gestureRecognizer.setOptions({ runningMode: "video" });
 
-      // console.log("Gesture Recognizer 초기화 성공");
-      console.log("videoElement.readyState " + videoElement.readyState);
-      console.log("외안되?");
-
-      if (videoElement) {
-        console.log("비디오 엘리먼트 존재 확인:", videoElement);
-
-        //loadedmetadata, loadeddata
-        // videoElement.addEventListener("canplay", () => {
-        //   console.log("렌더 루프 시작");
-        //   renderLoop(videoElement, gestureRecognizer);
-        // });
-
-        if (videoElement.readyState >= 4) {
-          console.log("렌더 루프 시작");
-          renderLoop(videoElement, gestureRecognizer);
-        }
-      } else {
-        console.error("비디오 엘리먼트를 찾을 수 없음");
-      }
+      console.log("손 감지 대기 중...");
+      detectHandPresence(videoElement); // 손 감지 루프 시작
     } catch (error) {
       console.error("Gesture Recognizer 초기화 중 오류 발생:", error);
     }
   };
 
-  let lastVideoTime = -1;
+  // 손 감지 루프 (손이 감지되면 렌더 루프 시작)
+  const detectHandPresence = async (videoElement) => {
+    const results = await gestureRecognizer.recognizeForVideo(
+      videoElement,
+      Date.now()
+    );
 
-  const renderLoop = (videoElement, gestureRecognizer) => {
-    // 현재 비디오 타임스탬프를 확인하여 이미 처리된 프레임인지 확인
-    if (videoElement.currentTime !== lastVideoTime) {
-      const gestureRecognitionResult = gestureRecognizer.recognizeForVideo(
-        videoElement,
-        Date.now()
-      );
-
-      // 결과를 처리하는 함수 호출
-      // processResult(gestureRecognitionResult);
-      processVideoFrame(videoElement, gestureRecognizer);
-
-      // 타임스탬프 업데이트
-      lastVideoTime = videoElement.currentTime;
+    if (results.gestures && results.gestures.length > 0) {
+      if (!isGestureActive) {
+        console.log("손 감지됨 - 제스처 인식 시작");
+        isGestureActive = true;
+        startGestureRecognition(videoElement); // 손이 감지되면 제스처 인식 루프 시작
+      }
+    } else {
+      if (isGestureActive) {
+        console.log("손이 화면에서 사라짐 - 제스처 인식 중지");
+        isGestureActive = false;
+        cancelAnimationFrame(animationFrameId); // 손이 사라지면 루프 중지
+      }
     }
 
-    // 다음 프레임을 처리하도록 루프를 계속 실행
-    requestAnimationFrame(() => {
-      renderLoop(videoElement, gestureRecognizer);
-    });
+    // 짧은 간격 후 다시 손을 감지하도록 설정
+    setTimeout(() => {
+      detectHandPresence(videoElement);
+    }, 200); // 200ms 후 다시 손 감지 시도
   };
 
-  const processVideoFrame = async (videoElement, gestureRecognizer) => {
+  // 손이 감지된 상태에서 제스처 인식 수행
+  const startGestureRecognition = async (videoElement) => {
     const results = await gestureRecognizer.recognizeForVideo(
       videoElement,
       Date.now()
     );
 
     onGestureResults(results);
-    requestAnimationFrame(() => {
-      processVideoFrame(videoElement, gestureRecognizer);
-    });
+
+    if (isGestureActive) {
+      animationFrameId = requestAnimationFrame(() => {
+        startGestureRecognition(videoElement);
+      });
+    }
   };
 
+  // 제스처 결과 처리
   const onGestureResults = (results) => {
     if (results.gestures && results.gestures.length > 0) {
-      const gesture = results.gestures[0][0].categoryName; // 가장 높은 확률의 제스처
+      const gesture = results.gestures[0][0].categoryName;
 
       if (gesture === "Open_Palm") {
         console.log("손을 들었음");
-        if (!isRecording.current && !raiseTimeout.current) {
-          console.log("1초 동안 손 들고 있으면, 이후 녹화 시작");
-          raiseTimeout.current = setTimeout(() => {
-            startRecording();
-            raiseTimeout.current = null;
-          }, 1000);
+        if (!isRecording.current) {
+          startRecording();
         }
-        if (lowerTimeout.current) {
-          clearTimeout(lowerTimeout.current);
-          lowerTimeout.current = null;
-        }
-      } else {
-        // 손을 내린 상태 인식 (주먹을 쥔 제스처로 가정)
-        if (raiseTimeout.current) {
-          console.log("녹화 취소");
-          clearTimeout(raiseTimeout.current);
-          raiseTimeout.current = null;
-        }
-      }
-    } else {
-      if (isRecording.current) {
-        if (!lowerTimeout.current) {
-          console.log("1초 동안 손 내리고 있으면, 이후 녹화 종료");
-          lowerTimeout.current = setTimeout(() => {
-            stopRecording();
-            lowerTimeout.current = null;
-          }, 1000);
-        }
-      } else {
-        if (raiseTimeout.current) {
-          clearTimeout(raiseTimeout.current);
-          raiseTimeout.current = null;
+      } else if (gesture === "Closed_Fist") {
+        console.log("주먹을 쥐었음");
+        if (isRecording.current) {
+          stopRecording();
         }
       }
     }
@@ -487,8 +457,8 @@ const VideoComponent = ({ isHost, title, hostName }) => {
     mediaRecorder.current.onstop = () => {
       console.log("음성 파일 서버에 전송");
       const audioBlob = new Blob(audioChunks.current, { type: "audio/wav" });
-      // saveAudioFile(audioBlob);
-      sendRecordingToServer(audioBlob);
+      saveAudioFile(audioBlob);
+      // sendRecordingToServer(audioBlob);
     };
 
     mediaRecorder.current.start();
@@ -582,15 +552,14 @@ const VideoComponent = ({ isHost, title, hostName }) => {
 
   useEffect(() => {
     return () => {
-        if (raiseTimeout.current) {
-            clearTimeout(raiseTimeout.current);
-        }
-        if (lowerTimeout.current) {
-            clearTimeout(lowerTimeout.current);
-        }
+      if (raiseTimeout.current) {
+        clearTimeout(raiseTimeout.current);
+      }
+      if (lowerTimeout.current) {
+        clearTimeout(lowerTimeout.current);
+      }
     };
-}, []);
-
+  }, []);
 
   const displayChange = () => {
     const newMode = (displayMode + 1) % 3;
@@ -836,8 +805,12 @@ const VideoComponent = ({ isHost, title, hostName }) => {
           />
         </div>
       </div>
-      <video ref={videoRef} className="input_video" style={{ display: "none" }}></video>
-        <canvas ref={canvasRef} style={{ display: "none" }}></canvas>
+      <video
+        ref={videoRef}
+        className="input_video"
+        style={{ display: "none" }}
+      ></video>
+      <canvas ref={canvasRef} style={{ display: "none" }}></canvas>
     </>
   );
 };
