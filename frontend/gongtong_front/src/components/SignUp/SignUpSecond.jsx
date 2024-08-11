@@ -20,6 +20,12 @@ const SignUpSecond = () => {
         birth: userForm.birth,
       });
       console.log(response);
+      try {
+        const nextResponse = await api.post("ranking/add");
+        console.log(nextResponse);
+      } catch (error) {
+        console.log("마일리지더하기실패", error);
+      }
       nav("/SignUpComplete");
     } catch (error) {
       console.log(error);

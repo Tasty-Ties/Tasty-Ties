@@ -22,8 +22,7 @@ const MyInfo = () => {
     await deleteId();
     Cookies.remove("accessToken");
     Cookies.remove("refreshToken");
-    nav("/");
-    window.location.reload();
+    nav("/delete");
   };
 
   return (
