@@ -1,5 +1,11 @@
 import React, { useEffect } from "react";
-import { Link, NavLink, Outlet, useParams } from "react-router-dom";
+import {
+  Link,
+  NavLink,
+  Outlet,
+  useParams,
+  useNavigate,
+} from "react-router-dom";
 import useCookingClassStore from "../store/CookingClassStore";
 import ClassEnrollUsers from "./../components/ClassDetail/ClassEnrollUsers";
 import {
@@ -12,17 +18,20 @@ import CountryFlags from "./../common/components/CountryFlags";
 import "./../styles/ClassDetail/ClassDetail.css";
 import ClassImageCarousel from "../components/ClassDetail/ClassImageCarousel";
 import Profile from "../common/components/Profile";
+import ProfileButton from "../common/components/ProfileButton";
 import Button from "./../common/components/Button";
 
 const FRONT_SERVER_URL = import.meta.env.VITE_FRONT_SERVER;
 
 const ClassDetail = () => {
   const { id } = useParams();
+  const nav = useNavigate();
 
   const { classDetail, fetchClassDetail } = useCookingClassStore((state) => ({
     classDetail: state.classDetail,
     fetchClassDetail: state.fetchClassDetail,
   }));
+  const username = classDetail.hostProfile?.username;
 
   useEffect(() => {
     fetchClassDetail(id);
@@ -138,12 +147,25 @@ const ClassDetail = () => {
         </div>
       </div>
       <div className="my-4">
-        <Profile
+        {/* <Profile
           username={classDetail.hostProfile?.nickname}
           image={classDetail.hostProfile?.profileImageUrl}
           size={"w-14"}
           textsize={"text-xl"}
-        />
+        /> */}
+        <div className="flex">
+          <ProfileButton
+            image={classDetail.hostProfile?.profileImageUrl}
+            type="round"
+            size="size-14"
+            onClick={() => {
+              nav(`/otherpage/${username}`);
+            }}
+          />
+          <p className="ml-2 mt-4 font-semibold text-xl">
+            {classDetail.hostProfile?.nickname}
+          </p>
+        </div>
         <div className="my-5">
           <div className="flex items-center">
             <svg
