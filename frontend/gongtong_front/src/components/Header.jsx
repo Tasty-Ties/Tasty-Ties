@@ -1,13 +1,79 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import Cookies from "js-cookie";
+import {
+  Navbar,
+  Button,
+  Typography,
+  Avatar,
+  Menu,
+  MenuHandler,
+  MenuList,
+  MenuItem,
+  IconButton,
+} from "@material-tailwind/react";
+
 import useAuthStore from "../store/AuthStore";
 import logo from "../assets/맛잇다로고.png";
-import Cookies from "js-cookie";
-import { useNavigate } from "react-router-dom";
+
+const NavItem = ({ text, link }) => {
+  return (
+    <Typography as="li" variant="small" color="blue-gray" className="p-1 font-normal">
+      <Link to={link} className="flex items-center">
+        {text}
+      </Link>
+    </Typography>
+  );
+};
+
+const NavList = () => {
+  return (
+    <>
+      <NavItem text="쿠킹클래스" link="/class" />
+      <NavItem text="숏폼" link="" />
+      <NavItem text="랭킹" link="" />
+    </>
+  );
+};
+
+const NavListWithLogin = () => {
+  return (
+    <>
+      <NavItem text="앨범" link="/album" />
+      <NavItem text="메신저" link="/chatting" />
+    </>
+  );
+};
 
 const Header = () => {
   const nav = useNavigate();
+
+  const [isLogin, setIsLogin] = useState(false);
+
   const { logout } = useAuthStore();
+
+  const accessToken = Cookies.get("accessToken");
+
+  useEffect(() => {
+    if (accessToken) {
+      setIsLogin(true);
+    } else {
+      setIsLogin(false);
+    }
+  }, [accessToken]);
+
+  const goLogin = () => {
+    nav("/login");
+  };
+
+  const goMypage = () => {
+    nav("/mypage");
+  };
+
+  const goSignup = () => {
+    nav("/signup");
+  };
+
   const handleLogout = () => {
     // Remove FCM token
     Cookies.remove("fcmToken");
@@ -17,25 +83,52 @@ const Header = () => {
   };
 
   return (
-    <div className="flex flex-row justify-between">
-      <Link to="/">
-        <img src={logo} alt="맛잇다로고" />
-      </Link>
-      <div className="flex flex-row space-x-4 items-center mx-3">
-        {Cookies.get("accessToken") && <Link to="/album">앨범</Link>}
-        <Link to="">숏폼</Link> <Link to="">랭킹</Link>
-        <Link to="/class">쿠킹클래스</Link>
-        {!Cookies.get("accessToken") && <Link to="/signup">회원가입</Link>}
-        {Cookies.get("accessToken") && <Link to="/chatting">메신저</Link>}
-        {Cookies.get("accessToken") ? (
-          <button onClick={handleLogout}>로그아웃</button>
-        ) : (
-          <Link to="/login">로그인</Link>
-        )}
-        {Cookies.get("accessToken") && <Link to="">알람</Link>}
-        {Cookies.get("accessToken") && <Link to="/mypage">마이페이지</Link>}
+    <Navbar className="sticky top-0 z-10 h-max max-w-full rounded-none px-4 py-2 lg:px-8 lg:py-4">
+      <div className="flex items-center justify-between text-blue-gray-900">
+        <Link to="/">
+          <img src={logo} alt="맛잇다로고" />
+        </Link>
+        <div className="flex items-center gap-4">
+          <div className="flex items-center mr-4 lg:block">
+            <ul className="flex mb-0 mt-0 flex-row items-center gap-6">
+              <NavList />
+              {isLogin && <NavListWithLogin />}
+            </ul>
+          </div>
+          <div className="flex items-center gap-x-1">
+            {isLogin ? (
+              <>
+                <IconButton variant="text" color="amber" className="mr-2 rounded-full">
+                  <i className="fa fa-bell text-lg" />
+                </IconButton>
+                <Menu>
+                  <MenuHandler className="hover:scale-105 cursor-pointer">
+                    <Avatar
+                      src="https://docs.material-tailwind.com/img/face-2.jpg"
+                      alt="avatar"
+                      size="sm"
+                    />
+                  </MenuHandler>
+                  <MenuList>
+                    <MenuItem onClick={goMypage}>마이페이지</MenuItem>
+                    <MenuItem onClick={handleLogout}>로그아웃</MenuItem>
+                  </MenuList>
+                </Menu>
+              </>
+            ) : (
+              <>
+                <Button variant="text" size="sm" className="lg:inline-block" onClick={goLogin}>
+                  <span>로그인</span>
+                </Button>
+                <Button variant="gradient" size="sm" className="lg:inline-block" onClick={goSignup}>
+                  <span>회원가입</span>
+                </Button>
+              </>
+            )}
+          </div>
+        </div>
       </div>
-    </div>
+    </Navbar>
   );
 };
 export default Header;
