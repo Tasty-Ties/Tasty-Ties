@@ -16,11 +16,13 @@ const TeachedClass = () => {
   console.log(teachedClasses);
 
   return (
-    <div className="m-6 mx-20">
+    <div>
       <div className="flex">
-        <p className="text-xl mr-2">수업한 클래스</p>
+        <p className="text-xl mr-2">진행한 클래스</p>
         <p className="text-sm mt-1">전체</p>
-        <p className="text-xs mt-2 ml-1">{teachedClasses.totalElements}</p>
+        <p className="text-xs text-first mt-2 ml-1">
+          {teachedClasses.totalElements}
+        </p>
       </div>
       <div className="mt-10 grid grid-cols-4 gap-6">
         {teachedClasses.content?.map((attendClass, index) => (

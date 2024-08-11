@@ -38,6 +38,8 @@ const Button = ({ text, type, onClick }) => {
     "enter-button": "bg-third text-white font-bold text-sm rounded w-12 h-12",
     "time-button":
       "bg-gray-400 text-black font-semibold text-sm rounded w-12 h-12",
+    "view-more":
+      "bg-transparent text-first text-xs font-semibold py-1 px-4 border border-first rounded-3xl flex justify-center",
   };
   return (
     <button className={`${typeList[type]}`} onClick={onClick}>

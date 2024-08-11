@@ -29,7 +29,7 @@ const MyInfo = () => {
   return (
     <div>
       <p className="font-bold text-xl mb-4">내 정보</p>
-      <div className="border-2 border-gray-400 p-5 rounded-lg">
+      <div className="border-2 border-gray-400 shadow-xl p-5 rounded-lg">
         <p className="text-xs mb-1 font-semibold">닉네임</p>
         <p className="text-xs mb-2 text-gray-500"> {informations.nickname}</p>
         <p className="text-xs mb-1 font-semibold">국적</p>

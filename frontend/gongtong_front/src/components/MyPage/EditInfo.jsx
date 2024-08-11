@@ -69,7 +69,12 @@ const EditInfo = () => {
 
     return (
       <div>
-        <input type="file" accept="image/*" onChange={handleImageChange} />
+        <input
+          type="file"
+          accept="image/*"
+          onChange={handleImageChange}
+          className="file-input file-input-primary-800 w-full max-w-xs"
+        />
 
         {profileImagePreview && (
           <img
@@ -134,28 +139,28 @@ const EditInfo = () => {
         type="text"
         value={nickname}
         onChange={(e) => setNickname(e.target.value)}
-        className="border border-first-800 rounded-md mb-2"
+        className="border border-first-800 w-full rounded-md mb-2"
       />
       <p className="mb-1 text-sm">비밀번호</p>
       <input
         type="password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
-        className="border border-first-800 rounded-md mb-2"
+        className="border border-first-800 w-full rounded-md mb-2"
       />
       <p className="mb-1 text-sm">비밀번호 확인</p>
       <input
         type="password"
         value={verifyPassword}
         onChange={(e) => setVerifyPassword(e.target.value)}
-        className="border border-first-800 rounded-md mb-2"
+        className="border border-first-800 w-full rounded-md mb-2"
       />
       <p className="mb-1 text-sm">이메일</p>
       <input
         type="email"
         value={email}
         onChange={handleEmailChange}
-        className="border border-first-800 rounded-md mb-2"
+        className="border border-first-800 w-full rounded-md mb-2"
       />
       <p className="mb-1 text-sm">자기소개</p>
 
@@ -163,7 +168,7 @@ const EditInfo = () => {
         type="textarea"
         value={description}
         onChange={(e) => setDescription(e.target.value)}
-        className="border border-first-800 rounded-md mb-2"
+        className="border border-first-800 w-full rounded-md mb-2"
       />
       <div className="flex">
         <p className="mb-1 text-sm">인스타 https://www.instagram.com/</p>

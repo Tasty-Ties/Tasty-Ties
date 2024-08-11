@@ -16,7 +16,7 @@ const Profile = () => {
 
   return (
     <>
-      <div>
+      <div className="w-3/4 mt-10 mx-auto content-center relative">
         <OtherCategory informations={informations} />
       </div>
     </>

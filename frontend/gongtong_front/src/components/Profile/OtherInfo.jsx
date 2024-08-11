@@ -15,7 +15,7 @@ const OtherInfo = () => {
     <div>
       {informations && (
         <div>
-          <p>수집한 국기</p>
+          <p className="text-xl">수집한 국기</p>
           <div className="flex">
             {informations.informations.userProfileDto?.collectedFlags.map(
               (flag, index) => (
@@ -28,7 +28,8 @@ const OtherInfo = () => {
             )}
           </div>
           <br />
-          <p className="text-3xl">진행한 클래스</p>
+          <br />
+          <p className="text-xl">진행한 클래스</p>
           <div className="flex space-x-3">
             {informations.informations.hostingClasses?.map(
               (teachClass, index) => (
@@ -36,29 +37,36 @@ const OtherInfo = () => {
               )
             )}
           </div>
-          <Button
-            text="더보기"
-            type="green-border-short"
-            onClick={() => nav(`/otherpage/${username}/teach`)}
-          />
+          <div className="flex justify-center mt-2">
+            <Button
+              text="더보기"
+              type="view-more"
+              onClick={() => nav(`/otherpage/${username}/teach`)}
+            />
+          </div>
           <br />
           <br />
           <br />
-          <p className="text-3xl">참여한 클래스</p>
-          <div className="flex">
+          <p className="text-xl">참여한 클래스</p>
+          <div className="flex space-x-3">
             {informations.informations.reservedClasses?.map(
               (attendClass, index) => (
                 <Lecture key={index} classInfo={attendClass} />
               )
             )}
           </div>
-          <Button
-            text="더보기"
-            type="green-border-short"
-            onClick={() => nav(`/otherpage/${username}/attend`)}
-          />
-          <p className="text-3xl">수강평</p>
-          <div>
+          <div className="flex justify-center mt-2">
+            <Button
+              text="더보기"
+              type="view-more"
+              onClick={() => nav(`/otherpage/${username}/attend`)}
+            />
+          </div>
+          <br />
+          <br />
+          <br />
+          <p className="text-xl">수강평</p>
+          <div className="grid grid-rows-4 gap-3">
             {informations.informations.reviews?.map((review, index) => (
               <ReviewForm key={index} review={review} />
             ))}
