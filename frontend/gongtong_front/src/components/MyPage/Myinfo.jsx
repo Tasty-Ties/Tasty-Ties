@@ -86,7 +86,8 @@ const MyInfo = () => {
           <Button text="회원탈퇴" type="delete-id" onClick={handleDeleteId} />
         </div>
       </div>
-      <br /> <br /> <br /> <br /> <br /> <br /> <br />
+      <br />
+      <br />
     </div>
   );
 };

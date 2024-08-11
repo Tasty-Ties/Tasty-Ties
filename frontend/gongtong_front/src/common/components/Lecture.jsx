@@ -34,7 +34,7 @@ const Lecture = ({ classInfo }) => {
       </div>
 
       <div className="font-bold mt-4 truncate">{classInfo.title}</div>
-      <div className="flex space-x-5 text-sm my-2">
+      <div className="flex-auto text-sm my-2">
         <div className="text-xs">
           {date} {startTime}~{endTime}
         </div>

@@ -9,12 +9,12 @@ const ReviewForm = ({ review }) => {
   return (
     review.comment && (
       <div className="flex w-auto place-content-center space-x-48 p-3">
-        <div className="flex-col w-72">
+        <div className="flex-col w-72 mt-4">
           <span className="mb-2 truncate text-gray-700 bg-slate-200 rounded-md px-3">
             {review.title}
           </span>
           <p className="truncate my-3">{review.comment}</p>
-          <div className="flex text-gray-600 mr-6">
+          <div className="flex text-xs text-gray-600 mr-6">
             <p>{review.nickname}</p>&nbsp;
             <p>|</p>&nbsp;
             <p>{date}</p>

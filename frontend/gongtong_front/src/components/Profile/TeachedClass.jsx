@@ -24,7 +24,7 @@ const TeachedClass = () => {
           {teachedClasses.totalElements}
         </p>
       </div>
-      <div className="mt-10 grid grid-cols-4 gap-6">
+      <div className="mt-10 grid grid-cols-4 gap-3">
         {teachedClasses.content?.map((attendClass, index) => (
           <Lecture key={index} classInfo={attendClass} />
         ))}

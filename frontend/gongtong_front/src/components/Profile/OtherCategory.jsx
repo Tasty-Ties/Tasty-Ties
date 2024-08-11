@@ -3,6 +3,7 @@ import instalogo from "../../assets/MyPage/insta.png";
 import youtubelogo from "../../assets/MyPage/Youtube.png";
 import CountryFlags from "../../common/components/CountryFlags";
 import ProfileButton from "../../common/components/ProfileButton";
+import Imageprofile from "../../assets/MyPage/기본프로필사진.jpg";
 
 const OtherCategory = (informations) => {
   const information = informations.informations;
@@ -16,7 +17,9 @@ const OtherCategory = (informations) => {
           {information.userProfileDto && (
             <div className="flex">
               <ProfileButton
-                image={information.userProfileDto.profileImageUrl}
+                image={
+                  information.userProfileDto.profileImageUrl || Imageprofile
+                }
                 type="square"
                 size="size-16"
               />
@@ -48,10 +51,12 @@ const OtherCategory = (informations) => {
                 {information.userProfileDto?.instagramHandle}
               </p>
               &nbsp;&nbsp;
-              <img src={youtubelogo} alt="유튜브로고" className="size-6" />
-              &nbsp;
-              <p className="text-sm">
-                {information.userProfileDto?.youtubeHandle}
+              <p className="flex">
+                <img src={youtubelogo} alt="유튜브로고" className="size-6" />
+                &nbsp;
+                <p className="text-sm">
+                  {information.userProfileDto?.youtubeHandle}
+                </p>
               </p>
             </p>
           </div>

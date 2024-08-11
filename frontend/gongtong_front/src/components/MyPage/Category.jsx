@@ -5,6 +5,7 @@ import youtubelogo from "../../assets/MyPage/Youtube.png";
 import useMyPageStore from "../../store/MyPageStore";
 import ProfileButton from "../../common/components/ProfileButton";
 import CountryFlags from "../../common/components/CountryFlags";
+import Imageprofile from "../../assets/MyPage/기본프로필사진.jpg";
 
 const Category = () => {
   const nav = useNavigate();
@@ -22,7 +23,7 @@ const Category = () => {
         <div className="flex flex-col">
           <div className="flex">
             <ProfileButton
-              image={informations.profileImageUrl}
+              image={informations.profileImageUrl || Imageprofile}
               type="square"
               size="size-16"
               onClick={() => nav("/mypage")}

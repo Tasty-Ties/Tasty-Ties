@@ -30,7 +30,7 @@ const OtherInfo = () => {
           <br />
           <br />
           <p className="text-xl">진행한 클래스</p>
-          <div className="flex space-x-3">
+          <div className="grid grid-cols-4 space-x-3">
             {informations.informations.hostingClasses?.map(
               (teachClass, index) => (
                 <Lecture key={index} classInfo={teachClass} />
@@ -48,7 +48,7 @@ const OtherInfo = () => {
           <br />
           <br />
           <p className="text-xl">참여한 클래스</p>
-          <div className="flex space-x-3">
+          <div className="grid grid-cols-4 space-x-3">
             {informations.informations.reservedClasses?.map(
               (attendClass, index) => (
                 <Lecture key={index} classInfo={attendClass} />
@@ -66,7 +66,7 @@ const OtherInfo = () => {
           <br />
           <br />
           <p className="text-xl">수강평</p>
-          <div className="grid grid-rows-4 gap-3">
+          <div className="grid grid-rows-3 gap-3">
             {informations.informations.reviews?.map((review, index) => (
               <ReviewForm key={index} review={review} />
             ))}
