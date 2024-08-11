@@ -18,15 +18,10 @@ import useMyPageStore from "../../store/MyPageStore";
 import ChatComponent from "./ChatComponent";
 import PeopleListComponent from "./PeopleListComponent";
 
-import {
-  Dialog,
-  DialogBackdrop,
-  DialogPanel,
-  DialogTitle,
-} from "@headlessui/react";
-
 import "./../../styles/LiveClass/LiveClass.css";
-import IconButton from "../../common/components/IconButton";
+import ChatLog from "../ChatRoom/ChatLog";
+import AttendeeList from "../ChatRoom/AttendeeList";
+import CameraCapture from "./CameraCapture";
 
 const localUserSetting = new UserModel();
 
@@ -36,7 +31,7 @@ const userId = 1;
 const userLang = "Japanese";
 const CHUNK_SIZE = 16000;
 
-const VideoComponent = ({ isHost, title, hostName }) => {
+const VideoComponent = ({ isHost }) => {
   const OV = useVideoStore((state) => state.OV);
   const setOV = useVideoStore((state) => state.setOV);
   const selectedAudioDevice = useVideoStore(
@@ -49,6 +44,8 @@ const VideoComponent = ({ isHost, title, hostName }) => {
   const isAudioActive = useVideoStore((state) => state.isAudioActive);
 
   const userInfo = useMyPageStore((state) => state.informations);
+  const classData = useVideoStore((state) => state.classData);
+  console.log(classData);
 
   const [localUser, setLocalUser] = useState(null);
   const session = useRef(null);
@@ -56,10 +53,25 @@ const VideoComponent = ({ isHost, title, hostName }) => {
 
   const [hostUser, setHostUser] = useState(null);
   const [partUser, setPartUser] = useState();
+  const [userProfileList, setUserProfileList] = useState({});
 
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
 
+  const remotes = useRef([]);
+  const localUserAccessAllowed = useRef(false);
+
+  const sessionId = useVideoStore((state) => state.sessionId);
+  const currentPublisher = useRef();
+
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [isHostOnly, setIsHostOnly] = useState(true);
+  const [isCaptureOpen, setIsCaptureOpen] = useState(false);
+  const [isPeopleListOpen, setIsPeopleListOpen] = useState(false);
+  const [isSliderOn, setIsSliderOn] = useState(false);
+  const [displayMode, setDisplayMode] = useState(0);
+
+  // 비디오 레이아웃 순서 정렬하는 코드
   useEffect(() => {
     console.log(subscribers);
     if (!subscribers) {
@@ -75,20 +87,44 @@ const VideoComponent = ({ isHost, title, hostName }) => {
         prev && prev.length > 0 ? [...prev, localUser] : [localUser]
       );
       subscribers.map((data) => {
-        if (data.nickname === hostName) {
+        if (data.nickname === classData.hostProfile.nickname) {
           setHostUser(data);
         } else {
           setPartUser((prev) => [...prev, data]);
         }
       });
     }
-  }, [subscribers, localUser]);
+  }, [subscribers, localUser?.streamManager]);
 
-  const remotes = useRef([]);
-  const localUserAccessAllowed = useRef(false);
-
-  const sessionId = useVideoStore((state) => state.sessionId);
-  const currentPublisher = useRef();
+  // 참여자 목록 정리하는 코드
+  useEffect(() => {
+    console.log(partUser);
+    console.log(userInfo);
+    if (!classData || !localUser) return;
+    const host = classData.hostProfile;
+    const parts = classData.userProfiles;
+    setUserProfileList({
+      [host.username]: [
+        host.nickname,
+        host.profileImageUrl,
+        "HOST",
+        host.username,
+      ],
+    });
+    if (parts) {
+      parts.forEach((part) => {
+        setUserProfileList((prev) => ({
+          ...prev,
+          [part.username]: [
+            part.nickname,
+            part.profileImageUrl,
+            "ATTENDEE",
+            part.username,
+          ],
+        }));
+      });
+    }
+  }, [partUser, localUser]);
 
   //미디어 파이프 및 영상 녹화 관련
   const mediaRecorder = useRef(null);
@@ -103,6 +139,8 @@ const VideoComponent = ({ isHost, title, hostName }) => {
 
   useEffect(() => {
     window.addEventListener("beforeunload", onbeforeunload);
+    console.log(userInfo.length);
+
     joinSession();
     // initializeMediapipe();
     initializeGestureRecognizer();
@@ -122,15 +160,36 @@ const VideoComponent = ({ isHost, title, hostName }) => {
         console.error("Broker reported error: " + frame.headers["message"]);
         console.error("Additional details: " + frame.body);
       },
+
+      connectHeaders: {
+        Authorization: `Bearer ${Cookies.get("accessToken")}`,
+      },
     });
 
     connectStompClient();
+
+    const host = classData.hostProfile;
+    setUserProfileList({
+      [host.username]: [
+        host.nickname,
+        host.profileImageUrl,
+        "HOST",
+        host.username,
+      ],
+    });
 
     return () => {
       window.removeEventListener("beforeunload", onbeforeunload);
       leaveSession();
     };
   }, []);
+
+  useEffect(() => {
+    switchCamera();
+  }, [selectedVideoDevice]);
+  useEffect(() => {
+    switchMic();
+  }, [selectedAudioDevice]);
 
   const joinSession = async () => {
     const newSession = OV.initSession();
@@ -172,44 +231,98 @@ const VideoComponent = ({ isHost, title, hostName }) => {
 
   const connectWebCam = async (session) => {
     try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-            audio: true, // 여기서 오디오 스트림도 가져옵니다.
-            video: { deviceId: selectedVideoDevice.deviceId },
+      // 오디오와 비디오 스트림을 함께 가져옵니다.
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: true, 
+        video: { deviceId: selectedVideoDevice.deviceId },
+      });
+  
+      // 퍼블리셔를 초기화합니다.
+      const publisher = OV.initPublisher(undefined, {
+        audioSource: selectedAudioDevice?.deviceId, // 오디오 소스를 설정
+        videoSource: selectedVideoDevice.deviceId,
+        publishAudio: isAudioActive,
+        publishVideo: isVideoActive,
+        resolution: "1280x720",
+        frameRate: 30,
+        insertMode: "APPEND",
+      });
+  
+      currentPublisher.current = publisher;
+      audioStream.current = stream; // 오디오 스트림을 제대로 설정합니다.
+  
+      if (session.capabilities.publish) {
+        publisher.on("accessAllowed", () => {
+          session.publish(publisher).then(() => {
+            updateSubscribers();
+            localUserAccessAllowed.current = true;
+          });
         });
-        
-        const publisher = OV.initPublisher(undefined, {
-            audioSource: stream.getAudioTracks()[0], // 오디오 트랙을 사용합니다.
-            videoSource: stream.getVideoTracks()[0],
-            publishAudio: isAudioActive,
-            publishVideo: isVideoActive,
-            resolution: "1280x720",
-            frameRate: 30,
-            insertMode: "APPEND",
-        });
-        
-        currentPublisher.current = publisher;
-        audioStream.current = stream; // 오디오 스트림을 저장합니다.
-
-        if (session.capabilities.publish) {
-            publisher.on("accessAllowed", () => {
-                session.publish(publisher).then(() => {
-                    updateSubscribers();
-                    localUserAccessAllowed.current = true;
-                });
-            });
-        }
-
-        localUserSetting.setNickname(userInfo.nickname);
-        localUserSetting.setConnectionId(session.connection.connectionId);
-        localUserSetting.setScreenShareActive(false);
-        localUserSetting.setStreamManager(publisher);
-        setLocalUser(localUserSetting);
-        subscribeToUserChanged(session);
-        subscribeToStreamDestroyed(session);
-
+      }
+  
+      localUserSetting.setNickname(userInfo.nickname);
+      localUserSetting.setConnectionId(session.connection.connectionId);
+      localUserSetting.setScreenShareActive(false);
+      localUserSetting.setStreamManager(publisher);
+      setLocalUser(localUserSetting);
+      subscribeToUserChanged(session);
+      subscribeToStreamDestroyed(session);
     } catch (error) {
-        console.error("Error accessing media devices:", error);
-        alert("오디오 또는 비디오 장치에 접근할 수 없습니다: " + error.message);
+      console.error("Error accessing media devices:", error);
+      alert("오디오 또는 비디오 장치에 접근할 수 없습니다: " + error.message);
+    }
+  };
+
+  const switchCamera = async () => {
+    if (currentPublisher.current) {
+      const newPublisher = await OV.initPublisher(undefined, {
+        audioSource: selectedAudioDevice?.deviceId,
+        videoSource: selectedVideoDevice.deviceId,
+        publishAudio: isAudioActive,
+        publishVideo: isVideoActive,
+        resolution: "1280x720",
+        frameRate: 30,
+        insertMode: "APPEND",
+      });
+
+      await new Promise((resolve, reject) => {
+        newPublisher.once("accessAllowed", resolve);
+        newPublisher.once("accessDenied", reject);
+      });
+
+      currentPublisher.current.replaceTrack(
+        newPublisher.stream.mediaStream.getVideoTracks()[0]
+      );
+      audioStream.current = newPublisher.stream.mediaStream;
+
+      localUserSetting.setStreamManager({ ...newPublisher });
+      setLocalUser(localUserSetting);
+    }
+  };
+  const switchMic = async () => {
+    if (currentPublisher.current) {
+      const newPublisher = await OV.initPublisher(undefined, {
+        audioSource: selectedAudioDevice?.deviceId,
+        videoSource: selectedVideoDevice.deviceId,
+        publishAudio: isAudioActive,
+        publishVideo: isVideoActive,
+        resolution: "1280x720",
+        frameRate: 30,
+        insertMode: "APPEND",
+      });
+
+      await new Promise((resolve, reject) => {
+        newPublisher.once("accessAllowed", resolve);
+        newPublisher.once("accessDenied", reject);
+      });
+
+      currentPublisher.current.replaceTrack(
+        newPublisher.stream.mediaStream.getAudioTracks()[0]
+      );
+      audioStream.current = newPublisher.stream.mediaStream;
+
+      localUserSetting.setStreamManager({ ...newPublisher });
+      setLocalUser(localUserSetting);
     }
   };
 
@@ -276,7 +389,6 @@ const VideoComponent = ({ isHost, title, hostName }) => {
         isScreenShareActive: localUser.screenShareActive,
       });
     }
-    console.log(document.getElementsByTagName("StreamComponent").length);
   };
 
   const sendSignalUserChanged = (session, data) => {
@@ -327,15 +439,22 @@ const VideoComponent = ({ isHost, title, hostName }) => {
     return response.data.data;
   }, []);
 
-  //GestureRecognizer
+  // 전역 변수로 제스처 인식 상태 관리
+  let gestureRecognizer = null;
+  let isGestureActive = false;
+  let animationFrameId = null;
+
   const initializeGestureRecognizer = async () => {
     const videoElement = videoRef.current;
-    videoElement.style.display = "block"; // 비디오를 화면에 표시
-    videoElement.style.position = "absolute"; //화면 밖으로
+
+    videoElement.style.display = "block";
+    videoElement.style.position = "absolute";
     videoElement.style.top = "-9999px";
     videoElement.style.left = "-9999px";
+    videoElement.style.width = "1px"; //최소한의 로딩을 위해
+    videoElement.style.height = "1px";
+    videoElement.style.opacity = "0";
 
-    // 카메라 스트림을 가져와서 비디오 엘리먼트에 연결
     navigator.mediaDevices
       .getUserMedia({
         video: true,
@@ -354,7 +473,7 @@ const VideoComponent = ({ isHost, title, hostName }) => {
         "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/wasm"
       );
 
-      const gestureRecognizer = await GestureRecognizer.createFromModelPath(
+      gestureRecognizer = await GestureRecognizer.createFromModelPath(
         vision,
         "https://storage.googleapis.com/mediapipe-models/gesture_recognizer/gesture_recognizer/float16/1/gesture_recognizer.task"
       );
@@ -364,108 +483,72 @@ const VideoComponent = ({ isHost, title, hostName }) => {
         return;
       }
 
-      // Running mode를 video로 설정
       await gestureRecognizer.setOptions({ runningMode: "video" });
 
-      // console.log("Gesture Recognizer 초기화 성공");
-      console.log("videoElement.readyState " + videoElement.readyState);
-      console.log("외안되?");
-
-      if (videoElement) {
-        console.log("비디오 엘리먼트 존재 확인:", videoElement);
-
-        //loadedmetadata, loadeddata
-        // videoElement.addEventListener("canplay", () => {
-        //   console.log("렌더 루프 시작");
-        //   renderLoop(videoElement, gestureRecognizer);
-        // });
-
-        if (videoElement.readyState >= 4) {
-          console.log("렌더 루프 시작");
-          renderLoop(videoElement, gestureRecognizer);
-        }
-      } else {
-        console.error("비디오 엘리먼트를 찾을 수 없음");
-      }
+      console.log("손 감지 대기 중...");
+      detectHandPresence(videoElement); // 손 감지 루프 시작
     } catch (error) {
       console.error("Gesture Recognizer 초기화 중 오류 발생:", error);
     }
   };
 
-  let lastVideoTime = -1;
+  // 손 감지 루프 (손이 감지되면 렌더 루프 시작)
+  const detectHandPresence = async (videoElement) => {
+    const results = await gestureRecognizer.recognizeForVideo(
+      videoElement,
+      Date.now()
+    );
 
-  const renderLoop = (videoElement, gestureRecognizer) => {
-    // 현재 비디오 타임스탬프를 확인하여 이미 처리된 프레임인지 확인
-    if (videoElement.currentTime !== lastVideoTime) {
-      const gestureRecognitionResult = gestureRecognizer.recognizeForVideo(
-        videoElement,
-        Date.now()
-      );
-
-      // 결과를 처리하는 함수 호출
-      // processResult(gestureRecognitionResult);
-      processVideoFrame(videoElement, gestureRecognizer);
-
-      // 타임스탬프 업데이트
-      lastVideoTime = videoElement.currentTime;
+    if (results.gestures && results.gestures.length > 0) {
+      if (!isGestureActive) {
+        console.log("손 감지됨 - 제스처 인식 시작");
+        isGestureActive = true;
+        startGestureRecognition(videoElement); // 손이 감지되면 제스처 인식 루프 시작
+      }
+    } else {
+      if (isGestureActive) {
+        console.log("손이 화면에서 사라짐 - 제스처 인식 중지");
+        isGestureActive = false;
+        cancelAnimationFrame(animationFrameId); // 손이 사라지면 루프 중지
+      }
     }
 
-    // 다음 프레임을 처리하도록 루프를 계속 실행
-    requestAnimationFrame(() => {
-      renderLoop(videoElement, gestureRecognizer);
-    });
+    // 짧은 간격 후 다시 손을 감지하도록 설정
+    setTimeout(() => {
+      detectHandPresence(videoElement);
+    }, 200); // 200ms 후 다시 손 감지 시도
   };
 
-  const processVideoFrame = async (videoElement, gestureRecognizer) => {
+  // 손이 감지된 상태에서 제스처 인식 수행
+  const startGestureRecognition = async (videoElement) => {
     const results = await gestureRecognizer.recognizeForVideo(
       videoElement,
       Date.now()
     );
 
     onGestureResults(results);
-    requestAnimationFrame(() => {
-      processVideoFrame(videoElement, gestureRecognizer);
-    });
+
+    if (isGestureActive) {
+      animationFrameId = requestAnimationFrame(() => {
+        startGestureRecognition(videoElement);
+      });
+    }
   };
 
+  // 제스처 결과 처리
   const onGestureResults = (results) => {
     if (results.gestures && results.gestures.length > 0) {
-      const gesture = results.gestures[0][0].categoryName; // 가장 높은 확률의 제스처
+      const gesture = results.gestures[0][0].categoryName;
 
       if (gesture === "Open_Palm") {
         console.log("손을 들었음");
-        if (!isRecording.current && !raiseTimeout.current) {
-          console.log("1초 동안 손 들고 있으면, 이후 녹화 시작");
-          raiseTimeout.current = setTimeout(() => {
-            startRecording();
-            raiseTimeout.current = null;
-          }, 1000);
+        if (!isRecording.current) {
+          startRecording();
         }
-        if (lowerTimeout.current) {
-          clearTimeout(lowerTimeout.current);
-          lowerTimeout.current = null;
-        }
-      } else {
-        // 손을 내린 상태 인식 (주먹을 쥔 제스처로 가정)
-        if (raiseTimeout.current) {
-          console.log("녹화 취소");
-          clearTimeout(raiseTimeout.current);
-          raiseTimeout.current = null;
-        }
-      }
-    } else {
-      if (isRecording.current) {
-        if (!lowerTimeout.current) {
-          console.log("1초 동안 손 내리고 있으면, 이후 녹화 종료");
-          lowerTimeout.current = setTimeout(() => {
-            stopRecording();
-            lowerTimeout.current = null;
-          }, 1000);
-        }
-      } else {
-        if (raiseTimeout.current) {
-          clearTimeout(raiseTimeout.current);
-          raiseTimeout.current = null;
+      } else if (gesture === "Closed_Fist") {
+        console.log("주먹을 쥐었음");
+        if (isRecording.current) {
+          stopRecording();
         }
       }
     }
@@ -487,8 +570,8 @@ const VideoComponent = ({ isHost, title, hostName }) => {
     mediaRecorder.current.onstop = () => {
       console.log("음성 파일 서버에 전송");
       const audioBlob = new Blob(audioChunks.current, { type: "audio/wav" });
-      // saveAudioFile(audioBlob);
-      sendRecordingToServer(audioBlob);
+      saveAudioFile(audioBlob);
+      // sendRecordingToServer(audioBlob);
     };
 
     mediaRecorder.current.start();
@@ -550,13 +633,6 @@ const VideoComponent = ({ isHost, title, hostName }) => {
     stompClient.current.activate();
   };
 
-  const [isChatOpen, setIsChatOpen] = useState(false);
-  const [isHostOnly, setIsHostOnly] = useState(false);
-  const [isCaptureOpen, setIsCaptureOpen] = useState(false);
-  const [isPeopleListOpen, setIsPeopleListOpen] = useState(false);
-  const [isSliderOn, setIsSliderOn] = useState(true);
-  const [displayMode, setDisplayMode] = useState(0);
-
   const displaySetting = (modeNumber) => {
     switch (modeNumber) {
       case 0: // HostOnly
@@ -582,16 +658,16 @@ const VideoComponent = ({ isHost, title, hostName }) => {
 
   useEffect(() => {
     return () => {
-        if (raiseTimeout.current) {
-            clearTimeout(raiseTimeout.current);
-        }
-        if (lowerTimeout.current) {
-            clearTimeout(lowerTimeout.current);
-        }
+      if (raiseTimeout.current) {
+        clearTimeout(raiseTimeout.current);
+      }
+      if (lowerTimeout.current) {
+        clearTimeout(lowerTimeout.current);
+      }
     };
-}, []);
+  }, []);
 
-
+  // 비디오 레이이아웃
   const displayChange = () => {
     const newMode = (displayMode + 1) % 3;
     console.log(newMode);
@@ -603,41 +679,6 @@ const VideoComponent = ({ isHost, title, hostName }) => {
   const captureOpen = () => {
     if (localUser) {
       setIsCaptureOpen(!isCaptureOpen);
-    }
-  };
-
-  const liveClassImage = useVideoStore((state) => state.liveClassImage);
-  const setLiveClassImage = useVideoStore((state) => state.setLiveClassImage);
-
-  const takePhoto = (e) => {
-    if (
-      isCaptureOpen &&
-      document.getElementById(
-        "video-" + localUser.getStreamManager().stream.streamId
-      )
-    ) {
-      console.log(
-        document.getElementById(
-          "video-" + localUser.getStreamManager().stream.streamId
-        )
-      );
-      const canvas = canvasRef.current;
-      const video = document.getElementById(
-        "video-" + localUser.getStreamManager().stream.streamId
-      );
-      const context = canvas.getContext("2d");
-
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
-      context.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-      const dataUrl = canvas.toDataURL("image/jpeg");
-      setLiveClassImage(e.target.value, dataUrl);
-
-      const link = document.createElement("a");
-      link.href = dataUrl;
-      link.download = "screenshot.jpg";
-      link.click();
     }
   };
 
@@ -664,181 +705,113 @@ const VideoComponent = ({ isHost, title, hostName }) => {
     if (ref.current) ref.current.scrollLeft += 200;
   };
 
-  const [videoClassName, setVideoClassName] = useState("");
+  const [videoClassName, setVideoClassName] = useState("w-2/3 mx-8");
 
   return (
-    <>
-      <Dialog
-        open={isCaptureOpen}
-        onClose={captureOpen}
-        className="relative z-50"
-      >
-        <DialogBackdrop
-          transition
-          className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity data-[closed]:opacity-0 data-[enter]:duration-300 data-[leave]:duration-200 data-[enter]:ease-out data-[leave]:ease-in"
+      <>
+        <CameraCapture
+            isCaptureOpen={isCaptureOpen}
+            captureOpen={captureOpen}
+            localUser={localUser}
         />
-
-        <div className="fixed inset-0 z-50 w-4/6 overflow-y-auto place-self-center">
-          <div className="flex min-h-full items-center justify-center p-4 text-center sm:items-center sm:p-0">
-            <DialogPanel
-              transition
-              className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all data-[closed]:translate-y-4 data-[closed]:opacity-0 data-[enter]:duration-300 data-[leave]:duration-200 data-[enter]:ease-out data-[leave]:ease-in sm:my-8 sm:w-full sm:max-w-lg data-[closed]:sm:translate-y-0 data-[closed]:sm:scale-95"
-            >
-              <div className="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
-                <div className="sm:flex sm:items-start">
-                  <div className="mt-3 text-left sm:ml-4 sm:mt-0 sm:text-left">
-                    <DialogTitle
-                      as="h3"
-                      className="text-base font-semibold leading-6 text-gray-900"
-                    >
-                      현재 사진이 마음에 드신다면, 버튼을 클릭하여 저장해보세요!
-                      <br />
-                      사진은 자유롭게 변경이 가능하며, 최대 4장의 사진까지 저장
-                      가능합니다.
-                    </DialogTitle>
-
-                    <div className="mt-2 grid grid-cols-4 grid-rows-2 gap-2">
-                      {liveClassImage[0] ? (
-                        <img src={liveClassImage[0]} />
-                      ) : (
-                        <IconButton
-                          type="screen-capture"
-                          icon="screen-capture"
-                          onClick={takePhoto}
-                          value="0"
-                        />
-                      )}
-                      {liveClassImage[1] ? (
-                        <img src={liveClassImage[1]} />
-                      ) : (
-                        <IconButton
-                          type="screen-capture"
-                          icon="screen-capture"
-                          onClick={takePhoto}
-                          value="1"
-                        />
-                      )}
-                      <div className="col-start-3 col-span-2 row-start-1 row-span-2">
-                        <StreamComponent user={localUser} />
+        <div className="min-h-screen min-w-screen flex flex-col items-center justify-center">
+          <div className="h-20 w-full flex justify-center items-center">
+            <div className="text-2xl">{classData.title}</div>
+          </div>
+          <div className="h-2/3 w-full items-center justify-center flex-auto flex flex-row">
+            {isSliderOn ? (
+                <div id="layout" className={videoClassName}>
+                  {hostUser && hostUser.getStreamManager() && (
+                      <div
+                          id="hostUser"
+                          className="aspect-video col-start-1 col-end-5 row-start-1 row-end-2 mx-32"
+                      >
+                        <StreamComponent user={hostUser}/>
                       </div>
-                      {liveClassImage[2] ? (
-                        <img src={liveClassImage[2]} />
-                      ) : (
-                        <IconButton
-                          type="screen-capture"
-                          icon="screen-capture"
-                          onClick={takePhoto}
-                          value="2"
-                        />
-                      )}
-                      {liveClassImage[3] ? (
-                        <img src={liveClassImage[3]} />
-                      ) : (
-                        <IconButton
-                          type="screen-capture"
-                          icon="screen-capture"
-                          onClick={takePhoto}
-                          value="3"
-                        />
-                      )}
+                  )}
+                  <div className="flex flex-row w-full col-start-1 col-end-5">
+                    <button onClick={prevButton} className="">
+                      &lt;
+                    </button>
+                    <div
+                        ref={ref}
+                        className="flex min-h-32 flex-row overflow-x-scroll flex-auto"
+                        id="scroll"
+                    >
+                      {partUser &&
+                          partUser.map((sub, i) => (
+                              <div
+                                  key={i}
+                                  className="flex-shrink-0 w-1/4 aspect-video object-fill p-1"
+                              >
+                                <StreamComponent user={sub} className=""/>
+                              </div>
+                          ))}
                     </div>
+                    <button onClick={nextButton} className="">
+                      &gt;
+                    </button>
                   </div>
                 </div>
-              </div>
-              <div className="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6 flex justify-end">
-                <IconButton
-                  text="다시 촬영하기"
-                  icon="take-photo"
-                  type="green-border-short"
-                />
-                <IconButton
-                  text="임시저장"
-                  icon="take-photo"
-                  type="green-border-short"
-                />
-                <IconButton
-                  text="저장하기"
-                  icon="download-photo"
-                  type="green-border-short"
-                />
-              </div>
-            </DialogPanel>
+            ) : (
+                <div id="layout" className={videoClassName}>
+                  {hostUser && hostUser.getStreamManager() && (
+                      <div id="hostUser">
+                        <StreamComponent user={hostUser}/>
+                      </div>
+                  )}
+                  {!isHostOnly &&
+                      partUser &&
+                      partUser.map((sub, i) => (
+                          <div key={i} id="partUser">
+                            <StreamComponent user={sub}/>
+                          </div>
+                      ))}
+                </div>
+            )}
+            {isChatOpen && (
+                <div className="w-1/3 mx-3 my-3 border-solid border-2">
+                  <ChatLog
+                      userProfile={userInfo.profileImageUrl}
+                      chatRoomId={classData.chatRoomId}
+                      chatRoomTitle={"채팅방"}
+                      stompClient={stompClient}
+                      username={userInfo.username}
+                      nickname={userInfo.nickname}
+                      userLang={userInfo.language.englishName}
+                  />
+                </div>
+            )}
+            {isPeopleListOpen && (
+                <div className="w-1/3 self-stretch mx-3 my-3 border-solid border-2">
+                  <AttendeeList
+                      setOpen={setIsPeopleListOpen}
+                      nickname={userInfo.nickname}
+                      users={userProfileList}
+                      subscribers={subscribers}
+                  />
+                </div>
+            )}
+          </div>
+
+          <div className="h-20 flex">
+            <MediaDeviceSetting currentPublisher={currentPublisher}/>
+            <ToolbarComponent
+                displayMode={displayChange}
+                captureOpen={captureOpen}
+                peopleListOpen={peopleListOpen}
+                chatOpen={chatOpen}
+                leaveSession={leaveSession}
+            />
           </div>
         </div>
-      </Dialog>
-      <div className="min-h-screen min-w-screen flex flex-col items-center justify-center">
-        <div className="h-20 w-full flex justify-center items-center">
-          <div className="text-2xl">{title}</div>
-        </div>
-        <div className="h-2/3 w-full items-center justify-center flex-auto flex flex-row">
-          {isSliderOn ? (
-            <div id="layout" className={videoClassName}>
-              {hostUser && hostUser.getStreamManager() && (
-                <div
-                  id="hostUser"
-                  className="aspect-video col-start-1 col-end-5 row-start-1 row-end-2 mx-32"
-                >
-                  <StreamComponent user={hostUser} />
-                </div>
-              )}
-              <div className="flex flex-row w-full col-start-1 col-end-5">
-                <button onClick={prevButton} className="">
-                  &lt;
-                </button>
-                <div
-                  ref={ref}
-                  className="flex min-h-32 flex-row overflow-x-scroll flex-auto"
-                  id="scroll"
-                >
-                  {partUser &&
-                    partUser.map((sub, i) => (
-                      <div
-                        key={i}
-                        className="flex-shrink-0 w-1/4 aspect-video object-fill p-1"
-                      >
-                        <StreamComponent user={sub} className="" />
-                      </div>
-                    ))}
-                </div>
-                <button onClick={nextButton} className="">
-                  &gt;
-                </button>
-              </div>
-            </div>
-          ) : (
-            <div id="layout" className={videoClassName}>
-              {hostUser && hostUser.getStreamManager() && (
-                <div id="hostUser">
-                  <StreamComponent user={hostUser} />
-                </div>
-              )}
-              {!isHostOnly &&
-                partUser &&
-                partUser.map((sub, i) => (
-                  <div key={i} id="partUser">
-                    <StreamComponent user={sub} />
-                  </div>
-                ))}
-            </div>
-          )}
-          {isChatOpen && <ChatComponent stompClient={stompClient} />}
-          {isPeopleListOpen && <PeopleListComponent />}
-        </div>
-
-        <div className="h-20 flex">
-          <MediaDeviceSetting currentPublisher={currentPublisher} />
-          <ToolbarComponent
-            displayMode={displayChange}
-            captureOpen={captureOpen}
-            peopleListOpen={peopleListOpen}
-            chatOpen={chatOpen}
-            leaveSession={leaveSession}
-          />
-        </div>
-      </div>
-      <video ref={videoRef} className="input_video" style={{ display: "none" }}></video>
-        <canvas ref={canvasRef} style={{ display: "none" }}></canvas>
-    </>
+        <video
+            ref={videoRef}
+            className="input_video"
+            style={{display: "none"}}
+        ></video>
+        {/* <canvas ref={canvasRef} style={{display: "none"}}></canvas> */}
+      </>
   );
 };
 

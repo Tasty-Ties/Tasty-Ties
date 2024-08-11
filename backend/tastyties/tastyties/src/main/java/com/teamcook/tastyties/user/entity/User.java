@@ -65,6 +65,9 @@ public class User {
     private boolean isDeleted = Boolean.FALSE;
     private boolean isAdult = Boolean.FALSE;
 
+    @NotNull @Column(nullable = false)
+    private String role;
+
     @Setter
     private String profileImageUrl;
 
@@ -100,7 +103,7 @@ public class User {
 
     public User(Country country, Language language, String username,
                 String password, String nickname, LocalDate birth,
-                String email) {
+                String email, String role) {
         this.country = country;
         this.language = language;
         this.username = username;
@@ -108,6 +111,7 @@ public class User {
         this.nickname = nickname;
         this.birth = birth;
         this.email = email;
+        this.role = role;
     }
 
     public void addAlbum(Album album) {

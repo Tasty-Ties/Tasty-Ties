@@ -41,7 +41,7 @@ public class SecurityConfig {
         http.cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/api/v1/chats/**").authenticated()
+                        .requestMatchers("/chatapi/**").authenticated()
                         .anyRequest().permitAll()
                 )
                 .exceptionHandling(exceptionHandling ->
@@ -62,6 +62,8 @@ public class SecurityConfig {
         configuration.addAllowedOrigin("http://127.0.0.1:5173");
         configuration.addAllowedOrigin("http://localhost:3000");
         configuration.addAllowedOrigin("http://127.0.0.1:3000");
+        configuration.addAllowedOrigin("https://i11b206.p.ssafy.io"); //이게 문제였어!!!!!!!!!!????????
+        configuration.addAllowedOrigin("wss://i11b206.p.ssafy.io");
 
         configuration.addAllowedMethod("*");
         configuration.addAllowedHeader("*");
