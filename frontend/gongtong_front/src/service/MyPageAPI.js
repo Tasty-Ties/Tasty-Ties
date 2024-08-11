@@ -22,33 +22,48 @@ export const deleteId = async () => {
 };
 
 // 수업할 클래스
-export const getTeachClass = async () => {
+export const getTeachClass = async (page = 1, size = 4) => {
   try {
-    const response = await api.get("/users/me/hosting");
+    const response = await api.get(
+      `/users/me/hosting?page=${page - 1}&size=${size}`
+    );
     console.log(response);
-    return response.data.data.content;
+    return {
+      classes: response.data.data.content,
+      totalItems: response.data.data.totalElements,
+    };
   } catch (error) {
     console.log(error);
   }
 };
 
 // 예약한 클래스
-export const getReserveClass = async () => {
+export const getReserveClass = async (page = 1, size = 4) => {
   try {
-    const response = await api.get("/users/me/reservations");
+    const response = await api.get(
+      `/users/me/reservations?page=${page - 1}&size=${size}`
+    );
     console.log(response);
-    return response.data.data.content;
+    return {
+      classes: response.data.data.content,
+      totalItems: response.data.data.totalElements,
+    };
   } catch (error) {
     console.log(error);
   }
 };
 
 // 참여한 클래스
-export const getAttendClass = async () => {
+export const getAttendClass = async (page = 1, size = 4) => {
   try {
-    const response = await api.get("/users/me/participated");
+    const response = await api.get(
+      `/users/me/participated?page=${page - 1}&size=${size}`
+    );
     console.log(response);
-    return response.data.data.content;
+    return {
+      classes: response.data.data.content,
+      totalItems: response.data.data.totalElements,
+    };
   } catch (error) {
     console.log(error);
   }
