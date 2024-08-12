@@ -95,11 +95,11 @@ const ClassList = () => {
               </div>
             ))
           ) : (
-            <div className="mt-20 col-span-4 text-4xl text-center text-gray-500">
+            <div className="mt-20 col-span-4 text-2xl text-center text-gray-500">
               <div>
                 <img
                   src="/images/classImages/alert.svg"
-                  className="mx-auto w-16 mb-5"
+                  className="mx-auto w-12 mb-5"
                 />
               </div>
               <div>검색 결과가 없습니다.</div>
