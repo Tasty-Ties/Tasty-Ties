@@ -1,27 +1,37 @@
-import axios from "axios";
 import React, { useEffect } from "react";
-import { Link, Outlet, useNavigate, useParams } from "react-router-dom";
-import useClassRegistStore from "./../store/ClassRegistStore";
-import ClassEnrollUsers from "../components/ClassDetail/ClassEnrollUsers";
+import {
+  Link,
+  NavLink,
+  Outlet,
+  useParams,
+  useNavigate,
+} from "react-router-dom";
+import useCookingClassStore from "../store/CookingClassStore";
+import ClassEnrollUsers from "./../components/ClassDetail/ClassEnrollUsers";
 import {
   setClassReservation,
   setDeleteClass,
   setDeleteClassReservation,
-} from "../service/ClassRegistAPI";
+} from "../service/CookingClassAPI";
+import CountryFlags from "./../common/components/CountryFlags";
 
-import "@styles/ClassDetail/ClassDetail.css";
+import "./../styles/ClassDetail/ClassDetail.css";
 import ClassImageCarousel from "../components/ClassDetail/ClassImageCarousel";
+import Profile from "../common/components/Profile";
+import ProfileButton from "../common/components/ProfileButton";
+import Button from "./../common/components/Button";
 
 const FRONT_SERVER_URL = import.meta.env.VITE_FRONT_SERVER;
 
 const ClassDetail = () => {
   const { id } = useParams();
+  const nav = useNavigate();
 
-  const { classDetail, fetchClassDetail } = useClassRegistStore((state) => ({
+  const { classDetail, fetchClassDetail } = useCookingClassStore((state) => ({
     classDetail: state.classDetail,
     fetchClassDetail: state.fetchClassDetail,
   }));
-  console.log(classDetail);
+  const username = classDetail.hostProfile?.username;
 
   useEffect(() => {
     fetchClassDetail(id);
@@ -60,19 +70,29 @@ const ClassDetail = () => {
     }
   };
 
+  const timeCalculate = () => {
+    let startTime = new Date(classDetail.cookingClassStartTime);
+    let endTime = new Date(classDetail.cookingClassEndTime);
+    let subtratedTime = Math.floor((endTime - startTime) / 1000 / 60);
+    let hours = Math.floor(subtratedTime / 60);
+    let minutes = subtratedTime % 60;
+    let cookingTime = hours > 0 ? `${hours}시간 ${minutes}분` : `${minutes}분`;
+    return cookingTime;
+  };
+  let cookingTime = timeCalculate();
+
+  console.log(classDetail);
+
   return (
-    <div className="detail-container">
+    <div className="w-3/6 mx-auto justify-center mt-8">
       <ClassImageCarousel classDetail={classDetail} />
-      <div className="class-info-box">
-        <div className="title">{classDetail.title}</div>
-        <div className="nickname-box">
+      <div className="mt-6">
+        <div className="text-4xl font-extrabold">{classDetail.title}</div>
+        <div className="mt-4 leading-6 flex items-center text-2xl font-bold">
           <span>{classDetail.dishName}</span>
-          <img
-            src={`${FRONT_SERVER_URL}/images/classImages/Korea.png`}
-            alt="국가 이미지"
-          />
+          <CountryFlags countryCode={classDetail.countryCode} size="w-10" />
         </div>
-        <div className="sub-box">
+        <div className="flex justify-between items-center mt-2">
           <div className="class-detail-rating-box">
             <div className="rating">
               <div className="detail-rating-status">
@@ -83,6 +103,7 @@ const ClassDetail = () => {
                       className="detail-rating"
                       id={`rate-${rating}`}
                       checked={rating <= classDetail.level}
+                      readOnly
                     />
                     <label htmlFor={`rate-${rating}`}>⭐</label>
                   </React.Fragment>
@@ -90,74 +111,63 @@ const ClassDetail = () => {
               </div>
             </div>
           </div>
-          <div className="btn-box">
-            {!classDetail.userEnrolled && !classDetail.host && (
-              <button onClick={handleClassReservation}>
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 14 12"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M5.25 8.75H0.75V7.25H5.25V2.75H6.75V7.25H11.25V8.75H6.75V13.25H5.25V8.75Z"
-                    fill="white"
-                  />
-                </svg>
-                <span>예약하기</span>
-              </button>
+          <div className="flex items-center content-between">
+            {!classDetail.userEnrolled &&
+              classDetail.quota > classDetail.reservedCount &&
+              !classDetail.host && (
+                <Button
+                  text="예약하기"
+                  type="green-short"
+                  onClick={handleClassReservation}
+                />
+              )}
+            {classDetail.quota <= classDetail.reservedCount &&
+              !classDetail.host && (
+                <Button text="마감" type="green-border-short" />
+              )}
+            {classDetail.userEnrolled && (
+              <Button
+                text="예약 취소하기"
+                type="green-border-short"
+                onClick={cancelClassReservation}
+              />
             )}
-            {classDetail.userEnrolled && !classDetail.host && (
-              <button onClick={cancelClassReservation}>
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 14 12"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M5.25 8.75H0.75V7.25H5.25V2.75H6.75V7.25H11.25V8.75H6.75V13.25H5.25V8.75Z"
-                    fill="white"
-                  />
-                </svg>
-                <span>예약 취소</span>
-              </button>
-            )}
+
             {classDetail.host && (
-              <button onClick={deleteClass}>
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 14 12"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M5.25 8.75H0.75V7.25H5.25V2.75H6.75V7.25H11.25V8.75H6.75V13.25H5.25V8.75Z"
-                    fill="white"
-                  />
-                </svg>
-                <span>강의 삭제하기</span>
-              </button>
+              <Button
+                text="강의 삭제하기"
+                type="green-border-short"
+                onClick={deleteClass}
+              />
             )}
-          </div>
-          <div className="people-box">
-            <ClassEnrollUsers classDetail={classDetail} />
+            <div className="ml-2 people-box">
+              <ClassEnrollUsers classDetail={classDetail} />
+            </div>
           </div>
         </div>
       </div>
-      <div className="user-info-box">
-        <div className="user-box">
-          <img
-            src={`${FRONT_SERVER_URL}/images/classImages/user-img.png`}
-            alt="유저 이미지"
+      <div className="my-4">
+        {/* <Profile
+          username={classDetail.hostProfile?.nickname}
+          image={classDetail.hostProfile?.profileImageUrl}
+          size={"w-14"}
+          textsize={"text-xl"}
+        /> */}
+        <div className="flex">
+          <ProfileButton
+            image={classDetail.hostProfile?.profileImageUrl}
+            type="round"
+            size="size-14"
+            onClick={() => {
+              nav(`/otherpage/${username}`);
+            }}
           />
-          <span>{classDetail.hostName}</span>
+          <p className="ml-2 mt-4 font-semibold text-xl">
+            {classDetail.hostProfile?.nickname}
+          </p>
         </div>
-        <div>
-          <div className="icon-box">
+        <div className="my-5">
+          <div className="flex items-center">
             <svg
               width="20"
               height="20"
@@ -170,16 +180,17 @@ const ClassDetail = () => {
                 fill="black"
               />
             </svg>
-            <span>실시간 클래스 시간 : </span>
-            <span>
+            <span className="ml-1 ">클래스 진행 시간 : </span>
+            <span className="ml-1">
               {classDetail.cookingClassStartTime &&
                 classDetail.cookingClassEndTime &&
                 `${classDetail.cookingClassStartTime.substring(0, 10)} 
                   ${classDetail.cookingClassStartTime.substring(11, 16)} ~ 
                   ${classDetail.cookingClassEndTime.substring(11, 16)}`}
             </span>
+            <span className="mx-1 text-xs flex">({cookingTime})</span>
           </div>
-          <div className="icon-box">
+          <div className="flex items-center my-5">
             <svg
               width="20"
               height="20"
@@ -192,11 +203,10 @@ const ClassDetail = () => {
                 fill="#1D1B20"
               />
             </svg>
-
-            <span>언어 : </span>
-            <span>{classDetail.languageName}</span>
+            <span className="ml-1">언어 : </span>
+            <span className="ml-1">{classDetail.languageName}</span>
           </div>
-          <div className="icon-box">
+          <div className="flex items-center my-3">
             <svg
               width="20"
               height="16"
@@ -209,33 +219,68 @@ const ClassDetail = () => {
                 fill="black"
               />
             </svg>
-
-            <div>
-              <span>다시보기 기간 : </span>
-              <span>
-                {classDetail.replayEndTime &&
-                  `${classDetail.replayEndTime.substring(
-                    0,
-                    10
-                  )} ${classDetail.replayEndTime.substring(11, 16)}`}
-              </span>
-            </div>
+            <span className="ml-1">다시보기 기간 : </span>
+            <span className="ml-1">
+              {classDetail.replayEndTime &&
+                `${classDetail.replayEndTime.substring(0, 10)}`}
+              {/* ${classDetail.replayEndTime.substring(11, 16)} */}
+            </span>
           </div>
         </div>
-        <div className="caution-box">
+        <div className="my-6">
           {classDetail.cookingClassTags &&
             classDetail.cookingClassTags.map((tag, index) => (
-              <span key={index}>{tag}</span>
+              <span
+                key={index}
+                className="border border-third text-third py-1 px-2 rounded-xl font-medium mr-2"
+              >
+                {tag}
+              </span>
             ))}
         </div>
       </div>
       <hr />
-      <div className="class-info-menu">
-        <Link to="">클래스 소개</Link>
-        <Link to="ingredient">식재료</Link>
-        <Link to="cookingTools">조리 도구</Link>
-        <Link to="recipes">레시피</Link>
-        <Link to="reviews">수강평</Link>
+      <div className="flex gap-4 justify-between my-8">
+        <NavLink
+          to="description"
+          className={({ isActive }) =>
+            isActive ? "font-extrabold border-b-2 border-black" : ""
+          }
+        >
+          클래스 소개
+        </NavLink>
+        <NavLink
+          to="ingredient"
+          className={({ isActive }) =>
+            isActive ? "font-extrabold border-b-2 border-black" : ""
+          }
+        >
+          식재료
+        </NavLink>
+        <NavLink
+          to="cookingTools"
+          className={({ isActive }) =>
+            isActive ? "font-extrabold border-b-2 border-black" : ""
+          }
+        >
+          조리 도구
+        </NavLink>
+        <NavLink
+          to="recipes"
+          className={({ isActive }) =>
+            isActive ? "font-extrabold border-b-2 border-black" : ""
+          }
+        >
+          레시피
+        </NavLink>
+        <NavLink
+          to="reviews"
+          className={({ isActive }) =>
+            isActive ? "font-extrabold border-b-2 border-black" : ""
+          }
+        >
+          수강평
+        </NavLink>
       </div>
       <Outlet
         context={{
@@ -243,8 +288,11 @@ const ClassDetail = () => {
           ingredients: classDetail.ingredients,
           cookingTools: classDetail.cookingTools,
           recipes: classDetail.recipe,
+          reviews: { id },
+          cookingTime: { cookingTime },
         }}
       />
+      <div style={{ height: "300px" }}></div>
     </div>
   );
 };

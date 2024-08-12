@@ -6,10 +6,14 @@ const useVideoStore = create((set) => ({
 
   selectedAudioDevice: null,
   selectedVideoDevice: null,
-  setSelectedAudioDevice: (audioDevice) =>
-    set({ selectedAudioDevice: audioDevice }),
-  setSelectedVideoDevice: (videoDevice) =>
-    set({ selectedVideoDevice: videoDevice }),
+  setSelectedAudioDevice: (audioDevice) => {
+    console.log("오디오 디바이스 변경 호출됨", audioDevice);
+    set({ selectedAudioDevice: audioDevice });
+  },
+  setSelectedVideoDevice: (videoDevice) => {
+    console.log("비디오 디바이스 변경 호출됨", videoDevice);
+    set({ selectedVideoDevice: videoDevice });
+  },
 
   sessionId: null,
   setSessionId: (id) => set({ sessionId: id }),
@@ -33,6 +37,20 @@ const useVideoStore = create((set) => ({
       newImage[index] = value;
       return { liveClassImage: newImage };
     }),
+  setRemoveLiveClassImage: (index) =>
+    set((state) => {
+      const newImage = [...state.liveClassImage];
+      newImage[index].revokeObjectURL();
+      newImage[index] = null;
+      return { liveClassImage: newImage };
+    }),
+  setEmptyLiveClassImage: () =>
+    set((state) => {
+      state.liveClassImage.map((image, i) => image.revokeObjectURL());
+    }),
+
+  classData: null,
+  setClassData: (data) => set({ classData: data }),
 }));
 
 export default useVideoStore;

@@ -19,10 +19,10 @@ import java.util.Map;
 public class LiveCookingClassService {
 
 
-    @Value("${OPENVIDU_URL}")
+    @Value("${openvidu_url}")
     private String OPENVIDU_URL;
 
-    @Value("${OPENVIDU_SECRET}")
+    @Value("${openvidu_secret}")
     private String OPENVIDU_SECRET;
 
     private OpenVidu openvidu;
@@ -82,6 +82,17 @@ public class LiveCookingClassService {
         ConnectionProperties properties = ConnectionProperties.fromJson(params).build();
         Connection connection = session.createConnection(properties);
         return connection.getToken();
+    }
+
+    @Transactional
+    public void deleteLiveSessionId(Integer userId, String uuid) throws AccessDeniedException {
+        if (uuid != null && ccRepository.findWithUuid(uuid) == null) {
+            throw new CookingClassNotFoundException("해당 쿠킹 클래스가 존재하지 않습니다.");
+        }
+        if (!ccRepository.isCookingClassHost(userId, uuid)) {
+            throw new AccessDeniedException("호스트가 아닙니다.");
+        }
+        ccRepository.deleteSessionIdByCookingClassId(uuid);
     }
 
 }

@@ -1,34 +1,28 @@
 import AppRoutes from "./Routes";
 
-import { LocalizationProvider } from "@mui/x-date-pickers";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import Header from "./components/Header";
-import { useLocation } from "react-router-dom";
+import Header from "./components/common/Header";
+import { useLocation, Navigate, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { listItemSecondaryActionClasses } from "@mui/material";
+import "@fortawesome/fontawesome-free/css/all.min.css";
 
-import {requestPermission, onForegroundMessage} from "./firebase/firebaseCloudMessaging";
-import { getMessaging, getToken } from "firebase/messaging";
-import { app as firebaseApp } from "./firebase/firebase";
+import { requestPermission, onForegroundMessage } from "./firebase/firebaseCloudMessaging";
+import { getFcmToken } from "./firebase/firebaseCloudMessaging";
+
+import Toast from "./components/common/Toast";
 
 // FCM permission & token
-if (Notification.permission !== 'granted') {
+if (Notification.permission !== "granted") {
   requestPermission();
 } else {
   // Save FCM token
-  getToken(getMessaging(firebaseApp), {
-    vapidKey: import.meta.env.VITE_FIREBASE_VAPID_KEY
-  }).then((currentToken) => {
-    if (currentToken) {
-      document.cookie = `fcmToken=${currentToken}; path=/; SameSite=Lax`;
-    }
-  })
+  getFcmToken();
   onForegroundMessage();
 }
 
 function App() {
   const location = useLocation();
   const [isHeaderVisible, setIsHeaderVisible] = useState(true);
+  const nav = useNavigate();
 
   useEffect(() => {
     if (location.pathname === "/liveclass") {
@@ -40,10 +34,9 @@ function App() {
 
   return (
     <>
-      <LocalizationProvider dateAdapter={AdapterDayjs}>
-        {isHeaderVisible && <Header />}
-        <AppRoutes />
-      </LocalizationProvider>
+      {isHeaderVisible && <Header />}
+      <AppRoutes />
+      <Toast />
     </>
   );
 }

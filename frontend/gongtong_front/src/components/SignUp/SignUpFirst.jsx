@@ -1,24 +1,37 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import userStore from "../../store/UserStore";
 import api from "../../service/Api";
 
 const SignUpFirst = () => {
   const nav = useNavigate();
-  const { userForm, setForm } = userStore();
+  const { userForm, setForm, resetForm } = userStore();
 
-  const [lengthValid, setLengthValid] = useState(null);
-  const [charValid, setCharValid] = useState(null);
-  const [isEmailAvailable, setIsEmailAvailable] = useState(null);
-  const [Emailvalid, setEmailvalid] = useState(null);
-  const [isUsernameAvailable, setIsUsernameAvailable] = useState(null);
-  const [isPwLengthValid, setPwLengthValid] = useState(null);
-  const [isPwCharValid, setPwCharValid] = useState(null);
-  const [passwordMatch, setPasswordMatch] = useState(null);
+  useEffect(() => {
+    return () => {
+      resetForm();
+    };
+  }, [resetForm]);
+
+  const [lengthValid, setLengthValid] = useState("");
+  const [charValid, setCharValid] = useState("");
+  const [isEmailAvailable, setIsEmailAvailable] = useState("");
+  const [Emailvalid, setEmailvalid] = useState("");
+  const [isUsernameAvailable, setIsUsernameAvailable] = useState("");
+  const [isPwLengthValid, setPwLengthValid] = useState("");
+  const [isPwCharValid, setPwCharValid] = useState("");
+  const [passwordMatch, setPasswordMatch] = useState("");
 
   const onChangeInput = (e) => {
     let name = e.target.name;
     let value = e.target.value;
+
+    if (name === "email") {
+      setIsEmailAvailable("");
+    }
+    if (name === "username") {
+      setIsUsernameAvailable("");
+    }
 
     setForm(name, value);
 
@@ -129,6 +142,7 @@ const SignUpFirst = () => {
           onChange={onChangeInput}
           placeholder="ssafy@abc.com"
         ></input>
+        <button onClick={checkEmail}>인증</button>
         {userForm.email !== "" && Emailvalid === false && (
           <div className="emailfail-message">
             이메일은 형식에 맞게 입력해주세요.
@@ -142,7 +156,6 @@ const SignUpFirst = () => {
         {isEmailAvailable === false && (
           <div className="emailfail-message2">이미 사용된 이메일입니다.</div>
         )}
-        <button onClick={checkEmail}>인증</button>
       </section>
 
       <section>
@@ -152,6 +165,7 @@ const SignUpFirst = () => {
           value={userForm.username}
           onChange={onChangeInput}
         ></input>
+        <button onClick={checkUsername}>중복확인</button>
         {userForm.username !== "" &&
           (lengthValid === false || charValid === false) && (
             <div className="idfail-message">
@@ -165,7 +179,6 @@ const SignUpFirst = () => {
         {isUsernameAvailable === false && (
           <div className="idfail-message2">이미 사용된 아이디입니다.</div>
         )}
-        <button onClick={checkUsername}>중복확인</button>
       </section>
 
       <section>

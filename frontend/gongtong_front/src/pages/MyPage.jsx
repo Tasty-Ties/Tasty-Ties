@@ -17,13 +17,8 @@ const MyPage = () => {
   }
 
   return (
-    <div className="flex">
-      <div>
-        <Category informations={informations} />
-      </div>
-      <div>
-        <Outlet />
-      </div>
+    <div className="w-3/4 mt-10 mx-auto content-center relative">
+      <Category informations={informations} />
     </div>
   );
 };

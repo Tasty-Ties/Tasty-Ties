@@ -8,7 +8,15 @@ import ReserveClass from "./components/MyPage/ReserveClass";
 import TeachClass from "./components/MyPage/TeachClass";
 import AttendClass from "./components/MyPage/AttendClass";
 import MyInfo from "./components/MyPage/Myinfo";
+import DeleteId from "./components/MyPage/MyInfo/DeleteId";
 import MyPoint from "./components/MyPage/MyPoint";
+import MyShorts from "./components/MyPage/MyShorts";
+import EditInfo from "./components/MyPage/EditInfo";
+import Profile from "./pages/Profile";
+import OtherInfo from "./components/Profile/OtherInfo";
+import TeachedClass from "./components/Profile/TeachedClass";
+import AttendedClass from "./components/Profile/AttendedClass";
+import Review from "./components/Profile/Review";
 import ClassList from "./pages/ClassList";
 import ClassDetail from "./pages/ClassDetail";
 import ClassIngredient from "./components/ClassDetail/ClassIngredient";
@@ -19,8 +27,10 @@ import ClassRecipes from "./components/ClassDetail/ClassRecipes";
 import ClassRegist from "./pages/ClassRegist";
 import ClassWaiting from "./pages/ClassWaiting";
 import LiveClass from "./pages/LiveClass";
-import { Route, Routes } from "react-router-dom";
-import MyShorts from "./components/MyPage/MyShorts";
+import AlbumPage from "./pages/AlbumPage";
+import { Navigate, Route, Routes } from "react-router-dom";
+import ChatRoom from "./pages/ChatRoom";
+import ReplayClass from "./pages/ReplayClass";
 
 const AppRoutes = () => {
   return (
@@ -37,10 +47,19 @@ const AppRoutes = () => {
         <Route path="" element={<MyInfo />} />
         <Route path="point" element={<MyPoint />} />
         <Route path="shorts" element={<MyShorts />} />
+        <Route path="editinfo" element={<EditInfo />} />
+      </Route>
+      <Route path="/delete" element={<DeleteId />} />
+      <Route path="/otherpage/:username" element={<Profile />}>
+        <Route path="" element={<OtherInfo />} />
+        <Route path="teach" element={<TeachedClass />} />
+        <Route path="attend" element={<AttendedClass />} />
+        <Route path="review" element={<Review />} />
       </Route>
       <Route path="/class" element={<ClassList />} />
       <Route path="/class/:id" element={<ClassDetail />}>
-        <Route path="" element={<ClassDescription />} />
+        <Route index element={<ClassDescription />} />
+        <Route path="description" element={<ClassDescription />} />
         <Route path="ingredient" element={<ClassIngredient />} />
         <Route path="cookingTools" element={<ClassCookingTools />} />
         <Route path="recipes" element={<ClassRecipes />} />
@@ -49,6 +68,8 @@ const AppRoutes = () => {
       <Route path="/classregist" element={<ClassRegist />} />
       <Route path="/classwaiting/:id" element={<ClassWaiting />} />
       <Route path="/liveclass" element={<LiveClass />} />
+      <Route path="/album" element={<AlbumPage />} />
+      <Route path="/chatting" element={<ChatRoom />} />
       {/* <Route path="/" element={< />} /> */}
     </Routes>
   );

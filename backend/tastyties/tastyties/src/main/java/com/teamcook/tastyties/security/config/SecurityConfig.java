@@ -84,8 +84,11 @@ public class SecurityConfig {
         configuration.addAllowedOrigin("http://127.0.0.1:5173");
         configuration.addAllowedOrigin("http://localhost:3000");
         configuration.addAllowedOrigin("http://127.0.0.1:3000");
+        configuration.addAllowedOrigin("http://i11b206.p.ssafy.io:3000");
+        configuration.addAllowedOrigin("https://i11b206.p.ssafy.io");
+	    configuration.addAllowedOrigin("http://i11b206.p.ssafy.io");
 
-        //configuration.addAllowedOrigin("*");
+       // configuration.addAllowedOrigin("*");
         configuration.addAllowedMethod("*");
         configuration.addAllowedHeader("*");
         configuration.setAllowCredentials(true);
