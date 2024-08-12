@@ -4,7 +4,6 @@ import axios from "axios";
 import ChatMessage from "./ChatMessage";
 import Cookies from "js-cookie";
 import AttendeeList from "./AttendeeList";
-import { convertFieldResponseIntoMuiTextFieldProps } from "@mui/x-date-pickers/internals";
 import { chatApi } from "./../../service/Api";
 import { useLocation } from "react-router-dom";
 
