@@ -12,9 +12,7 @@ const SignUpFirst = () => {
   const { userForm, setForm, resetForm } = userStore();
 
   useEffect(() => {
-    return () => {
-      resetForm();
-    };
+    resetForm(["email", "username", "password", "verifyPassword"]);
   }, [resetForm]);
 
   const [lengthValid, setLengthValid] = useState("");

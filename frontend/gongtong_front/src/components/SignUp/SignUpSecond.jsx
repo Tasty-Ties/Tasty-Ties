@@ -12,6 +12,7 @@ const SignUpSecond = () => {
 
   const userRegister = async (e) => {
     e.preventDefault();
+    console.log("회원정보", userForm);
     try {
       const response = await api.post("/users", {
         username: userForm.username,
@@ -25,7 +26,11 @@ const SignUpSecond = () => {
       });
       console.log(response);
       try {
-        const nextResponse = await api.post("ranking/add");
+        const nextResponse = await api.post("/ranking/addByUsername", {
+          username: userForm.username,
+          score: "100.0",
+          description: "회원가입 감사 마일리지",
+        });
         console.log(nextResponse);
       } catch (error) {
         console.log("마일리지더하기실패", error);
@@ -40,7 +45,7 @@ const SignUpSecond = () => {
 
   useEffect(() => {
     return () => {
-      resetForm();
+      resetForm(["nickname", "countryCode", "languageCode", "birth"]);
     };
   }, [resetForm]);
 
@@ -82,7 +87,7 @@ const SignUpSecond = () => {
     } catch (error) {
       if (error.response && error.response.status === 409) {
         setIsNicknameAvailable(false);
-        setForm("nickname", "");
+        setForm("nickname");
       } else {
         console.log(error);
       }

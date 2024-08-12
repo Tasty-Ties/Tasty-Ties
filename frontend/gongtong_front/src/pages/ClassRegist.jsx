@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import dayjs from "dayjs";
 import { useNavigate } from "react-router-dom";
 
 import Ingredient from "./../components/ClassRegist/Ingredient";
@@ -15,6 +14,8 @@ import { setClassRegist } from "../service/CookingClassAPI";
 import Button from "../common/components/Button";
 
 import "./../styles/ClassRegist/ClassRegist.css";
+
+import dayjs from "dayjs";
 
 const validationSchema = yup.object().shape({
   title: yup
@@ -158,9 +159,13 @@ const ClassRegist = () => {
       data.cookingClassStartTime,
       data.replayEndTime
     );
+    const calculatedStartTime = convertUTC(data.cookingClassStartTime);
+    const calculatedEndTime = convertUTC(data.cookingClassEndTime);
 
     const updatedData = {
       ...data,
+      cookingClassStartTime: calculatedStartTime,
+      cookingClassEndTime: calculatedEndTime,
       replayEndTime: calculatedReplayEndTime,
     };
 
@@ -172,6 +177,12 @@ const ClassRegist = () => {
       console.error("클래스 등록 실패:", error);
       alert("클래스 등록에 실패했습니다. 다시 시도해주세요.");
     }
+  };
+
+  const convertUTC = (date) => {
+    const offset = new Date().getTimezoneOffset() * 60000;
+    const endDay = new Date(date.valueOf() - offset);
+    return endDay.toISOString();
   };
 
   const calculateReplayEndTime = (startTime, days) => {
@@ -558,35 +569,6 @@ const ClassRegist = () => {
             <span className="ml-2">명</span>
             {errors.quota && (
               <p className="text-red-500">{errors.quota.message}</p>
-            )}
-          </div>
-        </div>
-        <hr className="my-4" />
-
-        <div className="grid grid-cols-8">
-          <div className="col-span-2">
-            <label htmlFor="replayEndTime">다시보기 기간</label>
-          </div>
-          <div className="col-span-6">
-            <input
-              {...register("replayEndTime")}
-              type="number"
-              className="w-1/2 border p-2 rounded"
-              placeholder="다시보기 기간을 입력해주세요"
-              min="1"
-              max="31"
-              onBlur={() => trigger("replayEndTime")}
-              onKeyDown={(e) => handleKeyDown(e, "replayEndTime")}
-              onChange={(e) => {
-                let value = parseInt(e.target.value);
-                if (value < 1) value = 1;
-                if (value > 31) value = 31;
-                setValue("replayEndTime", value);
-              }}
-            />
-            <span className="ml-2">일</span>
-            {errors.replayEndTime && (
-              <p className="text-red-500">{errors.replayEndTime.message}</p>
             )}
           </div>
         </div>
