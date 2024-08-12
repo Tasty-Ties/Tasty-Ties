@@ -5,6 +5,7 @@ import { Client } from "@stomp/stompjs";
 import useMyPageStore from "../store/MyPageStore";
 import Cookies from "js-cookie";
 import ChatRoomList from "../components/ChatRoom/ChatRoomList";
+import { chatApi } from "./../service/Api";
 
 const MAIN_SERVER_URL = import.meta.env.VITE_MAIN_SERVER;
 const CHAT_SERVER = import.meta.env.VITE_CHAT_SERVER;
@@ -72,11 +73,7 @@ const ChatRoom = () => {
     }
     try {
       console.log("유저의 정보입니다.", userInfo);
-      const response = await axios.get(CHAT_SERVER_URL + `/chats/rooms`, {
-        headers: {
-          Authorization: `Bearer ${Cookies.get("accessToken")}`,
-        },
-      });
+      const response = await chatApi.get(`/chats/rooms`);
       console.log("유저의 채팅방 목록입니다.", response);
       setChatRoomList(response.data.data.chatRooms);
     } catch (error) {
@@ -91,7 +88,7 @@ const ChatRoom = () => {
   return (
     <div className="flex flex-row flex-auto mx-3 pb-5 pt-2">
       <div className="w-1/3">
-        <div className="divide-y divide-gray-100">
+        <div className="divide-y divide-gray-100 overflow-auto">
           {isEmpty
             ? "아무런 채팅방에도 참여하고 있지 않습니다."
             : chatRoomList &&

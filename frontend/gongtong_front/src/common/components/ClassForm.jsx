@@ -66,7 +66,7 @@ const ClassForm = ({ classInfo, classType }) => {
     } else if (buttonText === "입장") {
       nav(`/classwaiting/${classInfo.uuid}`, {
         state: {
-          classData: classInfo,
+          classId: classInfo.uuid,
           isHost: location.pathname === "/mypage/teach",
         },
       });

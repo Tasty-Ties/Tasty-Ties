@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 
-const ClassImageFiles = ({ setFiles }) => {
+function ClassImageFiles({ setFiles }) {
   const [classImages, setClassImages] = useState([]);
 
   const validExtensions = ["jpg", "jpeg", "png"];
-  const maxFileSize = 10 * 1024 * 1024; // 10MB
+  const maxFileSize = 5 * 1024 * 1024; // 5MB
 
   const handleAddImages = (e) => {
     const imagesLists = Array.from(e.target.files);
@@ -18,7 +18,7 @@ const ClassImageFiles = ({ setFiles }) => {
         return;
       }
       if (file.size > maxFileSize) {
-        alert(`파일 사이즈를 확인해주세요 ${file.name}`);
+        alert(`파일 크기는 5MB를 초과할 수 없습니다: ${file.name}`);
         return;
       }
       validFiles.push(file);
@@ -29,6 +29,7 @@ const ClassImageFiles = ({ setFiles }) => {
     if (imageUrlLists.length > 5) {
       imageUrlLists = imageUrlLists.slice(0, 5);
       validFiles = validFiles.slice(0, 5);
+      alert("최대 5개의 이미지만 업로드할 수 있습니다.");
     }
     setClassImages(imageUrlLists);
     setFiles(validFiles);
@@ -77,6 +78,6 @@ const ClassImageFiles = ({ setFiles }) => {
       </div>
     </div>
   );
-};
+}
 
 export default ClassImageFiles;

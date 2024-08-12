@@ -2,18 +2,22 @@ package com.teamcook.tastyties.notification.service;
 
 import com.google.firebase.messaging.*;
 import com.teamcook.tastyties.notification.dto.FcmNotificationDto;
+import com.teamcook.tastyties.notification.dto.NotificationDto;
 import com.teamcook.tastyties.notification.entity.FcmNotification;
 import com.teamcook.tastyties.notification.repository.FcmNotificationRepository;
 import com.teamcook.tastyties.user.dto.UserFcmTokenDto;
 import com.teamcook.tastyties.user.entity.User;
 import com.teamcook.tastyties.user.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @Slf4j
@@ -22,6 +26,9 @@ public class NotificationService {
     private final FirebaseMessaging firebaseMessaging;
     private final FcmNotificationRepository fcmNotificationRepository;
     private final UserRepository userRepository;
+
+    private final int NOTIFICATION_DAY = 15;
+    private final int NOTIFICATION_SIZE = 20;
 
     public NotificationService(FirebaseMessaging firebaseMessaging, FcmNotificationRepository fcmNotificationRepository, UserRepository userRepository) {
         this.firebaseMessaging = firebaseMessaging;
@@ -120,6 +127,54 @@ public class NotificationService {
 
         if (!notifications.isEmpty()) {
             fcmNotificationRepository.saveAll(notifications);
+        }
+    }
+
+    public Map<String, Object> getNotifications(User user, Map<String, Object> requestParams) {
+        Map<String, Object> result = new HashMap<>();
+
+        int pgNo = requestParams.get("pgNo") == null ? 0 : Integer.parseInt(requestParams.get("pgNo").toString());
+
+        List<NotificationDto> notifications = getNotifications(user, pgNo);
+
+        result.put("pgNo", pgNo);
+        result.put("notifications", notifications);
+
+        return result;
+    }
+
+    private List<NotificationDto> getNotifications(User user, int pgNo) {
+        LocalDateTime startTime = LocalDateTime.now().minusDays(NOTIFICATION_DAY);
+        Pageable pageable = PageRequest.of(pgNo, NOTIFICATION_SIZE);
+
+        List<FcmNotification> fcmNotifications = fcmNotificationRepository.findRecentNotifications(user, startTime, pageable).getContent();
+
+        List<NotificationDto> notificationDtos = new ArrayList<>();
+        for (FcmNotification fcmNotification : fcmNotifications) {
+            notificationDtos.add(new NotificationDto(fcmNotification));
+        }
+
+        return notificationDtos;
+    }
+
+    @Transactional
+    public void checkReadNotifications(User user, Map<String, Object> requestParams) {
+        List<Integer> notificationIds = (List<Integer>) requestParams.get("notificationIds");
+
+        if (!notificationIds.isEmpty()) {
+            fcmNotificationRepository.checkReadNotification(user, notificationIds);
+        }
+    }
+
+    @Transactional
+    public void deleteNotifications(User user, Map<String, Object> requestParams) {
+        String notificationId = (String) requestParams.get("notificationIds");
+        List<Integer> notificationIds = Stream.of(notificationId.split(","))
+                .map(Integer::parseInt)
+                .collect(Collectors.toList());
+
+        if (!notificationIds.isEmpty()) {
+            fcmNotificationRepository.deleteNotification(user, notificationIds);
         }
     }
 

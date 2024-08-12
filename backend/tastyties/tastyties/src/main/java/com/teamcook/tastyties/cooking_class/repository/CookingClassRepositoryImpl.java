@@ -77,7 +77,8 @@ public class CookingClassRepositoryImpl implements CookingClassCustomRepository 
                         countryByClass.alpha2,
                         countryByClass.countryImageUrl
                 ),
-                        cookingClass.countryCode.eq(country.alpha2)
+                        cookingClass.countryCode.eq(country.alpha2),
+                        cookingClass.chatRoomId
                 ))
                 .from(cookingClass)
                 .leftJoin(cookingClass.host, user)
@@ -262,7 +263,8 @@ public class CookingClassRepositoryImpl implements CookingClassCustomRepository 
                         ), new QCountryProfileDto(
                         countryByClass.alpha2,
                         countryByClass.countryImageUrl
-                ), cookingClass.countryCode.eq(country.alpha2)
+                ), cookingClass.countryCode.eq(country.alpha2),
+                        cookingClass.chatRoomId
                 ))
                 .from(cookingClass)
                 .leftJoin(cookingClass.host, user)
@@ -304,7 +306,8 @@ public class CookingClassRepositoryImpl implements CookingClassCustomRepository 
                         ), new QCountryProfileDto(
                         countryByClass.alpha2,
                         countryByClass.countryImageUrl
-                ), cookingClass.countryCode.eq(country.alpha2)
+                ), cookingClass.countryCode.eq(country.alpha2),
+                        cookingClass.chatRoomId
                 ))
                 .from(cookingClass)
                 .leftJoin(cookingClass.host, user)
@@ -348,7 +351,8 @@ public class CookingClassRepositoryImpl implements CookingClassCustomRepository 
                                 countryByClass.alpha2,
                                 countryByClass.countryImageUrl
                         ),
-                                cookingClass.countryCode.eq(country.alpha2)
+                                cookingClass.countryCode.eq(country.alpha2),
+                                cookingClass.chatRoomId
                         ))
                         .from(cookingClass)
                         .leftJoin(cookingClass.host, user)

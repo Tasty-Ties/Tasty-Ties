@@ -19,22 +19,11 @@ const ClassListDropdown = ({ title, items, setClassification, setSort }) => {
               <MenuItem key={index}>
                 <a
                   className="block px-4 py-1 text-sm text-gray-700 data-[focus]:bg-gray-100 data-[focus]:text-gray-900 cursor-pointer"
-                  value={item}
                   onClick={() => {
-                    {
-                      if (title === "분류") {
-                        if (item === "클래스명") {
-                          setClassification({ title: "title" });
-                        } else if (item === "닉네임") {
-                          setClassification({ title: "username" });
-                        }
-                      } else if (title === "정렬") {
-                        if (item === "최신순") {
-                          setSort({ sort: "createtime,desc" });
-                        } else if (item === "오래된순") {
-                          setSort({ sort: "createtime,asc" });
-                        }
-                      }
+                    if (setClassification) {
+                      setClassification(item);
+                    } else if (setSort) {
+                      setSort(item);
                     }
                   }}
                 >
