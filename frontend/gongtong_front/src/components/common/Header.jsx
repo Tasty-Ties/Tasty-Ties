@@ -80,11 +80,11 @@ const Header = () => {
       console.log(error);
     }
 
-    Cookies.remove("accessToken"),
-      Cookies.remove("refreshToken"),
-      // Remove FCM token
-      Cookies.remove("fcmToken"),
-      nav("/");
+    Cookies.remove("accessToken");
+    Cookies.remove("refreshToken");
+    // Remove FCM token
+    Cookies.remove("fcmToken");
+    nav("/");
   };
 
   return (
