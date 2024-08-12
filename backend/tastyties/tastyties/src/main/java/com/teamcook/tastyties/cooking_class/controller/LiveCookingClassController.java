@@ -63,4 +63,17 @@ public class LiveCookingClassController {
                         .build());
     }
 
+    @DeleteMapping("/sessions/{uuid}")
+    public ResponseEntity<CommonResponseDto> deleteSession(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                                           @PathVariable String uuid) throws AccessDeniedException {
+        liveCookingClassService.deleteLiveSessionId(userDetails.getUserId(), uuid);
+
+        return ResponseEntity.ok()
+                .body(CommonResponseDto.builder()
+                        .stateCode(200)
+                        .message("정상적으로 세션키가 삭제되었습니다.")
+                        .data(null)
+                        .build());
+    }
+
 }
