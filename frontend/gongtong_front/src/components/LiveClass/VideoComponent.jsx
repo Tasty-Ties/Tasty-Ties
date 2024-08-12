@@ -1,7 +1,7 @@
 const MAIN_SERVER_URL = import.meta.env.VITE_MAIN_SERVER;
 const CHAT_SERVER_URL = import.meta.env.VITE_CHAT_SERVER;
 
-import axios from "axios";
+import api from "../../service/Api";
 import Cookies from "js-cookie";
 import { useCallback, useEffect, useRef, useState } from "react";
 
@@ -11,25 +11,26 @@ import ToolbarComponent from "./ToolbarComponent";
 import UserModel from "./UserModel";
 
 import { FilesetResolver, GestureRecognizer } from "@mediapipe/tasks-vision";
-
 import { Client } from "@stomp/stompjs";
+
 import useMyPageStore from "../../store/MyPageStore";
 import MediaDeviceSetting from "./MediaDeviceSetting";
 
 import AttendeeList from "../ChatRoom/AttendeeList";
 import ChatLog from "../ChatRoom/ChatLog";
-import "./../../styles/LiveClass/LiveClass.css";
 import CameraCapture from "./CameraCapture";
 import ExitLiveClass from "./ExitLiveClass";
-import { useNavigate } from "react-router-dom";
+
+import "./../../styles/LiveClass/LiveClass.css";
 
 const localUserSetting = new UserModel();
 
 const VideoComponent = ({ isHost }) => {
-  const nav = useNavigate();
-
   const OV = useVideoStore((state) => state.OV);
   const setOV = useVideoStore((state) => state.setOV);
+  const session = useRef(null);
+  const currentPublisher = useRef();
+
   const selectedAudioDevice = useVideoStore(
     (state) => state.selectedAudioDevice
   );
@@ -41,24 +42,18 @@ const VideoComponent = ({ isHost }) => {
 
   const userInfo = useMyPageStore((state) => state.informations);
   const classData = useVideoStore((state) => state.classData);
-  console.log(classData);
 
   const [localUser, setLocalUser] = useState(null);
-  const session = useRef(null);
-  const [subscribers, setSubscribers] = useState([]);
-
   const [hostUser, setHostUser] = useState(null);
   const [partUser, setPartUser] = useState();
+
+  const remotes = useRef([]);
+  const [subscribers, setSubscribers] = useState([]);
   const [userProfileList, setUserProfileList] = useState({});
 
   const videoRef = useRef(null);
-  const canvasRef = useRef(null);
 
-  const remotes = useRef([]);
   const localUserAccessAllowed = useRef(false);
-
-  const sessionId = useVideoStore((state) => state.sessionId);
-  const currentPublisher = useRef();
 
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isExitOpen, setIsExitOpen] = useState(false);
@@ -67,12 +62,13 @@ const VideoComponent = ({ isHost }) => {
   const [isPeopleListOpen, setIsPeopleListOpen] = useState(false);
   const [isSliderOn, setIsSliderOn] = useState(false);
   const [displayMode, setDisplayMode] = useState(0);
+  const [isForcedExit, setIsForcedExit] = useState(false);
 
-  const [isForcedExit, setIsForcedExit] = useState();
+  // 세션id를 로컬 스토리지에 저장
+  const sessionIdRef = useRef(localStorage.getItem("sessionId"));
 
   // 비디오 레이아웃 순서 정렬하는 코드
   useEffect(() => {
-    // console.log(subscribers);
     if (!subscribers) {
       return;
     }
@@ -97,8 +93,8 @@ const VideoComponent = ({ isHost }) => {
 
   // 참여자 목록 정리하는 코드
   useEffect(() => {
-    console.log(partUser);
-    console.log(userInfo);
+    // console.log(partUser);
+    // console.log(userInfo);
 
     if (!classData || !localUser) return;
     const host = classData.hostProfile;
@@ -172,13 +168,6 @@ const VideoComponent = ({ isHost }) => {
       leaveSession();
     };
   }, []);
-
-  useEffect(() => {
-    switchCamera();
-  }, [selectedVideoDevice]);
-  useEffect(() => {
-    switchMic();
-  }, [selectedAudioDevice]);
 
   //미디어 파이프 및 영상 녹화 관련
   const raiseTimeout = useRef(null);
@@ -276,6 +265,15 @@ const VideoComponent = ({ isHost }) => {
     }
   };
 
+  // 미디어 디바이스 교체
+  useEffect(() => {
+    switchCamera();
+  }, [selectedVideoDevice]);
+
+  useEffect(() => {
+    switchMic();
+  }, [selectedAudioDevice]);
+
   const switchCamera = async () => {
     if (currentPublisher.current) {
       const newPublisher = await OV.initPublisher(undefined, {
@@ -346,6 +344,8 @@ const VideoComponent = ({ isHost }) => {
       });
       setSubscribers(updatedSubscribers);
     });
+
+    // 호스트 나갔으면 나머지 참여자 내쫓는 코드
     session.on("signal:host-left", (event) => {
       setIsForcedExit(true);
       exitOpen();
@@ -436,21 +436,15 @@ const VideoComponent = ({ isHost }) => {
   };
 
   const getToken = useCallback(async () => {
-    return await createToken(sessionId);
+    return await createToken(sessionIdRef.current);
   }, []);
 
   const createToken = useCallback(async (sessionId) => {
-    // console.log(sessionId);
-    const response = await axios.post(
-      MAIN_SERVER_URL + "/classes/live/sessions/" + sessionId + "/connections",
-      {},
-      {
-        headers: {
-          Authorization: `Bearer ${Cookies.get("accessToken")}`,
-        },
-      }
+    console.log(sessionId);
+    const response = await api.post(
+      `${MAIN_SERVER_URL}/classes/live/sessions/${sessionId}/connections`
     );
-    // console.log(response.data);
+    console.log(response.data);
     return response.data.data;
   }, []);
 
@@ -675,7 +669,7 @@ const VideoComponent = ({ isHost }) => {
     };
   }, []);
 
-  // 비디오 레이이아웃
+  // 비디오 레이아웃
   const displayChange = () => {
     const newMode = (displayMode + 1) % 3;
     // console.log(newMode);
@@ -708,8 +702,6 @@ const VideoComponent = ({ isHost }) => {
     setIsChatOpen(!isChatOpen);
   };
 
-  const ref = useRef(null);
-
   const prevButton = () => {
     if (ref.current) ref.current.scrollLeft -= 200;
   };
@@ -717,6 +709,7 @@ const VideoComponent = ({ isHost }) => {
     if (ref.current) ref.current.scrollLeft += 200;
   };
 
+  const ref = useRef(null);
   const [videoClassName, setVideoClassName] = useState("w-2/3 mx-8");
 
   return (
