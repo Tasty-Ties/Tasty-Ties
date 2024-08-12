@@ -1,12 +1,22 @@
 import { ListItem, Typography } from "@material-tailwind/react";
 import React, { useState } from "react";
 
+import { changeIsReadNotification } from "../../../service/NotificationAPI";
+import { pushApiErrorNotification } from "../../common/Toast";
+
 const NotificationListItem = ({ notification }) => {
   const [check, setCheck] = useState(notification.read);
 
-  const handleCeckNotifiaction = () => {
-    setCheck(!check);
-    console.log("알람 읽음 체크" + check);
+  const handleCeckNotifiaction = async () => {
+    try {
+      const response = await changeIsReadNotification(notification.id);
+
+      if (response.status === 200) {
+        setCheck(!check);
+      }
+    } catch (e) {
+      pushApiErrorNotification(e);
+    }
   };
 
   return (

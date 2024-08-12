@@ -11,11 +11,18 @@ import React, { useEffect, useRef, useState } from "react";
 
 import NotificationListItem from "./item/NotificationListItem";
 import { getNotifications, deleteNotifications } from "../../service/NotificationAPI";
+import { pushApiErrorNotification } from "../common/Toast";
 
 const NotificationButton = () => {
   const [notifications, setNotifications] = useState([]);
   const [hasMore, setHasMore] = useState(true);
   const pgNo = useRef(0);
+
+  const [isAllDeleteButtonVisible, setIsAllDeleteButtonVisible] = useState(false);
+
+  useEffect(() => {
+    setIsAllDeleteButtonVisible(notifications.length > 0);
+  }, [notifications]);
 
   const observeRef = useRef(null);
 
@@ -32,7 +39,7 @@ const NotificationButton = () => {
         pgNo.current += 1;
       }
     } catch (e) {
-      console.log(e);
+      pushApiErrorNotification(e);
     }
   };
 
@@ -80,7 +87,7 @@ const NotificationButton = () => {
         clearAllNotifications();
       }
     } catch (e) {
-      console.log(e);
+      pushApiErrorNotification(e);
     }
   };
 
@@ -101,22 +108,24 @@ const NotificationButton = () => {
           <Typography variant="h5" className="text-black ml-2">
             알림
           </Typography>
-          <Button
-            variant="text"
-            size="sm"
-            color="red"
-            className="p-1.5"
-            onClick={handleDeleteAllNotifications}
-          >
-            전체 삭제
-          </Button>
+          {isAllDeleteButtonVisible && (
+            <Button
+              variant="text"
+              size="sm"
+              color="red"
+              className="p-1.5"
+              onClick={handleDeleteAllNotifications}
+            >
+              전체 삭제
+            </Button>
+          )}
         </div>
         <Typography className="text-sm text-black ml-2 mb-4">
           전체 알림({notifications.length})개
         </Typography>
         <List>
           {notifications.length === 0 ? (
-            <div>알림없음</div>
+            <Typography className="flex justify-center text-gray-600">알림없음</Typography>
           ) : (
             notifications.map((notification) => (
               <NotificationListItem notification={notification} key={notification.id} />
