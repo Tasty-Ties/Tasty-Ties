@@ -6,6 +6,7 @@ import com.teamcook.tastyties.common.repository.CountryRepository;
 import com.teamcook.tastyties.security.userdetails.CustomUserDetails;
 import com.teamcook.tastyties.shared.entity.UserAndCountry;
 import com.teamcook.tastyties.shared.repository.UserAndCountryRepository;
+import com.teamcook.tastyties.user.dto.reward.ActivityPointRequestByUsernameDto;
 import com.teamcook.tastyties.user.dto.reward.ActivityPointRequestDto;
 import com.teamcook.tastyties.user.dto.reward.ActivityPointResponseDto;
 import com.teamcook.tastyties.user.dto.reward.RankedUserDto;
@@ -85,6 +86,33 @@ public class UserRewardsService {
     @Transactional
     public void addScore(ActivityPointRequestDto activityPointRequestDto) {
         int userId = activityPointRequestDto.getUserId();
+        double score = activityPointRequestDto.getScore();
+        String description = activityPointRequestDto.getDescription();
+        String userKey = String.valueOf(userId);
+
+        // 기존 점수를 가져와서 누적
+        Double currentWeeklyScore = redisTemplate.opsForZSet().score(WEEKLY_LEADERBOARD_KEY, userKey);
+        Double currentMonthlyScore = redisTemplate.opsForZSet().score(MONTHLY_LEADERBOARD_KEY, userKey);
+        Double currentYearlyScore = redisTemplate.opsForZSet().score(YEARLY_LEADERBOARD_KEY, userKey);
+
+        double newWeeklyScore = (currentWeeklyScore != null ? currentWeeklyScore : 0) + score;
+        double newMonthlyScore = (currentMonthlyScore != null ? currentMonthlyScore : 0) + score;
+        double newYearlyScore = (currentYearlyScore != null ? currentYearlyScore : 0) + score;
+
+        redisTemplate.opsForZSet().add(WEEKLY_LEADERBOARD_KEY, userKey, newWeeklyScore);
+        redisTemplate.opsForZSet().add(MONTHLY_LEADERBOARD_KEY, userKey, newMonthlyScore);
+        redisTemplate.opsForZSet().add(YEARLY_LEADERBOARD_KEY, userKey, newYearlyScore);
+        userRepository.findById(userId).ifPresent(user -> {
+            ActivityPointLog log = new ActivityPointLog(score, description);
+            activityPointLogRepository.save(log);
+            user.addActivityPointLog(log);
+        });
+    }
+
+    @Transactional
+    public void addScoreByUsername(ActivityPointRequestByUsernameDto activityPointRequestDto) {
+        User findUser = userRepository.findByUsername(activityPointRequestDto.getUsername()).orElse(null);
+        int userId = findUser.getUserId();
         double score = activityPointRequestDto.getScore();
         String description = activityPointRequestDto.getDescription();
         String userKey = String.valueOf(userId);
