@@ -3,13 +3,21 @@ import { useNavigate } from "react-router-dom";
 import userStore from "../../store/UserStore";
 import api from "../../service/Api";
 
+import {
+  Card,
+  Input,
+  Checkbox,
+  Button,
+  Typography,
+} from "@material-tailwind/react";
+
 const SignUpFirst = () => {
   const nav = useNavigate();
   const { userForm, setForm, resetForm } = userStore();
 
   useEffect(() => {
     return () => {
-      resetForm();
+      resetForm(["email", "username", "password", "verifyPassword"]);
     };
   }, [resetForm]);
 
@@ -133,82 +141,143 @@ const SignUpFirst = () => {
   };
 
   return (
-    <>
-      <section>
-        <div>이메일</div>
-        <input
-          name="email"
-          value={userForm.email}
-          onChange={onChangeInput}
-          placeholder="ssafy@abc.com"
-        ></input>
-        <button onClick={checkEmail}>인증</button>
-        {userForm.email !== "" && Emailvalid === false && (
-          <div className="emailfail-message">
-            이메일은 형식에 맞게 입력해주세요.
-          </div>
-        )}
-        {isEmailAvailable === true && (
-          <div className="emailsuccess-message">
-            사용할 수 있는 이메일입니다.
-          </div>
-        )}
-        {isEmailAvailable === false && (
-          <div className="emailfail-message2">이미 사용된 이메일입니다.</div>
-        )}
-      </section>
-
-      <section>
-        <div>아이디</div>
-        <input
-          name="username"
-          value={userForm.username}
-          onChange={onChangeInput}
-        ></input>
-        <button onClick={checkUsername}>중복확인</button>
-        {userForm.username !== "" &&
-          (lengthValid === false || charValid === false) && (
-            <div className="idfail-message">
-              아이디는 영문,숫자를 조합하여 4~20글자로 입력해주세요.
+    <div
+      className="h-screen flex justify-center items-center bg-cover bg-center" // <- 여기
+      style={{ backgroundImage: `url(/images/loginImages/login_bg.png)` }} // <- 여기
+    >
+      <div className="w-1/2"></div>
+      <div className="w-1/2 flex h-full">
+        <Card
+          color="transparent"
+          shadow={false}
+          className="flex flex-col p-8 bg-white rounded-none shadow-lg w-full"
+        >
+          {" "}
+          {/* <- 여기 추가 */}
+          <Typography color="blue-gray">
+            Welcome !, Bienvenue!, ようこそ!, Welkom!, स्वागत है!
+          </Typography>
+          <Typography variant="h4" color="blue-gray" className="mt-5">
+            회원가입
+          </Typography>
+          <Typography color="blue-gray" className="mt-2">
+            맛,잇다의 세계로 들어와 다양한 문화의 음식을 즐겨보세요!!
+          </Typography>
+          <section>
+            <div className="text-md font-semibold text-gray-700 mb-2 mt-10">
+              이메일
             </div>
-          )}
-
-        {isUsernameAvailable === true && (
-          <div className="idsuccess-message">사용할 수 있는 아이디입니다.</div>
-        )}
-        {isUsernameAvailable === false && (
-          <div className="idfail-message2">이미 사용된 아이디입니다.</div>
-        )}
-      </section>
-
-      <section>
-        <div>비밀번호</div>
-        <input
-          name="password"
-          type="password"
-          value={userForm.password}
-          onChange={onChangeInput}
-        ></input>
-        {userForm.password !== "" &&
-          (isPwLengthValid === false || isPwCharValid === false) && (
-            <div className="pwfail-message">
-              비밀번호는 영문,숫자,특수기호를 조합해 8~20글자로 입력해주세요.
+            <div className="flex items-center gap-2">
+              <Input
+                name="email"
+                value={userForm.email}
+                onChange={onChangeInput}
+                placeholder="ssafy@abc.com"
+              ></Input>
+              <Button
+                variant="outlined"
+                onClick={checkEmail}
+                className="h-full whitespace-nowrap w-32 border-green-900"
+              >
+                인증
+              </Button>
             </div>
-          )}
-      </section>
+            {userForm.email !== "" && Emailvalid === false && (
+              <Typography color="red" className="text-sm emailfail-message">
+                이메일은 형식에 맞게 입력해주세요.
+              </Typography>
+            )}
+            {isEmailAvailable === true && (
+              <Typography
+                color="green"
+                className="text-sm emailsuccess-message"
+              >
+                사용할 수 있는 이메일입니다.
+              </Typography>
+            )}
+            {isEmailAvailable === false && (
+              <Typography color="red" className="emailfail-message2">
+                이미 사용된 이메일입니다.
+              </Typography>
+            )}
+          </section>
+          <section>
+            <div className="text-md font-semibold text-gray-700 mb-2 mt-4">
+              아이디
+            </div>
+            <div className="flex items-center gap-2">
+              <Input
+                name="username"
+                value={userForm.username}
+                onChange={onChangeInput}
+                placeholder="아이디를 입력하세요"
+              ></Input>
+              <Button
+                variant="outlined"
+                onClick={checkUsername}
+                className="h-full whitespace-nowrap border-green-900 w-32"
+              >
+                중복확인
+              </Button>
+            </div>
+            {userForm.username !== "" &&
+              (lengthValid === false || charValid === false) && (
+                <div className="idfail-message">
+                  아이디는 영문,숫자를 조합하여 4~20글자로 입력해주세요.
+                </div>
+              )}
 
-      <div>비밀번호 확인</div>
-      <input
-        name="verifyPassword"
-        type="password"
-        value={userForm.verifyPassword}
-        onChange={onChangeInput}
-      ></input>
-      {userForm.verifyPassword !== "" && passwordMatch === false && (
-        <div className="pwmatchfail-message">비밀번호와 일치하지 않습니다.</div>
-      )}
-      <button onClick={() => nav("/signupfin")}>→</button>
-    </>
+            {isUsernameAvailable === true && (
+              <Typography color="green" className="text-sm idsuccess-message">
+                사용할 수 있는 아이디입니다.
+              </Typography>
+            )}
+            {isUsernameAvailable === false && (
+              <Typography color="red" className="text-sm idfail-message2">
+                이미 사용된 아이디입니다.
+              </Typography>
+            )}
+          </section>
+          <section>
+            <div className="text-md font-semibold text-gray-700 mb-2 mt-4">
+              비밀번호
+            </div>
+            <Input
+              name="password"
+              type="password"
+              value={userForm.password}
+              onChange={onChangeInput}
+              placeholder="비밀번호를 입력하세요"
+            ></Input>
+            {userForm.password !== "" &&
+              (isPwLengthValid === false || isPwCharValid === false) && (
+                <Typography color="red" className="pwfail-message">
+                  비밀번호는 영문,숫자,특수기호를 조합해 8~20글자로
+                  입력해주세요.
+                </Typography>
+              )}
+          </section>
+          <div className="text-md font-semibold text-gray-700 mb-2 mt-4">
+            비밀번호 확인
+          </div>
+          <Input
+            name="verifyPassword"
+            type="password"
+            value={userForm.verifyPassword}
+            onChange={onChangeInput}
+          ></Input>
+          {userForm.verifyPassword !== "" && passwordMatch === false && (
+            <Typography color="red" className="pwmatchfail-message">
+              비밀번호와 일치하지 않습니다.
+            </Typography>
+          )}
+          <div className="mb-5"></div>
+          <Button className="bg-first mt-10 " onClick={() => nav("/signupfin")}>
+            다음
+          </Button>
+        </Card>
+      </div>
+    </div>
   );
 };
 

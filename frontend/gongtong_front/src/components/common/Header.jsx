@@ -32,7 +32,7 @@ const NavList = () => {
     <>
       <NavItem text="쿠킹클래스" link="/class" />
       <NavItem text="숏폼" link="" />
-      <NavItem text="랭킹" link="" />
+      <NavItem text="랭킹" link="/ranking" />
     </>
   );
 };

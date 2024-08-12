@@ -43,21 +43,21 @@ const Category = () => {
             </div>
           </div>
           <div className="flex mt-1">
-            <p className="flex">
+            <div className="flex">
               <img src={instalogo} alt="인스타로고" className="size-6" />
               &nbsp;
               <p className="text-sm text-gray-500">
                 {informations.instagramHandle || "연결된 계정이 없습니다."}
               </p>
-            </p>
+            </div>
             &nbsp;&nbsp;&nbsp;&nbsp;
-            <p className="flex">
+            <div className="flex">
               <img src={youtubelogo} alt="유튜브로고" className="size-6" />
               &nbsp;
               <p className="text-sm text-gray-500">
                 {informations.youtubeHandle || "연결된 계정이 없습니다."}
               </p>
-            </p>
+            </div>
           </div>
         </div>
         <br />

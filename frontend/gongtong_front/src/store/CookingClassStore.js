@@ -1,10 +1,10 @@
 import { create } from "zustand";
 import {
+  getClassDetail,
+  getClassLists,
+  getClassReviews,
   getCountries,
   getLanguages,
-  getClassLists,
-  getClassDetail,
-  getClassReviews,
 } from "./../service/CookingClassAPI";
 
 const useCookingClassStore = create((set) => ({
