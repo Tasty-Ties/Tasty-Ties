@@ -1,15 +1,13 @@
+import RankingRight from "../components/Ranking/RankingRight";
+import RankingLeft from "./../components/Ranking/RankingLeft";
 const Ranking = () => {
   return (
-    <div>
-      <div>
-        <div></div>
-        <div></div>
-        <div></div>
+    <div className="grid grid-cols-10 mx-auto mt-20">
+      <div className="col-span-4 mt-14">
+        <RankingLeft />
       </div>
-      <div>
-        <div>정렬</div>
-        <div>랭크</div>
-        <div>페이지네이션</div>
+      <div className="col-span-6">
+        <RankingRight />
       </div>
     </div>
   );

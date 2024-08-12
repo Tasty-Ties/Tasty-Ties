@@ -9,19 +9,20 @@ const ClassList = () => {
   const { classLists, hasMoreContent, getClassLists } = useCookingClassStore();
   const [page, setPage] = useState(0);
   const observerRef = useRef(null);
-  const [searchParams, setSearchParams] = useState(null);
+  const [searchParams, setSearchParams] = useState({
+    sort: "createTime,desc",
+  });
   const isLoading = useRef(false);
   const location = useLocation();
 
   let cookie = Cookies.get("accessToken");
 
-  // 컴포넌트가 처음 마운트될 때 초기 데이터 로드
   useEffect(() => {
+    console.log(searchParams);
     setPage(0);
     fetchClassListData(0, searchParams);
   }, [location]);
 
-  // 검색어 변경 시 호출
   const handleSearch = (searchParams) => {
     setSearchParams(searchParams);
     setPage(0);
@@ -94,11 +95,11 @@ const ClassList = () => {
               </div>
             ))
           ) : (
-            <div className="mt-20 col-span-4 text-4xl text-center text-gray-500">
+            <div className="mt-20 col-span-4 text-2xl text-center text-gray-500">
               <div>
                 <img
                   src="/images/classImages/alert.svg"
-                  className="mx-auto w-16 mb-5"
+                  className="mx-auto w-12 mb-5"
                 />
               </div>
               <div>검색 결과가 없습니다.</div>
