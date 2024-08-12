@@ -83,6 +83,9 @@ const ClassDetail = () => {
 
   console.log(classDetail);
 
+  const currentTime = new Date(); // 현재 시간을 가져옵니다.
+  const classTime = new Date(classDetail.cookingClassStartTime); // 수업 시간을 가져옵니다.
+
   return (
     <div className="w-3/6 mx-auto justify-center mt-8">
       <ClassImageCarousel classDetail={classDetail} />
@@ -112,27 +115,35 @@ const ClassDetail = () => {
             </div>
           </div>
           <div className="flex items-center content-between">
-            {!classDetail.userEnrolled &&
-              classDetail.quota > classDetail.reservedCount &&
-              !classDetail.host && (
+            {!classDetail.host &&
+              !classDetail.userEnrolled &&
+              // currentTime < classTime &&
+              classDetail.quota > classDetail.reservedCount && (
                 <Button
                   text="예약하기"
                   type="green-short"
                   onClick={handleClassReservation}
                 />
               )}
-            {classDetail.quota <= classDetail.reservedCount &&
-              !classDetail.host && (
+
+            {!classDetail.host &&
+              // currentTime > classTime &&
+              classDetail.quota <= classDetail.reservedCount &&
+              !classDetail.userEnrolled && (
                 <Button text="마감" type="green-border-short" />
               )}
-            {classDetail.userEnrolled && (
-              <Button
-                text="예약 취소하기"
-                type="green-border-short"
-                onClick={cancelClassReservation}
-              />
-            )}
 
+            {!classDetail.host &&
+              // currentTime < classTime &&
+              classDetail.userEnrolled && (
+                <Button
+                  text="예약 취소하기"
+                  type="green-border-short"
+                  onClick={cancelClassReservation}
+                />
+              )}
+
+            {/* {currentTime < classTime && classDetail.host && ( */}
             {classDetail.host && (
               <Button
                 text="강의 삭제하기"
@@ -147,12 +158,6 @@ const ClassDetail = () => {
         </div>
       </div>
       <div className="my-4">
-        {/* <Profile
-          username={classDetail.hostProfile?.nickname}
-          image={classDetail.hostProfile?.profileImageUrl}
-          size={"w-14"}
-          textsize={"text-xl"}
-        /> */}
         <div className="flex">
           <ProfileButton
             image={classDetail.hostProfile?.profileImageUrl}
@@ -205,26 +210,6 @@ const ClassDetail = () => {
             </svg>
             <span className="ml-1">언어 : </span>
             <span className="ml-1">{classDetail.languageName}</span>
-          </div>
-          <div className="flex items-center my-3">
-            <svg
-              width="20"
-              height="16"
-              viewBox="0 0 20 16"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M2 16C1.45 16 0.975 15.8083 0.575 15.425C0.191667 15.025 0 14.55 0 14V2C0 1.45 0.191667 0.983334 0.575 0.599999C0.975 0.2 1.45 0 2 0H14C14.55 0 15.0167 0.2 15.4 0.599999C15.8 0.983334 16 1.45 16 2V6.5L20 2.5V13.5L16 9.5V14C16 14.55 15.8 15.025 15.4 15.425C15.0167 15.8083 14.55 16 14 16H2ZM2 14H14V2H2V14ZM2 14V2V14Z"
-                fill="black"
-              />
-            </svg>
-            <span className="ml-1">다시보기 기간 : </span>
-            <span className="ml-1">
-              {classDetail.replayEndTime &&
-                `${classDetail.replayEndTime.substring(0, 10)}`}
-              {/* ${classDetail.replayEndTime.substring(11, 16)} */}
-            </span>
           </div>
         </div>
         <div className="my-6">

@@ -407,4 +407,13 @@ public class CookingClassRepositoryImpl implements CookingClassCustomRepository 
         return cookingClass != null ? cookingClass.getSessionId() : null;
     }
 
+    @Override
+    public void deleteSessionIdByCookingClassId(String uuid) {
+        queryFactory.update(cookingClass)
+                .set(cookingClass.sessionId, (String) null)
+                .where(cookingClass.uuid.eq(uuid))
+                .execute();
+    }
+
+
 }

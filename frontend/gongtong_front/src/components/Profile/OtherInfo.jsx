@@ -71,6 +71,13 @@ const OtherInfo = () => {
               <ReviewForm key={index} review={review} />
             ))}
           </div>
+          <div className="flex justify-center mt-2">
+            <Button
+              text="더보기"
+              type="view-more"
+              onClick={() => nav(`/otherpage/${username}/review`)}
+            />
+          </div>
         </div>
       )}
     </div>

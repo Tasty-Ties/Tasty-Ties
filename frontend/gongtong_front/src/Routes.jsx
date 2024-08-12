@@ -30,7 +30,7 @@ import LiveClass from "./pages/LiveClass";
 import AlbumPage from "./pages/AlbumPage";
 import { Navigate, Route, Routes } from "react-router-dom";
 import ChatRoom from "./pages/ChatRoom";
-import ReplayClass from "./pages/ReplayClass";
+import Ranking from "./../src/pages/Ranking";
 
 const AppRoutes = () => {
   return (
@@ -70,6 +70,7 @@ const AppRoutes = () => {
       <Route path="/liveclass" element={<LiveClass />} />
       <Route path="/album" element={<AlbumPage />} />
       <Route path="/chatting" element={<ChatRoom />} />
+      <Route path="/ranking" element={<Ranking />} />
       {/* <Route path="/" element={< />} /> */}
     </Routes>
   );
