@@ -9,19 +9,20 @@ const ClassList = () => {
   const { classLists, hasMoreContent, getClassLists } = useCookingClassStore();
   const [page, setPage] = useState(0);
   const observerRef = useRef(null);
-  const [searchParams, setSearchParams] = useState(null);
+  const [searchParams, setSearchParams] = useState({
+    sort: "createTime,desc",
+  });
   const isLoading = useRef(false);
   const location = useLocation();
 
   let cookie = Cookies.get("accessToken");
 
-  // 컴포넌트가 처음 마운트될 때 초기 데이터 로드
   useEffect(() => {
+    console.log(searchParams);
     setPage(0);
     fetchClassListData(0, searchParams);
   }, [location]);
 
-  // 검색어 변경 시 호출
   const handleSearch = (searchParams) => {
     setSearchParams(searchParams);
     setPage(0);

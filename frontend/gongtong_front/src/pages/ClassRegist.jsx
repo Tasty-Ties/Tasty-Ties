@@ -563,35 +563,6 @@ const ClassRegist = () => {
         </div>
         <hr className="my-4" />
 
-        <div className="grid grid-cols-8">
-          <div className="col-span-2">
-            <label htmlFor="replayEndTime">다시보기 기간</label>
-          </div>
-          <div className="col-span-6">
-            <input
-              {...register("replayEndTime")}
-              type="number"
-              className="w-1/2 border p-2 rounded"
-              placeholder="다시보기 기간을 입력해주세요"
-              min="1"
-              max="31"
-              onBlur={() => trigger("replayEndTime")}
-              onKeyDown={(e) => handleKeyDown(e, "replayEndTime")}
-              onChange={(e) => {
-                let value = parseInt(e.target.value);
-                if (value < 1) value = 1;
-                if (value > 31) value = 31;
-                setValue("replayEndTime", value);
-              }}
-            />
-            <span className="ml-2">일</span>
-            {errors.replayEndTime && (
-              <p className="text-red-500">{errors.replayEndTime.message}</p>
-            )}
-          </div>
-        </div>
-        <hr className="my-4" />
-
         <div className="mt-5 flex justify-center">
           <div className="mr-2">
             <Button
