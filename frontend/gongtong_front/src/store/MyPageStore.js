@@ -32,10 +32,10 @@ const useMyPageStore = create((set) => ({
     set({ attendClasses: classes, totalItems });
   },
 
-  mileagelogs: [],
+  mileageLogs: [],
   fetchMileageLogs: async (month) => {
-    const mileagelogs = await getMileageLog();
-    set({ mileagelogs });
+    const mileageLogs = await getMileageLog(month);
+    set({ mileageLogs });
   },
 }));
 

@@ -94,6 +94,7 @@ export const getMileageLog = async (month) => {
   try {
     const response = await api.get(`/users/me/activity-point?period=${month}`);
     console.log(response);
+    return response.data.data;
   } catch (error) {
     console.log("마일리지불러오기 실패", error);
   }
