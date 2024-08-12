@@ -1,9 +1,9 @@
 const MAIN_SERVER_URL = import.meta.env.VITE_MAIN_SERVER;
 const CHAT_SERVER_URL = import.meta.env.VITE_CHAT_SERVER;
 
-import { useEffect, useState, useRef, useCallback } from "react";
 import axios from "axios";
 import Cookies from "js-cookie";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import useVideoStore from "./../../store/useVideoStore";
 import StreamComponent from "./StreamComponent";
@@ -13,19 +13,21 @@ import UserModel from "./UserModel";
 import { FilesetResolver, GestureRecognizer } from "@mediapipe/tasks-vision";
 
 import { Client } from "@stomp/stompjs";
-import MediaDeviceSetting from "./MediaDeviceSetting";
 import useMyPageStore from "../../store/MyPageStore";
-import ChatComponent from "./ChatComponent";
-import PeopleListComponent from "./PeopleListComponent";
+import MediaDeviceSetting from "./MediaDeviceSetting";
 
-import "./../../styles/LiveClass/LiveClass.css";
-import ChatLog from "../ChatRoom/ChatLog";
 import AttendeeList from "../ChatRoom/AttendeeList";
+import ChatLog from "../ChatRoom/ChatLog";
+import "./../../styles/LiveClass/LiveClass.css";
 import CameraCapture from "./CameraCapture";
+import ExitLiveClass from "./ExitLiveClass";
+import { useNavigate } from "react-router-dom";
 
 const localUserSetting = new UserModel();
 
 const VideoComponent = ({ isHost }) => {
+  const nav = useNavigate();
+
   const OV = useVideoStore((state) => state.OV);
   const setOV = useVideoStore((state) => state.setOV);
   const selectedAudioDevice = useVideoStore(
@@ -59,11 +61,14 @@ const VideoComponent = ({ isHost }) => {
   const currentPublisher = useRef();
 
   const [isChatOpen, setIsChatOpen] = useState(false);
+  const [isExitOpen, setIsExitOpen] = useState(false);
   const [isHostOnly, setIsHostOnly] = useState(true);
   const [isCaptureOpen, setIsCaptureOpen] = useState(false);
   const [isPeopleListOpen, setIsPeopleListOpen] = useState(false);
   const [isSliderOn, setIsSliderOn] = useState(false);
   const [displayMode, setDisplayMode] = useState(0);
+
+  const [isForcedExit, setIsForcedExit] = useState();
 
   // 비디오 레이아웃 순서 정렬하는 코드
   useEffect(() => {
@@ -341,11 +346,22 @@ const VideoComponent = ({ isHost }) => {
       });
       setSubscribers(updatedSubscribers);
     });
+    session.on("signal:host-left", (event) => {
+      setIsForcedExit(true);
+      exitOpen();
+    });
   };
 
   const subscribeToStreamDestroyed = (session) => {
     session.on("streamDestroyed", (event) => {
       deleteSubscriber(event.stream);
+      const connection = event.stream.connection;
+      console.log(hostUser);
+      if (connection.data.split(`"`)[3] === classData.hostProfile.nickname) {
+        session.signal({
+          type: "host-left",
+        });
+      }
     });
   };
 
@@ -595,7 +611,7 @@ const VideoComponent = ({ isHost }) => {
   const sendMessage = (e) => {
     // e.preventDefault();
 
-    console.log("메세지 보내요::"+e);
+    console.log("메세지 보내요::" + e);
     if (e === null || e === "") {
       return;
     }
@@ -604,7 +620,6 @@ const VideoComponent = ({ isHost }) => {
       destination: `/pub/chat/text/rooms/${classData.chatRoomId}`,
       body: e,
     });
-
   };
 
   // const sendMessage = (e) => {
@@ -682,6 +697,10 @@ const VideoComponent = ({ isHost }) => {
     setIsPeopleListOpen(!isPeopleListOpen);
   };
 
+  const exitOpen = () => {
+    setIsExitOpen(!isExitOpen);
+  };
+
   const chatOpen = () => {
     if (isPeopleListOpen) {
       peopleListOpen();
@@ -706,6 +725,12 @@ const VideoComponent = ({ isHost }) => {
         isCaptureOpen={isCaptureOpen}
         captureOpen={captureOpen}
         localUser={localUser}
+      />
+      <ExitLiveClass
+        exitOpen={exitOpen}
+        isExitOpen={isExitOpen}
+        isHost={isHost}
+        isForcedExit={isForcedExit}
       />
       <div className="min-h-screen min-w-screen flex flex-col items-center justify-center">
         <div className="h-20 w-full flex justify-center items-center">
@@ -790,11 +815,13 @@ const VideoComponent = ({ isHost }) => {
         <div className="h-20 flex">
           <MediaDeviceSetting currentPublisher={currentPublisher} />
           <ToolbarComponent
+            isHost={isHost}
+            setIsForcedExit={setIsForcedExit}
             displayMode={displayChange}
             captureOpen={captureOpen}
             peopleListOpen={peopleListOpen}
             chatOpen={chatOpen}
-            leaveSession={leaveSession}
+            exitOpen={exitOpen}
           />
         </div>
       </div>
