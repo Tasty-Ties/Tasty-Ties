@@ -6,10 +6,7 @@ import com.teamcook.tastyties.common.repository.CountryRepository;
 import com.teamcook.tastyties.security.userdetails.CustomUserDetails;
 import com.teamcook.tastyties.shared.entity.UserAndCountry;
 import com.teamcook.tastyties.shared.repository.UserAndCountryRepository;
-import com.teamcook.tastyties.user.dto.reward.ActivityPointRequestByUsernameDto;
-import com.teamcook.tastyties.user.dto.reward.ActivityPointRequestDto;
-import com.teamcook.tastyties.user.dto.reward.ActivityPointResponseDto;
-import com.teamcook.tastyties.user.dto.reward.RankedUserDto;
+import com.teamcook.tastyties.user.dto.reward.*;
 import com.teamcook.tastyties.user.entity.ActivityPointLog;
 import com.teamcook.tastyties.user.entity.User;
 import com.teamcook.tastyties.user.entity.UserStatistics;
@@ -103,7 +100,7 @@ public class UserRewardsService {
         redisTemplate.opsForZSet().add(MONTHLY_LEADERBOARD_KEY, userKey, newMonthlyScore);
         redisTemplate.opsForZSet().add(YEARLY_LEADERBOARD_KEY, userKey, newYearlyScore);
         userRepository.findById(userId).ifPresent(user -> {
-            ActivityPointLog log = new ActivityPointLog(score, description);
+            ActivityPointLog log = new ActivityPointLog(score, user.getActivityPoint() + score, description);
             activityPointLogRepository.save(log);
             user.addActivityPointLog(log);
         });
@@ -130,7 +127,7 @@ public class UserRewardsService {
         redisTemplate.opsForZSet().add(MONTHLY_LEADERBOARD_KEY, userKey, newMonthlyScore);
         redisTemplate.opsForZSet().add(YEARLY_LEADERBOARD_KEY, userKey, newYearlyScore);
         userRepository.findById(userId).ifPresent(user -> {
-            ActivityPointLog log = new ActivityPointLog(score, description);
+            ActivityPointLog log = new ActivityPointLog(score, user.getActivityPoint()+score, description);
             activityPointLogRepository.save(log);
             user.addActivityPointLog(log);
         });
@@ -240,5 +237,10 @@ public class UserRewardsService {
     private int getUserRankByActivityPoint(User user) {
         long rank = userRepository.countByActivityPointGreaterThan(user.getActivityPoint());
         return (int) rank + 1;
+    }
+
+    public List<ActivityPointLogResponseDto> getMyActivityPointLog(CustomUserDetails userDetails, int period) {
+        User user = userDetails.user();
+        return activityPointLogRepository.findActivityPointLogForProfile(user, period);
     }
 }

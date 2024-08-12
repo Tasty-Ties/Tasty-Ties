@@ -98,5 +98,4 @@ public class RankingController {
                         .data(totalLeaderboard)
                         .build());
     }
-
 }
