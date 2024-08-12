@@ -2,6 +2,8 @@ import { NavLink, Outlet } from "react-router-dom";
 import instalogo from "../../assets/MyPage/insta.png";
 import youtubelogo from "../../assets/MyPage/Youtube.png";
 import CountryFlags from "../../common/components/CountryFlags";
+import ProfileButton from "../../common/components/ProfileButton";
+import Imageprofile from "../../assets/MyPage/기본프로필사진.jpg";
 
 const OtherCategory = (informations) => {
   const information = informations.informations;
@@ -14,12 +16,14 @@ const OtherCategory = (informations) => {
         <div className="flex flex-col">
           {information.userProfileDto && (
             <div className="flex">
-              <img
-                src={information.userProfileDto.profileImageUrl}
-                alt="프로필사진"
-                className="size-16 rounded-lg bg-gray-50"
+              <ProfileButton
+                image={
+                  information.userProfileDto.profileImageUrl || Imageprofile
+                }
+                type="square"
+                size="size-16"
               />
-              &nbsp;&nbsp;&nbsp;&nbsp;
+              &nbsp;&nbsp;
               <div className="flex flex-col mt-2">
                 <p>
                   <CountryFlags
@@ -47,9 +51,12 @@ const OtherCategory = (informations) => {
                 {information.userProfileDto?.instagramHandle}
               </p>
               &nbsp;&nbsp;
-              <img src={youtubelogo} alt="유튜브로고" className="size-6" />
-              <p className="text-sm">
-                {information.userProfileDto?.youtubeHandle}
+              <p className="flex">
+                <img src={youtubelogo} alt="유튜브로고" className="size-6" />
+                &nbsp;
+                <p className="text-sm">
+                  {information.userProfileDto?.youtubeHandle}
+                </p>
               </p>
             </p>
           </div>
@@ -72,7 +79,7 @@ const OtherCategory = (informations) => {
               to="teach"
               className={({ isActive }) => (isActive ? "bg-first-100 " : "")}
             >
-              <div className="bg-inherit">수업한 클래스</div>
+              <div className="bg-inherit">진행한 클래스</div>
             </NavLink>
           </li>
           <li>
@@ -94,7 +101,7 @@ const OtherCategory = (informations) => {
         </ul>
         <br />
       </div>
-      <div>
+      <div className="m-8 ml-36">
         <Outlet
           context={{
             informations: informations,

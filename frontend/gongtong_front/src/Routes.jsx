@@ -8,6 +8,7 @@ import ReserveClass from "./components/MyPage/ReserveClass";
 import TeachClass from "./components/MyPage/TeachClass";
 import AttendClass from "./components/MyPage/AttendClass";
 import MyInfo from "./components/MyPage/Myinfo";
+import DeleteId from "./components/MyPage/MyInfo/DeleteId";
 import MyPoint from "./components/MyPage/MyPoint";
 import MyShorts from "./components/MyPage/MyShorts";
 import EditInfo from "./components/MyPage/EditInfo";
@@ -48,6 +49,7 @@ const AppRoutes = () => {
         <Route path="shorts" element={<MyShorts />} />
         <Route path="editinfo" element={<EditInfo />} />
       </Route>
+      <Route path="/delete" element={<DeleteId />} />
       <Route path="/otherpage/:username" element={<Profile />}>
         <Route path="" element={<OtherInfo />} />
         <Route path="teach" element={<TeachedClass />} />

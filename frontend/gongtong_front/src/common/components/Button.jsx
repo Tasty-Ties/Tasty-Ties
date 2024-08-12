@@ -17,7 +17,7 @@ const Button = ({ text, type, onClick }) => {
     "yellow-border-short":
       "bg-transparent hover:bg-transparent text-second-600 font-semibold hover:text-second-700 py-2 px-4 border border-second-600 hover:border-second-700 rounded",
     "green-long":
-      "bg-first hover:bg-first-800 text-white font-bold py-2 px-40 rounded",
+      "bg-first hover:bg-first-800 text-white font-bold py-2 px-28 rounded",
     "green-semi-long":
       "bg-first hover:bg-first-800 text-white font-bold py-2 px-20 rounded",
     "green-border-semi-long":
@@ -38,6 +38,8 @@ const Button = ({ text, type, onClick }) => {
     "enter-button": "bg-third text-white font-bold text-sm rounded w-12 h-12",
     "time-button":
       "bg-gray-400 text-black font-semibold text-sm rounded w-12 h-12",
+    "view-more":
+      "bg-transparent text-first text-xs font-semibold py-1 px-4 border border-first rounded-3xl",
   };
   return (
     <button className={`${typeList[type]}`} onClick={onClick}>
