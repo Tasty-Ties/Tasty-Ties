@@ -133,7 +133,11 @@ const SignUpFirst = () => {
   };
 
   return (
-    <>
+    <div
+      className="min-h-screen flex justify-center items-center bg-cover bg-center" // <- 여기
+      style={{ backgroundImage: `url(/images/loginImages/login_bg.png)` }} // <- 여기
+    >
+    <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md"> {/* <- 여기 추가 */}
       <section>
         <div>이메일</div>
         <input
@@ -208,7 +212,8 @@ const SignUpFirst = () => {
         <div className="pwmatchfail-message">비밀번호와 일치하지 않습니다.</div>
       )}
       <button onClick={() => nav("/signupfin")}>→</button>
-    </>
+      </div>
+    </div>
   );
 };
 
