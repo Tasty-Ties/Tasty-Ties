@@ -13,8 +13,8 @@ import {
   IconButton,
 } from "@material-tailwind/react";
 
-import useAuthStore from "../store/AuthStore";
-import logo from "../assets/맛잇다로고.png";
+import useAuthStore from "../../store/AuthStore";
+import logo from "../../assets/맛잇다로고.png";
 
 const NavItem = ({ text, link }) => {
   return (
@@ -120,7 +120,7 @@ const Header = () => {
                 <Button variant="text" size="sm" className="lg:inline-block" onClick={goLogin}>
                   <span>로그인</span>
                 </Button>
-                <Button variant="gradient" size="sm" className="lg:inline-block" onClick={goSignup}>
+                <Button variant="outlined" size="sm" className="lg:inline-block" onClick={goSignup}>
                   <span>회원가입</span>
                 </Button>
               </>
