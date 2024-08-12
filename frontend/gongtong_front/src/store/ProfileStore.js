@@ -3,6 +3,7 @@ import {
   getOtherInfo,
   getTeachedClass,
   getAttendedClass,
+  getReview,
 } from "../service/ProfileAPI";
 import { getMileageLog } from "../service/MyPageAPI";
 
@@ -23,6 +24,12 @@ const useProfileStore = create((set) => ({
   fetchAttendedClasses: async (username) => {
     const attendedClasses = await getAttendedClass(username);
     set({ attendedClasses });
+  },
+
+  reviews: [],
+  fetchReviews: async (username, page = 1, size = 4) => {
+    const { reviews, totalItems } = await getReview(username, page, size);
+    set({ reviews: reviews, totalItems });
   },
 }));
 
