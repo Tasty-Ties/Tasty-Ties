@@ -1,20 +1,30 @@
 import { ListItem, Typography } from "@material-tailwind/react";
-import React from "react";
+import React, { useState } from "react";
 
-const NotificationListItem = () => {
+const NotificationListItem = ({ notification }) => {
+  const [check, setCheck] = useState(notification.read);
+
+  const handleCeckNotifiaction = () => {
+    setCheck(!check);
+    console.log("알람 읽음 체크" + check);
+  };
+
   return (
     <ListItem className="focus:bg-white">
       <div className="flex flex-col text-black w-full">
         <div className="flex flex-row w-full items-center justify-between">
-          <Typography variant="h6">제목</Typography>
+          <Typography variant="h6">{notification.title}</Typography>
           <input
             type="checkbox"
             className="h-3 w-3 rounded-full bg-third border border-third transition-all hover:scale-105 appearance-none checked:bg-white checked:border-gray-900/20"
+            onClick={handleCeckNotifiaction}
           />
         </div>
-        <Typography variant="small">알림 본문</Typography>
-        <div className="flex justify-end mt-1">
-          <Typography className="text-xs text-gray-500">2024.08.12</Typography>
+        <Typography variant="small" className="mt-1">
+          {notification.body}
+        </Typography>
+        <div className="flex justify-end mt-3">
+          <Typography className="text-xs text-gray-500">{notification.createTime}</Typography>
         </div>
       </div>
     </ListItem>
