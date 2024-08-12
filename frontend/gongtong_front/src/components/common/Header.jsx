@@ -13,7 +13,7 @@ import {
   IconButton,
 } from "@material-tailwind/react";
 
-import useAuthStore from "../../store/AuthStore";
+import api from "../../service/Api";
 import logo from "../../assets/맛잇다로고.png";
 
 const NavItem = ({ text, link }) => {
@@ -50,8 +50,6 @@ const Header = () => {
 
   const [isLogin, setIsLogin] = useState(false);
 
-  const { logout } = useAuthStore();
-
   const accessToken = Cookies.get("accessToken");
 
   useEffect(() => {
@@ -74,12 +72,19 @@ const Header = () => {
     nav("/signup");
   };
 
-  const handleLogout = () => {
-    // Remove FCM token
-    Cookies.remove("fcmToken");
+  const handleLogout = async () => {
+    try {
+      const response = await api.post("/auth/logout");
+      console.log(response);
+    } catch (error) {
+      console.log(error);
+    }
 
-    logout();
-    nav("/");
+    Cookies.remove("accessToken"),
+      Cookies.remove("refreshToken"),
+      // Remove FCM token
+      Cookies.remove("fcmToken"),
+      nav("/");
   };
 
   return (
