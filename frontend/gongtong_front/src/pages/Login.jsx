@@ -74,7 +74,7 @@ const Login = () => {
           Welcome !, Bienvenue!, ようこそ!, Welkom!, स्वागत है! 
         </Typography>
         <Typography variant="h4" color="blue-gray" className="mt-5">
-          회원가입 
+          로그인 
         </Typography>
         <Typography color="blue-gray" className="mt-2 mb-10">
           맛,잇다의 세계로 들어와 다양한 문화의 음식을 즐겨보세요!!
