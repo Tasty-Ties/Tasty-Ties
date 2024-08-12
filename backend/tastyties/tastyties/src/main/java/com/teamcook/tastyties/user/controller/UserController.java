@@ -9,9 +9,11 @@ import com.teamcook.tastyties.user.dto.UserInfoDto;
 import com.teamcook.tastyties.user.dto.UserProfileDto;
 import com.teamcook.tastyties.user.dto.UserRegistrationDto;
 import com.teamcook.tastyties.user.dto.UserUpdateDto;
+import com.teamcook.tastyties.user.dto.reward.ActivityPointLogResponseDto;
 import com.teamcook.tastyties.user.exception.UserDetailsNotFoundException;
 import com.teamcook.tastyties.user.exception.UserIDAlreadyExistsException;
 import com.teamcook.tastyties.user.service.UserProfileService;
+import com.teamcook.tastyties.user.service.UserRewardsService;
 import com.teamcook.tastyties.user.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -22,15 +24,19 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/users")
 public class UserController {
     private final UserService userService;
     private final UserProfileService userProfileService;
+    private final UserRewardsService userRewardsService;
     @Autowired
-    public UserController(UserService userService, UserProfileService userProfileService) {
+    public UserController(UserService userService, UserProfileService userProfileService, UserRewardsService userRewardsService) {
         this.userService = userService;
         this.userProfileService = userProfileService;
+        this.userRewardsService = userRewardsService;
     }
 
     // 회원 가입
@@ -181,6 +187,18 @@ public class UserController {
                         .stateCode(200)
                         .message("수업할 클래스가 정상적으로 조회되었습니다.")
                         .data(participatingClasses)
+                        .build());
+    }
+
+    // 나의 마일리지
+    @GetMapping("/me/activity-point")
+    public ResponseEntity<CommonResponseDto> getActivityPointLog(@AuthenticationPrincipal CustomUserDetails userDetails, int period) {
+        List<ActivityPointLogResponseDto> myActivityPointLog = userRewardsService.getMyActivityPointLog(userDetails, period);
+        return ResponseEntity.ok()
+                .body(CommonResponseDto.builder()
+                        .stateCode(200)
+                        .message("수업할 클래스가 정상적으로 조회되었습니다.")
+                        .data(myActivityPointLog)
                         .build());
     }
 
