@@ -1,35 +1,27 @@
-import { set } from "react-hook-form";
 import useMyPageStore from "../../store/MyPageStore";
 import { useEffect, useState } from "react";
+import PointTable from "./MyPoint/PointTable";
 
 const MyPoint = () => {
   const mileageLogs = useMyPageStore((state) => state.mileageLogs);
   const fetchMileageLogs = useMyPageStore((state) => state.fetchMileageLogs);
-  const [month, setMonth] = useState(0);
+  const [month, setMonth] = useState(1); // 기본 1개월
 
   useEffect(() => {
-    setMonth(1);
     fetchMileageLogs(month);
   }, [month]);
   console.log(mileageLogs);
 
   return (
     <div>
-      <div>마일리지</div>
+      <div className="font-bold text-xl mb-3">마일리지</div>
       <div>
-        <p>
-          <button onClick={() => setMonth(1)}>1개월</button>
-        </p>
-        <p>
-          <button onClick={() => setMonth(3)}>3개월</button>
-        </p>
-        <p>
-          <button onClick={() => setMonth(6)}>6개월</button>
-        </p>
-        <p>
-          <button onClick={() => setMonth(12)}>12개월</button>
-        </p>
+        <button onClick={() => setMonth(1)}>1개월</button>
+        <button onClick={() => setMonth(3)}>3개월</button>
+        <button onClick={() => setMonth(6)}>6개월</button>
+        <button onClick={() => setMonth(12)}>12개월</button>
       </div>
+      <PointTable log={mileageLogs} />
     </div>
   );
 };
