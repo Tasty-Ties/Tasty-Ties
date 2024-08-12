@@ -1,13 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-<<<<<<< HEAD
-import Button from "../../common/components/Button";
-import axios from "axios";
-import ChatMessage from "./ChatMessage";
-import Cookies from "js-cookie";
-import AttendeeList from "./AttendeeList";
-import { chatApi } from "./../../service/Api";
-=======
->>>>>>> 6c42858f9d29bc3262a65505e238741ea548d3d9
 import { useLocation } from "react-router-dom";
 import Button from "../../common/components/Button";
 import { chatApi } from "./../../service/Api";
