@@ -47,6 +47,8 @@ const NotificationButton = () => {
     onClick: () => {
       if (notifications.length === 0) {
         fetchNotifications();
+      } else {
+        clearAllNotifications();
       }
     },
   };
@@ -94,6 +96,7 @@ const NotificationButton = () => {
   const clearAllNotifications = () => {
     setNotifications([]);
     pgNo.current = 0;
+    setHasMore(true);
   };
 
   return (

@@ -27,6 +27,7 @@ const NotificationListItem = ({ notification }) => {
           <input
             type="checkbox"
             className="h-3 w-3 rounded-full bg-third border border-third transition-all hover:scale-105 appearance-none checked:bg-white checked:border-gray-900/20"
+            defaultChecked={check}
             onClick={handleCeckNotifiaction}
           />
         </div>
