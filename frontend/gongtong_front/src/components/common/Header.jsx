@@ -15,6 +15,7 @@ import {
 
 import api from "../../service/Api";
 import logo from "../../assets/맛잇다로고.png";
+import NotificationButton from "../Notification/NotificationButton";
 
 const NavItem = ({ text, link }) => {
   return (
@@ -103,9 +104,7 @@ const Header = () => {
           <div className="flex items-center gap-x-1">
             {isLogin ? (
               <>
-                <IconButton variant="text" color="amber" className="mr-2 rounded-full">
-                  <i className="fa fa-bell text-lg" />
-                </IconButton>
+                <NotificationButton />
                 <Menu>
                   <MenuHandler className="hover:scale-105 cursor-pointer">
                     <Avatar
