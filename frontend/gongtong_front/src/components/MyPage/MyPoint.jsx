@@ -10,8 +10,8 @@ const MyPoint = () => {
   useEffect(() => {
     setMonth(1);
     fetchMileageLogs(month);
-    console.log(mileageLogs);
   }, [month]);
+  console.log(mileageLogs);
 
   return (
     <div>
