@@ -20,18 +20,18 @@ const userStore = create((set) => ({
         [key]: value,
       },
     })),
-  resetForm: () =>
-    set({
-      userForm: {
-        email: "",
-        username: "",
-        password: "",
-        verifyPassword: "",
-        nickname: "",
-        countryCode: "",
-        languageCode: "",
-        birth: "",
-      },
+  resetForm: (fields = []) =>
+    set((state) => {
+      const resetFields = fields.reduce((acc, field) => {
+        acc[field] = "";
+        return acc;
+      }, {});
+      return {
+        userForm: {
+          ...state.userForm,
+          ...resetFields,
+        },
+      };
     }),
 
   // 마일리지 100p 제공
