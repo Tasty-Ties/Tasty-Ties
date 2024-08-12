@@ -25,12 +25,6 @@ import CameraCapture from "./CameraCapture";
 
 const localUserSetting = new UserModel();
 
-//채팅 관련
-const roomId = "66a9c5dd498fe728acb763f8";
-const userId = 1;
-const userLang = "Japanese";
-const CHUNK_SIZE = 16000;
-
 const VideoComponent = ({ isHost }) => {
   const OV = useVideoStore((state) => state.OV);
   const setOV = useVideoStore((state) => state.setOV);
@@ -73,7 +67,7 @@ const VideoComponent = ({ isHost }) => {
 
   // 비디오 레이아웃 순서 정렬하는 코드
   useEffect(() => {
-    console.log(subscribers);
+    // console.log(subscribers);
     if (!subscribers) {
       return;
     }
@@ -100,6 +94,7 @@ const VideoComponent = ({ isHost }) => {
   useEffect(() => {
     console.log(partUser);
     console.log(userInfo);
+
     if (!classData || !localUser) return;
     const host = classData.hostProfile;
     const parts = classData.userProfiles;
@@ -181,18 +176,18 @@ const VideoComponent = ({ isHost }) => {
   }, [selectedAudioDevice]);
 
   //미디어 파이프 및 영상 녹화 관련
-  // const mediaRecorder = useRef(null);
-  // const audioChunks = useRef([]);
-  // const isRecording = useRef(false);
   const raiseTimeout = useRef(null);
   const lowerTimeout = useRef(null);
   const audioStream = useRef(null);
 
-  useEffect(()=>{
+  useEffect(() => {
     initializeGestureRecognizer(); // 제스처 초기화
-    initializeSpeechRecognition(); // 음성 인식 초기화
+    if (userInfo && userInfo.language && userInfo.language.languageCode) {
+      const languageCode = userInfo.language.languageCode.toLowerCase(); // 언어 코드를 소문자로 변환
+      const countryCode = userInfo.country.countryCode.toUpperCase();
+      initializeSpeechRecognition(languageCode, countryCode); // 음성 인식 초기화
+    }
   }, []);
-
 
   const joinSession = async () => {
     const newSession = OV.initSession();
@@ -429,7 +424,7 @@ const VideoComponent = ({ isHost }) => {
   }, []);
 
   const createToken = useCallback(async (sessionId) => {
-    console.log(sessionId);
+    // console.log(sessionId);
     const response = await axios.post(
       MAIN_SERVER_URL + "/classes/live/sessions/" + sessionId + "/connections",
       {},
@@ -439,38 +434,37 @@ const VideoComponent = ({ isHost }) => {
         },
       }
     );
-    console.log(response.data);
+    // console.log(response.data);
     return response.data.data;
   }, []);
 
   //Web Speech API 관련
   let recognition = null;
   let isRecognitionActive = false; // 음성 인식 상태를 추적
-  const initializeSpeechRecognition = () => {
-    
+
+  const initializeSpeechRecognition = (languageCode, countryCode) => {
     recognition = new (window.SpeechRecognition ||
       window.webkitSpeechRecognition)();
-    recognition.lang = "ko-KR"; // 한국어로 설정
+    recognition.lang = languageCode + "-" + countryCode || "ko-KR"; // 사용자의 언어로 지정하되, 한국어가 기본
     recognition.interimResults = false;
     recognition.maxAlternatives = 1;
     // recognition.continuous = true; // 연속 인식 모드로 설정
 
     recognition.onresult = (event) => {
-      let interimTranscript = '';
-      let finalTranscript = '';
+      let finalTranscript = "";
       for (let i = event.resultIndex; i < event.results.length; i++) {
-          const transcript = event.results[i][0].transcript;
-          if (event.results[i].isFinal) {
-              finalTranscript += transcript;
-          } else {
-              interimTranscript += transcript;
-          }
+        const transcript = event.results[i][0].transcript;
+        if (event.results[i].isFinal) {
+          finalTranscript += transcript;
+        }
       }
-      console.log("최종 결과:", finalTranscript); // 확정된 결과
-  };
+      console.log("최종 결과:", finalTranscript);
+      sendMessage(finalTranscript);
+    };
 
     recognition.onerror = (event) => {
       console.error("음성 인식 오류:", event.error);
+      isRecognitionActive = false;
       //TODO: 여기에서 화면에 있는 손 이모지 지우기
       isRecognitionActive = false; // 오류 발생 시 상태 초기화
     };
@@ -488,7 +482,7 @@ const VideoComponent = ({ isHost }) => {
   let gestureRecognizer = null;
   let isGestureActive = false;
   let animationFrameId = null;
-  let finalTranscript = ""; //STT 결과 임시 저장
+  let SttTranslatedMessage = ""; //STT 결과 임시 저장
 
   const initializeGestureRecognizer = async () => {
     const videoElement = videoRef.current;
@@ -581,23 +575,51 @@ const VideoComponent = ({ isHost }) => {
     }
   };
 
-// 손 제스처 결과 처리
-const onGestureResults = (results) => {
-  if (results.gestures && results.gestures.length > 0) {
-    const gesture = results.gestures[0][0].categoryName;
-    if (gesture === "Open_Palm" && !isRecognitionActive) {
-      console.log("손을 들었음, 음성 인식 시작");
-      isRecognitionActive = true;
-      recognition.start();
-    } 
-    else if (gesture === "Closed_Fist" && isRecognitionActive) {
-      console.log("주먹을 쥐었음, 음성 인식 중지");
-      //TODO: 여기서 손 이모지 내리기
-      recognition.stop();
-      isRecognitionActive = false;
+  // 손 제스처 결과 처리
+  const onGestureResults = (results) => {
+    if (results.gestures && results.gestures.length > 0) {
+      const gesture = results.gestures[0][0].categoryName;
+      if (gesture === "Open_Palm" && !isRecognitionActive) {
+        console.log("손을 들었음, 음성 인식 시작");
+        isRecognitionActive = true;
+        recognition.start();
+      } else if (gesture === "Closed_Fist" && isRecognitionActive) {
+        console.log("주먹을 쥐었음, 음성 인식 중지");
+        //TODO: 여기서 손 이모지 내리기
+        isRecognitionActive = false;
+        recognition.stop();
+      }
     }
-  }
-};
+  };
+
+  const sendMessage = (e) => {
+    // e.preventDefault();
+
+    console.log("메세지 보내요::"+e);
+    if (e === null || e === "") {
+      return;
+    }
+
+    stompClient.current.publish({
+      destination: `/pub/chat/text/rooms/${classData.chatRoomId}`,
+      body: e,
+    });
+
+  };
+
+  // const sendMessage = (e) => {
+  //   // 사용자 정보 가져오기
+  //   const token = Cookies.get("token"); // 쿠키에서 토큰 가져오기
+  //   // WebSocket 메시지 전송
+  //   stompClient.current.publish({
+  //     destination: `/pub/chat/text/rooms/${roomId}`,
+  //     body: SttTranslatedMessage, //전역 변수 메세지 보내기
+  //     headers: {
+  //       Authorization: `Bearer ${token}`, // JWT 토큰
+  //       username: userInfo.username, // 사용자 이름
+  //     },
+  //   });
+  // };
 
   //채팅
   const connectStompClient = () => {
@@ -641,10 +663,10 @@ const onGestureResults = (results) => {
   // 비디오 레이이아웃
   const displayChange = () => {
     const newMode = (displayMode + 1) % 3;
-    console.log(newMode);
+    // console.log(newMode);
     setDisplayMode(newMode);
     setVideoClassName(displaySetting(newMode));
-    console.log(displaySetting(newMode));
+    // console.log(displaySetting(newMode));
   };
 
   const captureOpen = () => {

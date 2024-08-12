@@ -10,5 +10,9 @@ export default defineConfig({
       { find: "@styles", replacement: "/src/styles" },
       { find: "@pages", replacement: "/src/pages" },
     ],
-  },
+  }, 
+  server:{
+    host: '0.0.0.0',
+    port: 3000,
+  }
 });
