@@ -59,7 +59,6 @@ export default withMT({
       },
     },
   },
-<<<<<<< HEAD
   plugins: [
     function ({ addUtilities }) {
       addUtilities({
@@ -74,7 +73,3 @@ export default withMT({
     },
   ],
 });
-=======
-  plugins: [],
-});
->>>>>>> f1c30556af6acdd388e4c186b3bf7182677401a6

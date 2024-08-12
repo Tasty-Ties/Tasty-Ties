@@ -13,7 +13,7 @@
   font-family: "Noto Sans KR";
   src: url("https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100..900&display=swap");
   font-optical-sizing: auto;
-  font-weight: <weight>;
+  font-weight: 500;
   font-style: normal;
 }
 @font-face {
@@ -52,6 +52,6 @@
   /* font-family: "Noto Sans KR"; */
   /* font-family: "PTBandocheB"; */
   /* font-family: "Pretendard-Regular"; */
-  /* font-family: "NanumSquareRound"; */
+  font-family: "NanumSquareRound";
   /* font-family: "Dovemayo_gothic"; */
 }
