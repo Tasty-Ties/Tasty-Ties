@@ -20,18 +20,35 @@ const SignUpSecond = () => {
         birth: userForm.birth,
       });
       console.log(response);
+      try {
+        const nextResponse = await api.post("ranking/add");
+        console.log(nextResponse);
+      } catch (error) {
+        console.log("마일리지더하기실패", error);
+      }
       nav("/SignUpComplete");
     } catch (error) {
       console.log(error);
     }
   };
 
-  const { userForm, setForm } = userStore();
+  const { userForm, setForm, resetForm } = userStore();
+
+  useEffect(() => {
+    return () => {
+      resetForm();
+    };
+  }, [resetForm]);
+
   const [isNicknameAvailable, setIsNicknameAvailable] = useState("");
 
   const onChangeInput = (e) => {
     let name = e.target.name;
     let value = e.target.value;
+
+    if (name === "nickname") {
+      setIsNicknameAvailable("");
+    }
 
     setForm(name, value);
   };
@@ -104,13 +121,13 @@ const SignUpSecond = () => {
           value={userForm.nickname}
           onChange={onChangeInput}
         ></input>
+        <button onClick={checkNickname}>중복체크</button>
         {isNicknameAvailable === true && (
           <div className="success-message">사용할 수 있는 닉네임입니다.</div>
         )}
         {isNicknameAvailable === false && (
           <div className="nickname-fail-message">이미 사용된 닉네임입니다.</div>
         )}
-        <button onClick={checkNickname}>중복체크</button>
       </section>
 
       <div>국적</div>

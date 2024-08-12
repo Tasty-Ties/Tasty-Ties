@@ -29,6 +29,7 @@ public class ChatMessage {
     private Map<String, String> translatedMessages;
     @CreatedDate
     private LocalDateTime createdTime;
+    private boolean isTranslated;
 
     @Builder
     public ChatMessage(MessageType type, String chatRoomId, UserType userType, String username, String originLanguage, String originMessage) {
@@ -39,10 +40,15 @@ public class ChatMessage {
         this.originLanguage = originLanguage;
         this.originMessage = originMessage;
         this.translatedMessages = new HashMap<>();
+        this.isTranslated = true;
     }
 
     public void addTranslatedMessage(String key, String value) {
         translatedMessages.put(key, value);
+    }
+
+    public void clearTranslatedMessages() {
+        translatedMessages.clear();
     }
 
     public boolean containTranslatedLanguage(String translatedLanguage) {

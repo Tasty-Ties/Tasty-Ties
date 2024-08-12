@@ -83,7 +83,6 @@ public class ChatMessageServiceImpl implements ChatMessageService {
 
         List<ChatMessageDto> chatMessageDtos = new ArrayList<>();
         for (ChatMessage chatMessage : chatMessages) {
-            log.debug(chatMessage.getOriginMessage());
             chatMessageDtos.add(new ChatMessageDto(chatMessage));
         }
 
@@ -93,6 +92,9 @@ public class ChatMessageServiceImpl implements ChatMessageService {
     private void getChatUsersByChatRoom(ChatRoom chatRoom) {
         List<UserDto> userDtos = chatRoom.getUsers();
         List<User> users = userRepository.findByUsernames(chatRoom.getUsernames());
+
+        userDtos.sort((user1, user2) -> user1.getUsername().compareTo(user2.getUsername()));
+        users.sort((user1, user2) -> user1.getUsername().compareTo(user2.getUsername()));
 
         int size = userDtos.size();
         for (int i = 0; i < size; i++) {

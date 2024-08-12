@@ -2,6 +2,8 @@ package com.teamcook.tastytieschat.notification.service;
 
 import com.google.firebase.messaging.*;
 import com.teamcook.tastytieschat.chat.dto.UserDto;
+import com.teamcook.tastytieschat.chat.entity.ChatUser;
+import com.teamcook.tastytieschat.chat.repository.ChatUserRepository;
 import com.teamcook.tastytieschat.notification.dto.FcmNotificationDto;
 import com.teamcook.tastytieschat.notification.entity.FcmNotification;
 import com.teamcook.tastytieschat.notification.repository.FcmNotificationRepository;
@@ -22,11 +24,13 @@ public class NotificationServiceImpl implements NotificationService {
     private final FirebaseMessaging firebaseMessaging;
     private final FcmNotificationRepository fcmNotificationRepository;
     private final UserRepository userRepository;
+    private final ChatUserRepository chatUserRepository;
 
-    public NotificationServiceImpl(FirebaseMessaging firebaseMessaging, FcmNotificationRepository fcmNotificationRepository, UserRepository userRepository) {
+    public NotificationServiceImpl(FirebaseMessaging firebaseMessaging, FcmNotificationRepository fcmNotificationRepository, UserRepository userRepository, ChatUserRepository chatUserRepository) {
         this.firebaseMessaging = firebaseMessaging;
         this.fcmNotificationRepository = fcmNotificationRepository;
         this.userRepository = userRepository;
+        this.chatUserRepository = chatUserRepository;
     }
 
     @Override
@@ -51,7 +55,20 @@ public class NotificationServiceImpl implements NotificationService {
             usernames.add(userDto.getUsername());
         }
 
-        return new HashSet<>(userRepository.findFcmTokensByUsernames(usernames));
+        Set<User> users = new HashSet<>(userRepository.findFcmTokensByUsernames(usernames));
+        Set<ChatUser> chatUsers = chatUserRepository.findByUsernameInAndIsActiveTrue(usernames);
+
+        users.removeIf(user -> {
+            for (ChatUser chatUser : chatUsers) {
+                if (chatUser.isEqualsWithUser(user)) {
+                    return true;
+                }
+            }
+
+            return false;
+        });
+
+        return users;
     }
 
     private void sendMessageTo(User user, FcmNotificationDto fcmNotification) {

@@ -17,7 +17,7 @@ const MyPage = () => {
   }
 
   return (
-    <div>
+    <div className="w-3/4 mt-10 mx-auto content-center relative">
       <Category informations={informations} />
     </div>
   );

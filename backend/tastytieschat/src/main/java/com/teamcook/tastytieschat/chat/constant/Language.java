@@ -1,21 +1,21 @@
 package com.teamcook.tastytieschat.chat.constant;
 
 public enum Language {
-    EN("English"),
-    KO("Korean"),
-    ZH("Chinese"),
-    JA("Japanese"),
-    ES("Spanish"),
-    FR("French"),
-    DE("German"),
-    RU("Russian"),
-    IT("Italian"),
-    PT("Portuguese"),
-    AR("Arabic"),
-    HI("Hindi"),
-    VI("Vietnamese"),
-    TH("Thai"),
-    TR("Turkish");
+    EN("english"),
+    KO("korean"),
+    ZH("chinese"),
+    JA("japanese"),
+    ES("spanish"),
+    FR("french"),
+    DE("german"),
+    RU("russian"),
+    IT("italian"),
+    PT("portuguese"),
+    AR("arabic"),
+    HI("hindi"),
+    VI("vietnamese"),
+    TH("thai"),
+    TR("turkish");
 
     private final String name;
 
@@ -29,5 +29,16 @@ public enum Language {
 
     public boolean equals(String language) {
         return this.name.equals(language);
+    }
+
+    public static boolean contains(String language) {
+        language = language.toLowerCase();
+        for (Language l: Language.values()) {
+            if (l.getName().equals(language)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
