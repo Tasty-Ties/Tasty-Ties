@@ -32,10 +32,18 @@ export const getAttendedClass = async (username) => {
   }
 };
 
-// // 수강평
-// export const getReview = async (username, page=1, size=4) => {
-//   try {
-//     const response = await api.get(`users/profile/${username}/reviews?page=${page-1}&size=${size}`)
-//     console.log(response);
-//   }
-// }
+// 수강평
+export const getReview = async (username, page = 1, size = 4) => {
+  try {
+    const response = await api.get(
+      `users/profile/${username}/reviews?page=${page - 1}&size=${size}`
+    );
+    console.log(response);
+    return {
+      reviews: response.data.data.content,
+      totalItems: response.data.data.totalElements,
+    };
+  } catch (error) {
+    console.log(error);
+  }
+};
