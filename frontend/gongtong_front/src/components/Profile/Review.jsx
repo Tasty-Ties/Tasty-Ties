@@ -22,13 +22,9 @@ const Review = () => {
       <div>{reviews[0].cookingClassReviewCreateTime}</div>
       <div>{reviews[0].nickname}</div>
       <div>{reviews[0].mainImage}</div> */}
-      <HorizontalCard
-        title={reviews[0]?.title}
-        comment={reviews[0]?.comment}
-        date={reviews[0]?.cookingClassReviewCreateTime}
-        nickname={reviews[0]?.nickname}
-        image={reviews[0]?.mainImage}
-      />
+      {reviews.map((review, index) => (
+        <HorizontalCard key={index} reviews={review} />
+      ))}
     </div>
   );
 };

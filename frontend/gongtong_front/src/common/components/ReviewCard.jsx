@@ -5,7 +5,8 @@ import {
   Typography,
 } from "@material-tailwind/react";
 
-const HorizontalCard = ({ title, comment, date, nickname, image }) => {
+const HorizontalCard = ({ reviews }) => {
+  console.log(reviews);
   return (
     <Card className="w-full max-w-[48rem] h-40 flex-row">
       <CardHeader
@@ -14,27 +15,27 @@ const HorizontalCard = ({ title, comment, date, nickname, image }) => {
         className="m-0 h-32 w-52 shrink-0 rounded-lg"
       >
         <img
-          src={image}
+          src={reviews?.mainImage}
           alt="card-image"
           className="h-full w-full object-cover object-center"
         />
       </CardHeader>
       <CardBody className="overflow-hidden">
         <Typography variant="h5" color="blue-gray" className="mb-1 truncate">
-          {title}
+          {reviews?.title}
         </Typography>
         <Typography
           variant="h6"
           color="gray"
           className="mb-1 uppercase truncate"
         >
-          {comment}
+          {reviews?.comment}
         </Typography>
         <Typography color="gray" className="text-sm font-normal truncate">
-          {date}
+          {reviews?.date}
         </Typography>
         <Typography color="gray" className="text-sm font-normal truncate">
-          {nickname}
+          {reviews?.nickname}
         </Typography>
       </CardBody>
     </Card>
