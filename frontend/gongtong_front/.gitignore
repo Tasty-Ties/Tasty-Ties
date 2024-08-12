@@ -30,6 +30,3 @@ firebase-messaging-sw.js
 nginx.conf
 Dockerfile
 firebase-messaging-sw.js.js
-
-# package-lock.json
-package-lock.json
