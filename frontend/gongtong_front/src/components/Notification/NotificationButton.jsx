@@ -10,7 +10,7 @@ import {
 import React, { useEffect, useRef, useState } from "react";
 
 import NotificationListItem from "./item/NotificationListItem";
-import { getNotifications } from "../../service/NotificationAPI";
+import { getNotifications, deleteNotifications } from "../../service/NotificationAPI";
 
 const NotificationButton = () => {
   const [notifications, setNotifications] = useState([]);
@@ -69,6 +69,26 @@ const NotificationButton = () => {
     };
   }, [observeRef.current, hasMore]);
 
+  const handleDeleteAllNotifications = async () => {
+    try {
+      const ids = notifications.map((notification) => notification.id);
+      console.log(ids);
+
+      const response = await deleteNotifications(ids);
+
+      if (response.status === 200) {
+        clearAllNotifications();
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const clearAllNotifications = () => {
+    setNotifications([]);
+    pgNo.current = 0;
+  };
+
   return (
     <Popover placement="bottom-end">
       <PopoverHandler {...triggers}>
@@ -76,15 +96,24 @@ const NotificationButton = () => {
           <i className="fa fa-bell text-lg" />
         </IconButton>
       </PopoverHandler>
-      <PopoverContent className="w-[30%] max-h-[80%] overflow-auto scrollbar-hidden">
-        <div className="flex flex-row items-center justify-between mt-4 mb-4">
+      <PopoverContent className="w-[30%] max-h-[80%] overflow-auto scrollbar-hidden mt-3">
+        <div className="flex flex-row items-center justify-between mt-4 mb-3">
           <Typography variant="h5" className="text-black ml-2">
             알림
           </Typography>
-          <Button variant="text" size="sm" color="red" className="p-1.5">
+          <Button
+            variant="text"
+            size="sm"
+            color="red"
+            className="p-1.5"
+            onClick={handleDeleteAllNotifications}
+          >
             전체 삭제
           </Button>
         </div>
+        <Typography className="text-sm text-black ml-2 mb-4">
+          전체 알림({notifications.length})개
+        </Typography>
         <List>
           {notifications.length === 0 ? (
             <div>알림없음</div>
