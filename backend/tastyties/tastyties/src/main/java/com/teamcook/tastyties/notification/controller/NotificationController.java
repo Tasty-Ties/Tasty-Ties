@@ -37,18 +37,18 @@ public class NotificationController {
                         .build());
     }
 
-    @PostMapping("")
-    public ResponseEntity<CommonResponseDto> checkNotifications(@AuthenticationPrincipal CustomUserDetails userDetails, @RequestBody Map<String, Object> requestParams) {
+    @PatchMapping("")
+    public ResponseEntity<CommonResponseDto> changeIsReadNotification(@AuthenticationPrincipal CustomUserDetails userDetails, @RequestParam Map<String, Object> requestParams) {
         if (userDetails == null) {
             throw new AuthenticationFailureException();
         }
 
-        notificationService.checkReadNotifications(userDetails.user(), requestParams);
+        notificationService.changeIsReadNotification(userDetails.user(), requestParams);
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(CommonResponseDto.builder()
                         .stateCode(200)
-                        .message("알림 읽음을 성공적으로 체크했습니다.")
+                        .message("알림 읽음을 성공적으로 바꿨습니다.")
                         .build());
     }
 

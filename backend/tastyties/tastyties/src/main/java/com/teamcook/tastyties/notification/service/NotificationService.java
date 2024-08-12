@@ -158,11 +158,16 @@ public class NotificationService {
     }
 
     @Transactional
-    public void checkReadNotifications(User user, Map<String, Object> requestParams) {
-        List<Integer> notificationIds = (List<Integer>) requestParams.get("notificationIds");
+    public void changeIsReadNotification(User user, Map<String, Object> requestParams) {
+        String notificationId = (String) requestParams.get("notificationId");
+        if  (notificationId == null) {
+            return;
+        }
 
-        if (!notificationIds.isEmpty()) {
-            fcmNotificationRepository.checkReadNotification(user, notificationIds);
+        int nId = Integer.parseInt((String)requestParams.get("notificationId"));
+
+        if (nId > -1) {
+            fcmNotificationRepository.changeIsReadNotification(user, nId);
         }
     }
 
