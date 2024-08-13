@@ -13,6 +13,7 @@ import com.teamcook.tastyties.user.entity.UserStatistics;
 import com.teamcook.tastyties.user.exception.CountryNotFoundException;
 import com.teamcook.tastyties.user.repository.UserRepository;
 import com.teamcook.tastyties.user.repository.activitypoint.ActivityPointLogRepository;
+import com.teamcook.tastyties.user.repository.statistics.UserStatisticsRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -39,16 +40,18 @@ public class UserRewardsService {
     private static final String MONTHLY_LEADERBOARD_KEY = "monthly:leaderboard";
     private static final String YEARLY_LEADERBOARD_KEY = "yearly:leaderboard";
     private static final int PAGE_SIZE = 7;
+    private final UserStatisticsRepository userStatisticsRepository;
 
     @Autowired
     public UserRewardsService(UserRepository userRepository, CountryRepository countryRepository,
                               UserAndCountryRepository userAndCountryRepository, ActivityPointLogRepository activityPointLogRepository,
-                              RedisTemplate<String, Object> redisTemplate) {
+                              RedisTemplate<String, Object> redisTemplate, UserStatisticsRepository userStatisticsRepository) {
         this.userRepository = userRepository;
         this.countryRepository = countryRepository;
         this.userAndCountryRepository = userAndCountryRepository;
         this.activityPointLogRepository = activityPointLogRepository;
         this.redisTemplate = redisTemplate;
+        this.userStatisticsRepository = userStatisticsRepository;
     }
 
     // 국기 수집 기능
@@ -104,6 +107,21 @@ public class UserRewardsService {
             activityPointLogRepository.save(log);
             user.addActivityPointLog(log);
         });
+    }
+
+    @Transactional
+    public void addScoreAfterClass(ActivityPointAfterClassRequestDto afterClassRequestDto) {
+        ActivityPointRequestDto activityPointRequestDto = afterClassRequestDto.getActivityPointRequestDto();
+        addScore(activityPointRequestDto);
+        int userId = activityPointRequestDto.getUserId();
+        User user = userRepository.findById(userId).orElse(null);
+
+        if (user == null) {
+            throw new IllegalArgumentException("user를 찾을 수 없습니다.");
+        }
+
+        UserStatistics userStatistics = userStatisticsRepository.getUserStatistics(user);
+        userStatistics.updateStatistics(afterClassRequestDto.isHost());
     }
 
     @Transactional
