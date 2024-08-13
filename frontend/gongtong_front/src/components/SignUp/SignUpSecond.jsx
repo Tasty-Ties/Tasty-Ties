@@ -4,7 +4,14 @@ import userStore from "../../store/UserStore";
 import api from "../../service/Api";
 
 import {
-  Card, Input, Checkbox, Button, Typography, MenuItem, Select, Option
+  Card,
+  Input,
+  Checkbox,
+  Button,
+  Typography,
+  MenuItem,
+  Select,
+  Option,
 } from "@material-tailwind/react";
 
 const SignUpSecond = () => {
@@ -66,12 +73,11 @@ const SignUpSecond = () => {
 
   // 국적, 모국어를 handle 하는 함수
   const handleSelectChange = (name) => (value) => {
-    console.log(name)
-    console.log(value)
+    console.log(name);
+    console.log(value);
     setForm(name, value);
     console.log(userForm);
   };
-  
 
   const checkNickname = async () => {
     try {
@@ -134,85 +140,103 @@ const SignUpSecond = () => {
 
   return (
     <div
-    className="h-screen flex justify-center items-center bg-cover bg-center" // <- 여기
-    style={{ backgroundImage: `url(/images/loginImages/login_bg.png)` }} // <- 여기
+      className="h-screen flex justify-center items-center bg-cover bg-center" // <- 여기
+      style={{ backgroundImage: `url(/images/loginImages/login_bg.png)` }} // <- 여기
     >
       <div className="w-1/2"></div>
       <div className="w-1/2 flex h-full">
-      <Card color="transparent" shadow={false} className="flex flex-col p-8 bg-white rounded-none shadow-lg w-full"> {/* <- 여기 추가 */}
-      <Typography color="blue-gray">
-          Welcome !, Bienvenue!, ようこそ!, Welkom!, स्वागत है! 
-        </Typography>
-        <Typography variant="h4" color="blue-gray" className="mt-5">
-          회원가입 
-        </Typography>
-        <Typography color="blue-gray" className="mt-2">
-          맛,잇다의 세계로 들어와 다양한 문화의 음식을 즐겨보세요!!
-        </Typography>
-      <section>
-      <div className="text-md font-semibold text-gray-700 mb-2 mt-10">닉네임</div>
-      <div className="flex items-center gap-2">
-        <Input
-          name="nickname"
-          value={userForm.nickname}
-          onChange={onChangeInput}
-        ></Input>
-        <Button
-            variant="outlined" 
-            onClick={checkNickname}
-            className="h-full whitespace-nowrap w-32 border-green-900" 
+        <Card
+          color="transparent"
+          shadow={false}
+          className="flex flex-col p-8 bg-white rounded-none shadow-lg w-full"
         >
-            중복체크
-        </Button>
-        </div>
-        {isNicknameAvailable === true && (
-          <Typography color="green" className="text-sm success-message">사용할 수 있는 닉네임입니다.</Typography>
-        )}
-        {isNicknameAvailable === false && (
-          <Typography color="red" className="text-sm nickname-fail-message">이미 사용된 닉네임입니다.</Typography>
-        )}
-      </section>
-
-      <div className="text-md font-semibold text-gray-700 mb-2 mt-4">국적</div>
-      <Select
-        name="countryCode"
-        value={userForm.countryCode}
-        onChange={handleSelectChange('countryCode')}
-        label="국적을 선택하세요"
-        className="relative"
-      >
-        
-        {countries.map((country) => (
-          <Option key={country.countryCode} value={country.countryCode}>
-            {country.koreanName}
-          </Option>
-        ))}
-      </Select>
-
-      <div className="text-md font-semibold text-gray-700 mb-2 mt-4">모국어</div>
-      <Select
-        name="languageCode"
-        value={userForm.languageCode}
-        onChange={handleSelectChange('languageCode')}
-        label="모국어를 선택하세요"
-      >
-        {languages.map((language) => (
-          <Option key={language.languageCode} value={language.languageCode}>
-            {language.koreanName}
-          </Option>
-        ))}
-      </Select>
-
-      <div className="text-md font-semibold text-gray-700 mb-2 mt-4">생년월일</div>
-      <Input
-        name="birth"
-        type="date"
-        value={userForm.birth}
-        onChange={onChangeInput}
-      ></Input>
-            <Button className="bg-first mt-5" onClick={() => nav("/signup")}>이전</Button>
-            <Button className="bg-second mt-5" onClick={userRegister}>회원가입</Button>
-      </Card>
+          {" "}
+          {/* <- 여기 추가 */}
+          <Typography color="blue-gray">
+            Welcome !, Bienvenue!, ようこそ!, Welkom!, स्वागत है!
+          </Typography>
+          <Typography variant="h4" color="blue-gray" className="mt-5">
+            회원가입
+          </Typography>
+          <Typography color="blue-gray" className="mt-2">
+            맛,잇다의 세계로 들어와 다양한 문화의 음식을 즐겨보세요!!
+          </Typography>
+          <section>
+            <div className="text-md font-semibold text-gray-700 mb-2 mt-10">
+              닉네임
+            </div>
+            <div className="flex items-center gap-2">
+              <Input
+                name="nickname"
+                value={userForm.nickname}
+                onChange={onChangeInput}
+              ></Input>
+              <Button
+                variant="outlined"
+                onClick={checkNickname}
+                className="h-full whitespace-nowrap w-32 border-green-900"
+              >
+                중복체크
+              </Button>
+            </div>
+            {isNicknameAvailable === true && (
+              <Typography color="green" className="text-sm success-message">
+                사용할 수 있는 닉네임입니다.
+              </Typography>
+            )}
+            {isNicknameAvailable === false && (
+              <Typography color="red" className="text-sm nickname-fail-message">
+                이미 사용된 닉네임입니다.
+              </Typography>
+            )}
+          </section>
+          <div className="text-md font-semibold text-gray-700 mb-2 mt-4">
+            국적
+          </div>
+          <Select
+            name="countryCode"
+            value={userForm.countryCode}
+            onChange={handleSelectChange("countryCode")}
+            label="국적을 선택하세요"
+            className="relative"
+          >
+            {countries.map((country) => (
+              <Option key={country.countryCode} value={country.countryCode}>
+                {country.koreanName}
+              </Option>
+            ))}
+          </Select>
+          <div className="text-md font-semibold text-gray-700 mb-2 mt-4">
+            모국어
+          </div>
+          <Select
+            name="languageCode"
+            value={userForm.languageCode}
+            onChange={handleSelectChange("languageCode")}
+            label="모국어를 선택하세요"
+          >
+            {languages.map((language) => (
+              <Option key={language.languageCode} value={language.languageCode}>
+                {language.koreanName}
+              </Option>
+            ))}
+          </Select>
+          <div className="text-md font-semibold text-gray-700 mb-2 mt-4">
+            생년월일
+          </div>
+          <Input
+            name="birth"
+            type="date"
+            value={userForm.birth}
+            onChange={onChangeInput}
+          ></Input>
+          <Button className="bg-first mt-5" onClick={() => nav("/signup")}>
+            이전
+          </Button>
+          <Button className="bg-second mt-5" onClick={userRegister}>
+            회원가입
+          </Button>
+        </Card>
       </div>
     </div>
   );

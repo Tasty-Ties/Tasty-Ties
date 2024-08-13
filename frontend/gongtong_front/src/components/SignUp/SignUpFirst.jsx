@@ -272,7 +272,10 @@ const SignUpFirst = () => {
             </Typography>
           )}
           <div className="mb-5"></div>
-          <Button className="bg-first mt-10 " onClick={() => nav("/signupfin")}>
+          <Button
+            className="bg-first mt-10 "
+            onClick={() => nav("/signupfin", console.log(userForm))}
+          >
             다음
           </Button>
         </Card>
