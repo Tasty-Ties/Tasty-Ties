@@ -65,6 +65,23 @@ const VideoComponent = ({ isHost }) => {
   const [isSliderOn, setIsSliderOn] = useState(false);
   const [displayMode, setDisplayMode] = useState(0);
 
+  const [isRecognitionActive, setIsRecognitionActive] = useState(false); //음성 인식 추적 변수 (확성기 표시)
+  const recognitionRef = useRef(null);
+
+  //미디어 파이프 및 영상 녹화 관련
+  const raiseTimeout = useRef(null);
+  const lowerTimeout = useRef(null);
+  const audioStream = useRef(null);
+
+  //채팅 관련
+  const stompClient = useRef(null);
+
+  // 제스처 인식 상태 관리
+  let gestureRecognizer = null;
+  let isGestureActive = false;
+  let animationFrameId = null;
+  let SttTranslatedMessage = ""; //STT 결과 임시 저장
+
   // 비디오 레이아웃 순서 정렬하는 코드
   useEffect(() => {
     // console.log(subscribers);
@@ -121,9 +138,6 @@ const VideoComponent = ({ isHost }) => {
     }
   }, [partUser, localUser]);
 
-  //채팅 관련
-  const stompClient = useRef(null);
-
   useEffect(() => {
     window.addEventListener("beforeunload", onbeforeunload);
 
@@ -175,10 +189,10 @@ const VideoComponent = ({ isHost }) => {
     switchMic();
   }, [selectedAudioDevice]);
 
-  //미디어 파이프 및 영상 녹화 관련
-  const raiseTimeout = useRef(null);
-  const lowerTimeout = useRef(null);
-  const audioStream = useRef(null);
+  useEffect(() => {
+    initializeSpeechRecognition("ko", "KR"); // 기본 언어 설정
+    console.log("SpeechRecognition initialized", recognitionRef.current);
+  }, []);
 
   useEffect(() => {
     initializeGestureRecognizer(); // 제스처 초기화
@@ -187,6 +201,17 @@ const VideoComponent = ({ isHost }) => {
       const countryCode = userInfo.country.countryCode.toUpperCase();
       initializeSpeechRecognition(languageCode, countryCode); // 음성 인식 초기화
     }
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (raiseTimeout.current) {
+        clearTimeout(raiseTimeout.current);
+      }
+      if (lowerTimeout.current) {
+        clearTimeout(lowerTimeout.current);
+      }
+    };
   }, []);
 
   const joinSession = async () => {
@@ -438,51 +463,49 @@ const VideoComponent = ({ isHost }) => {
     return response.data.data;
   }, []);
 
-  //Web Speech API 관련
-  let recognition = null;
-  let isRecognitionActive = false; // 음성 인식 상태를 추적
-
   const initializeSpeechRecognition = (languageCode, countryCode) => {
-    recognition = new (window.SpeechRecognition ||
-      window.webkitSpeechRecognition)();
-    recognition.lang = languageCode + "-" + countryCode || "ko-KR"; // 사용자의 언어로 지정하되, 한국어가 기본
-    recognition.interimResults = false;
-    recognition.maxAlternatives = 1;
-    // recognition.continuous = true; // 연속 인식 모드로 설정
+    const SpeechRecognition =
+      window.SpeechRecognition || window.webkitSpeechRecognition;
 
-    recognition.onresult = (event) => {
-      let finalTranscript = "";
-      for (let i = event.resultIndex; i < event.results.length; i++) {
-        const transcript = event.results[i][0].transcript;
-        if (event.results[i].isFinal) {
-          finalTranscript += transcript;
+    if (!SpeechRecognition) {
+      console.error("SpeechRecognition API is not supported in this browser.");
+      return;
+    }
+
+    if (!recognitionRef.current) {
+      recognitionRef.current = new SpeechRecognition();
+      recognitionRef.current.lang = languageCode + "-" + countryCode || "ko-KR";
+      recognitionRef.current.interimResults = false;
+      recognitionRef.current.maxAlternatives = 1;
+
+      recognitionRef.current.onstart = () => {
+        console.log("Speech recognition started");
+        setIsRecognitionActive(true); // 음성 인식이 시작될 때 상태 업데이트
+      };
+
+      recognitionRef.current.onend = () => {
+        console.log("Speech recognition ended");
+        setIsRecognitionActive(false); // 음성 인식이 종료될 때 상태 업데이트
+      };
+
+      recognitionRef.current.onresult = (event) => {
+        let finalTranscript = "";
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          const transcript = event.results[i][0].transcript;
+          if (event.results[i].isFinal) {
+            finalTranscript += transcript;
+          }
         }
-      }
-      console.log("최종 결과:", finalTranscript);
-      sendMessage(finalTranscript);
-    };
+        console.log("최종 결과:", finalTranscript);
+        sendMessage(finalTranscript);
+      };
 
-    recognition.onerror = (event) => {
-      console.error("음성 인식 오류:", event.error);
-      isRecognitionActive = false;
-      //TODO: 여기에서 화면에 있는 손 이모지 지우기
-      isRecognitionActive = false; // 오류 발생 시 상태 초기화
-    };
-
-    recognition.onend = () => {
-      console.log("음성 인식이 종료되었습니다.");
-      if (isRecognitionActive) {
-        // 만약 사용자가 손을 내리지 않았다면 음성 인식을 다시 시작
-        recognition.start();
-      }
-    };
+      recognitionRef.current.onerror = (event) => {
+        console.error("음성 인식 오류:", event.error);
+        setIsRecognitionActive(false);
+      };
+    }
   };
-
-  // 전역 변수로 제스처 인식 상태 관리
-  let gestureRecognizer = null;
-  let isGestureActive = false;
-  let animationFrameId = null;
-  let SttTranslatedMessage = ""; //STT 결과 임시 저장
 
   const initializeGestureRecognizer = async () => {
     const videoElement = videoRef.current;
@@ -491,8 +514,8 @@ const VideoComponent = ({ isHost }) => {
     videoElement.style.position = "absolute";
     videoElement.style.top = "-9999px";
     videoElement.style.left = "-9999px";
-    videoElement.style.width = "1px"; //최소한의 로딩을 위해
-    videoElement.style.height = "1px";
+    videoElement.style.width = "100px"; //최소한의 로딩을 위해
+    videoElement.style.height = "100px";
     videoElement.style.opacity = "0";
 
     navigator.mediaDevices
@@ -581,21 +604,34 @@ const VideoComponent = ({ isHost }) => {
       const gesture = results.gestures[0][0].categoryName;
       if (gesture === "Open_Palm" && !isRecognitionActive) {
         console.log("손을 들었음, 음성 인식 시작");
-        isRecognitionActive = true;
-        recognition.start();
+        startSpeechRecognition();
       } else if (gesture === "Closed_Fist" && isRecognitionActive) {
         console.log("주먹을 쥐었음, 음성 인식 중지");
-        //TODO: 여기서 손 이모지 내리기
-        isRecognitionActive = false;
-        recognition.stop();
+        stopSpeechRecognition();
       }
+    }
+  };
+
+  //음성 인식 시작 함수
+  const startSpeechRecognition = () => {
+    if (recognitionRef.current && recognitionRef.current.state !== "started") {
+      console.log("Starting speech recognition...");
+      recognitionRef.current.start();
+    } else {
+      console.log("Speech recognition is already active or object is null");
+    }
+  };
+
+  const stopSpeechRecognition = () => {
+    if (recognitionRef.current) {
+      recognitionRef.current.stop();
     }
   };
 
   const sendMessage = (e) => {
     // e.preventDefault();
 
-    console.log("메세지 보내요::"+e);
+    console.log("메세지 보내요::" + e);
     if (e === null || e === "") {
       return;
     }
@@ -604,22 +640,7 @@ const VideoComponent = ({ isHost }) => {
       destination: `/pub/chat/text/rooms/${classData.chatRoomId}`,
       body: e,
     });
-
   };
-
-  // const sendMessage = (e) => {
-  //   // 사용자 정보 가져오기
-  //   const token = Cookies.get("token"); // 쿠키에서 토큰 가져오기
-  //   // WebSocket 메시지 전송
-  //   stompClient.current.publish({
-  //     destination: `/pub/chat/text/rooms/${roomId}`,
-  //     body: SttTranslatedMessage, //전역 변수 메세지 보내기
-  //     headers: {
-  //       Authorization: `Bearer ${token}`, // JWT 토큰
-  //       username: userInfo.username, // 사용자 이름
-  //     },
-  //   });
-  // };
 
   //채팅
   const connectStompClient = () => {
@@ -648,17 +669,6 @@ const VideoComponent = ({ isHost }) => {
         }
     }
   };
-
-  useEffect(() => {
-    return () => {
-      if (raiseTimeout.current) {
-        clearTimeout(raiseTimeout.current);
-      }
-      if (lowerTimeout.current) {
-        clearTimeout(lowerTimeout.current);
-      }
-    };
-  }, []);
 
   // 비디오 레이이아웃
   const displayChange = () => {
@@ -702,6 +712,11 @@ const VideoComponent = ({ isHost }) => {
 
   return (
     <>
+      {isRecognitionActive && (
+        <div className="absolute top-0 right-0 m-4 p-2 bg-red-500 text-white">
+          <i className="fas fa-microphone"></i> 음성 인식 중...
+        </div>
+      )}
       <CameraCapture
         isCaptureOpen={isCaptureOpen}
         captureOpen={captureOpen}
