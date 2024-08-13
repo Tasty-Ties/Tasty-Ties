@@ -827,7 +827,7 @@ const VideoComponent = ({ isHost }) => {
         isHost={isHost}
         isForcedExit={isForcedExit}
       />
-      <div className="min-h-screen min-w-screen bg-gradient-to-b from-gray-300 to-white flex flex-col items-center justify-center">
+      <div className="min-h-screen min-w-screen bg-gradient-to-b from-gray-200 to-white flex flex-col items-center justify-center">
         <div className="h-20 w-full flex justify-center items-end mb-5">
           <div className="text-4xl font-bold">{classData?.title}</div>
         </div>

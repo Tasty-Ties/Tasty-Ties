@@ -129,11 +129,11 @@ const ClassWaiting = () => {
   };
 
   return (
-    <div className="flex flex-col">
-      <div className="text-2xl pt-2 self-center">
+    <div className="flex flex-col  min-h-screen bg-gradient-to-b from-gray-200 to-white">
+      <div className="text-2xl font-bold pt-12 self-center">
         {isHost ? (
           <div>
-            클래스 시작 버튼을 눌러 {classData?.title} 클래스를 시작해주세요
+            클래스 시작 버튼을 눌러 " {classData?.title} " 클래스를 시작해주세요
           </div>
         ) : (
           <div>
