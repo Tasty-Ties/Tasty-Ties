@@ -57,13 +57,10 @@ const ChatLog = ({
   }, [chatRoomId, previousLog, messageLog]);
 
   const subscribeChatRoom = async () => {
-    await stompClient.current.subscribe(
-      `/sub/chat/rooms/${chatRoomId}`,
-      async (message) => {
-        receivedMessage(JSON.parse(message.body));
-        console.log("새롭게 받아온 메시지입니다.", JSON.parse(message.body));
-      }
-    );
+    await stompClient.current.subscribe(`/sub/chat/rooms/${chatRoomId}`, async (message) => {
+      receivedMessage(JSON.parse(message.body));
+      console.log("새롭게 받아온 메시지입니다.", JSON.parse(message.body));
+    });
     console.log(`${chatRoomTitle} 채팅방 구독이 활성화되었습니다.`);
   };
 
@@ -79,10 +76,7 @@ const ChatLog = ({
           pgNo: chatLogIndexRef.current,
         },
       });
-      console.log(
-        ">>>>>>> 기존 채팅 목록을 불러옵니다. 채팅 페이지는 : ",
-        chatLogIndexRef.current
-      );
+      console.log(">>>>>>> 기존 채팅 목록을 불러옵니다. 채팅 페이지는 : ", chatLogIndexRef.current);
       console.log("기존 채팅 목록", response.data.data);
       setPreviousLog((prev) => [...prev, ...response.data.data.chatMessages]);
 
@@ -90,12 +84,7 @@ const ChatLog = ({
         console.log(user);
         setUserProfileList((prev) => ({
           ...prev,
-          [user.username]: [
-            user.nickname,
-            user.profileImageUrl,
-            user.type,
-            user.username,
-          ],
+          [user.username]: [user.nickname, user.profileImageUrl, user.type, user.username],
         }));
       });
     } catch (error) {
@@ -146,11 +135,7 @@ const ChatLog = ({
   return (
     <div className="relative flex flex-col h-full">
       {open ? (
-        <AttendeeList
-          setOpen={setOpen}
-          nickname={nickname}
-          users={userProfileList}
-        />
+        <AttendeeList setOpen={setOpen} nickname={nickname} users={userProfileList} />
       ) : (
         <></>
       )}
@@ -187,9 +172,7 @@ const ChatLog = ({
           </button>
         </div>
         <button
-          className={`justify-self-end px-3 ${
-            isInLiveClass ? "invisible" : ""
-          }`}
+          className={`justify-self-end px-3 ${isInLiveClass ? "invisible" : ""}`}
           onClick={() => setOpen(!open)}
         >
           <svg
@@ -208,11 +191,7 @@ const ChatLog = ({
           </svg>
         </button>
       </div>
-      <div
-        className="flex-auto overflow-auto flex-shrink-0 h-96"
-        id="scroll"
-        ref={scrollBoxRef}
-      >
+      <div className="flex-auto overflow-auto flex-shrink-0 h-96" id="scroll" ref={scrollBoxRef}>
         {/* <div id="topPoint" ref={topScrollRef} className="h-5"></div> */}
         <div className=" flex flex-col-reverse">
           {previousLog &&
