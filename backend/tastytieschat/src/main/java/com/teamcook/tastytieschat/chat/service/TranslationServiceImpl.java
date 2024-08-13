@@ -3,7 +3,11 @@ package com.teamcook.tastytieschat.chat.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.teamcook.tastytieschat.chat.constant.Language;
 import com.teamcook.tastytieschat.chat.entity.ChatMessage;
+import com.teamcook.tastytieschat.chat.exception.LanguageNotExistException;
+import com.teamcook.tastytieschat.chat.exception.TranslatedResultFormatException;
+import com.teamcook.tastytieschat.chat.exception.TranslationException;
 import com.teamcook.tastytieschat.common.config.ChatGPTConfig;
 import com.teamcook.tastytieschat.chat.dto.GptRequestDto;
 import com.teamcook.tastytieschat.chat.dto.GptRequestMessageDto;
@@ -24,6 +28,9 @@ public class TranslationServiceImpl implements TranslationService {
     private final ObjectMapper objectMapper;
     private final ChatGPTConfig chatGPTConfig;
 
+    private final int TRANSLATION_LIMIT_COUNT = 10;
+    private final String DELIMITER = ": ";
+
     @Value("${openai.model}")
     private String model;
 
@@ -36,9 +43,21 @@ public class TranslationServiceImpl implements TranslationService {
     public void translationChatMessage(ChatMessage chatMessage, Set<String> translatedLanguages) throws Exception {
         GptRequestDto gptRequestDto = setGptPrompt(chatMessage, translatedLanguages);
 
+        int count = 0;
         while (validateTranslation(chatMessage, translatedLanguages)) {
             ResponseEntity<String> response = callGptApi(gptRequestDto);
-            handleApiResponse(chatMessage, response);
+
+            try {
+                handleApiResponse(chatMessage, response);
+            } catch (Exception e) {
+                if (count < TRANSLATION_LIMIT_COUNT) {
+                    count++;
+                } else {
+                    throw new TranslationException();
+                }
+            }
+
+            count++;
         }
     }
 
@@ -50,12 +69,10 @@ public class TranslationServiceImpl implements TranslationService {
 
     private String createGptRequestMessage(ChatMessage chatMessage, Set<String> translatedLanguages) {
         return "You are a translator with vast knowledge of human languages." +
-                "Please translate the following to " +
-                String.join(", ", translatedLanguages) +
-                " from the next sentence. " +
-                chatMessage.getOriginMessage() +
-                "Output the translations in the format 'Language: Translated Text' for each language, " +
-                "each on a new line.";
+                "Please translate the following sentence into the specified languages, one by one.\n\n" +
+                chatMessage.getOriginMessage() + "\n\n" +
+                "Languages: " + String.join(", ", translatedLanguages) + "\n\n" +
+                "For each language, translate and output in the specified format 'Language: Translated Text'.";
     }
 
     private ResponseEntity<String> callGptApi(GptRequestDto gptRequestDto) throws Exception {
@@ -79,10 +96,21 @@ public class TranslationServiceImpl implements TranslationService {
         LinkedHashMap<String, Object> choices = (LinkedHashMap) ((ArrayList) parsedResponseBody.get("choices")).get(0);
         LinkedHashMap<String, Object> message = (LinkedHashMap) choices.get("message");
         String[] contents = ((String) message.get("content")).split("\n");
+        log.debug((String) message.get("content"));
 
         for (String content : contents) {
-            String[] splitedContent = content.split(": ");
-            chatMessage.addTranslatedMessage(splitedContent[0], splitedContent[1]);
+            log.debug(content);
+            String[] splitedContent = content.split(DELIMITER);
+            if (!content.contains(DELIMITER) || splitedContent.length != 2) {
+                continue;
+            }
+            String language = splitedContent[0];
+            String translatedMessage = splitedContent[1];
+            if (!Language.contains(language)) {
+                throw new LanguageNotExistException();
+            }
+
+            chatMessage.addTranslatedMessage(language, translatedMessage);
         }
     }
 
@@ -98,6 +126,8 @@ public class TranslationServiceImpl implements TranslationService {
     private boolean validateTranslation(ChatMessage chatMessage, Set<String> translatedLanguages) {
         // 번역한 언어 제외
         Iterator<String> iterator = translatedLanguages.iterator();
+        log.debug("translatedLanguages while 종료 전::"+translatedLanguages);
+
         while (iterator.hasNext()) {
             String translatedLanguage = iterator.next();
             if (chatMessage.containTranslatedLanguage(translatedLanguage)) {
@@ -105,6 +135,7 @@ public class TranslationServiceImpl implements TranslationService {
             }
         }
 
+        log.debug("translatedLanguages while 종료 후::"+translatedLanguages);
         return !translatedLanguages.isEmpty();
     }
 

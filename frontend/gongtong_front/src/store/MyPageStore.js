@@ -4,6 +4,7 @@ import {
   getTeachClass,
   getReserveClass,
   getAttendClass,
+  getMileageLog,
 } from "../service/MyPageAPI";
 
 const useMyPageStore = create((set) => ({
@@ -14,21 +15,27 @@ const useMyPageStore = create((set) => ({
   },
 
   teachClasses: [],
-  fetchTeachClasses: async () => {
-    const teachClasses = await getTeachClass();
-    set({ teachClasses });
+  fetchTeachClasses: async (page = 1, size = 4) => {
+    const { classes, totalItems } = await getTeachClass(page, size);
+    set({ teachClasses: classes, totalItems });
   },
 
   reserveClasses: [],
-  fetchReserveClasses: async () => {
-    const reserveClasses = await getReserveClass();
-    set({ reserveClasses });
+  fetchReserveClasses: async (page = 1, size = 4) => {
+    const { classes, totalItems } = await getReserveClass(page, size);
+    set({ reserveClasses: classes, totalItems });
   },
 
   attendClasses: [],
-  fetchAttendClasses: async () => {
-    const attendClasses = await getAttendClass();
-    set({ attendClasses });
+  fetchAttendClasses: async (page = 1, size = 4) => {
+    const { classes, totalItems } = await getAttendClass(page, size);
+    set({ attendClasses: classes, totalItems });
+  },
+
+  mileageLogs: [],
+  fetchMileageLogs: async (month) => {
+    const mileageLogs = await getMileageLog(month);
+    set({ mileageLogs });
   },
 }));
 

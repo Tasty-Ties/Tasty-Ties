@@ -1,5 +1,6 @@
 import { getMessaging, getToken, onMessage } from "firebase/messaging";
 import { app as firebaseApp } from "./firebase";
+import { pushNotification } from "../components/common/Toast";
 
 const messaging = getMessaging(firebaseApp);
 
@@ -21,7 +22,7 @@ export function requestPermission() {
 //FCM foreground
 export function onForegroundMessage() {
   onMessage(messaging, (payload) => {
-    console.log("Received forground message: ", payload);
+    pushNotification("message", payload.notification.body);
   });
 }
 

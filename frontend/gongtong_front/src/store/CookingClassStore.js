@@ -1,11 +1,10 @@
 import { create } from "zustand";
 import {
+  getClassDetail,
+  getClassLists,
+  getClassReviews,
   getCountries,
   getLanguages,
-  getClassLists,
-  getClassDetail,
-  getClassReviews,
-  getSearchLists,
 } from "./../service/CookingClassAPI";
 
 const useCookingClassStore = create((set) => ({
@@ -23,15 +22,13 @@ const useCookingClassStore = create((set) => ({
 
   classLists: [],
   hasMoreContent: true,
-  fetchClassLists: async (page) => {
-    const classLists = await getClassLists(page);
-    if (classLists.length === 0) {
-      set({ hasMoreContent: false });
-    } else {
-      set((state) => ({
-        classLists: [...state.classLists, ...classLists],
-      }));
-    }
+  fetchClassLists: async (page, searchParams) => {
+    const classLists = await getClassLists(page, searchParams);
+    set((state) => ({
+      classLists:
+        page === 0 ? classLists : [...state.classLists, ...classLists],
+      hasMoreContent: classLists.length === 12,
+    }));
   },
 
   classDetail: {},
@@ -46,11 +43,12 @@ const useCookingClassStore = create((set) => ({
     set({ classReviews });
   },
 
-  classSearchLists: [],
-  fetchSearchLists: async () => {
-    const classSearchLists = await getSearchLists();
-    set({ classSearchLists });
+  getClassLists: async (page, searchParams) => {
+    const classLists = await getClassLists(page, searchParams);
+    return classLists;
   },
+
+  resetClassLists: () => set({ classLists: [], hasMoreContent: true }),
 }));
 
 export default useCookingClassStore;

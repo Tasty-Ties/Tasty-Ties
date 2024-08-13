@@ -1,28 +1,40 @@
-import React, { useEffect } from "react";
-import { Link, NavLink, Outlet, useParams } from "react-router-dom";
-import useCookingClassStore from "../store/CookingClassStore";
-import ClassEnrollUsers from "./../components/ClassDetail/ClassEnrollUsers";
+import React, { useEffect, useState } from "react";
+import {
+  Link,
+  NavLink,
+  Outlet,
+  useNavigate,
+  useParams,
+} from "react-router-dom";
 import {
   setClassReservation,
   setDeleteClass,
   setDeleteClassReservation,
 } from "../service/CookingClassAPI";
+import useCookingClassStore from "../store/CookingClassStore";
 import CountryFlags from "./../common/components/CountryFlags";
+import ClassEnrollUsers from "./../components/ClassDetail/ClassEnrollUsers";
 
-import "./../styles/ClassDetail/ClassDetail.css";
+import ProfileButton from "../common/components/ProfileButton";
+import Alert from "../components/ClassDetail/Alert";
 import ClassImageCarousel from "../components/ClassDetail/ClassImageCarousel";
-import Profile from "../common/components/Profile";
 import Button from "./../common/components/Button";
+import "./../styles/ClassDetail/ClassDetail.css";
+import Cookies from "js-cookie";
 
 const FRONT_SERVER_URL = import.meta.env.VITE_FRONT_SERVER;
 
 const ClassDetail = () => {
   const { id } = useParams();
+  const nav = useNavigate();
 
   const { classDetail, fetchClassDetail } = useCookingClassStore((state) => ({
     classDetail: state.classDetail,
     fetchClassDetail: state.fetchClassDetail,
   }));
+  const username = classDetail.hostProfile?.username;
+
+  let cookie = Cookies.get("accessToken");
 
   useEffect(() => {
     fetchClassDetail(id);
@@ -38,14 +50,24 @@ const ClassDetail = () => {
     }
   };
 
+  const [isAlertOpen, setIsAlertOpen] = useState(false);
+
   const cancelClassReservation = async (e) => {
     try {
       await setDeleteClassReservation(id);
-      alert("취소 완료!");
       fetchClassDetail(id);
     } catch (error) {
       console.error("클래스 예약 취소 실패:", error);
     }
+  };
+
+  const handleCancelReservation = () => {
+    setIsAlertOpen(true);
+  };
+
+  const confirmCancelReservation = async () => {
+    await cancelClassReservation();
+    setIsAlertOpen(false);
   };
 
   const deleteClass = async (e) => {
@@ -73,6 +95,9 @@ const ClassDetail = () => {
   let cookingTime = timeCalculate();
 
   console.log(classDetail);
+
+  const currentTime = new Date();
+  const classTime = new Date(classDetail.cookingClassStartTime);
 
   return (
     <div className="w-3/6 mx-auto justify-center mt-8">
@@ -103,28 +128,44 @@ const ClassDetail = () => {
             </div>
           </div>
           <div className="flex items-center content-between">
-            {!classDetail.userEnrolled &&
-              classDetail.quota > classDetail.reservedCount &&
-              !classDetail.host && (
+            {!classDetail.host &&
+              !classDetail.userEnrolled &&
+              classDetail.quota > classDetail.reservedCount && (
                 <Button
                   text="예약하기"
                   type="green-short"
-                  onClick={handleClassReservation}
+                  onClick={() => {
+                    if (cookie) {
+                      handleClassReservation();
+                    } else {
+                      alert("로그인 후 이용 가능합니다.");
+                      nav("/login");
+                    }
+                  }}
                 />
               )}
-            {classDetail.quota <= classDetail.reservedCount &&
-              !classDetail.host && (
+
+            {!cookie &&
+              classDetail.host &&
+              // currentTime > classTime &&
+              classDetail.quota <= classDetail.reservedCount &&
+              !classDetail.userEnrolled && (
                 <Button text="마감" type="green-border-short" />
               )}
-            {classDetail.userEnrolled && (
-              <Button
-                text="예약 취소하기"
-                type="green-border-short"
-                onClick={cancelClassReservation}
-              />
-            )}
 
-            {classDetail.host && (
+            {cookie &&
+              !classDetail.host &&
+              // currentTime < classTime &&
+              classDetail.userEnrolled && (
+                <Button
+                  text="예약 취소하기"
+                  type="green-border-short"
+                  onClick={handleCancelReservation}
+                />
+              )}
+
+            {/* {currentTime < classTime && classDetail.host && ( */}
+            {cookie && classDetail.host && (
               <Button
                 text="강의 삭제하기"
                 type="green-border-short"
@@ -138,12 +179,18 @@ const ClassDetail = () => {
         </div>
       </div>
       <div className="my-4">
-        <Profile
-          username={classDetail.hostProfile?.nickname}
-          image={classDetail.hostProfile?.profileImageUrl}
-          size={"w-14"}
-          textsize={"text-xl"}
-        />
+        <div className="flex">
+          <Link to={`/otherpage/${username}`} className="flex">
+            <ProfileButton
+              image={classDetail.hostProfile?.profileImageUrl}
+              type="round"
+              size="size-14"
+            />
+            <p className="ml-2 mt-4 font-semibold text-xl">
+              {classDetail.hostProfile?.nickname}
+            </p>
+          </Link>
+        </div>
         <div className="my-5">
           <div className="flex items-center">
             <svg
@@ -183,26 +230,6 @@ const ClassDetail = () => {
             </svg>
             <span className="ml-1">언어 : </span>
             <span className="ml-1">{classDetail.languageName}</span>
-          </div>
-          <div className="flex items-center my-3">
-            <svg
-              width="20"
-              height="16"
-              viewBox="0 0 20 16"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M2 16C1.45 16 0.975 15.8083 0.575 15.425C0.191667 15.025 0 14.55 0 14V2C0 1.45 0.191667 0.983334 0.575 0.599999C0.975 0.2 1.45 0 2 0H14C14.55 0 15.0167 0.2 15.4 0.599999C15.8 0.983334 16 1.45 16 2V6.5L20 2.5V13.5L16 9.5V14C16 14.55 15.8 15.025 15.4 15.425C15.0167 15.8083 14.55 16 14 16H2ZM2 14H14V2H2V14ZM2 14V2V14Z"
-                fill="black"
-              />
-            </svg>
-            <span className="ml-1">다시보기 기간 : </span>
-            <span className="ml-1">
-              {classDetail.replayEndTime &&
-                `${classDetail.replayEndTime.substring(0, 10)}`}
-              {/* ${classDetail.replayEndTime.substring(11, 16)} */}
-            </span>
           </div>
         </div>
         <div className="my-6">
@@ -271,6 +298,11 @@ const ClassDetail = () => {
         }}
       />
       <div style={{ height: "300px" }}></div>
+      <Alert
+        open={isAlertOpen}
+        setOpen={setIsAlertOpen}
+        onConfirm={confirmCancelReservation}
+      />
     </div>
   );
 };

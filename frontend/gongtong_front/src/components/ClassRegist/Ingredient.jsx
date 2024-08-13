@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, forwardRef } from "react";
 
-const Ingredient = ({ onChange }) => {
+const Ingredient = forwardRef(function Ingredient({ onChange }, ref) {
   const [ingredients, setIngredients] = useState([
     {
       ingredientName: "",
@@ -44,18 +44,25 @@ const Ingredient = ({ onChange }) => {
     onChange(values);
   };
 
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter" || e.keyCode === 13) {
+      e.preventDefault(); // 엔터 키 기본 동작 방지
+    }
+  };
+
   useEffect(() => {}, [ingredients]);
 
   return (
-    <div className="regist-component-box">
-      <div className="">
+    <div className="regist-component-box ">
+      <div className=" grid grid-cols-12">
         {ingredients.map((field, index) => (
-          <div key={index} className="flex my-3">
+          <div key={index} className="flex my-3 col-span-10">
             <input
               type="text"
               name="ingredientName"
               value={field.ingredientName}
               onChange={(e) => handleInputChange(index, e)}
+              onKeyDown={handleKeyDown}
               className="w-1/4 border p-2 rounded mr-2"
               placeholder="재료명"
             />
@@ -63,7 +70,9 @@ const Ingredient = ({ onChange }) => {
               type="number"
               name="quantity"
               value={field.quantity}
+              min="1"
               onChange={(e) => handleInputChange(index, e)}
+              onKeyDown={handleKeyDown}
               className="w-1/4 border p-2 rounded mr-2"
               placeholder="개수"
             />
@@ -72,6 +81,7 @@ const Ingredient = ({ onChange }) => {
               name="quantityUnit"
               value={field.quantityUnit}
               onChange={(e) => handleInputChange(index, e)}
+              onKeyDown={handleKeyDown}
               className="w-1/4 border p-2 rounded mr-2"
               placeholder="단위"
             />
@@ -91,7 +101,7 @@ const Ingredient = ({ onChange }) => {
             </button>
           </div>
         ))}
-        <div className="text-right">
+        <div className="text-right col-end-12 grid self-center ml-6">
           <button type="button" onClick={handleAddFields}>
             <svg
               width="37"
@@ -117,6 +127,8 @@ const Ingredient = ({ onChange }) => {
       </div>
     </div>
   );
-};
+});
+
+Ingredient.displayName = "Ingredient";
 
 export default Ingredient;

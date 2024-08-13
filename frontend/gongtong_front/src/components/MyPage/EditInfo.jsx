@@ -1,7 +1,6 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import Button from "../../common/components/Button";
-import IdImage from "./EditInfo/IdImage";
 import api from "../../service/Api";
 
 const EditInfo = () => {
@@ -22,6 +21,8 @@ const EditInfo = () => {
   );
   const [emailId, setEmailId] = useState("");
   const [emailDomain, setEmailDomain] = useState("");
+  const [profileImage, setProfileImage] = useState(null); // 파일을 저장할 state 추가
+  const [profileImagePreview, setProfileImagePreview] = useState(null); // 미리보기용 state 추가
   const nav = useNavigate();
 
   useEffect(() => {
@@ -32,26 +33,38 @@ const EditInfo = () => {
     }
   }, [email]);
 
-  const handleFileChange = async (file) => {
-    const formData = new FormData();
-    formData.append("profileImage", file);
+  const handleFileChange = (file) => {
+    const imageUrl = URL.createObjectURL(file);
+    setProfileImagePreview(imageUrl);
+    setProfileImage(file); // 파일을 state에 저장
+  };
 
-    try {
-      const response = await api.patch("/users/me/profile-image", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
-
-      if (response.status === 200) {
-        alert("프로필 이미지가 성공적으로 업데이트되었습니다.");
-      } else {
-        alert("프로필 이미지 업데이트에 실패했습니다.");
+  const IdImage = ({ setFiles }) => {
+    const handleImageChange = (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        setFiles(file);
       }
-    } catch (error) {
-      console.error("업로드 중 오류 발생:", error);
-      alert("업로드 중 오류가 발생했습니다.");
-    }
+    };
+
+    return (
+      <div>
+        <input
+          type="file"
+          accept="image/*"
+          onChange={handleImageChange}
+          className="file-input file-input-primary-800 w-full max-w-xs"
+        />
+
+        {profileImagePreview && (
+          <img
+            src={profileImagePreview}
+            alt="미리보기 이미지"
+            style={{ width: "150px", height: "150px", objectFit: "cover" }}
+          />
+        )}
+      </div>
+    );
   };
 
   const handleEmailChange = (e) => {
@@ -71,7 +84,7 @@ const EditInfo = () => {
 
     const updatedInfo = {
       nickname,
-      password: password || undefined, // 비밀번호가 비어있으면 보내지 않음
+      password: password || undefined,
       emailId,
       emailDomain,
       description,
@@ -80,87 +93,107 @@ const EditInfo = () => {
     };
 
     try {
+      // 프로필 사진이 선택된 경우, 사진을 먼저 업로드
+      if (profileImage) {
+        const formData = new FormData();
+        formData.append("profileImage", profileImage);
+
+        const response = await api.patch("/users/me/profile-image", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
+
+        if (response.status !== 200) {
+          alert("프로필 이미지 업데이트에 실패했습니다.");
+          return;
+        }
+      }
+
       const response = await api.patch("/users/me", updatedInfo);
 
       if (response.status === 200) {
-        alert("정보가 성공적으로 업데이트되었습니다.");
         nav("/mypage");
       } else {
         alert("정보 업데이트에 실패했습니다.");
       }
     } catch (error) {
       console.error("업데이트 중 오류 발생:", error);
-      alert("업데이트 중 오류가 발생했습니다.");
+      alert("모든 값을 입력해주세요.");
     }
   };
 
   return (
     <div>
-      <h1>내 정보 수정</h1>
-      <br />
-      <IdImage setFiles={handleFileChange} />
+      <p className="text-xl mb-4">내 정보 수정</p>
+      <p className="mb-1 text-sm">프로필사진</p>
+      <p className="mb-2">
+        <IdImage setFiles={handleFileChange} />
+      </p>
+      <p className="mb-1 text-sm">닉네임</p>
+      <input
+        type="text"
+        value={nickname}
+        onChange={(e) => setNickname(e.target.value)}
+        className="border border-first-800 w-full rounded-md mb-2"
+      />
+      <p className="mb-1 text-sm">비밀번호</p>
+      <input
+        type="password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        className="border border-first-800 w-full rounded-md mb-2"
+      />
+      <p className="mb-1 text-sm">비밀번호 확인</p>
+      <input
+        type="password"
+        value={verifyPassword}
+        onChange={(e) => setVerifyPassword(e.target.value)}
+        className="border border-first-800 w-full rounded-md mb-2"
+      />
+      <p className="mb-1 text-sm">이메일</p>
+      <input
+        type="email"
+        value={email}
+        onChange={handleEmailChange}
+        className="border border-first-800 w-full rounded-md mb-2"
+      />
+      <p className="mb-1 text-sm">자기소개</p>
 
-      <section>
-        닉네임:
-        <input
-          type="text"
-          value={nickname}
-          onChange={(e) => setNickname(e.target.value)}
-        />
-      </section>
-      <br />
-      <section>
-        비밀번호:
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-      </section>
-      <br />
-      <section>
-        비밀번호 확인:
-        <input
-          type="password"
-          value={verifyPassword}
-          onChange={(e) => setVerifyPassword(e.target.value)}
-        />
-      </section>
-      <br />
-      <section>
-        이메일:
-        <input type="email" value={email} onChange={handleEmailChange} />
-      </section>
-      <br />
-      <section>
-        자기소개:
-        <input
-          type="textarea"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-        />
-      </section>
-      <br />
-      <section>
-        인스타: https://www.instagram.com/
+      <input
+        type="textarea"
+        value={description}
+        onChange={(e) => setDescription(e.target.value)}
+        className="border border-first-800 w-full rounded-md mb-2"
+      />
+      <div className="flex">
+        <p className="mb-1 text-sm">인스타 https://www.instagram.com/</p>
         <input
           type="text"
           value={instaHandle}
           onChange={(e) => setInstaHandle(e.target.value)}
+          className="border border-first-800 rounded-md w-24 mb-2 ml-1"
         />
-      </section>
-      <br />
-      <section>
-        유튜브: https://www.youtube.com/@
+      </div>
+      <div className="flex">
+        <p className="mb-1 text-sm">유튜브 https://www.youtube.com/@</p>
         <input
           type="text"
           value={youtubeHandle}
           onChange={(e) => setYoutubeHandle(e.target.value)}
+          className="border border-first-800 rounded-md w-24 mb-2 ml-1"
         />
-      </section>
+      </div>
       <br />
-      <Button text="저장하기" type="green-sqr" onClick={handleSave} />
-      <Button text="취소" type="gray-sqr" onClick={() => nav("/mypage")} />
+
+      <div className="space-x-40">
+        <Button text="수정완료" type="edit-complete" onClick={handleSave} />
+        <Button
+          text="수정취소"
+          type="edit-cancle"
+          onClick={() => nav("/mypage")}
+        />
+      </div>
     </div>
   );
 };

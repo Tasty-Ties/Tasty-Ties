@@ -27,3 +27,6 @@ dist-ssr
 
 # firebase
 firebase-messaging-sw.js
+nginx.conf
+Dockerfile
+firebase-messaging-sw.js.js

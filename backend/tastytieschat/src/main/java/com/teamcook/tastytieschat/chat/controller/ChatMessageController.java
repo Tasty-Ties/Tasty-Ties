@@ -61,7 +61,6 @@ public class ChatMessageController {
     @EventListener(SessionConnectedEvent.class)
     public void onConnect(SessionConnectedEvent event) {
         String sessionId = event.getMessage().getHeaders().get("simpSessionId").toString();
-
         try {
             Message<?> connectMessage = (Message<?>) event.getMessage().getHeaders().get("simpConnectMessage");
             Map<String, List<String>> nativeHeaders = (Map<String, List<String>>) connectMessage.getHeaders().get("nativeHeaders");
@@ -70,9 +69,11 @@ public class ChatMessageController {
 
             if (username != null) {
                 sessions.put(sessionId, username);
+                log.debug(sessions.toString());
                 chatUserService.setActiveChatUser(username);
             }
-        } catch (NullPointerException e) {}
+        } catch (NullPointerException e) {
+        }
     }
 
     @EventListener(SessionDisconnectEvent.class)
@@ -98,6 +99,7 @@ public class ChatMessageController {
     @MessageMapping("/chat/text/rooms/{roomId}")
     @SendTo("/sub/chat/rooms/{roomId}")
     public ChatMessageResponseDto sendMessage(@DestinationVariable String roomId, @Payload String message, SimpMessageHeaderAccessor headerAccessor) {
+
         try {
             String sessionId = headerAccessor.getSessionId();
             String username = sessions.get(sessionId);
@@ -194,16 +196,19 @@ public class ChatMessageController {
         try {
             translationService.translationChatMessage(chatMessage, translatedLanguages);
         } catch (Exception e) {
+            log.debug("번역 실패: " + e.getMessage());
             chatMessage.setTranslated(false);
         }
 
-        String chatRoomTitle = (String) map.get("chatRoomTitle");
-        Set<UserDto> listeners = (Set<UserDto>) map.get("listeners");
-        FcmNotificationDto notificationDto = FcmNotificationDto.builder()
-                .title(NotificationType.NEW_CHAT_MESSAGE.getTitle())
-                .body(NotificationType.NEW_CHAT_MESSAGE.generateBodyWittChatRoomTitle(chatRoomTitle))
-                .build();
-        notificationService.sendMessage(listeners, notificationDto);
+        if (chatMessage.isTranslated()) {
+            String chatRoomTitle = (String) map.get("chatRoomTitle");
+            Set<UserDto> listeners = (Set<UserDto>) map.get("listeners");
+            FcmNotificationDto notificationDto = FcmNotificationDto.builder()
+                    .title(NotificationType.NEW_CHAT_MESSAGE.getTitle())
+                    .body(NotificationType.NEW_CHAT_MESSAGE.generateBodyWittChatRoomTitle(chatRoomTitle))
+                    .build();
+            notificationService.sendMessage(listeners, notificationDto);
+        }
 
         return chatMessage;
     }

@@ -12,7 +12,6 @@ import com.teamcook.tastyties.cooking_class.dto.*;
 import com.teamcook.tastyties.cooking_class.entity.*;
 import com.teamcook.tastyties.shared.entity.CookingClassAndCookingClassTag;
 import com.teamcook.tastyties.shared.entity.QCookingClassAndCookingClassTag;
-import com.teamcook.tastyties.user.dto.QUserFcmTokenDto;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -77,7 +76,8 @@ public class CookingClassRepositoryImpl implements CookingClassCustomRepository 
                         countryByClass.alpha2,
                         countryByClass.countryImageUrl
                 ),
-                        cookingClass.countryCode.eq(country.alpha2)
+                        cookingClass.countryCode.eq(country.alpha2),
+                        cookingClass.chatRoomId
                 ))
                 .from(cookingClass)
                 .leftJoin(cookingClass.host, user)
@@ -86,7 +86,7 @@ public class CookingClassRepositoryImpl implements CookingClassCustomRepository 
                 .where(
                         cookingClass.isDelete.eq(false),
                         titleLike(condition.getTitle()),
-                        usernameEq(condition.getUsername()),
+                        nicknameEq(condition.getNickname()),
                         useLocalFilter(condition.isUseLocalFilter()),
                         countryCodeEq(condition.getCountryCode()),
                         languageCodeEq(condition.getLanguageCode())
@@ -101,7 +101,7 @@ public class CookingClassRepositoryImpl implements CookingClassCustomRepository 
                 .leftJoin(cookingClass.host, user)
                 .where(
                         titleLike(condition.getTitle()),
-                        usernameEq(condition.getUsername()));
+                        nicknameEq(condition.getNickname()));
 
 
         return PageableExecutionUtils.getPage(results, pageable, countQuery::fetchOne);
@@ -113,8 +113,8 @@ public class CookingClassRepositoryImpl implements CookingClassCustomRepository 
     }
 
     // username equal 필터
-    private BooleanExpression usernameEq(String username) {
-        return hasText(username) ? user.username.eq(username) : null;
+    private BooleanExpression nicknameEq(String nickname) {
+        return hasText(nickname) ? user.nickname.eq(nickname) : null;
     }
 
     // 현지인 필터
@@ -262,7 +262,8 @@ public class CookingClassRepositoryImpl implements CookingClassCustomRepository 
                         ), new QCountryProfileDto(
                         countryByClass.alpha2,
                         countryByClass.countryImageUrl
-                ), cookingClass.countryCode.eq(country.alpha2)
+                ), cookingClass.countryCode.eq(country.alpha2),
+                        cookingClass.chatRoomId
                 ))
                 .from(cookingClass)
                 .leftJoin(cookingClass.host, user)
@@ -304,7 +305,8 @@ public class CookingClassRepositoryImpl implements CookingClassCustomRepository 
                         ), new QCountryProfileDto(
                         countryByClass.alpha2,
                         countryByClass.countryImageUrl
-                ), cookingClass.countryCode.eq(country.alpha2)
+                ), cookingClass.countryCode.eq(country.alpha2),
+                        cookingClass.chatRoomId
                 ))
                 .from(cookingClass)
                 .leftJoin(cookingClass.host, user)
@@ -348,7 +350,8 @@ public class CookingClassRepositoryImpl implements CookingClassCustomRepository 
                                 countryByClass.alpha2,
                                 countryByClass.countryImageUrl
                         ),
-                                cookingClass.countryCode.eq(country.alpha2)
+                                cookingClass.countryCode.eq(country.alpha2),
+                                cookingClass.chatRoomId
                         ))
                         .from(cookingClass)
                         .leftJoin(cookingClass.host, user)
@@ -402,5 +405,14 @@ public class CookingClassRepositoryImpl implements CookingClassCustomRepository 
                 .fetchOne();
         return cookingClass != null ? cookingClass.getSessionId() : null;
     }
+
+    @Override
+    public void deleteSessionIdByCookingClassId(String uuid) {
+        queryFactory.update(cookingClass)
+                .set(cookingClass.sessionId, (String) null)
+                .where(cookingClass.uuid.eq(uuid))
+                .execute();
+    }
+
 
 }

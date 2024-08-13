@@ -57,8 +57,8 @@ public class UserService {
         }
         Country country = countryRepository.findByAlpha2(request.getCountryCode());
         Language language = languageRepository.findByAlpha2(request.getLanguageCode());
-        User newUser = new User(country, language, request.getUsername(), encodedPassword,
-                request.getNickname(), request.getBirth(), request.getEmailId() + "@" + request.getEmailDomain());
+        User newUser = new User(country, language, request.getUsername(), encodedPassword, request.getNickname(),
+                request.getBirth(), request.getEmailId() + "@" + request.getEmailDomain(), "USER");
 
 
         // 기본 앨범 생성 및 사용자에 추가

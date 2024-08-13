@@ -22,13 +22,14 @@ public class CookingClassListDto {
     private CountryProfileDto hostCountry;
     private CountryProfileDto classCountry;
     private boolean isLocal;
+    private String chatRoomId;
 
     @QueryProjection
     public CookingClassListDto(String title, String mainImage,
                                LocalDateTime startTime, LocalDateTime endTime,
                                String hostUsername, String hostName, String uuid,
                                CountryProfileDto hostCountry, CountryProfileDto classCountry,
-                               boolean isLocal) {
+                               boolean isLocal, String chatRoomId) {
         this.title = title;
         this.mainImage = mainImage;
         this.startTime = startTime;
@@ -39,5 +40,6 @@ public class CookingClassListDto {
         this.hostCountry = hostCountry;
         this.classCountry = classCountry;
         this.isLocal = isLocal;
+        this.chatRoomId = chatRoomId;
     }
 }
