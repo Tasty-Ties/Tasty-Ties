@@ -96,8 +96,8 @@ const ClassDetail = () => {
 
   console.log(classDetail);
 
-  const currentTime = new Date(); // 현재 시간을 가져옵니다.
-  const classTime = new Date(classDetail.cookingClassStartTime); // 수업 시간을 가져옵니다.
+  const currentTime = new Date();
+  const classTime = new Date(classDetail.cookingClassStartTime);
 
   return (
     <div className="w-3/6 mx-auto justify-center mt-8">
