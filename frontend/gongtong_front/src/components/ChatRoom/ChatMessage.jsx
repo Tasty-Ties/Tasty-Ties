@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-const ChatMessage = ({ type, imgSrc, nickname, message, chatTime }) => {
+const ChatMessage = ({ type, imgSrc, nickname, message, chatTime, isNew }) => {
   const defaultImage =
     "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRF1IwK6-SxM83UpFVY6WtUZxXx-phss_gAUfdKbkTfau6VWVkt";
 
@@ -77,8 +77,10 @@ const ChatMessage = ({ type, imgSrc, nickname, message, chatTime }) => {
             ) : (
               <div className="self-end my-2 tex t-xs px-2">
                 {chatTime
-                  ? new Date().getDate() > new Date(chatTime).getDate() &&
-                    new Date().getMonth() >= new Date(chatTime).getMonth()
+                  ? isNew
+                    ? chatTime
+                    : new Date().getDate() > new Date(chatTime).getDate() &&
+                      new Date().getMonth() >= new Date(chatTime).getMonth()
                     ? new Date(chatTime).getMonth() +
                       1 +
                       "월 " +

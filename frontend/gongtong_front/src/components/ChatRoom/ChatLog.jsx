@@ -57,16 +57,15 @@ const ChatLog = ({
   }, [chatRoomId, previousLog, messageLog]);
 
   const subscribeChatRoom = async () => {
-    await stompClient.current.subscribe(`/sub/chat/rooms/${chatRoomId}`, async (message) => {
-      receivedMessage(JSON.parse(message.body));
-      console.log("새롭게 받아온 메시지입니다.", JSON.parse(message.body));
-    });
+    await stompClient.current.subscribe(
+      `/sub/chat/rooms/${chatRoomId}`,
+      async (message) => {
+        receivedMessage(JSON.parse(message.body));
+        console.log("새롭게 받아온 메시지입니다.", JSON.parse(message.body));
+      }
+    );
     console.log(`${chatRoomTitle} 채팅방 구독이 활성화되었습니다.`);
   };
-
-  useEffect(() => {
-    console.log(userProfileList);
-  }, [userProfileList]);
 
   const getChatLog = async () => {
     try {
@@ -76,15 +75,17 @@ const ChatLog = ({
           pgNo: chatLogIndexRef.current,
         },
       });
-      console.log(">>>>>>> 기존 채팅 목록을 불러옵니다. 채팅 페이지는 : ", chatLogIndexRef.current);
-      console.log("기존 채팅 목록", response.data.data);
       setPreviousLog((prev) => [...prev, ...response.data.data.chatMessages]);
 
       response.data.data.users.forEach((user) => {
-        console.log(user);
         setUserProfileList((prev) => ({
           ...prev,
-          [user.username]: [user.nickname, user.profileImageUrl, user.type, user.username],
+          [user.username]: [
+            user.nickname,
+            user.profileImageUrl,
+            user.type,
+            user.username,
+          ],
         }));
       });
     } catch (error) {
@@ -107,8 +108,6 @@ const ChatLog = ({
   };
 
   const sendMessage = (e) => {
-    e.preventDefault();
-
     stompClient.current.publish({
       destination: `/pub/chat/text/rooms/${chatRoomId}`,
       body: chatInputRef.current.value,
@@ -119,23 +118,35 @@ const ChatLog = ({
 
   useEffect(() => {
     if (newMessage.messages?.[userLang]) {
-      console.log(newMessage);
-      console.log(userProfileList[newMessage.username]?.[0]);
       setMessageLog((prev) => [
         ...prev,
         {
           userNickname: userProfileList[newMessage.username]?.[0],
           translation: newMessage.messages[userLang],
+          timeLine:
+            new Date().getHours().toString().padStart(2, "0") +
+            " : " +
+            new Date().getMinutes().toString().padStart(2, "0"),
         },
       ]);
     }
     console.log("새롭게 저장된 메시지 목록", messageLog);
   }, [newMessage]);
 
+  const activeEnter = (e) => {
+    if (e.key === "Enter") {
+      sendMessage();
+    }
+  };
+
   return (
     <div className="relative flex flex-col h-full">
       {open ? (
-        <AttendeeList setOpen={setOpen} nickname={nickname} users={userProfileList} />
+        <AttendeeList
+          setOpen={setOpen}
+          nickname={nickname}
+          users={userProfileList}
+        />
       ) : (
         <></>
       )}
@@ -172,7 +183,9 @@ const ChatLog = ({
           </button>
         </div>
         <button
-          className={`justify-self-end px-3 ${isInLiveClass ? "invisible" : ""}`}
+          className={`justify-self-end px-3 ${
+            isInLiveClass ? "invisible" : ""
+          }`}
           onClick={() => setOpen(!open)}
         >
           <svg
@@ -191,7 +204,11 @@ const ChatLog = ({
           </svg>
         </button>
       </div>
-      <div className="flex-auto overflow-auto flex-shrink-0 h-96" id="scroll" ref={scrollBoxRef}>
+      <div
+        className="flex-auto overflow-auto flex-shrink-0 h-96"
+        id="scroll"
+        ref={scrollBoxRef}
+      >
         {/* <div id="topPoint" ref={topScrollRef} className="h-5"></div> */}
         <div className=" flex flex-col-reverse">
           {previousLog &&
@@ -216,6 +233,7 @@ const ChatLog = ({
                         : previous.messages[previous.originLanguage]
                     }
                     chatTime={previous.createdTime}
+                    isNew={false}
                   />
                 }
               </div>
@@ -231,7 +249,8 @@ const ChatLog = ({
                     imgSrc={userProfile}
                     nickname={message.userNickname}
                     message={message.translation}
-                    chatTime={new Date()}
+                    chatTime={message.timeLine}
+                    isNew={true}
                   />
                 }
               </div>
@@ -245,6 +264,7 @@ const ChatLog = ({
           autoComplete="given-name"
           className="block rounded-md border-0 px-3.5 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 w-5/6"
           ref={chatInputRef}
+          onKeyDown={activeEnter}
         />
         <Button
           type="yellow-short"
