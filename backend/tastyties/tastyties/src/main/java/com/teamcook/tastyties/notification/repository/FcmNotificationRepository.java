@@ -17,8 +17,8 @@ public interface FcmNotificationRepository extends JpaRepository<FcmNotification
     @Query("SELECT f FROM FcmNotification f WHERE f.user = :user AND f.createTime >= :startTime ORDER BY f.createTime DESC")
     Page<FcmNotification> findRecentNotifications(@Param("user") User user, @Param("startTime") LocalDateTime startTime, Pageable pageable);
     @Modifying(clearAutomatically = true)
-    @Query("UPDATE FcmNotification f SET f.isRead = TRUE WHERE f.user = :user AND f.id IN :notificationIds")
-    void checkReadNotification(@Param("user") User user, @Param("notificationIds") List<Integer> notificationIds);
+    @Query("UPDATE FcmNotification f SET f.isRead = CASE WHEN f.isRead = true THEN false ELSE true END WHERE f.user = :user AND f.id = :notificationId")
+    void changeIsReadNotification(@Param("user") User user, @Param("notificationId") int notificationId);
     @Modifying
     @Query("DELETE FcmNotification f WHERE f.user = :user AND f.id IN :notificationIds")
     void deleteNotification(@Param("user") User user, @Param("notificationIds") List<Integer> notificationIds);
