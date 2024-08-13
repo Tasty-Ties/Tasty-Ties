@@ -1,13 +1,9 @@
 import React from "react";
 
-import MainCarousel from "../components/Main/MainCarousel";
+import Main from "../components/Main/Main";
 
 const mainPage = () => {
-  return (
-    <div className="h-screen overflow-hidden">
-      <MainCarousel />
-    </div>
-  );
+  return <Main />;
 };
 
 export default mainPage;

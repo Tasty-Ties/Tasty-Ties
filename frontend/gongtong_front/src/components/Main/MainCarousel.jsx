@@ -76,7 +76,7 @@ const MainCarousel = () => {
     <div ref={outerDivRef} className="h-full overflow-y-auto scrollbar-hidden">
       <MainCarouselItem className="bg-yellow-500">1</MainCarouselItem>
       <MainCarouselItem className="bg-red-500">2</MainCarouselItem>
-      <CookingClassList />
+      <MainCarouselItem className="bg-blue-500">3</MainCarouselItem>
     </div>
   );
 };

@@ -2,16 +2,17 @@ import React from "react";
 import { Carousel, IconButton, Typography } from "@material-tailwind/react";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 
-import CookingClassListItem from "./item/CookingClassListItem";
+// import CookingClassListItem from "./item/CookingClassListItem";
+import ShortformListItem from "./item/ShortformListItem";
 
-const CookingClassList = () => {
+const ShortformList = () => {
   return (
-    <div className="flex flex-col w-3/4 mx-auto content-center relative">
-      <Typography variant="h4" className="ml-12">
-        최신 등록된 강의
+    <div className="flex flex-col w-3/4 mx-auto content-center relative mt-20">
+      <Typography variant="h4" className="ml-12 mb-4">
+        # 인기 급상승
       </Typography>
       <Carousel
-        className="h-auto px-6 flex items-center overflow-hidden"
+        className="h-auto px-12 flex items-center overflow-hidden"
         prevArrow={({ handlePrev }) => (
           <IconButton
             variant="text"
@@ -48,21 +49,23 @@ const CookingClassList = () => {
           </div>
         )}
       >
-        <div className="grid grid-cols-4 w-full h-[90%]">
-          <CookingClassListItem />
-          <CookingClassListItem />
-          <CookingClassListItem />
-          <CookingClassListItem />
+        <div className="grid grid-cols-5 gap-4 w-full">
+          <ShortformListItem />
+          <ShortformListItem />
+          <ShortformListItem />
+          <ShortformListItem />
+          <ShortformListItem />
         </div>
-        <div className="ml-12 grid grid-cols-4 w-full">
-          <CookingClassListItem />
-          <CookingClassListItem />
-          <CookingClassListItem />
-          <CookingClassListItem />
+        <div className="ml-24 grid grid-cols-5 gap-4 w-full">
+          <ShortformListItem />
+          <ShortformListItem />
+          <ShortformListItem />
+          <ShortformListItem />
+          <ShortformListItem />
         </div>
       </Carousel>
     </div>
   );
 };
 
-export default CookingClassList;
+export default ShortformList;
