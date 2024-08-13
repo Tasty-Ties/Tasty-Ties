@@ -23,6 +23,12 @@ const MediaDeviceSetting = ({ currentPublisher }) => {
   const isVideoActive = useVideoStore((state) => state.isVideoActive);
   const setIsVideoActive = useVideoStore((state) => state.setIsVideoActive);
   const setIsAudioActive = useVideoStore((state) => state.setIsAudioActive);
+  const selectedAudioDevice = useVideoStore(
+    (state) => state.selectedAudioDevice
+  );
+  const selectedVideoDevice = useVideoStore(
+    (state) => state.selectedVideoDevice
+  );
 
   const getPermission = async () => {
     try {
@@ -98,6 +104,29 @@ const MediaDeviceSetting = ({ currentPublisher }) => {
       setIsSelectingAudio(false);
     }
   };
+
+  // publisher 객체 생성에 필요한 요소들을 로컬 스토리지에 저장
+  const storePublisher = () => {
+    if (!selectedVideoDevice && !selectedAudioDevice) return;
+    console.log("MediaDeviceSetting 컴포넌트");
+    console.log(isVideoActive, isAudioActive);
+    localStorage.setItem("selectedVideoDevice", selectedVideoDevice);
+    localStorage.setItem("selectedAudioDevice", selectedAudioDevice);
+    localStorage.setItem("isVideoActive", isVideoActive.toString());
+    localStorage.setItem("isAudioActive", isAudioActive.toString());
+  };
+
+  // 각 요소가 변경될 때마다 저장 실행
+  useEffect(() => {
+    console.log(
+      "storePublisher가 호출됨",
+      selectedVideoDevice,
+      selectedAudioDevice,
+      isVideoActive,
+      isAudioActive
+    );
+    storePublisher();
+  }, [selectedVideoDevice, selectedAudioDevice, isVideoActive, isAudioActive]);
 
   return (
     <>
