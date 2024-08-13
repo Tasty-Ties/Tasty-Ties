@@ -195,7 +195,6 @@ public class CookingClassService {
         Set<String> cookingTools = mapToCookingToolNames(cc.getCookingTools());
         List<String> tags = mapToTagNames(cc.getCookingClassAndCookingClassTags());
 
-        // 이미지 관련 추가 필요
         List<String> imageUrls = mapToCookingClassImages(cc.getCookingClassImages());
 
         User host = cc.getHost();
@@ -236,7 +235,7 @@ public class CookingClassService {
                 )).collect(Collectors.toSet());
     }
 
-    private List<String> mapToCookingClassImages(Set<CookingClassImage> cookingClassImages) {
+    private List<String> mapToCookingClassImages(List<CookingClassImage> cookingClassImages) {
         log.debug("image size: {}", cookingClassImages.size());
         return cookingClassImages.stream()
                 .map(CookingClassImage::getCookingClassImageUrl)
