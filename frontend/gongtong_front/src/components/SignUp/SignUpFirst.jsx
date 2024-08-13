@@ -17,7 +17,7 @@ const SignUpFirst = () => {
 
   useEffect(() => {
     return () => {
-      resetForm(["email", "username", "password", "verifyPassword"]);
+      resetForm();
     };
   }, [resetForm]);
 
