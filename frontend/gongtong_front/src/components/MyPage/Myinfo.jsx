@@ -17,7 +17,6 @@ const MyInfo = () => {
     fetchInformations();
   }, [fetchInformations]);
 
-  console.log(informations);
   const handleDeleteId = async () => {
     await deleteId();
     Cookies.remove("accessToken");

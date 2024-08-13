@@ -82,9 +82,9 @@ export const setClassRegist = async (data, files) => {
     "registerDto",
     new Blob([JSON.stringify(data)], { type: "application/json" })
   );
-  files.forEach((file) => {
+  for (const file of files) {
     formData.append("images", file);
-  });
+  }
   try {
     await api.post("/classes", formData, {
       headers: {

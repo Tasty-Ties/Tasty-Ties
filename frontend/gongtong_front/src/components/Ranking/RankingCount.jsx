@@ -4,6 +4,11 @@ const RankingCount = ({ num, duration }) => {
   const [count, setCount] = useState(0);
 
   useEffect(() => {
+    if (isNaN(num) || num === null || num === undefined) {
+      setCount(0);
+      return;
+    }
+
     const startCount = count;
     const startTime = performance.now();
 
@@ -28,7 +33,7 @@ const RankingCount = ({ num, duration }) => {
           textShadow: "0px 0px 15px rgba(255, 255, 255, 0.6)",
         }}
       >
-        {count}
+        {isNaN(count) ? 0 : count}
       </span>
     </div>
   );

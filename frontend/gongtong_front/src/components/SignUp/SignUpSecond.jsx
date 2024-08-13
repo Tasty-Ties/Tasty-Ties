@@ -76,14 +76,6 @@ const SignUpSecond = () => {
     console.log(userForm);
   };
 
-  // // 국적, 모국어를 handle 하는 함수
-  // const handleSelectChange = (name) => (value) => {
-  //   console.log(name);
-  //   console.log(value);
-  //   setForm(name, value);
-  //   console.log(userForm);
-  // };
-
   const checkNickname = async () => {
     try {
       const response = await api.get(
