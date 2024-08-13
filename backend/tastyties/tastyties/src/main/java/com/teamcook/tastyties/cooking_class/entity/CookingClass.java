@@ -70,6 +70,7 @@ public class CookingClass {
     private LocalDateTime createTime;
     private LocalDateTime updateTime;
 
+    @Setter
     private boolean isDelete = false;
 
     @OneToMany(mappedBy = "cookingClass")
