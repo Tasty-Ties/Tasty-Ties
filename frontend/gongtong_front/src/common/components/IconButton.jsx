@@ -4,7 +4,7 @@ const IconButton = ({ text, icon, type, onClick, value }) => {
     "class-color": "",
     "class-border": "",
     "screen-capture":
-      "bg-transparent hover:bg-blue-500 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded flex place-items-center items-center",
+      "bg-transparent hover:bg-blue-500 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded flex place-items-center justify-center",
     "green-border-short":
       "bg-transparent hover:bg-transparent text-first font-semibold hover:text-first-600 py-2 px-4 border border-first hover:border-first-600 rounded items-center flex flex-row",
     "green-short":
@@ -19,7 +19,7 @@ const IconButton = ({ text, icon, type, onClick, value }) => {
         viewBox="0 0 24 24"
         strokeWidth={1.5}
         stroke="currentColor"
-        className="size-6 flex-auto"
+        className="size-6"
       >
         <path
           strokeLinecap="round"

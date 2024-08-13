@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 
 const LiveClass = () => {
-  const { isHost, title, hostName } = useLocation().state;
+  const { isHost } = useLocation().state;
 
   // 스크롤 막는 코드
   useEffect(() => {
@@ -14,7 +14,7 @@ const LiveClass = () => {
     };
   }, []);
 
-  return <VideoComponent isHost={isHost} title={title} hostName={hostName} />;
+  return <VideoComponent isHost={isHost} />;
 };
 
 export default LiveClass;

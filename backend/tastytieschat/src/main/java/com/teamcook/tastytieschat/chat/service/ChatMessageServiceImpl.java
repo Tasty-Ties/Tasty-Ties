@@ -93,6 +93,12 @@ public class ChatMessageServiceImpl implements ChatMessageService {
         List<UserDto> userDtos = chatRoom.getUsers();
         List<User> users = userRepository.findByUsernames(chatRoom.getUsernames());
 
+        userDtos.sort((user1, user2) -> user1.getUsername().compareTo(user2.getUsername()));
+        users.sort((user1, user2) -> user1.getUsername().compareTo(user2.getUsername()));
+
+        log.debug("userDtos: " + userDtos.size());
+        log.debug("users: " + users.size());
+
         int size = userDtos.size();
         for (int i = 0; i < size; i++) {
             UserDto userDto = userDtos.get(i);

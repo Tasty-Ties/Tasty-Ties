@@ -1,247 +1,247 @@
 
 -- activity point log --
 create table activity_point_log (
-    amount float(53) not null,
-    id integer not null auto_increment,
-    user_id integer,
-    transaction_date datetime(6),
-    description varchar(255),
-    primary key (id)
+                                    amount float(53) not null,
+                                    id integer not null auto_increment,
+                                    user_id integer,
+                                    transaction_date datetime(6),
+                                    description varchar(255),
+                                    primary key (id)
 ) engine=InnoDB;
 
 -- album --
 create table album (
-    album_id integer not null auto_increment,
-    folder_count integer not null,
-    user_id integer not null,
-    album_name varchar(255),
-    primary key (album_id)
+                       album_id integer not null auto_increment,
+                       folder_count integer not null,
+                       user_id integer not null,
+                       album_name varchar(255),
+                       primary key (album_id)
 ) engine=InnoDB;
 
--- cooking class -- 
+-- cooking class --
 create table cooking_class (
-    cooking_class_id integer not null auto_increment,
-    dish_cooking_time integer not null,
-    host_id integer,
-    is_delete bit not null,
-    is_limited_age bit not null,
-    level integer not null,
-    quota integer not null,
-    cooking_class_end_time datetime(6) not null,
-    cooking_class_start_time datetime(6) not null,
-    create_time datetime(6),
-    replay_end_time datetime(6),
-    update_time datetime(6),
-    chat_room_id varchar(255),
-    country_code varchar(255) not null,
-    country_name varchar(255) not null,
-    description varchar(255),
-    dish_name varchar(255) not null,
-    language_code varchar(255) not null,
-    language_name varchar(255) not null,
-    main_image varchar(255),
-    session_id varchar(255),
-    title varchar(255) not null,
-    uuid varchar(255) not null,
-    primary key (cooking_class_id)
+                               cooking_class_id integer not null auto_increment,
+                               dish_cooking_time integer not null,
+                               host_id integer,
+                               is_delete bit not null,
+                               is_limited_age bit not null,
+                               level integer not null,
+                               quota integer not null,
+                               cooking_class_end_time datetime(6) not null,
+                               cooking_class_start_time datetime(6) not null,
+                               create_time datetime(6),
+                               replay_end_time datetime(6),
+                               update_time datetime(6),
+                               chat_room_id varchar(255),
+                               country_code varchar(255) not null,
+                               country_name varchar(255) not null,
+                               description varchar(255),
+                               dish_name varchar(255) not null,
+                               language_code varchar(255) not null,
+                               language_name varchar(255) not null,
+                               main_image varchar(255),
+                               session_id varchar(255),
+                               title varchar(255) not null,
+                               uuid varchar(255) not null,
+                               primary key (cooking_class_id)
 ) engine=InnoDB;
 
 -- cooking class and cooking class tag --
 create table cooking_class_and_cooking_class_tag (
-    cooking_class_and_cooking_class_tag_id integer not null auto_increment,
-    cooking_class_id integer,
-    cooking_class_tag_id integer,
-    primary key (cooking_class_and_cooking_class_tag_id)
+                                                     cooking_class_and_cooking_class_tag_id integer not null auto_increment,
+                                                     cooking_class_id integer,
+                                                     cooking_class_tag_id integer,
+                                                     primary key (cooking_class_and_cooking_class_tag_id)
 ) engine=InnoDB;
 
 -- cooking class image --
 create table cooking_class_image (
-    cooking_class_id integer,
-    id integer not null auto_increment,
-    cooking_class_image_url varchar(255),
-    primary key (id)
+                                     cooking_class_id integer,
+                                     id integer not null auto_increment,
+                                     cooking_class_image_url varchar(255),
+                                     primary key (id)
 ) engine=InnoDB;
 
 -- cooking class tag --
 create table cooking_class_tag (
-    cooking_class_tag_id integer not null auto_increment,
-    cooking_class_tag_name varchar(255),
-    primary key (cooking_class_tag_id)
+                                   cooking_class_tag_id integer not null auto_increment,
+                                   cooking_class_tag_name varchar(255),
+                                   primary key (cooking_class_tag_id)
 ) engine=InnoDB;
 
 -- cooking tool --
 create table cooking_tool (
-    cooking_class_id integer,
-    cooking_tool_id integer not null auto_increment,
-    cooking_tool_name varchar(255),
-    primary key (cooking_tool_id)
+                              cooking_class_id integer,
+                              cooking_tool_id integer not null auto_increment,
+                              cooking_tool_name varchar(255),
+                              primary key (cooking_tool_id)
 ) engine=InnoDB;
 
 -- country --
 create table country (
-    id integer not null auto_increment,
-    alpha2 varchar(255) not null unique,
-    country_image_url varchar(255),
-    english_name varchar(255) not null unique,
-    korean_name varchar(255) not null unique,
-    primary key (id)
+                         id integer not null auto_increment,
+                         alpha2 varchar(255) not null unique,
+                         country_image_url varchar(255),
+                         english_name varchar(255) not null unique,
+                         korean_name varchar(255) not null unique,
+                         primary key (id)
 ) engine=InnoDB;
 
 -- folder --
 create table folder (
-    album_id integer,
-    folder_id integer not null auto_increment,
-    max_photo_count integer not null,
-    cooking_class_uuid varchar(255),
-    country_code varchar(255),
-    folder_name varchar(255),
-    main_img_url varchar(255),
-    primary key (folder_id)
+                        album_id integer,
+                        folder_id integer not null auto_increment,
+                        max_photo_count integer not null,
+                        cooking_class_uuid varchar(255),
+                        country_code varchar(255),
+                        folder_name varchar(255),
+                        main_img_url varchar(255),
+                        primary key (folder_id)
 ) engine=InnoDB;
 
 -- ingredient --
 create table ingredient (
-    cooking_class_id integer,
-    ingredient_id integer not null auto_increment,
-    is_required bit not null,
-    quantity integer not null,
-    ingredient_name varchar(255),
-    quantity_unit varchar(255),
-    primary key (ingredient_id)
+                            cooking_class_id integer,
+                            ingredient_id integer not null auto_increment,
+                            is_required bit not null,
+                            quantity integer not null,
+                            ingredient_name varchar(255),
+                            quantity_unit varchar(255),
+                            primary key (ingredient_id)
 ) engine=InnoDB;
 
 -- language --
 create table language (
-    id integer not null auto_increment,
-    alpha2 varchar(255) not null unique,
-    english varchar(255) not null unique,
-    korean varchar(255) not null unique,
-    primary key (id)
+                          id integer not null auto_increment,
+                          alpha2 varchar(255) not null unique,
+                          english varchar(255) not null unique,
+                          korean varchar(255) not null unique,
+                          primary key (id)
 ) engine=InnoDB;
 
 -- notification --
 create table notification (
-    id integer not null auto_increment,
-    user_id integer,
-    create_time datetime(6),
-    body varchar(255),
-    title varchar(255),
-    primary key (id)
+                              id integer not null auto_increment,
+                              user_id integer,
+                              create_time datetime(6),
+                              body varchar(255),
+                              title varchar(255),
+                              primary key (id)
 ) engine=InnoDB;
 
 -- photo --
 create table photo (
-    folder_id integer,
-    order_index integer not null,
-    photo_id integer not null auto_increment,
-    photo_image_url varchar(255),
-    primary key (photo_id)
+                       folder_id integer,
+                       order_index integer not null,
+                       photo_id integer not null auto_increment,
+                       photo_image_url varchar(255),
+                       primary key (photo_id)
 ) engine=InnoDB;
 
 -- recipe --
 create table recipe (
-    cooking_class_id integer,
-    recipe_id integer not null auto_increment,
-    description varchar(255),
-    step varchar(255),
-    primary key (recipe_id)
+                        cooking_class_id integer,
+                        recipe_id integer not null auto_increment,
+                        description varchar(255),
+                        step varchar(255),
+                        primary key (recipe_id)
 ) engine=InnoDB;
 
 -- seq --
 create table short_form_and_short_form_tag_seq (
-    next_val bigint
+                                                   next_val bigint
 ) engine=InnoDB;
 
 insert into short_form_and_short_form_tag_seq values ( 1 );
 
 -- short form --
 create table short_form (
-    category tinyint not null,
-    hit integer not null,
-    is_delete bit not null,
-    short_form_id integer not null auto_increment,
-    user_id integer,
-    create_time datetime(6),
-    short_form_video_url varchar(255) not null,
-    title varchar(255) not null,
-    uuid varchar(255) not null,
-    primary key (short_form_id)
+                            category tinyint not null,
+                            hit integer not null,
+                            is_delete bit not null,
+                            short_form_id integer not null auto_increment,
+                            user_id integer,
+                            create_time datetime(6),
+                            short_form_video_url varchar(255) not null,
+                            title varchar(255) not null,
+                            uuid varchar(255) not null,
+                            primary key (short_form_id)
 ) engine=InnoDB;
 
 -- short form and short form tag --
 create table short_form_and_short_form_tag (
-    id integer not null,
-    `short-form_id` integer not null,
-    `short-form_tag_id` integer,
-    primary key (id)
+                                               id integer not null,
+                                               `short-form_id` integer not null,
+                                               `short-form_tag_id` integer,
+                                               primary key (id)
 ) engine=InnoDB;
 
 -- short form like --
 create table short_form_like (
-    is_like bit not null,
-    `short-form_id` integer,
-    short_form_like_id integer not null auto_increment,
-    primary key (short_form_like_id)
+                                 is_like bit not null,
+                                 `short-form_id` integer,
+                                 short_form_like_id integer not null auto_increment,
+                                 primary key (short_form_like_id)
 ) engine=InnoDB;
 
 -- short form tag --
 create table short_form_tag (
-    short_form_tag_id integer not null auto_increment,
-    short_form_tag_name varchar(255),
-    primary key (short_form_tag_id)
+                                short_form_tag_id integer not null auto_increment,
+                                short_form_tag_name varchar(255),
+                                primary key (short_form_tag_id)
 ) engine=InnoDB;
 
 -- user --
 create table user (
-    activity_point float(53) not null,
-    birth date not null,
-    country_id integer not null,
-    is_adult bit not null,
-    is_deleted bit not null,
-    language_id integer not null,
-    user_id integer not null auto_increment,
-    description varchar(255),
-    email varchar(255) not null,
-    fcm_token varchar(255),
-    instagram_handle varchar(255),
-    instagram_url varchar(255),
-    nickname varchar(255) not null,
-    password varchar(255) not null,
-    profile_image_url varchar(255),
-    username varchar(255) not null,
-    youtube_handle varchar(255),
-    youtube_url varchar(255),
-    primary key (user_id)
+                      activity_point float(53) not null,
+                      birth date not null,
+                      country_id integer not null,
+                      is_adult bit not null,
+                      is_deleted bit not null,
+                      language_id integer not null,
+                      user_id integer not null auto_increment,
+                      description varchar(255),
+                      email varchar(255) not null,
+                      fcm_token varchar(255),
+                      instagram_handle varchar(255),
+                      instagram_url varchar(255),
+                      nickname varchar(255) not null,
+                      password varchar(255) not null,
+                      profile_image_url varchar(255),
+                      username varchar(255) not null,
+                      youtube_handle varchar(255),
+                      youtube_url varchar(255),
+                      primary key (user_id)
 ) engine=InnoDB;
 
 -- user and cooking class --
 create table user_and_cooking_class (
-    cooking_class_id integer,
-    user_cooking_class_id integer not null auto_increment,
-    user_id integer,
-    cooking_class_review_create_time datetime(6),
-    reservation_time datetime(6),
-    cooking_class_review varchar(255),
-    uuid varchar(255),
-    primary key (user_cooking_class_id)
+                                        cooking_class_id integer,
+                                        user_cooking_class_id integer not null auto_increment,
+                                        user_id integer,
+                                        cooking_class_review_create_time datetime(6),
+                                        reservation_time datetime(6),
+                                        cooking_class_review varchar(255),
+                                        uuid varchar(255),
+                                        primary key (user_cooking_class_id)
 ) engine=InnoDB;
 
 -- user and country --
 create table user_and_country (
-    country_id integer,
-    user_flag_id integer not null auto_increment,
-    user_id integer,
-    flag_create_time datetime(6),
-    primary key (user_flag_id)
+                                  country_id integer,
+                                  user_flag_id integer not null auto_increment,
+                                  user_id integer,
+                                  flag_create_time datetime(6),
+                                  primary key (user_flag_id)
 ) engine=InnoDB;
 
 -- user statistics --
 create table user_statistics (
-    classes_attended integer not null,
-    classes_hosted integer not null,
-    id integer not null auto_increment,
-    user_id integer,
-    primary key (id)
+                                 classes_attended integer not null,
+                                 classes_hosted integer not null,
+                                 id integer not null auto_increment,
+                                 user_id integer,
+                                 primary key (id)
 ) engine=InnoDB;
 
 -- index --
@@ -249,7 +249,7 @@ create index idx_user_id on album (user_id);
 
 create index idx_uuid on cooking_class (uuid);
 
--- fk -- 
+-- fk --
 alter table user add constraint UKob8kqyqqgmefl0aco34akdtpe unique (email);
 alter table user add constraint UKn4swgcf30j6bmtb4l4cjryuym unique (nickname);
 alter table user add constraint UKsb8bbouer5wak8vyiiy4pf2bx unique (username);
@@ -331,4 +331,3 @@ INSERT INTO country (alpha2, english_name, korean_name) VALUES ('IN', 'India', '
 INSERT INTO country (alpha2, english_name, korean_name) VALUES ('VN', 'Vietnam', '베트남');
 INSERT INTO country (alpha2, english_name, korean_name) VALUES ('TH', 'Thailand', '태국');
 INSERT INTO country (alpha2, english_name, korean_name) VALUES ('TR', 'Turkey', '터키');
-

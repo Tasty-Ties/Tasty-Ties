@@ -21,17 +21,19 @@ export const getLanguages = async () => {
 };
 
 // 클래스 목록
-export const getClassLists = async (page) => {
+export const getClassLists = async (page, searchParams = {}) => {
   try {
     const response = await api.get("/classes", {
       params: {
-        page: page,
+        ...searchParams,
+        page,
         size: 12,
       },
     });
     return response.data.data.content;
   } catch (error) {
     console.log("CookingClassAPI - getClassListsError : " + error);
+    throw error;
   }
 };
 
@@ -42,6 +44,7 @@ export const getClassDetail = async (classId) => {
     return response.data.data;
   } catch (error) {
     console.log("CookingClassAPI - getClassDetailError : " + error);
+    console.error(error);
   }
 };
 
@@ -73,17 +76,15 @@ export const setDeleteClass = async (id) => {
 };
 
 // 클래스 등록
-export const setClassRegist = async (classInformation, files) => {
-  console.log(classInformation);
-  console.log(files);
+export const setClassRegist = async (data, files) => {
   const formData = new FormData();
   formData.append(
     "registerDto",
-    new Blob([JSON.stringify(classInformation)], { type: "application/json" })
+    new Blob([JSON.stringify(data)], { type: "application/json" })
   );
-  files.forEach((file) => {
+  for (const file of files) {
     formData.append("images", file);
-  });
+  }
   try {
     await api.post("/classes", formData, {
       headers: {
@@ -103,19 +104,5 @@ export const getClassReviews = async (id) => {
     return response.data.data.content;
   } catch (error) {
     console.log("CookingClassAPI - setDeleteClassReservation : " + error);
-  }
-};
-
-export const getSearchLists = async (page) => {
-  try {
-    const response = await api.get("/classes", {
-      params: {
-        page: page,
-        size: 12,
-      },
-    });
-    return response.data.data.content;
-  } catch (error) {
-    console.log("CookingClassAPI - getClassListsError : " + error);
   }
 };

@@ -23,10 +23,12 @@ public class ActivityPointLog {
 
     private LocalDateTime transactionDate;
     private double amount;
+    private double totalPoint;
     private String description;
 
-    public ActivityPointLog(double amount, String description) {
+    public ActivityPointLog(double amount, double totalPoint, String description) {
         this.amount = amount;
+        this.totalPoint = totalPoint;
         this.description = description;
     }
 

@@ -5,6 +5,7 @@ import com.teamcook.tastyties.common.dto.LanguageResponseDto;
 import com.teamcook.tastyties.common.entity.Country;
 import com.teamcook.tastyties.common.entity.Language;
 import com.teamcook.tastyties.cooking_class.dto.CookingClassListDto;
+import com.teamcook.tastyties.cooking_class.dto.CookingClassParticipatedListDto;
 import com.teamcook.tastyties.cooking_class.repository.CookingClassRepository;
 import com.teamcook.tastyties.shared.dto.ReviewResponseDto;
 import com.teamcook.tastyties.shared.repository.UserAndCookingClassRepository;
@@ -98,13 +99,14 @@ public class UserProfileService {
 
     // 참여한 클래스
     @Transactional
-    public Page<CookingClassListDto> getParticipatedClasses(String username, Pageable pageable) {
+    public Page<CookingClassParticipatedListDto> getParticipatedClasses(String username, Pageable pageable) {
         Optional<User> user = userRepository.findByUsername(username);
         if (user.isEmpty()) {
             throw new UsernameNotFoundException("존재하지 않는 유저입니다.");
         }
         return userAndClassRepository.findParticipatedClassesByUserId(user.get().getUserId(), pageable);
     }
+
 
     @Transactional
     public Page<CookingClassListDto> getHostingClasses(int hostId, Pageable pageable) {
@@ -118,5 +120,14 @@ public class UserProfileService {
             throw new UsernameNotFoundException("존재하지 않는 유저입니다.");
         }
         return cookingClassRepository.getHostedClassByHostId(user.get().getUserId(), pageable);
+    }
+
+    @Transactional
+    public Page<ReviewResponseDto> getReviews(String username, Pageable pageable) {
+        Optional<User> user = userRepository.findByUsername(username);
+        if (user.isEmpty()) {
+            throw new UsernameNotFoundException("존재하지 않는 유저입니다.");
+        }
+        return userAndCookingClassRepository.findReviewsForProfile(user.get().getUserId(), pageable);
     }
 }

@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, forwardRef } from "react";
 
-const Recipe = ({ onChange }) => {
+const Recipe = forwardRef(function Recipe({ onChange }, ref) {
   const [recipes, setRecipes] = useState([{ step: 1, description: "" }]);
 
   const handleAddFields = () => {
@@ -33,19 +33,26 @@ const Recipe = ({ onChange }) => {
     }
   };
 
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault(); // 엔터 키 기본 동작 방지
+    }
+  };
+
   useEffect(() => {}, [recipes]);
 
   return (
     <div className="regist-component-box">
-      <div className="input-box">
+      <div className="input-box grid grid-cols-12 items-center">
         {recipes.map((field, index) => (
-          <div key={index} className="flex items-center my-4">
+          <div key={index} className="flex items-center my-4 col-span-9">
             <span className="mr-2 text-xl">{index + 1}.</span>
             <input
               type="text"
               name="description"
               value={field.description}
               onChange={(e) => handleInputChange(index, e)}
+              onKeyDown={handleKeyDown}
               className="w-full border p-2 rounded"
               placeholder="레시피를 작성해주세요"
             />
@@ -56,7 +63,7 @@ const Recipe = ({ onChange }) => {
             </div>
           </div>
         ))}
-        <div className="text-right">
+        <div className="col-end-12 grid self-center">
           <button type="button" onClick={handleAddFields}>
             <svg
               width="37"
@@ -82,5 +89,8 @@ const Recipe = ({ onChange }) => {
       </div>
     </div>
   );
-};
+});
+
+Recipe.displayName = "Recipe";
+
 export default Recipe;

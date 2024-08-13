@@ -19,26 +19,26 @@ const Lecture = ({ classInfo }) => {
 
   return (
     <div className="flex flex-col">
-      <div className="relative">
+      <div className="relative overflow-hidden">
         <img
           src={classInfo.mainImage}
           alt="클래스메인사진"
-          className="w-60 h-40 rounded-xl"
+          className="w-52 h-32 object-cover rounded-xl"
         />
         <span className="absolute right-1 top-1">
           <CountryFlags
             countryCode={classInfo.classCountry.alpha2}
-            size="w-9"
+            size="w-7"
           />
         </span>
       </div>
 
-      <div className="font-bold text-base mt-2">{classInfo.title}</div>
-      <div className="flex space-x-3 text-sm">
-        <div>
+      <div className="font-bold mt-4 truncate">{classInfo.title}</div>
+      <div className="flex-auto text-sm my-2">
+        <div className="text-xs">
           {date} {startTime}~{endTime}
         </div>
-        <p>{classInfo.hostName}</p>
+        <p className="text-xs">{classInfo.hostName}</p>
       </div>
     </div>
   );

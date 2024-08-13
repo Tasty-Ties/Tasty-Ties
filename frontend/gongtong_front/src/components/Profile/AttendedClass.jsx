@@ -20,11 +20,15 @@ const AttendClass = () => {
       <div className="flex">
         <p className="text-xl mr-2">참여한 클래스</p>
         <p className="text-sm mt-1">전체</p>
-        <p className="text-xs mt-2 ml-1">{attendedClasses.totalElements}</p>
+        <p className="text-xs text-first mt-2 ml-1">
+          {attendedClasses.totalElements}
+        </p>
       </div>
-      {attendedClasses.content?.map((attendClass, index) => (
-        <Lecture key={index} classInfo={attendClass} />
-      ))}
+      <div className="mt-10 grid grid-cols-4 gap-3">
+        {attendedClasses.content?.map((attendClass, index) => (
+          <Lecture key={index} classInfo={attendClass} />
+        ))}
+      </div>
     </div>
   );
 };

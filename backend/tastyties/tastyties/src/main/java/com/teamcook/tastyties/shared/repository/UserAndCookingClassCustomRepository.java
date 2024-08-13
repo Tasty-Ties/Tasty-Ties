@@ -1,6 +1,7 @@
 package com.teamcook.tastyties.shared.repository;
 
 import com.teamcook.tastyties.cooking_class.dto.CookingClassListDto;
+import com.teamcook.tastyties.cooking_class.dto.CookingClassParticipatedListDto;
 import com.teamcook.tastyties.cooking_class.entity.CookingClass;
 import com.teamcook.tastyties.shared.dto.ReviewResponseDto;
 import com.teamcook.tastyties.shared.entity.UserAndCookingClass;
@@ -27,12 +28,12 @@ public interface UserAndCookingClassCustomRepository {
     boolean deleteReservation(User user, CookingClass cookingClass);
 
     Page<CookingClassListDto> findReservedClassesByUserId(int userId, Pageable pageable);
-    Page<CookingClassListDto> findParticipatedClassesByUserId(int userId, Pageable pageable);
+    Page<CookingClassParticipatedListDto> findParticipatedClassesByUserId(int userId, Pageable pageable);
     Set<CookingClassListDto> findReservedClassesForProfile(int userId);
 
     Page<ReviewResponseDto> findReviewsForCookingClass(String uuid, Pageable pageable);
     List<ReviewResponseDto> findReviewsForCookingClass(int userId);
-
+    Page<ReviewResponseDto> findReviewsForProfile(int userId, Pageable pageable);
 
     UserAndCookingClass findReservationByUsernameAndClassUuid(int userId, String uuid);
 }

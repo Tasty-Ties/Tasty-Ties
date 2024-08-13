@@ -8,6 +8,7 @@ import ReserveClass from "./components/MyPage/ReserveClass";
 import TeachClass from "./components/MyPage/TeachClass";
 import AttendClass from "./components/MyPage/AttendClass";
 import MyInfo from "./components/MyPage/Myinfo";
+import DeleteId from "./components/MyPage/MyInfo/DeleteId";
 import MyPoint from "./components/MyPage/MyPoint";
 import MyShorts from "./components/MyPage/MyShorts";
 import EditInfo from "./components/MyPage/EditInfo";
@@ -29,6 +30,8 @@ import LiveClass from "./pages/LiveClass";
 import AlbumPage from "./pages/AlbumPage";
 import { Navigate, Route, Routes } from "react-router-dom";
 import ChatRoom from "./pages/ChatRoom";
+import Ranking from "./../src/pages/Ranking";
+import RegistClassComplete from "./components/ClassRegist/RegistClassComplete";
 
 const AppRoutes = () => {
   return (
@@ -47,6 +50,7 @@ const AppRoutes = () => {
         <Route path="shorts" element={<MyShorts />} />
         <Route path="editinfo" element={<EditInfo />} />
       </Route>
+      <Route path="/delete" element={<DeleteId />} />
       <Route path="/otherpage/:username" element={<Profile />}>
         <Route path="" element={<OtherInfo />} />
         <Route path="teach" element={<TeachedClass />} />
@@ -55,7 +59,7 @@ const AppRoutes = () => {
       </Route>
       <Route path="/class" element={<ClassList />} />
       <Route path="/class/:id" element={<ClassDetail />}>
-        <Route path="" element={<Navigate to="description" />} />
+        <Route index element={<ClassDescription />} />
         <Route path="description" element={<ClassDescription />} />
         <Route path="ingredient" element={<ClassIngredient />} />
         <Route path="cookingTools" element={<ClassCookingTools />} />
@@ -63,11 +67,12 @@ const AppRoutes = () => {
         <Route path="reviews" element={<ClassReviews />} />
       </Route>
       <Route path="/classregist" element={<ClassRegist />} />
+      <Route path="/registcomplete" element={<RegistClassComplete />} />
       <Route path="/classwaiting/:id" element={<ClassWaiting />} />
       <Route path="/liveclass" element={<LiveClass />} />
       <Route path="/album" element={<AlbumPage />} />
       <Route path="/chatting" element={<ChatRoom />} />
-
+      <Route path="/ranking" element={<Ranking />} />
       {/* <Route path="/" element={< />} /> */}
     </Routes>
   );

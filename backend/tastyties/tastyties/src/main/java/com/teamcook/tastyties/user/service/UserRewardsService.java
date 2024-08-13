@@ -6,15 +6,14 @@ import com.teamcook.tastyties.common.repository.CountryRepository;
 import com.teamcook.tastyties.security.userdetails.CustomUserDetails;
 import com.teamcook.tastyties.shared.entity.UserAndCountry;
 import com.teamcook.tastyties.shared.repository.UserAndCountryRepository;
-import com.teamcook.tastyties.user.dto.reward.ActivityPointRequestDto;
-import com.teamcook.tastyties.user.dto.reward.ActivityPointResponseDto;
-import com.teamcook.tastyties.user.dto.reward.RankedUserDto;
+import com.teamcook.tastyties.user.dto.reward.*;
 import com.teamcook.tastyties.user.entity.ActivityPointLog;
 import com.teamcook.tastyties.user.entity.User;
 import com.teamcook.tastyties.user.entity.UserStatistics;
 import com.teamcook.tastyties.user.exception.CountryNotFoundException;
 import com.teamcook.tastyties.user.repository.UserRepository;
 import com.teamcook.tastyties.user.repository.activitypoint.ActivityPointLogRepository;
+import com.teamcook.tastyties.user.repository.statistics.UserStatisticsRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -41,16 +40,18 @@ public class UserRewardsService {
     private static final String MONTHLY_LEADERBOARD_KEY = "monthly:leaderboard";
     private static final String YEARLY_LEADERBOARD_KEY = "yearly:leaderboard";
     private static final int PAGE_SIZE = 7;
+    private final UserStatisticsRepository userStatisticsRepository;
 
     @Autowired
     public UserRewardsService(UserRepository userRepository, CountryRepository countryRepository,
                               UserAndCountryRepository userAndCountryRepository, ActivityPointLogRepository activityPointLogRepository,
-                              RedisTemplate<String, Object> redisTemplate) {
+                              RedisTemplate<String, Object> redisTemplate, UserStatisticsRepository userStatisticsRepository) {
         this.userRepository = userRepository;
         this.countryRepository = countryRepository;
         this.userAndCountryRepository = userAndCountryRepository;
         this.activityPointLogRepository = activityPointLogRepository;
         this.redisTemplate = redisTemplate;
+        this.userStatisticsRepository = userStatisticsRepository;
     }
 
     // 국기 수집 기능
@@ -102,7 +103,49 @@ public class UserRewardsService {
         redisTemplate.opsForZSet().add(MONTHLY_LEADERBOARD_KEY, userKey, newMonthlyScore);
         redisTemplate.opsForZSet().add(YEARLY_LEADERBOARD_KEY, userKey, newYearlyScore);
         userRepository.findById(userId).ifPresent(user -> {
-            ActivityPointLog log = new ActivityPointLog(score, description);
+            ActivityPointLog log = new ActivityPointLog(score, user.getActivityPoint() + score, description);
+            activityPointLogRepository.save(log);
+            user.addActivityPointLog(log);
+        });
+    }
+
+    @Transactional
+    public void addScoreAfterClass(ActivityPointAfterClassRequestDto afterClassRequestDto) {
+        ActivityPointRequestDto activityPointRequestDto = afterClassRequestDto.getActivityPointRequestDto();
+        addScore(activityPointRequestDto);
+        int userId = activityPointRequestDto.getUserId();
+        User user = userRepository.findById(userId).orElse(null);
+
+        if (user == null) {
+            throw new IllegalArgumentException("user를 찾을 수 없습니다.");
+        }
+
+        UserStatistics userStatistics = userStatisticsRepository.getUserStatistics(user);
+        userStatistics.updateStatistics(afterClassRequestDto.isHost());
+    }
+
+    @Transactional
+    public void addScoreByUsername(ActivityPointRequestByUsernameDto activityPointRequestDto) {
+        User findUser = userRepository.findByUsername(activityPointRequestDto.getUsername()).orElse(null);
+        int userId = findUser.getUserId();
+        double score = activityPointRequestDto.getScore();
+        String description = activityPointRequestDto.getDescription();
+        String userKey = String.valueOf(userId);
+
+        // 기존 점수를 가져와서 누적
+        Double currentWeeklyScore = redisTemplate.opsForZSet().score(WEEKLY_LEADERBOARD_KEY, userKey);
+        Double currentMonthlyScore = redisTemplate.opsForZSet().score(MONTHLY_LEADERBOARD_KEY, userKey);
+        Double currentYearlyScore = redisTemplate.opsForZSet().score(YEARLY_LEADERBOARD_KEY, userKey);
+
+        double newWeeklyScore = (currentWeeklyScore != null ? currentWeeklyScore : 0) + score;
+        double newMonthlyScore = (currentMonthlyScore != null ? currentMonthlyScore : 0) + score;
+        double newYearlyScore = (currentYearlyScore != null ? currentYearlyScore : 0) + score;
+
+        redisTemplate.opsForZSet().add(WEEKLY_LEADERBOARD_KEY, userKey, newWeeklyScore);
+        redisTemplate.opsForZSet().add(MONTHLY_LEADERBOARD_KEY, userKey, newMonthlyScore);
+        redisTemplate.opsForZSet().add(YEARLY_LEADERBOARD_KEY, userKey, newYearlyScore);
+        userRepository.findById(userId).ifPresent(user -> {
+            ActivityPointLog log = new ActivityPointLog(score, user.getActivityPoint()+score, description);
             activityPointLogRepository.save(log);
             user.addActivityPointLog(log);
         });
@@ -212,5 +255,10 @@ public class UserRewardsService {
     private int getUserRankByActivityPoint(User user) {
         long rank = userRepository.countByActivityPointGreaterThan(user.getActivityPoint());
         return (int) rank + 1;
+    }
+
+    public List<ActivityPointLogResponseDto> getMyActivityPointLog(CustomUserDetails userDetails, int period) {
+        User user = userDetails.user();
+        return activityPointLogRepository.findActivityPointLogForProfile(user, period);
     }
 }

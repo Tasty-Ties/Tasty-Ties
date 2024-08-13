@@ -2,6 +2,8 @@ package com.teamcook.tastyties.user.controller;
 
 import com.teamcook.tastyties.common.dto.CommonResponseDto;
 import com.teamcook.tastyties.security.userdetails.CustomUserDetails;
+import com.teamcook.tastyties.user.dto.reward.ActivityPointAfterClassRequestDto;
+import com.teamcook.tastyties.user.dto.reward.ActivityPointRequestByUsernameDto;
 import com.teamcook.tastyties.user.dto.reward.ActivityPointRequestDto;
 import com.teamcook.tastyties.user.dto.reward.ActivityPointResponseDto;
 import com.teamcook.tastyties.user.service.UserRewardsService;
@@ -28,8 +30,31 @@ public class RankingController {
 
     @PostMapping("/add")
     public ResponseEntity<CommonResponseDto> addScore(@RequestBody ActivityPointRequestDto activityPointRequestDto) {
-        log.debug("test");
         userRewardsService.addScore(activityPointRequestDto);
+        return ResponseEntity.ok()
+                .body(CommonResponseDto.builder()
+                        .stateCode(200)
+                        .message("마일리지가 정상적으로 적립되었습니다.")
+                        .data(null)
+                        .build());
+    }
+
+    @PostMapping("/add-after-class")
+    public ResponseEntity<CommonResponseDto> addScoreAfterClass(@RequestBody ActivityPointAfterClassRequestDto activityPointRequestDto) {
+        log.debug("isHost: {}", activityPointRequestDto.isHost());
+        userRewardsService.addScoreAfterClass(activityPointRequestDto);
+        return ResponseEntity.ok()
+                .body(CommonResponseDto.builder()
+                        .stateCode(200)
+                        .message("마일리지가 정상적으로 적립되었습니다.")
+                        .data(null)
+                        .build());
+    }
+
+    @PostMapping("/addByUsername")
+    public ResponseEntity<CommonResponseDto> addScoreByUsername(@RequestBody ActivityPointRequestByUsernameDto activityPointRequestDto) {
+        log.debug("test");
+        userRewardsService.addScoreByUsername(activityPointRequestDto);
         return ResponseEntity.ok()
                 .body(CommonResponseDto.builder()
                         .stateCode(200)
@@ -85,5 +110,4 @@ public class RankingController {
                         .data(totalLeaderboard)
                         .build());
     }
-
 }

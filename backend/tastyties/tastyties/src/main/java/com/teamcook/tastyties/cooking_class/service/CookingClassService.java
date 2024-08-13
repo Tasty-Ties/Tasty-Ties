@@ -134,7 +134,7 @@ public class CookingClassService {
                 }).collect(Collectors.toSet());
     }
 
-    private List<CookingClassAndCookingClassTag> createCookingClassTags(Set<String> tagNames, CookingClass cc) {
+    private List<CookingClassAndCookingClassTag> createCookingClassTags(List<String> tagNames, CookingClass cc) {
         return tagNames.stream()
                 .map(tagName -> {
                     CookingClassTag tag = findOrCreateTag(tagName);
@@ -193,10 +193,9 @@ public class CookingClassService {
         Set<IngredientDto> ingredientDtos = mapToIngredientDtos(cc.getIngredients());
         Set<RecipeDto> recipeDtos = mapToRecipeDtos(cc.getRecipes());
         Set<String> cookingTools = mapToCookingToolNames(cc.getCookingTools());
-        Set<String> tags = mapToTagNames(cc.getCookingClassAndCookingClassTags());
+        List<String> tags = mapToTagNames(cc.getCookingClassAndCookingClassTags());
 
-        // 이미지 관련 추가 필요
-        Set<String> imageUrls = mapToCookingClassImages(cc.getCookingClassImages());
+        List<String> imageUrls = mapToCookingClassImages(cc.getCookingClassImages());
 
         User host = cc.getHost();
         return new CookingClassDto(
@@ -212,10 +211,10 @@ public class CookingClassService {
         );
     }
 
-    private Set<String> mapToTagNames(List<CookingClassAndCookingClassTag> ccAndTags) {
+    private List<String> mapToTagNames(List<CookingClassAndCookingClassTag> ccAndTags) {
         return ccAndTags.stream()
                 .map(ccAndTag -> ccAndTag.getCookingClassTag().getCookingClassTagName())
-                .collect(Collectors.toSet());
+                .collect(Collectors.toList());
     }
 
     private Set<IngredientDto> mapToIngredientDtos(Set<Ingredient> ingredients) {
@@ -236,11 +235,11 @@ public class CookingClassService {
                 )).collect(Collectors.toSet());
     }
 
-    private Set<String> mapToCookingClassImages(Set<CookingClassImage> cookingClassImages) {
+    private List<String> mapToCookingClassImages(List<CookingClassImage> cookingClassImages) {
         log.debug("image size: {}", cookingClassImages.size());
         return cookingClassImages.stream()
                 .map(CookingClassImage::getCookingClassImageUrl)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toList());
     }
 
     private Set<String> mapToCookingToolNames(Set<CookingTool> cookingTools) {
@@ -273,7 +272,7 @@ public class CookingClassService {
 
         long row = userAndCookingClassRepository.deleteCookingClass(cookingClass);
         cookingClass.delete();
-
+        cookingClass.setDelete(true);
         return DeletedCookingClassDto.builder()
                 .className(cookingClass.getTitle())
                 .users(users)
@@ -287,6 +286,8 @@ public class CookingClassService {
     @Transactional
     public ReservedCookingClassDto reserveClass(User user, String uuid) {
         // TODO: 쿠킹 클래스 정보 가지고 올 때 호스트 정보도 가져오기 why? 호스트의 id와 fcm token이 필요함 (current)
+        log.debug("uuid: {}", uuid);
+
         CookingClass cc = cookingClassRepository.findWithUuid(uuid);
         if (cc == null) {
             throw new CookingClassNotFoundException("존재하지 않는 클래스입니다.");
@@ -350,6 +351,7 @@ public class CookingClassService {
 
     @Transactional
     public void saveReview(CustomUserDetails userDetails, ReviewRequestDto reviewRequestDto) {
+        log.debug("reviewRequestDto: {}", reviewRequestDto);
         UserAndCookingClass reservation = userAndCookingClassRepository.findReservationByUsernameAndClassUuid(
                 userDetails.getUserId(), reviewRequestDto.getUuid());
 

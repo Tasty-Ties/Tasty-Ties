@@ -44,3 +44,5 @@ src/main/resources/static
 
 dump/
 log/
+
+Dockerfile
