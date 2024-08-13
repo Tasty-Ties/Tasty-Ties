@@ -130,14 +130,13 @@ const ClassDetail = () => {
           <div className="flex items-center content-between">
             {!classDetail.host &&
               !classDetail.userEnrolled &&
-              // currentTime < classTime &&
               classDetail.quota > classDetail.reservedCount && (
                 <Button
                   text="예약하기"
                   type="green-short"
                   onClick={() => {
                     if (cookie) {
-                      handleClassReservation;
+                      handleClassReservation();
                     } else {
                       alert("로그인 후 이용 가능합니다.");
                       nav("/login");
@@ -146,7 +145,8 @@ const ClassDetail = () => {
                 />
               )}
 
-            {!classDetail.host &&
+            {!cookie &&
+              classDetail.host &&
               // currentTime > classTime &&
               classDetail.quota <= classDetail.reservedCount &&
               !classDetail.userEnrolled && (
