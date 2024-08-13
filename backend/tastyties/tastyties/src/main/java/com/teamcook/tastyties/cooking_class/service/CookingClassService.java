@@ -134,7 +134,7 @@ public class CookingClassService {
                 }).collect(Collectors.toSet());
     }
 
-    private List<CookingClassAndCookingClassTag> createCookingClassTags(Set<String> tagNames, CookingClass cc) {
+    private List<CookingClassAndCookingClassTag> createCookingClassTags(List<String> tagNames, CookingClass cc) {
         return tagNames.stream()
                 .map(tagName -> {
                     CookingClassTag tag = findOrCreateTag(tagName);
@@ -193,10 +193,10 @@ public class CookingClassService {
         Set<IngredientDto> ingredientDtos = mapToIngredientDtos(cc.getIngredients());
         Set<RecipeDto> recipeDtos = mapToRecipeDtos(cc.getRecipes());
         Set<String> cookingTools = mapToCookingToolNames(cc.getCookingTools());
-        Set<String> tags = mapToTagNames(cc.getCookingClassAndCookingClassTags());
+        List<String> tags = mapToTagNames(cc.getCookingClassAndCookingClassTags());
 
         // 이미지 관련 추가 필요
-        Set<String> imageUrls = mapToCookingClassImages(cc.getCookingClassImages());
+        List<String> imageUrls = mapToCookingClassImages(cc.getCookingClassImages());
 
         User host = cc.getHost();
         return new CookingClassDto(
@@ -212,10 +212,10 @@ public class CookingClassService {
         );
     }
 
-    private Set<String> mapToTagNames(List<CookingClassAndCookingClassTag> ccAndTags) {
+    private List<String> mapToTagNames(List<CookingClassAndCookingClassTag> ccAndTags) {
         return ccAndTags.stream()
                 .map(ccAndTag -> ccAndTag.getCookingClassTag().getCookingClassTagName())
-                .collect(Collectors.toSet());
+                .collect(Collectors.toList());
     }
 
     private Set<IngredientDto> mapToIngredientDtos(Set<Ingredient> ingredients) {
@@ -236,11 +236,11 @@ public class CookingClassService {
                 )).collect(Collectors.toSet());
     }
 
-    private Set<String> mapToCookingClassImages(Set<CookingClassImage> cookingClassImages) {
+    private List<String> mapToCookingClassImages(Set<CookingClassImage> cookingClassImages) {
         log.debug("image size: {}", cookingClassImages.size());
         return cookingClassImages.stream()
                 .map(CookingClassImage::getCookingClassImageUrl)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toList());
     }
 
     private Set<String> mapToCookingToolNames(Set<CookingTool> cookingTools) {
@@ -273,7 +273,7 @@ public class CookingClassService {
 
         long row = userAndCookingClassRepository.deleteCookingClass(cookingClass);
         cookingClass.delete();
-
+        cookingClass.setDelete(true);
         return DeletedCookingClassDto.builder()
                 .className(cookingClass.getTitle())
                 .users(users)
