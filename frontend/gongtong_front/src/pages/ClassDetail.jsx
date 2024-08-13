@@ -130,7 +130,6 @@ const ClassDetail = () => {
           <div className="flex items-center content-between">
             {!classDetail.host &&
               !classDetail.userEnrolled &&
-              // currentTime < classTime &&
               classDetail.quota > classDetail.reservedCount && (
                 <Button
                   text="예약하기"
@@ -146,7 +145,8 @@ const ClassDetail = () => {
                 />
               )}
 
-            {!classDetail.host &&
+            {!cookie &&
+              classDetail.host &&
               // currentTime > classTime &&
               classDetail.quota <= classDetail.reservedCount &&
               !classDetail.userEnrolled && (
