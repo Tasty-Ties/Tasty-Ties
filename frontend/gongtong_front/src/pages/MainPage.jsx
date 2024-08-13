@@ -1,14 +1,12 @@
-import Pagination from "../common/components/Pagination";
-import ClassListDropdown from "../components/ClassList/ClassListDropdown";
+import React from "react";
+
+import MainCarousel from "../components/Main/MainCarousel";
 
 const mainPage = () => {
   return (
-    <>
-      <div>Helloworld</div>
-      <div className="left-3/4">
-        <ClassListDropdown />
-      </div>
-    </>
+    <div className="h-screen overflow-hidden">
+      <MainCarousel />
+    </div>
   );
 };
 
