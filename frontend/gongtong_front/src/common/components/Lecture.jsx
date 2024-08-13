@@ -33,12 +33,12 @@ const Lecture = ({ classInfo }) => {
         </span>
       </div>
 
-      <div className="font-bold mt-4 truncate">{classInfo.title}</div>
+      <div className="font-bold text-lg mt-4 truncate">{classInfo.title}</div>
       <div className="flex-auto text-sm my-2">
-        <div className="text-xs">
+        <div>
           {date} {startTime}~{endTime}
         </div>
-        <p className="text-xs">{classInfo.hostName}</p>
+        <p>{classInfo.hostName}</p>
       </div>
     </div>
   );

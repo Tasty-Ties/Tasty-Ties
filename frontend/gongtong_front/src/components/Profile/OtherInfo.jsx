@@ -2,7 +2,7 @@ import { useNavigate, useOutletContext, useParams } from "react-router-dom";
 import CountryFlags from "../../common/components/CountryFlags";
 import Lecture from "../../common/components/Lecture";
 import Button from "../../common/components/Button";
-import ReviewForm from "../../common/components/ReviewForm";
+import ReviewCard from "../../common/components/ReviewCard";
 
 const OtherInfo = () => {
   const nav = useNavigate();
@@ -68,7 +68,7 @@ const OtherInfo = () => {
           <p className="text-2xl mb-2">수강평</p>
           <div className="grid grid-rows-3 gap-3">
             {informations.informations.reviews?.map((review, index) => (
-              <ReviewForm key={index} review={review} />
+              <ReviewCard key={index} review={review} />
             ))}
           </div>
           <div className="flex justify-center mt-2">

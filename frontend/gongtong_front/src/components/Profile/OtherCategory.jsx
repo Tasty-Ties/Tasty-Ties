@@ -10,8 +10,8 @@ const OtherCategory = (informations) => {
   console.log(information);
 
   return (
-    <div className="flex">
-      <div className="w-56">
+    <div className="flex h-screen">
+      <div className="w-56 flex-shrink-0">
         <br />
         <div className="flex flex-col">
           {information.userProfileDto && (
@@ -43,14 +43,16 @@ const OtherCategory = (informations) => {
               </div>
             </div>
           )}
-          <div className="flex mt-1">
+          <div className="flex justify-around mt-1">
             <p className="flex">
               <img src={instalogo} alt="인스타로고" className="size-6" />
               &nbsp;&nbsp;
               <a
                 className="text-base text-gray-700"
                 href={information.userProfileDto?.instagramUrl}
-              ></a>
+              >
+                {information.userProfileDto?.instagramHandle}
+              </a>
               &nbsp;&nbsp;&nbsp;&nbsp;
               <p className="flex">
                 <img src={youtubelogo} alt="유튜브로고" className="size-6" />
@@ -58,7 +60,9 @@ const OtherCategory = (informations) => {
                 <a
                   className="text-base text-gray-700"
                   href={information.userProfileDto?.youtubeUrl}
-                ></a>
+                >
+                  {information.userProfileDto?.youtubeHandle}
+                </a>
               </p>
             </p>
           </div>

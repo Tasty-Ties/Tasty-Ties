@@ -67,7 +67,7 @@ const Login = () => {
 
   return (
     <div
-      className="h-screen flex justify-center items-center bg-cover bg-center" // <- 여기
+      className="font-nanum h-screen flex justify-center items-center bg-cover bg-center" // <- 여기
       style={{ backgroundImage: `url(/images/loginImages/login_bg.png)` }} // <- 여기
     >
       <div className="w-1/2"></div>
@@ -77,13 +77,17 @@ const Login = () => {
           shadow={false}
           className="flex flex-col p-8 bg-white rounded-none shadow-lg w-full"
         >
-          <Typography color="blue-gray">
+          <Typography color="blue-gray" className="font-nanum">
             Welcome !, Bienvenue!, ようこそ!, Welkom!, स्वागत है!
           </Typography>
-          <Typography variant="h4" color="blue-gray" className="mt-5">
+          <Typography
+            variant="h4"
+            color="blue-gray"
+            className="font-nanum mt-5"
+          >
             로그인
           </Typography>
-          <Typography color="blue-gray" className="mt-2 mb-10">
+          <Typography color="blue-gray" className="font-nanum mt-2 mb-10">
             맛,잇다의 세계로 들어와 다양한 문화의 음식을 즐겨보세요!!
           </Typography>
           <form onSubmit={handleSubmit}>
@@ -115,7 +119,10 @@ const Login = () => {
             <Button className="bg-first mt-20" type="submit" fullWidth={true}>
               Login
             </Button>
-            <Typography color="blue-gray" className="text-sm text-center mt-20">
+            <Typography
+              color="blue-gray"
+              className="font-nanum text-sm text-center mt-20"
+            >
               아직 맛,잇다의 회원이 아니신가요?{" "}
               <span
                 className="font-bold text-black cursor-pointer"

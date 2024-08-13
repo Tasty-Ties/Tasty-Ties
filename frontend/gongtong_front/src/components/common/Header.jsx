@@ -17,6 +17,7 @@ import api from "../../service/Api";
 import logo from "../../assets/맛잇다로고.png";
 import NotificationButton from "../Notification/NotificationButton";
 import useMyPageStore from "../../store/MyPageStore";
+import profileimage from "../../assets/MyPage/기본프로필사진.jpg";
 
 const NavItem = ({ text, link }) => {
   return (
@@ -37,7 +38,7 @@ const NavList = () => {
   return (
     <>
       <NavItem text="쿠킹클래스" link="/class" />
-      <NavItem text="숏폼" link="" />
+      {/* <NavItem text="숏폼" link="" /> */}
       <NavItem text="랭킹" link="/ranking" />
     </>
   );
@@ -76,7 +77,7 @@ const Header = () => {
     nav("/login");
   };
 
-  const profileImage = informations?.profileImageUrl;
+  const profileImage = informations?.profileImageUrl || profileimage;
 
   const goMypage = () => {
     nav("/mypage");
@@ -123,8 +124,12 @@ const Header = () => {
                     <Avatar src={profileImage} alt="avatar" size="sm" />
                   </MenuHandler>
                   <MenuList>
-                    <MenuItem onClick={goMypage}>마이페이지</MenuItem>
-                    <MenuItem onClick={handleLogout}>로그아웃</MenuItem>
+                    <MenuItem className="font-nanum" onClick={goMypage}>
+                      마이페이지
+                    </MenuItem>
+                    <MenuItem className="font-nanum" onClick={handleLogout}>
+                      로그아웃
+                    </MenuItem>
                   </MenuList>
                 </Menu>
               </>

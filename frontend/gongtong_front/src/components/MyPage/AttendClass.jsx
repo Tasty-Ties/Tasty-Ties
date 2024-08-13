@@ -32,7 +32,7 @@ const AttendClass = () => {
 
   return (
     <div>
-      <p className="font-bold text-xl mb-3">참여한 클래스</p>
+      <p className="font-bold text-2xl mb-3">참여한 클래스</p>
       <div className="grid grid-rows-4 gap-3">
         {attendClasses.map((attendClass, index) => (
           <ClassForm key={index} classInfo={attendClass} classType="attend" />

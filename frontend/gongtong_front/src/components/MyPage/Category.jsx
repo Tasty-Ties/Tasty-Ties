@@ -19,7 +19,7 @@ const Category = () => {
 
   return (
     <div className="flex">
-      <div className="w-56">
+      <div className="w-56 flex-shrink-0">
         <br />
         <div className="flex flex-col">
           <div className="flex">
@@ -43,7 +43,7 @@ const Category = () => {
               </p>
             </div>
           </div>
-          <div className="flex mt-1">
+          <div className="flex justify-around mt-1">
             <div className="flex">
               <img src={instalogo} alt="인스타로고" className="size-6" />
               &nbsp;&nbsp;
@@ -121,17 +121,17 @@ const Category = () => {
               <div className="bg-inherit text-lg">마일리지</div>
             </NavLink>
           </li>
-          <li>
+          {/* <li>
             <NavLink
               to="shorts"
               className={({ isActive }) => (isActive ? "bg-first-100 " : "")}
             >
               <div className="bg-inherit text-lg">숏폼</div>
             </NavLink>
-          </li>
+          </li> */}
         </ul>
       </div>
-      <div className="m-8 ml-36">
+      <div className="m-8 ml-36 flex-grow flex justify-center">
         <Outlet />
       </div>
     </div>

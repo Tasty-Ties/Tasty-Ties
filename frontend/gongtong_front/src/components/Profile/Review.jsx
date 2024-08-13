@@ -26,10 +26,12 @@ const Review = () => {
 
   return (
     <div>
-      <div>수강평</div>
-      {reviews.map((review, index) => (
-        <HorizontalCard key={index} reviews={review} />
-      ))}
+      <div className="text-2xl mr-2 mb-10">수강평</div>
+      <div className="grid grid-rows-4 gap-3">
+        {reviews.map((review, index) => (
+          <HorizontalCard key={index} review={review} />
+        ))}
+      </div>
       <div>
         <Pagination
           totalItems={totalItems}
