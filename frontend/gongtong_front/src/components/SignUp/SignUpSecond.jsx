@@ -51,6 +51,7 @@ const SignUpSecond = () => {
   const { userForm, setForm, resetForm } = userStore();
 
   useEffect(() => {
+    console.log("첫번째 넘어오는 정보", userForm);
     return () => {
       resetForm(["nickname", "countryCode", "languageCode", "birth"]);
     };
@@ -59,7 +60,7 @@ const SignUpSecond = () => {
   const [isNicknameAvailable, setIsNicknameAvailable] = useState("");
 
   const onChangeInput = (e) => {
-    console.log("test:", e.target.name);
+    console.log("test:", e);
     let name = e.target.name;
     let value = e.target.value;
 
@@ -67,15 +68,11 @@ const SignUpSecond = () => {
       setIsNicknameAvailable("");
     }
 
-    setForm(name, value);
-    console.log(userForm);
-  };
-
-  // 국적, 모국어를 handle 하는 함수
-  const handleSelectChange = (name) => (value) => {
-    console.log(name);
-    console.log(value);
-    setForm(name, value);
+    if (name === "countryCode" || name === "languageCode") {
+      setForm(name, e);
+    } else {
+      setForm(name, value);
+    }
     console.log(userForm);
   };
 
@@ -138,6 +135,12 @@ const SignUpSecond = () => {
     fetchLanguages();
   }, []);
 
+  const [value, setValue] = useState("react");
+
+  useEffect(() => {
+    console.log(userForm);
+  }, [userForm]);
+
   return (
     <div
       className="h-screen flex justify-center items-center bg-cover bg-center" // <- 여기
@@ -195,10 +198,12 @@ const SignUpSecond = () => {
           </div>
           <Select
             name="countryCode"
-            value={userForm.countryCode}
-            onChange={handleSelectChange("countryCode")}
+            value=""
             label="국적을 선택하세요"
             className="relative"
+            onChange={(val) => {
+              setForm("countryCode", val);
+            }}
           >
             {countries.map((country) => (
               <Option key={country.countryCode} value={country.countryCode}>
@@ -211,9 +216,11 @@ const SignUpSecond = () => {
           </div>
           <Select
             name="languageCode"
-            value={userForm.languageCode}
-            onChange={handleSelectChange("languageCode")}
+            value=""
             label="모국어를 선택하세요"
+            onChange={(val) => {
+              setForm("languageCode", val);
+            }}
           >
             {languages.map((language) => (
               <Option key={language.languageCode} value={language.languageCode}>

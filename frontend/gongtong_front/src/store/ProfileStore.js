@@ -5,7 +5,6 @@ import {
   getAttendedClass,
   getReview,
 } from "../service/ProfileAPI";
-import { getMileageLog } from "../service/MyPageAPI";
 
 const useProfileStore = create((set) => ({
   otherInformations: [],
