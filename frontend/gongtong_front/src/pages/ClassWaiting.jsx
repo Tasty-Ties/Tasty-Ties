@@ -39,14 +39,17 @@ const ClassWaiting = () => {
 
   const videoPreviewRef = useRef(null);
 
+  // 클래스 정보 가져옴
   const getClassInfo = async () => {
     setClassData(await getClassDetail(classId));
-    console.log("클래스 인포를 가져옵니다.", classId);
   };
 
   useEffect(() => {
+    localStorage.clear(); // 클래스 입장 전 로컬 스토리지의 모든 아이템 삭제함
     setOV(new OpenVidu());
     getClassInfo();
+
+    // 사용자 정보 가져옴
     if (userInfo.length === 0) {
       fetchInformations();
     }
@@ -77,6 +80,7 @@ const ClassWaiting = () => {
           `/classes/live/sessions/${classData.uuid}`
         );
         setSessionId(response.data.data);
+        localStorage.setItem("sessionId", response.data.data);
       } catch (error) {
         const status = error.response?.data.status;
         switch (status) {
@@ -99,6 +103,7 @@ const ClassWaiting = () => {
           `/classes/live/sessions/${classData.uuid}`
         );
         setSessionId(response.data.data);
+        localStorage.setItem("sessionId", response.data.data);
       } catch (error) {
         const status = error.response.data.status;
         switch (status) {
