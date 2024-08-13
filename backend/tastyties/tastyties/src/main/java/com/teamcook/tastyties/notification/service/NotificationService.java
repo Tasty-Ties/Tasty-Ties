@@ -47,7 +47,7 @@ public class NotificationService {
         try {
             firebaseMessaging.send(message);
 
-            saveMessage(fcmNotification);
+            saveMessage(user.getUserId(), fcmNotification);
         } catch (FirebaseMessagingException e) {
             log.error("Failed to send fcm notification", e);
         }
@@ -60,8 +60,8 @@ public class NotificationService {
                 .build();
     }
 
-    private void saveMessage(FcmNotificationDto fcmNotification) {
-        User user = userRepository.findById(fcmNotification.getUserId()).orElse(null);
+    private void saveMessage(int userId, FcmNotificationDto fcmNotification) {
+        User user = userRepository.findById(userId).orElse(null);
 
         if (user != null) {
             fcmNotificationRepository.save(FcmNotification.builder()
