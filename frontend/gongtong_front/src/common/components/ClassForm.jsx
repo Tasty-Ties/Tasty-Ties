@@ -46,24 +46,13 @@ const ClassForm = ({ classInfo, classType }) => {
   let buttonText = "";
   let buttonType = "";
 
-  if (classType === "attend") {
-    let replayEndTime = new Date(classInfo.replayEndTime);
-    if (replayEndTime > now) {
-      buttonText = "다시보기";
-      buttonType = "replay-button";
-    } else {
-      buttonText = "기간만료";
-      buttonType = "expired-button";
-    }
-  } else {
+  if (classType !== "attend") {
     buttonText = timeRemaining;
     buttonType = timeRemaining === "입장" ? "enter-button" : "time-button";
   }
 
   const handleButtonClick = () => {
-    if (classType === "attend" && buttonText === "다시보기") {
-      nav(`/classreplay/${classInfo.uuid}`);
-    } else if (buttonText === "입장") {
+    if (buttonText === "입장") {
       nav(`/classwaiting/${classInfo.uuid}`, {
         state: {
           classId: classInfo.uuid,
@@ -107,13 +96,15 @@ const ClassForm = ({ classInfo, classType }) => {
           </button>
         </div>
       </div>
-      <div className="m-3 mr-3">
-        <Button
-          text={buttonText}
-          type={buttonType}
-          onClick={handleButtonClick}
-        />
-      </div>
+      {classType !== "attend" && (
+        <div className="m-3 mr-3">
+          <Button
+            text={buttonText}
+            type={buttonType}
+            onClick={handleButtonClick}
+          />
+        </div>
+      )}
     </div>
   );
 };

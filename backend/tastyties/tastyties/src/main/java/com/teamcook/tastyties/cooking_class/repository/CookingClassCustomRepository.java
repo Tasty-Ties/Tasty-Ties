@@ -34,4 +34,6 @@ public interface CookingClassCustomRepository {
     boolean isCookingClassGuest(Integer userId, String uuid);
 
     String findSessionIdWithUuid(String uuid);
+
+    void deleteSessionIdByCookingClassId(String uuid);
 }
