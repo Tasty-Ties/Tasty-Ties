@@ -34,10 +34,10 @@ const OtherCategory = (informations) => {
                   />
                 </p>
 
-                <p className="text-sm ml-1 mt-1">
+                <p className="text-base ml-1 mt-1">
                   {information.userProfileDto?.nickname}
                 </p>
-                <p className="text-sm ml-1 mt-1">
+                <p className="text-base ml-1 mt-1">
                   {information.userProfileDto?.description}
                 </p>
               </div>
@@ -46,25 +46,28 @@ const OtherCategory = (informations) => {
           <div className="flex mt-1">
             <p className="flex">
               <img src={instalogo} alt="인스타로고" className="size-6" />
-              &nbsp;
-              <p className="text-sm">
-                {information.userProfileDto?.instagramHandle}
-              </p>
               &nbsp;&nbsp;
+              <a
+                className="text-base text-gray-700"
+                href={information.userProfileDto?.instagramUrl}
+              ></a>
+              &nbsp;&nbsp;&nbsp;&nbsp;
               <p className="flex">
                 <img src={youtubelogo} alt="유튜브로고" className="size-6" />
-                &nbsp;
-                <p className="text-sm">
-                  {information.userProfileDto?.youtubeHandle}
-                </p>
+                &nbsp;&nbsp;
+                <a
+                  className="text-base text-gray-700"
+                  href={information.userProfileDto?.youtubeUrl}
+                ></a>
               </p>
             </p>
           </div>
         </div>
 
         <br />
+        <br />
         <hr />
-        <ul>
+        <ul className="text-lg">
           <li>
             <NavLink
               to=""

@@ -15,6 +15,7 @@ const Category = () => {
   useEffect(() => {
     fetchInformations();
   }, [fetchInformations]);
+  console.log(informations);
 
   return (
     <div className="flex">
@@ -35,8 +36,8 @@ const Category = () => {
                 size="w-5"
               />
 
-              <p className="text-sm ml-1 mt-1">{informations.nickname}</p>
-              <p className="text-sm text-gray-500 ml-1 mt-1">
+              <p className="text-base ml-1 mt-1">{informations.nickname}</p>
+              <p className="text-base text-gray-700 ml-1 mt-1">
                 {informations.description ||
                   "아직 자기소개를 입력하지 않았어요."}
               </p>
@@ -45,31 +46,38 @@ const Category = () => {
           <div className="flex mt-1">
             <div className="flex">
               <img src={instalogo} alt="인스타로고" className="size-6" />
-              &nbsp;
-              <p className="text-sm text-gray-500">
+              &nbsp;&nbsp;
+              <a
+                className="text-base text-gray-700"
+                href={informations.instagramUrl}
+              >
                 {informations.instagramHandle || "연결된 계정이 없습니다."}
-              </p>
+              </a>
             </div>
             &nbsp;&nbsp;&nbsp;&nbsp;
             <div className="flex">
               <img src={youtubelogo} alt="유튜브로고" className="size-6" />
-              &nbsp;
-              <p className="text-sm text-gray-500">
+              &nbsp;&nbsp;
+              <a
+                className="text-base text-gray-700"
+                href={informations.youtubeUrl}
+              >
                 {informations.youtubeHandle || "연결된 계정이 없습니다."}
-              </p>
+              </a>
             </div>
           </div>
         </div>
         <br />
+        <br />
         <ul>
-          <li className="font-bold text-xl">클래스</li>
+          <li className="font-bold text-2xl">클래스</li>
           <hr className="border border-first" />
           <div>
             <NavLink
               to="reserve"
               className={({ isActive }) => (isActive ? "bg-first-100 " : "")}
             >
-              <div className="bg-inherit">예약한 클래스</div>
+              <div className="bg-inherit text-lg">예약한 클래스</div>
             </NavLink>
           </div>
           <li>
@@ -77,7 +85,7 @@ const Category = () => {
               to="teach"
               className={({ isActive }) => (isActive ? "bg-first-100 " : "")}
             >
-              <div className="bg-inherit">수업할 클래스</div>
+              <div className="bg-inherit text-lg">수업할 클래스</div>
             </NavLink>
           </li>
           <li>
@@ -85,14 +93,15 @@ const Category = () => {
               to="attend"
               className={({ isActive }) => (isActive ? "bg-first-100 " : "")}
             >
-              <div className="bg-inherit">참여한 클래스</div>
+              <div className="bg-inherit text-lg">참여한 클래스</div>
             </NavLink>
           </li>
         </ul>
 
         <br />
+        <br />
         <ul className=" flex flex-col">
-          <li className="font-bold text-xl">나의 활동</li>
+          <li className="font-bold text-2xl">나의 활동</li>
           <hr className="border border-first" />
 
           <li>
@@ -101,7 +110,7 @@ const Category = () => {
               end
               className={({ isActive }) => (isActive ? "bg-first-100 " : "")}
             >
-              <div className="bg-inherit">내 정보</div>
+              <div className="bg-inherit text-lg">내 정보</div>
             </NavLink>
           </li>
           <li>
@@ -109,7 +118,7 @@ const Category = () => {
               to="point"
               className={({ isActive }) => (isActive ? "bg-first-100 " : "")}
             >
-              <div className="bg-inherit">마일리지</div>
+              <div className="bg-inherit text-lg">마일리지</div>
             </NavLink>
           </li>
           <li>
@@ -117,7 +126,7 @@ const Category = () => {
               to="shorts"
               className={({ isActive }) => (isActive ? "bg-first-100 " : "")}
             >
-              <div className="bg-inherit">숏폼</div>
+              <div className="bg-inherit text-lg">숏폼</div>
             </NavLink>
           </li>
         </ul>

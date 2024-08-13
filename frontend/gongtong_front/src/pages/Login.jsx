@@ -56,9 +56,9 @@ const Login = () => {
     } catch (error) {
       console.log(error);
       if (error.response.status === 401) {
-        alert("아이디 또는 비밀번호가 잘못되었습니다.");
+        alert("비밀번호가 잘못되었습니다.");
       } else if (error.response.status === 500) {
-        alert("탈퇴한 사용자입니다.");
+        alert("존재하지 않는 아이디 입니다. 회원가입을 해주세요.");
       } else {
         alert("인증 오류가 발생했습니다.");
       }

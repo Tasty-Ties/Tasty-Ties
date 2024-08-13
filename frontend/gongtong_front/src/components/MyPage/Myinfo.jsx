@@ -26,27 +26,27 @@ const MyInfo = () => {
 
   return (
     <div>
-      <p className="font-bold text-xl mb-4">내 정보</p>
+      <p className="font-bold text-2xl mb-4">내 정보</p>
       <div className="border-2 border-gray-400 shadow-xl p-5 rounded-lg">
-        <p className="text-xs mb-1 font-semibold">닉네임</p>
-        <p className="text-xs mb-2 text-gray-500"> {informations.nickname}</p>
-        <p className="text-xs mb-1 font-semibold">국적</p>
-        <p className="text-xs mb-2 text-gray-500">
+        <p className="text-lg mb-0.5 font-semibold">닉네임</p>
+        <p className="text-lg mb-2 text-gray-500"> {informations.nickname}</p>
+        <p className="text-lg mb-1 font-semibold">국적</p>
+        <p className="text-lg mb-2 text-gray-500">
           {informations.country?.koreanName || "국적 정보 없음"}
         </p>
-        <p className="text-xs mb-1 font-semibold">모국어</p>
-        <p className="text-xs mb-2 text-gray-500">
+        <p className="text-lg mb-1 font-semibold">모국어</p>
+        <p className="text-lg mb-2 text-gray-500">
           {informations.language?.koreanName || "모국어 정보 없음"}
         </p>
-        <p className="text-xs mb-1 font-semibold">마일리지</p>
-        <p className="text-xs mb-2 text-gray-500">
+        <p className="text-lg mb-1 font-semibold">마일리지</p>
+        <p className="text-lg mb-2 text-gray-500">
           {informations.activityPoint}
         </p>
-        <p className="text-xs mb-1 font-semibold">이메일</p>
-        <p className="text-xs mb-2 text-gray-500"> {informations.email}</p>
-        <p className="text-xs mb-1 font-semibold">생년월일</p>
-        <p className="text-xs mb-2 text-gray-500"> {informations.birth}</p>
-        <p className="text-xs mb-1 font-semibold">수집한 국기</p>
+        <p className="text-lg mb-1 font-semibold">이메일</p>
+        <p className="text-lg mb-2 text-gray-500"> {informations.email}</p>
+        <p className="text-lg mb-1 font-semibold">생년월일</p>
+        <p className="text-lg mb-2 text-gray-500"> {informations.birth}</p>
+        <p className="text-lg mb-1 font-semibold">수집한 국기</p>
         <p className="flex mb-2">
           {informations.collectedFlags?.map((flag, index) => (
             <CountryFlags
@@ -56,12 +56,12 @@ const MyInfo = () => {
             />
           ))}
         </p>
-        <p className="text-xs mb-1 font-semibold">SNS 연동 현황</p>
-        <p className="flex text-xs mb-2">
+        <p className="text-lg mb-1 font-semibold">SNS 연동 현황</p>
+        <p className="flex text-lg mb-2">
           <p className="flex">
             <img src={instalogo} alt="인스타로고" className="size-5" />
             &nbsp;
-            <p className="text-xs  text-gray-500">
+            <p className="text-lg  text-gray-500">
               {informations.instagramHandle || "연결된 계정이 없습니다"}
             </p>
           </p>
@@ -69,13 +69,13 @@ const MyInfo = () => {
           <p className="flex">
             <img src={youtubelogo} alt="유튜브로고" className="size-5" />
             &nbsp;
-            <p className="text-xs  text-gray-500">
+            <p className="text-lg  text-gray-500">
               {informations.youtubeHandle || "연결된 계정이 없습니다"}
             </p>
           </p>
         </p>
         <br />
-        <div className="flex space-x-40">
+        <div className="flex space-x-60">
           <Button
             text="내정보 수정하기"
             type="edit-complete"
