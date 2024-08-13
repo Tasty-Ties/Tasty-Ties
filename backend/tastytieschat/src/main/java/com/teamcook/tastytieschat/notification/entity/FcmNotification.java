@@ -25,6 +25,7 @@ public class FcmNotification {
     private String title;
     private String body;
     private LocalDateTime createTime;
+    private boolean isRead = Boolean.FALSE;
 
     @PrePersist
     protected void onCreate() {

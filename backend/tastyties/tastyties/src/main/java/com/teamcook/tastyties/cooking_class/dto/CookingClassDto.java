@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 
 @Data
@@ -21,7 +22,7 @@ public class CookingClassDto {
     private boolean isLimitedAge;
     private String countryCode;
     private String countryName;
-    private Set<String> cookingClassTags;
+    private List<String> cookingClassTags;
     private String description;
     private String languageCode;
     private String languageName;
@@ -41,7 +42,7 @@ public class CookingClassDto {
     private long reservedCount;
 
     private Set<UserSimpleProfileDto> userProfiles;
-    private Set<String> imageUrls;
+    private List<String> imageUrls;
     private String mainImageUrl;
 
     private String chatRoomId;
