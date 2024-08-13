@@ -2,16 +2,17 @@ import React, { useState } from "react";
 
 function ClassImageFiles({ setFiles }) {
   const [classImages, setClassImages] = useState([]);
+  const [imageFiles, setImageFiles] = useState([]);
 
   const validExtensions = ["jpg", "jpeg", "png"];
   const maxFileSize = 5 * 1024 * 1024; // 5MB
 
   const handleAddImages = (e) => {
-    const imagesLists = Array.from(e.target.files);
-    let imageUrlLists = [...classImages];
-    let validFiles = [];
+    const newFiles = Array.from(e.target.files);
+    let newImageUrlLists = [...classImages];
+    let newValidFiles = [...imageFiles];
 
-    imagesLists.forEach((file) => {
+    newFiles.forEach((file) => {
       const fileExtension = file.name.split(".").pop().toLowerCase();
       if (!validExtensions.includes(fileExtension)) {
         alert(`파일 타입을 확인해주세요 ${file.name}`);
@@ -21,24 +22,28 @@ function ClassImageFiles({ setFiles }) {
         alert(`파일 크기는 5MB를 초과할 수 없습니다: ${file.name}`);
         return;
       }
-      validFiles.push(file);
-      const currentImageUrl = URL.createObjectURL(file); // 생성
-      imageUrlLists.push(currentImageUrl);
+      newValidFiles.push(file);
+      const currentImageUrl = URL.createObjectURL(file);
+      newImageUrlLists.push(currentImageUrl);
     });
 
-    if (imageUrlLists.length > 5) {
-      imageUrlLists = imageUrlLists.slice(0, 5);
-      validFiles = validFiles.slice(0, 5);
+    if (newImageUrlLists.length > 5) {
+      newImageUrlLists = newImageUrlLists.slice(0, 5);
+      newValidFiles = newValidFiles.slice(0, 5);
       alert("최대 5개의 이미지만 업로드할 수 있습니다.");
     }
-    setClassImages(imageUrlLists);
-    setFiles(validFiles);
+    setClassImages(newImageUrlLists);
+    setImageFiles(newValidFiles);
+    setFiles(newValidFiles);
   };
 
   const handleDeleteImage = (id) => {
-    const imageUrl = classImages[id];
-    setClassImages(classImages.filter((_, index) => index !== id));
-    URL.revokeObjectURL(imageUrl); // 소멸
+    const newImageUrlLists = classImages.filter((_, index) => index !== id);
+    const newValidFiles = imageFiles.filter((_, index) => index !== id);
+    setClassImages(newImageUrlLists);
+    setImageFiles(newValidFiles);
+    setFiles(newValidFiles);
+    URL.revokeObjectURL(classImages[id]);
   };
 
   return (
