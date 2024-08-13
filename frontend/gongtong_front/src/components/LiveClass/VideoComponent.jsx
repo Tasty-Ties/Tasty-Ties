@@ -82,7 +82,7 @@ const VideoComponent = ({ isHost }) => {
   const [isCaptureOpen, setIsCaptureOpen] = useState(false);
   const [isPeopleListOpen, setIsPeopleListOpen] = useState(false);
   const [isSliderOn, setIsSliderOn] = useState(false);
-  const [displayMode, setDisplayMode] = useState(1);
+  const [displayMode, setDisplayMode] = useState(0);
   const [isForcedExit, setIsForcedExit] = useState(false);
 
   // 세션id를 로컬 스토리지에 저장
@@ -227,6 +227,8 @@ const VideoComponent = ({ isHost }) => {
         ],
       });
     }
+
+    setDisplayMode(1);
 
     return () => {
       window.removeEventListener("beforeunload", onbeforeunload);
@@ -812,7 +814,7 @@ const VideoComponent = ({ isHost }) => {
       )}
       <div className="min-h-screen min-w-screen flex flex-col items-center justify-center">
         <div className="h-20 w-full flex justify-center items-center">
-          <div className="text-2xl">{classData?.title}</div>
+          {classData && <div className="text-2xl">{classData.title}</div>}
         </div>
         <div className="h-2/3 w-full items-center justify-center flex-auto flex flex-row">
           {isSliderOn ? (
