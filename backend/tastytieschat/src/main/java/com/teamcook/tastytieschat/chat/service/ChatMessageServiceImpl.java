@@ -96,6 +96,9 @@ public class ChatMessageServiceImpl implements ChatMessageService {
         userDtos.sort((user1, user2) -> user1.getUsername().compareTo(user2.getUsername()));
         users.sort((user1, user2) -> user1.getUsername().compareTo(user2.getUsername()));
 
+        log.debug("userDtos: " + userDtos.size());
+        log.debug("users: " + users.size());
+
         int size = userDtos.size();
         for (int i = 0; i < size; i++) {
             UserDto userDto = userDtos.get(i);
