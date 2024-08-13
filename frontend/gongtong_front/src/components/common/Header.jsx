@@ -15,15 +15,11 @@ import {
 
 import api from "../../service/Api";
 import logo from "../../assets/맛잇다로고.png";
+import NotificationButton from "../Notification/NotificationButton";
 
 const NavItem = ({ text, link }) => {
   return (
-    <Typography
-      as="li"
-      variant="small"
-      color="blue-gray"
-      className="p-1 font-normal"
-    >
+    <Typography as="li" variant="small" color="blue-gray" className="p-1 font-normal">
       <Link to={link} className="flex items-center">
         {text}
       </Link>
@@ -86,10 +82,10 @@ const Header = () => {
     }
 
     Cookies.remove("accessToken");
-      Cookies.remove("refreshToken");
-      // Remove FCM token
-      Cookies.remove("fcmToken");
-      nav("/");
+    Cookies.remove("refreshToken");
+    // Remove FCM token
+    Cookies.remove("fcmToken");
+    nav("/");
   };
 
   return (
@@ -108,13 +104,7 @@ const Header = () => {
           <div className="flex items-center gap-x-1">
             {isLogin ? (
               <>
-                <IconButton
-                  variant="text"
-                  color="amber"
-                  className="mr-2 rounded-full"
-                >
-                  <i className="fa fa-bell text-lg" />
-                </IconButton>
+                <NotificationButton />
                 <Menu>
                   <MenuHandler className="hover:scale-105 cursor-pointer">
                     <Avatar
@@ -131,20 +121,10 @@ const Header = () => {
               </>
             ) : (
               <>
-                <Button
-                  variant="text"
-                  size="sm"
-                  className="lg:inline-block"
-                  onClick={goLogin}
-                >
+                <Button variant="text" size="sm" className="lg:inline-block" onClick={goLogin}>
                   <span>로그인</span>
                 </Button>
-                <Button
-                  variant="outlined"
-                  size="sm"
-                  className="lg:inline-block"
-                  onClick={goSignup}
-                >
+                <Button variant="outlined" size="sm" className="lg:inline-block" onClick={goSignup}>
                   <span>회원가입</span>
                 </Button>
               </>
