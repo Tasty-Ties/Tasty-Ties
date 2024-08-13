@@ -243,11 +243,11 @@ const VideoComponent = ({ isHost }) => {
   const audioStream = useRef(null);
 
   useEffect(() => {
-    // initializeGestureRecognizer(); // 제스처 초기화
+    initializeGestureRecognizer(); // 제스처 초기화
     if (userInfo && userInfo.language && userInfo.language.languageCode) {
       const languageCode = userInfo.language.languageCode.toLowerCase(); // 언어 코드를 소문자로 변환
       const countryCode = userInfo.country.countryCode.toUpperCase();
-      // initializeSpeechRecognition(languageCode, countryCode); // 음성 인식 초기화
+      initializeSpeechRecognition(languageCode, countryCode); // 음성 인식 초기화
     }
   }, []);
 
