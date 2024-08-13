@@ -10,9 +10,12 @@ import useVideoStore from "../../store/useVideoStore";
 import { useEffect, useState } from "react";
 import api from "./../../service/Api";
 import useMyPageStore from "../../store/MyPageStore";
+import { useNavigate } from "react-router-dom";
+import Complete from "../../common/pages/Complete";
 
 const ExitLiveClass = ({ exitOpen, isExitOpen, isHost, isForcedExit }) => {
   const liveClassImage = useVideoStore((state) => state.liveClassImage);
+  const navigate = useNavigate();
   const setEmptyLiveClassImage = useVideoStore(
     (state) => state.setEmptyLiveClassImage
   );
@@ -34,7 +37,10 @@ const ExitLiveClass = ({ exitOpen, isExitOpen, isHost, isForcedExit }) => {
   }, [liveClassImage]);
 
   const handleExit = async () => {
-    if (isImageExist) {
+    if (!isImageExist && isHost) {
+      alert("기념사진을 찍어주세요!");
+      return;
+    } else if (isImageExist) {
       // 앨범 사진 저장
       const formData = new FormData();
       for (let i = 0; i < liveClassImage.length; i++) {
@@ -42,9 +48,11 @@ const ExitLiveClass = ({ exitOpen, isExitOpen, isHost, isForcedExit }) => {
         if (image) {
           const response = await fetch(image);
           const blob = await response.blob();
+          //-------------------------------------------------
           const file = new File([blob], `image_${i}.jpg`, {
             type: "image/jpeg",
           });
+          //-------------------------------------------------
           formData.append("images", file);
         }
       }
@@ -68,13 +76,29 @@ const ExitLiveClass = ({ exitOpen, isExitOpen, isHost, isForcedExit }) => {
             "Content-Type": "multipart/form-data",
           },
         });
-        // if (response === 200) {
-        // }
-        console.log(response);
+        //-------수정한 코드--------------------
+        if (response.status === 200 && isHost) {
+          navigate(
+            "/classcomplete",
+            {
+              replace: true,
+            },
+            100
+          );
+        } else if (response.status === 200 && !isHost) {
+          navigate(
+            "/reviewWrite",
+            {
+              replace: true,
+            },
+            100
+          );
+        }
+        //---------------------------------------
       } catch (error) {
         console.error(error);
       } finally {
-        // setEmptyLiveClassImage();
+        setEmptyLiveClassImage();
       }
     }
 
