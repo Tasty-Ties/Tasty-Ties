@@ -1,33 +1,45 @@
 const MAIN_SERVER_URL = import.meta.env.VITE_MAIN_SERVER;
 const CHAT_SERVER_URL = import.meta.env.VITE_CHAT_SERVER;
 
-import { useEffect, useState, useRef, useCallback } from "react";
-import axios from "axios";
+import api from "../../service/Api";
 import Cookies from "js-cookie";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 
-import useVideoStore from "./../../store/useVideoStore";
 import StreamComponent from "./StreamComponent";
 import ToolbarComponent from "./ToolbarComponent";
 import UserModel from "./UserModel";
 
 import { FilesetResolver, GestureRecognizer } from "@mediapipe/tasks-vision";
-
 import { Client } from "@stomp/stompjs";
-import MediaDeviceSetting from "./MediaDeviceSetting";
+
+import useVideoStore from "./../../store/useVideoStore";
 import useMyPageStore from "../../store/MyPageStore";
-import ChatComponent from "./ChatComponent";
-import PeopleListComponent from "./PeopleListComponent";
+import useCookingClassStore from "../../store/CookingClassStore";
+
+import MediaDeviceSetting from "./MediaDeviceSetting";
+import AttendeeList from "../ChatRoom/AttendeeList";
+import ChatLog from "../ChatRoom/ChatLog";
+import CameraCapture from "./CameraCapture";
+import ExitLiveClass from "./ExitLiveClass";
 
 import "./../../styles/LiveClass/LiveClass.css";
-import ChatLog from "../ChatRoom/ChatLog";
-import AttendeeList from "../ChatRoom/AttendeeList";
-import CameraCapture from "./CameraCapture";
+import { OpenVidu } from "openvidu-browser";
 
 const localUserSetting = new UserModel();
 
 const VideoComponent = ({ isHost }) => {
+  console.log("비디오컴포넌트의 시작");
   const OV = useVideoStore((state) => state.OV);
   const setOV = useVideoStore((state) => state.setOV);
+  const session = useRef(null);
+  const currentPublisher = useRef();
+
   const selectedAudioDevice = useVideoStore(
     (state) => state.selectedAudioDevice
   );
@@ -37,33 +49,81 @@ const VideoComponent = ({ isHost }) => {
   const isVideoActive = useVideoStore((state) => state.isVideoActive);
   const isAudioActive = useVideoStore((state) => state.isAudioActive);
 
+  const setSelectedAudioDevice = useVideoStore(
+    (state) => state.setSelectedAudioDevice
+  );
+  const setSelectedVideoDevice = useVideoStore(
+    (state) => state.setSelectedVideoDevice
+  );
+  const setIsVideoActive = useVideoStore((state) => state.setIsVideoActive);
+  const setIsAudioActive = useVideoStore((state) => state.setIsAudioActive);
+
   const userInfo = useMyPageStore((state) => state.informations);
   const classData = useVideoStore((state) => state.classData);
-  console.log(classData);
 
   const [localUser, setLocalUser] = useState(null);
-  const session = useRef(null);
-  const [subscribers, setSubscribers] = useState([]);
-
   const [hostUser, setHostUser] = useState(null);
   const [partUser, setPartUser] = useState();
+
+  const remotes = useRef([]);
+  const [subscribers, setSubscribers] = useState([]);
   const [userProfileList, setUserProfileList] = useState({});
 
   const videoRef = useRef(null);
-  const canvasRef = useRef(null);
 
-  const remotes = useRef([]);
   const localUserAccessAllowed = useRef(false);
 
-  const sessionId = useVideoStore((state) => state.sessionId);
-  const currentPublisher = useRef();
-
   const [isChatOpen, setIsChatOpen] = useState(false);
+  const [isExitOpen, setIsExitOpen] = useState(false);
   const [isHostOnly, setIsHostOnly] = useState(true);
   const [isCaptureOpen, setIsCaptureOpen] = useState(false);
   const [isPeopleListOpen, setIsPeopleListOpen] = useState(false);
   const [isSliderOn, setIsSliderOn] = useState(false);
-  const [displayMode, setDisplayMode] = useState(0);
+  const [displayMode, setDisplayMode] = useState(1);
+  const [isForcedExit, setIsForcedExit] = useState(false);
+
+  // 세션id를 로컬 스토리지에 저장
+  const sessionIdRef = useRef(localStorage.getItem("sessionId"));
+
+  const fetchClassDetail = useCookingClassStore(
+    (state) => state.fetchClassDetail
+  );
+  const fetchInformations = useMyPageStore((state) => state.fetchInformations);
+
+  useLayoutEffect(() => {
+    if (!classData) {
+      fetchClassDetail(localStorage.getItem("classId"));
+    }
+    if (!userInfo) {
+      fetchInformations();
+    }
+    callPublisher();
+  }, []);
+
+  // 로컬 스토리지에 저장된 요소값들을 불러와서 저장
+  const callPublisher = useCallback(() => {
+    console.log("callPublisher 호출됨");
+    const savedVideoDevice = localStorage.getItem("selectedVideoDevice");
+    const savedAudioDevice = localStorage.getItem("selectedAudioDevice");
+    const savedIsVideoActive = localStorage.getItem("isVideoActive") === "true";
+    const savedIsAudioActive = localStorage.getItem("isAudioActive") === "true";
+
+    if (savedVideoDevice) {
+      setSelectedVideoDevice(savedVideoDevice);
+      setSelectedAudioDevice(savedAudioDevice);
+      setIsVideoActive(savedIsVideoActive);
+      setIsAudioActive(savedIsAudioActive);
+    }
+  }, [
+    setSelectedVideoDevice,
+    setSelectedAudioDevice,
+    setIsVideoActive,
+    setIsAudioActive,
+  ]);
+
+  useEffect(() => {
+    callPublisher();
+  }, []);
 
   const [isRecognitionActive, setIsRecognitionActive] = useState(false); //음성 인식 추적 변수 (확성기 표시)
   const recognitionRef = useRef(null);
@@ -84,7 +144,6 @@ const VideoComponent = ({ isHost }) => {
 
   // 비디오 레이아웃 순서 정렬하는 코드
   useEffect(() => {
-    // console.log(subscribers);
     if (!subscribers) {
       return;
     }
@@ -98,7 +157,7 @@ const VideoComponent = ({ isHost }) => {
         prev && prev.length > 0 ? [...prev, localUser] : [localUser]
       );
       subscribers.map((data) => {
-        if (data.nickname === classData.hostProfile.nickname) {
+        if (data.nickname === classData?.hostProfile.nickname) {
           setHostUser(data);
         } else {
           setPartUser((prev) => [...prev, data]);
@@ -108,9 +167,9 @@ const VideoComponent = ({ isHost }) => {
   }, [subscribers, localUser?.streamManager]);
 
   // 참여자 목록 정리하는 코드
-  useEffect(() => {
-    console.log(partUser);
-    console.log(userInfo);
+  useLayoutEffect(() => {
+    // console.log(partUser);
+    // console.log(userInfo);
 
     if (!classData || !localUser) return;
     const host = classData.hostProfile;
@@ -141,7 +200,7 @@ const VideoComponent = ({ isHost }) => {
   useEffect(() => {
     window.addEventListener("beforeunload", onbeforeunload);
 
-    joinSession();
+    joinSession(sessionIdRef.current);
 
     stompClient.current = new Client({
       brokerURL: CHAT_SERVER_URL,
@@ -166,28 +225,25 @@ const VideoComponent = ({ isHost }) => {
 
     connectStompClient();
 
-    const host = classData.hostProfile;
-    setUserProfileList({
-      [host.username]: [
-        host.nickname,
-        host.profileImageUrl,
-        "HOST",
-        host.username,
-      ],
-    });
+    const host = classData?.hostProfile;
+    if (host) {
+      setUserProfileList({
+        [host.username]: [
+          host.nickname,
+          host.profileImageUrl,
+          "HOST",
+          host.username,
+        ],
+      });
+    }
 
     return () => {
       window.removeEventListener("beforeunload", onbeforeunload);
-      leaveSession();
+      if (session.current) {
+        session.current.disconnect();
+      }
     };
-  }, []);
-
-  useEffect(() => {
-    switchCamera();
-  }, [selectedVideoDevice]);
-  useEffect(() => {
-    switchMic();
-  }, [selectedAudioDevice]);
+  }, [classData]);
 
   useEffect(() => {
     initializeSpeechRecognition("ko", "KR"); // 기본 언어 설정
@@ -195,11 +251,11 @@ const VideoComponent = ({ isHost }) => {
   }, []);
 
   useEffect(() => {
-    initializeGestureRecognizer(); // 제스처 초기화
+    // initializeGestureRecognizer(); // 제스처 초기화
     if (userInfo && userInfo.language && userInfo.language.languageCode) {
       const languageCode = userInfo.language.languageCode.toLowerCase(); // 언어 코드를 소문자로 변환
       const countryCode = userInfo.country.countryCode.toUpperCase();
-      initializeSpeechRecognition(languageCode, countryCode); // 음성 인식 초기화
+      // initializeSpeechRecognition(languageCode, countryCode); // 음성 인식 초기화
     }
   }, []);
 
@@ -215,17 +271,21 @@ const VideoComponent = ({ isHost }) => {
   }, []);
 
   const joinSession = async () => {
-    const newSession = OV.initSession();
+    const newOV = OV ? OV : new OpenVidu();
+    const newSession = newOV.initSession(sessionIdRef.current);
+
+    setOV(newOV);
     session.current = newSession;
-    await connectToSession(newSession);
+
+    await connectToSession(newSession, newOV);
     subscribeToStreamCreated(newSession);
     console.log(newSession);
   };
 
-  const connectToSession = async (session) => {
+  const connectToSession = async (session, newOV) => {
     try {
       const token = await getToken();
-      connect(session, token);
+      connect(session, token, newOV);
     } catch (error) {
       console.error(
         "토큰을 가져오는데 문제가 있음 :",
@@ -236,11 +296,11 @@ const VideoComponent = ({ isHost }) => {
     }
   };
 
-  const connect = (session, token) => {
+  const connect = (session, token, newOV) => {
     session
       .connect(token, { clientData: userInfo.nickname })
       .then(() => {
-        connectWebCam(session);
+        connectWebCam(session, newOV);
       })
       .catch((error) => {
         alert("세션에 연결하는데 문제가 있음 : ", error.message);
@@ -252,18 +312,18 @@ const VideoComponent = ({ isHost }) => {
       });
   };
 
-  const connectWebCam = async (session) => {
+  const connectWebCam = async (session, newOV) => {
     try {
       // 오디오와 비디오 스트림을 함께 가져옵니다.
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: true,
-        video: { deviceId: selectedVideoDevice.deviceId },
+        video: { deviceId: selectedVideoDevice },
       });
 
       // 퍼블리셔를 초기화합니다.
-      const publisher = OV.initPublisher(undefined, {
+      const publisher = newOV.initPublisher(undefined, {
         audioSource: selectedAudioDevice?.deviceId, // 오디오 소스를 설정
-        videoSource: selectedVideoDevice.deviceId,
+        videoSource: selectedVideoDevice?.deviceId,
         publishAudio: isAudioActive,
         publishVideo: isVideoActive,
         resolution: "1280x720",
@@ -295,6 +355,17 @@ const VideoComponent = ({ isHost }) => {
       alert("오디오 또는 비디오 장치에 접근할 수 없습니다: " + error.message);
     }
   };
+
+  // 미디어 디바이스 교체
+  useEffect(() => {
+    console.log("switchCam 호출됨");
+    switchCamera();
+  }, [selectedVideoDevice]);
+
+  useEffect(() => {
+    console.log("switchMic 호출됨");
+    switchMic();
+  }, [selectedAudioDevice]);
 
   const switchCamera = async () => {
     if (currentPublisher.current) {
@@ -366,11 +437,24 @@ const VideoComponent = ({ isHost }) => {
       });
       setSubscribers(updatedSubscribers);
     });
+
+    // 호스트 나갔으면 나머지 참여자 내쫓는 코드
+    session.on("signal:host-left", (event) => {
+      setIsForcedExit(true);
+      exitOpen();
+    });
   };
 
   const subscribeToStreamDestroyed = (session) => {
     session.on("streamDestroyed", (event) => {
       deleteSubscriber(event.stream);
+      const connection = event.stream.connection;
+      console.log(hostUser);
+      if (connection.data.split(`"`)[3] === classData.hostProfile.nickname) {
+        session.signal({
+          type: "host-left",
+        });
+      }
     });
   };
 
@@ -428,9 +512,10 @@ const VideoComponent = ({ isHost }) => {
   };
 
   const onbeforeunload = (event) => {
-    leaveSession();
+    if (session.current) {
+      session.current.disconnect();
+    }
     event.preventDefault();
-    event.returnValue = "";
   };
 
   const leaveSession = () => {
@@ -445,21 +530,15 @@ const VideoComponent = ({ isHost }) => {
   };
 
   const getToken = useCallback(async () => {
-    return await createToken(sessionId);
+    return await createToken(sessionIdRef.current);
   }, []);
 
   const createToken = useCallback(async (sessionId) => {
-    // console.log(sessionId);
-    const response = await axios.post(
-      MAIN_SERVER_URL + "/classes/live/sessions/" + sessionId + "/connections",
-      {},
-      {
-        headers: {
-          Authorization: `Bearer ${Cookies.get("accessToken")}`,
-        },
-      }
+    console.log(sessionId);
+    const response = await api.post(
+      `${MAIN_SERVER_URL}/classes/live/sessions/${sessionId}/connections`
     );
-    // console.log(response.data);
+    console.log(response.data);
     return response.data.data;
   }, []);
 
@@ -670,7 +749,22 @@ const VideoComponent = ({ isHost }) => {
     }
   };
 
+<<<<<<< HEAD
   // 비디오 레이이아웃
+=======
+  useEffect(() => {
+    return () => {
+      if (raiseTimeout.current) {
+        clearTimeout(raiseTimeout.current);
+      }
+      if (lowerTimeout.current) {
+        clearTimeout(lowerTimeout.current);
+      }
+    };
+  }, []);
+
+  // 비디오 레이아웃
+>>>>>>> 1ce5033ddf864e154f13e4037e525666145e19e0
   const displayChange = () => {
     const newMode = (displayMode + 1) % 3;
     // console.log(newMode);
@@ -692,14 +786,16 @@ const VideoComponent = ({ isHost }) => {
     setIsPeopleListOpen(!isPeopleListOpen);
   };
 
+  const exitOpen = () => {
+    setIsExitOpen(!isExitOpen);
+  };
+
   const chatOpen = () => {
     if (isPeopleListOpen) {
       peopleListOpen();
     }
     setIsChatOpen(!isChatOpen);
   };
-
-  const ref = useRef(null);
 
   const prevButton = () => {
     if (ref.current) ref.current.scrollLeft -= 200;
@@ -708,6 +804,7 @@ const VideoComponent = ({ isHost }) => {
     if (ref.current) ref.current.scrollLeft += 200;
   };
 
+  const ref = useRef(null);
   const [videoClassName, setVideoClassName] = useState("w-2/3 mx-8");
 
   return (
@@ -722,9 +819,15 @@ const VideoComponent = ({ isHost }) => {
         captureOpen={captureOpen}
         localUser={localUser}
       />
+      <ExitLiveClass
+        exitOpen={exitOpen}
+        isExitOpen={isExitOpen}
+        isHost={isHost}
+        isForcedExit={isForcedExit}
+      />
       <div className="min-h-screen min-w-screen flex flex-col items-center justify-center">
         <div className="h-20 w-full flex justify-center items-center">
-          <div className="text-2xl">{classData.title}</div>
+          <div className="text-2xl">{classData?.title}</div>
         </div>
         <div className="h-2/3 w-full items-center justify-center flex-auto flex flex-row">
           {isSliderOn ? (
@@ -805,11 +908,13 @@ const VideoComponent = ({ isHost }) => {
         <div className="h-20 flex">
           <MediaDeviceSetting currentPublisher={currentPublisher} />
           <ToolbarComponent
+            isHost={isHost}
+            setIsForcedExit={setIsForcedExit}
             displayMode={displayChange}
             captureOpen={captureOpen}
             peopleListOpen={peopleListOpen}
             chatOpen={chatOpen}
-            leaveSession={leaveSession}
+            exitOpen={exitOpen}
           />
         </div>
       </div>
