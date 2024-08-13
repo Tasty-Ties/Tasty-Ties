@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import userStore from "../../store/UserStore";
+import useUserStore from "../../store/UserStore";
 import api from "../../service/Api";
 
 import {
@@ -13,7 +13,7 @@ import {
 
 const SignUpFirst = () => {
   const nav = useNavigate();
-  const { userForm, setForm, resetForm } = userStore();
+  const { userForm, setForm, resetForm } = useUserStore();
 
   useEffect(() => {
     return () => {

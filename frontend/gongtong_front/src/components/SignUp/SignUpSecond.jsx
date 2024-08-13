@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import userStore from "../../store/UserStore";
+import useUserStore from "../../store/UserStore";
 import api from "../../service/Api";
 
 import {
@@ -48,7 +48,7 @@ const SignUpSecond = () => {
     }
   };
 
-  const { userForm, setForm, resetForm } = userStore();
+  const { userForm, setForm, resetForm } = useUserStore();
 
   useEffect(() => {
     console.log("첫번째 넘어오는 정보", userForm);
