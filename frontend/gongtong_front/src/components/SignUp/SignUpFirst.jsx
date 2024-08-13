@@ -152,7 +152,6 @@ const SignUpFirst = () => {
           shadow={false}
           className="flex flex-col p-8 bg-white rounded-none shadow-lg w-full"
         >
-          {" "}
           {/* <- 여기 추가 */}
           <Typography color="blue-gray">
             Welcome !, Bienvenue!, ようこそ!, Welkom!, स्वागत है!
