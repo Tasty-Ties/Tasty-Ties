@@ -17,7 +17,7 @@ const SignUpFirst = () => {
 
   useEffect(() => {
     return () => {
-      resetForm(["email", "username", "password", "verifyPassword"]);
+      resetForm();
     };
   }, [resetForm]);
 
@@ -152,7 +152,6 @@ const SignUpFirst = () => {
           shadow={false}
           className="flex flex-col p-8 bg-white rounded-none shadow-lg w-full"
         >
-          {" "}
           {/* <- 여기 추가 */}
           <Typography color="blue-gray">
             Welcome !, Bienvenue!, ようこそ!, Welkom!, स्वागत है!
@@ -272,7 +271,10 @@ const SignUpFirst = () => {
             </Typography>
           )}
           <div className="mb-5"></div>
-          <Button className="bg-first mt-10 " onClick={() => nav("/signupfin")}>
+          <Button
+            className="bg-first mt-10 "
+            onClick={() => nav("/signupfin", console.log(userForm))}
+          >
             다음
           </Button>
         </Card>

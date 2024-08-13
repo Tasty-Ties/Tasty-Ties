@@ -1,14 +1,20 @@
 import { useEffect } from "react";
 import Category from "../components/MyPage/Category";
-import { Outlet } from "react-router-dom";
 import useMyPageStore from "../store/MyPageStore";
+import Cookies from "js-cookie";
+import { useNavigate } from "react-router-dom";
 
 const MyPage = () => {
   const fetchInformations = useMyPageStore((state) => state.fetchInformations);
   const informations = useMyPageStore((state) => state.informations);
+  const accessToken = Cookies.get("accessToken");
+  const nav = useNavigate();
 
   useEffect(() => {
     fetchInformations();
+    if (!accessToken) {
+      nav("/login");
+    }
     // console.log(informations); 콘솔에 두번씩 출력됨
   }, []);
 
