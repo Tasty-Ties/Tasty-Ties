@@ -1,25 +1,26 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Link,
   NavLink,
   Outlet,
-  useParams,
   useNavigate,
+  useParams,
 } from "react-router-dom";
-import useCookingClassStore from "../store/CookingClassStore";
-import ClassEnrollUsers from "./../components/ClassDetail/ClassEnrollUsers";
 import {
   setClassReservation,
   setDeleteClass,
   setDeleteClassReservation,
 } from "../service/CookingClassAPI";
+import useCookingClassStore from "../store/CookingClassStore";
 import CountryFlags from "./../common/components/CountryFlags";
+import ClassEnrollUsers from "./../components/ClassDetail/ClassEnrollUsers";
 
-import "./../styles/ClassDetail/ClassDetail.css";
-import ClassImageCarousel from "../components/ClassDetail/ClassImageCarousel";
-import Profile from "../common/components/Profile";
 import ProfileButton from "../common/components/ProfileButton";
+import Alert from "../components/ClassDetail/Alert";
+import ClassImageCarousel from "../components/ClassDetail/ClassImageCarousel";
 import Button from "./../common/components/Button";
+import "./../styles/ClassDetail/ClassDetail.css";
+import Cookies from "js-cookie";
 
 const FRONT_SERVER_URL = import.meta.env.VITE_FRONT_SERVER;
 
@@ -32,6 +33,8 @@ const ClassDetail = () => {
     fetchClassDetail: state.fetchClassDetail,
   }));
   const username = classDetail.hostProfile?.username;
+
+  let cookie = Cookies.get("accessToken");
 
   useEffect(() => {
     fetchClassDetail(id);
@@ -47,14 +50,24 @@ const ClassDetail = () => {
     }
   };
 
+  const [isAlertOpen, setIsAlertOpen] = useState(false);
+
   const cancelClassReservation = async (e) => {
     try {
       await setDeleteClassReservation(id);
-      alert("취소 완료!");
       fetchClassDetail(id);
     } catch (error) {
       console.error("클래스 예약 취소 실패:", error);
     }
+  };
+
+  const handleCancelReservation = () => {
+    setIsAlertOpen(true);
+  };
+
+  const confirmCancelReservation = async () => {
+    await cancelClassReservation();
+    setIsAlertOpen(false);
   };
 
   const deleteClass = async (e) => {
@@ -122,7 +135,14 @@ const ClassDetail = () => {
                 <Button
                   text="예약하기"
                   type="green-short"
-                  onClick={handleClassReservation}
+                  onClick={() => {
+                    if (cookie) {
+                      handleClassReservation;
+                    } else {
+                      alert("로그인 후 이용 가능합니다.");
+                      nav("/login");
+                    }
+                  }}
                 />
               )}
 
@@ -133,18 +153,19 @@ const ClassDetail = () => {
                 <Button text="마감" type="green-border-short" />
               )}
 
-            {!classDetail.host &&
+            {cookie &&
+              !classDetail.host &&
               // currentTime < classTime &&
               classDetail.userEnrolled && (
                 <Button
                   text="예약 취소하기"
                   type="green-border-short"
-                  onClick={cancelClassReservation}
+                  onClick={handleCancelReservation}
                 />
               )}
 
             {/* {currentTime < classTime && classDetail.host && ( */}
-            {classDetail.host && (
+            {cookie && classDetail.host && (
               <Button
                 text="강의 삭제하기"
                 type="green-border-short"
@@ -159,17 +180,16 @@ const ClassDetail = () => {
       </div>
       <div className="my-4">
         <div className="flex">
-          <ProfileButton
-            image={classDetail.hostProfile?.profileImageUrl}
-            type="round"
-            size="size-14"
-            onClick={() => {
-              nav(`/otherpage/${username}`);
-            }}
-          />
-          <p className="ml-2 mt-4 font-semibold text-xl">
-            {classDetail.hostProfile?.nickname}
-          </p>
+          <Link to={`/otherpage/${username}`} className="flex">
+            <ProfileButton
+              image={classDetail.hostProfile?.profileImageUrl}
+              type="round"
+              size="size-14"
+            />
+            <p className="ml-2 mt-4 font-semibold text-xl">
+              {classDetail.hostProfile?.nickname}
+            </p>
+          </Link>
         </div>
         <div className="my-5">
           <div className="flex items-center">
@@ -278,6 +298,11 @@ const ClassDetail = () => {
         }}
       />
       <div style={{ height: "300px" }}></div>
+      <Alert
+        open={isAlertOpen}
+        setOpen={setIsAlertOpen}
+        onConfirm={confirmCancelReservation}
+      />
     </div>
   );
 };

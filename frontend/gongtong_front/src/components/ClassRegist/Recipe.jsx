@@ -43,9 +43,9 @@ const Recipe = forwardRef(function Recipe({ onChange }, ref) {
 
   return (
     <div className="regist-component-box">
-      <div className="input-box">
+      <div className="input-box grid grid-cols-12 items-center">
         {recipes.map((field, index) => (
-          <div key={index} className="flex items-center my-4">
+          <div key={index} className="flex items-center my-4 col-span-9">
             <span className="mr-2 text-xl">{index + 1}.</span>
             <input
               type="text"
@@ -63,7 +63,7 @@ const Recipe = forwardRef(function Recipe({ onChange }, ref) {
             </div>
           </div>
         ))}
-        <div className="text-right">
+        <div className="col-end-12 grid self-center">
           <button type="button" onClick={handleAddFields}>
             <svg
               width="37"

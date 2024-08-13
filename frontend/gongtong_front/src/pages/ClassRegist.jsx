@@ -14,6 +14,7 @@ import { setClassRegist } from "../service/CookingClassAPI";
 import Button from "../common/components/Button";
 
 import "./../styles/ClassRegist/ClassRegist.css";
+import Cookies from "js-cookie";
 
 import dayjs from "dayjs";
 
@@ -105,6 +106,7 @@ const validationSchema = yup.object().shape({
 });
 
 const ClassRegist = () => {
+  let cookie = Cookies.get("accessToken");
   const navigate = useNavigate();
   const { countries, fetchCountries, languages, fetchLanguages } =
     useCookingClassStore();
@@ -145,6 +147,9 @@ const ClassRegist = () => {
   useEffect(() => {
     fetchCountries();
     fetchLanguages();
+    if (!cookie) {
+      navigate("/login");
+    }
   }, [fetchCountries, fetchLanguages]);
 
   const onSubmit = async (data) => {
@@ -169,14 +174,32 @@ const ClassRegist = () => {
       replayEndTime: calculatedReplayEndTime,
     };
 
-    try {
-      await setClassRegist(updatedData, files);
-      alert("성공적으로 등록되었습니다.");
-      navigate("/class");
-    } catch (error) {
-      console.error("클래스 등록 실패:", error);
-      alert("클래스 등록에 실패했습니다. 다시 시도해주세요.");
-    }
+    console.log(updatedData);
+    console.log(files);
+
+    // try {
+    //   await setClassRegist(updatedData, files);
+    //   navigate("/registcomplete", {
+    //     replace: true,
+    //     state: {
+    //       message: "클래스 등록이 완료되었습니다.",
+    //       classTitle: updatedData.title,
+    //       classTime: `${updatedData.cookingClassStartTime.substring(
+    //         0,
+    //         10
+    //       )} ${updatedData.cookingClassStartTime.substring(
+    //         11,
+    //         16
+    //       )} ~ ${updatedData.cookingClassEndTime.substring(
+    //         0,
+    //         10
+    //       )} ${updatedData.cookingClassEndTime.substring(11, 16)}`,
+    //     },
+    //   });
+    // } catch (error) {
+    //   console.error("클래스 등록 실패:", error);
+    //   alert("클래스 등록에 실패했습니다. 다시 시도해주세요.");
+    // }
   };
 
   const convertUTC = (date) => {
@@ -417,6 +440,7 @@ const ClassRegist = () => {
             <label htmlFor="cookingClassStartTime">수업일정</label>
           </div>
           <div className="col-span-6">
+            <p className="text-gray-600">클래스 시작시간</p>
             <input
               {...register("cookingClassStartTime")}
               type="datetime-local"
@@ -432,6 +456,7 @@ const ClassRegist = () => {
                 {errors.cookingClassStartTime.message}
               </p>
             )}
+            <p className="text-gray-600">클래스 종료시간</p>
             <input
               {...register("cookingClassEndTime")}
               type="datetime-local"
