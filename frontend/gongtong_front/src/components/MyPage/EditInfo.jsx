@@ -21,6 +21,8 @@ const EditInfo = () => {
   );
   const [emailId, setEmailId] = useState("");
   const [emailDomain, setEmailDomain] = useState("");
+  const [profileImage, setProfileImage] = useState(null); // 파일을 저장할 state 추가
+  const [profileImagePreview, setProfileImagePreview] = useState(null); // 미리보기용 state 추가
   const nav = useNavigate();
 
   useEffect(() => {
@@ -31,32 +33,10 @@ const EditInfo = () => {
     }
   }, [email]);
 
-  const [profileImagePreview, setProfileImagePreview] = useState(null);
-
-  // handleFileChange 함수 수정됨
-  const handleFileChange = async (file) => {
-    const formData = new FormData();
-    formData.append("profileImage", file);
-
+  const handleFileChange = (file) => {
     const imageUrl = URL.createObjectURL(file);
     setProfileImagePreview(imageUrl);
-
-    try {
-      const response = await api.patch("/users/me/profile-image", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
-
-      if (response.status === 200) {
-        alert("프로필 이미지가 성공적으로 업데이트되었습니다.");
-      } else {
-        alert("프로필 이미지 업데이트에 실패했습니다.");
-      }
-    } catch (error) {
-      console.error("업로드 중 오류 발생:", error);
-      alert("업로드 중 오류가 발생했습니다.");
-    }
+    setProfileImage(file); // 파일을 state에 저장
   };
 
   const IdImage = ({ setFiles }) => {
@@ -104,7 +84,7 @@ const EditInfo = () => {
 
     const updatedInfo = {
       nickname,
-      password: password || undefined, // 비밀번호가 비어있으면 보내지 않음
+      password: password || undefined,
       emailId,
       emailDomain,
       description,
@@ -113,17 +93,33 @@ const EditInfo = () => {
     };
 
     try {
+      // 프로필 사진이 선택된 경우, 사진을 먼저 업로드
+      if (profileImage) {
+        const formData = new FormData();
+        formData.append("profileImage", profileImage);
+
+        const response = await api.patch("/users/me/profile-image", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
+
+        if (response.status !== 200) {
+          alert("프로필 이미지 업데이트에 실패했습니다.");
+          return;
+        }
+      }
+
       const response = await api.patch("/users/me", updatedInfo);
 
       if (response.status === 200) {
-        alert("정보가 성공적으로 업데이트되었습니다.");
         nav("/mypage");
       } else {
         alert("정보 업데이트에 실패했습니다.");
       }
     } catch (error) {
       console.error("업데이트 중 오류 발생:", error);
-      alert("업데이트 중 오류가 발생했습니다.");
+      alert("모든 값을 입력해주세요.");
     }
   };
 

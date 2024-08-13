@@ -53,10 +53,10 @@ const Ingredient = forwardRef(function Ingredient({ onChange }, ref) {
   useEffect(() => {}, [ingredients]);
 
   return (
-    <div className="regist-component-box">
-      <div className="">
+    <div className="regist-component-box ">
+      <div className=" grid grid-cols-12">
         {ingredients.map((field, index) => (
-          <div key={index} className="flex my-3">
+          <div key={index} className="flex my-3 col-span-10">
             <input
               type="text"
               name="ingredientName"
@@ -101,7 +101,7 @@ const Ingredient = forwardRef(function Ingredient({ onChange }, ref) {
             </button>
           </div>
         ))}
-        <div className="text-right">
+        <div className="text-right col-end-12 grid self-center ml-6">
           <button type="button" onClick={handleAddFields}>
             <svg
               width="37"
