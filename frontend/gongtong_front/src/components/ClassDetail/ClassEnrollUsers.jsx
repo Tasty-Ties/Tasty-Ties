@@ -1,5 +1,6 @@
 import { Menu } from "@headlessui/react";
 import React from "react";
+import { Link } from "react-router-dom";
 
 const ClassEnrollUsers = ({ classDetail }) => {
   return (
@@ -33,8 +34,8 @@ const ClassEnrollUsers = ({ classDetail }) => {
                   className="block px-4 py-2 text-sm text-gray-700 data-[focus]:bg-gray-100 data-[focus]:text-gray-900"
                 >
                   {({ active }) => (
-                    <a
-                      href="#" // 여기에 이동할 주소 입력
+                    <Link
+                      to={`/otherpage/${userProfile.username}`} // 여기에 이동할 주소 입력
                       className={`block px-4 py-2 text-sm ${
                         active ? "bg-blue-100" : ""
                       }`}
@@ -47,7 +48,7 @@ const ClassEnrollUsers = ({ classDetail }) => {
                         />
                         <span>{userProfile.username}</span>
                       </div>
-                    </a>
+                    </Link>
                   )}
                 </Menu.Item>
               ))}
