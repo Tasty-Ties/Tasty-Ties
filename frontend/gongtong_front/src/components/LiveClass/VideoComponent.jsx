@@ -22,6 +22,8 @@ import useVideoStore from "./../../store/useVideoStore";
 import useMyPageStore from "../../store/MyPageStore";
 import useCookingClassStore from "../../store/CookingClassStore";
 
+import { getClassDetail } from "./../../service/CookingClassAPI";
+
 import MediaDeviceSetting from "./MediaDeviceSetting";
 import AttendeeList from "../ChatRoom/AttendeeList";
 import ChatLog from "../ChatRoom/ChatLog";
@@ -34,7 +36,6 @@ import { OpenVidu } from "openvidu-browser";
 const localUserSetting = new UserModel();
 
 const VideoComponent = ({ isHost }) => {
-  console.log("비디오컴포넌트의 시작");
   const OV = useVideoStore((state) => state.OV);
   const setOV = useVideoStore((state) => state.setOV);
   const session = useRef(null);
@@ -59,7 +60,9 @@ const VideoComponent = ({ isHost }) => {
   const setIsAudioActive = useVideoStore((state) => state.setIsAudioActive);
 
   const userInfo = useMyPageStore((state) => state.informations);
+  const fetchInformations = useMyPageStore((state) => state.fetchInformations);
   const classData = useVideoStore((state) => state.classData);
+  const setClassData = useVideoStore((state) => state.setClassData);
 
   const [localUser, setLocalUser] = useState(null);
   const [hostUser, setHostUser] = useState(null);
@@ -85,20 +88,23 @@ const VideoComponent = ({ isHost }) => {
   // 세션id를 로컬 스토리지에 저장
   const sessionIdRef = useRef(localStorage.getItem("sessionId"));
 
-  const fetchClassDetail = useCookingClassStore(
-    (state) => state.fetchClassDetail
-  );
-  const fetchInformations = useMyPageStore((state) => state.fetchInformations);
+  const getClassInfo = async () => {
+    setClassData(await getClassDetail(localStorage.getItem("classId")));
+  };
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     if (!classData) {
-      fetchClassDetail(localStorage.getItem("classId"));
+      getClassInfo();
     }
     if (!userInfo) {
       fetchInformations();
     }
     callPublisher();
   }, []);
+
+  useEffect(() => {
+    console.log(classData, userInfo);
+  }, [classData, userInfo]);
 
   // 로컬 스토리지에 저장된 요소값들을 불러와서 저장
   const callPublisher = useCallback(() => {
@@ -793,6 +799,8 @@ const VideoComponent = ({ isHost }) => {
         isExitOpen={isExitOpen}
         isHost={isHost}
         isForcedExit={isForcedExit}
+        useId={userInfo.userId}
+        classId={classData.uuid}
       />
       <div className="min-h-screen min-w-screen flex flex-col items-center justify-center">
         <div className="h-20 w-full flex justify-center items-center">
