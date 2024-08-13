@@ -19,4 +19,12 @@ public class UserStatistics {
 
     private int classesHosted;
     private int classesAttended;
+
+    public void updateStatistics(boolean isHost) {
+        if (isHost) {
+            this.classesHosted++;
+        } else {
+            this.classesAttended++;
+        }
+    }
 }
