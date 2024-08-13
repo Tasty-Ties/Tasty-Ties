@@ -1,11 +1,10 @@
-import { Button, Textarea } from "@material-tailwind/react";
+import { Button } from "@material-tailwind/react";
 import Check from "./../../assets/완료.png";
 
-import { useState } from "react";
+import { useEffect } from "react";
 import useVideoStore from "../../store/useVideoStore";
 
 import { useNavigate } from "react-router-dom";
-import api from "../../service/Api";
 
 const ReviewWrite = () => {
   const navigate = useNavigate();
@@ -42,7 +41,9 @@ const ReviewWrite = () => {
       <Button
         className="bg-first mt-5 w-full"
         type="green-long"
-        onClick={() => navigate("/")}
+        onClick={() => {
+          navigate("/");
+        }}
       >
         메인으로 이동
       </Button>
