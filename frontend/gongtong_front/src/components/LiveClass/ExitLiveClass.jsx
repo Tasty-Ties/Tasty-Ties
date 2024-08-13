@@ -37,11 +37,12 @@ const ExitLiveClass = ({ exitOpen, isExitOpen, isHost, isForcedExit }) => {
     if (isImageExist) {
       // 앨범 사진 저장
       const formData = new FormData();
-      for (const image of liveClassImage) {
+      for (let i = 0; i < liveClassImage.length; i++) {
+        const image = liveClassImage[i];
         if (image) {
           const response = await fetch(image);
           const blob = await response.blob();
-          const file = new File([blob], "filename", {
+          const file = new File([blob], `image_${i}.jpg`, {
             type: "image/jpeg",
           });
           formData.append("images", file);
@@ -59,15 +60,16 @@ const ExitLiveClass = ({ exitOpen, isExitOpen, isHost, isForcedExit }) => {
             type: "application/json",
           })
         );
-        for (let pair of formData.entries()) {
-          console.log(pair[0] + ":", pair[1]);
-        }
+        // for (let pair of formData.entries()) {
+        //   console.log(pair[0] + ":", pair[1]);
+        // }
         const response = await api.post("/albums/register-folder", formData, {
           headers: {
             "Content-Type": "multipart/form-data",
           },
         });
-
+        // if (response === 200) {
+        // }
         console.log(response);
       } catch (error) {
         console.error(error);
