@@ -92,7 +92,7 @@ const VideoComponent = ({ isHost }) => {
     setClassData(await getClassDetail(localStorage.getItem("classId")));
   };
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!classData) {
       getClassInfo();
     }
@@ -126,10 +126,6 @@ const VideoComponent = ({ isHost }) => {
     setIsVideoActive,
     setIsAudioActive,
   ]);
-
-  useEffect(() => {
-    callPublisher();
-  }, []);
 
   // 비디오 레이아웃 순서 정렬하는 코드
   useEffect(() => {
@@ -191,6 +187,9 @@ const VideoComponent = ({ isHost }) => {
 
   useEffect(() => {
     window.addEventListener("beforeunload", onbeforeunload);
+    setSubscribers([]);
+    setLocalUser(undefined);
+    remotes.current.length = 0;
 
     joinSession(sessionIdRef.current);
 
@@ -231,11 +230,8 @@ const VideoComponent = ({ isHost }) => {
 
     return () => {
       window.removeEventListener("beforeunload", onbeforeunload);
-      if (session.current) {
-        session.current.disconnect();
-      }
     };
-  }, [classData]);
+  }, []);
 
   //미디어 파이프 및 영상 녹화 관련
   const raiseTimeout = useRef(null);
@@ -254,6 +250,7 @@ const VideoComponent = ({ isHost }) => {
   const joinSession = async () => {
     const newOV = OV ? OV : new OpenVidu();
     const newSession = newOV.initSession(sessionIdRef.current);
+    console.log(newSession);
 
     setOV(newOV);
     session.current = newSession;
@@ -278,6 +275,7 @@ const VideoComponent = ({ isHost }) => {
   };
 
   const connect = (session, token, newOV) => {
+    console.log(session, token, sessionIdRef.current);
     session
       .connect(token, { clientData: userInfo.nickname })
       .then(() => {
@@ -496,7 +494,13 @@ const VideoComponent = ({ isHost }) => {
     if (session.current) {
       session.current.disconnect();
     }
+    session.current.unpublish(currentPublisher.current);
     event.preventDefault();
+    setOV(null);
+    session.current = null;
+    setSubscribers([]);
+    setLocalUser(undefined);
+    remotes.current.length = 0;
   };
 
   const leaveSession = () => {
@@ -789,19 +793,23 @@ const VideoComponent = ({ isHost }) => {
 
   return (
     <>
-      <CameraCapture
-        isCaptureOpen={isCaptureOpen}
-        captureOpen={captureOpen}
-        localUser={localUser}
-      />
-      <ExitLiveClass
-        exitOpen={exitOpen}
-        isExitOpen={isExitOpen}
-        isHost={isHost}
-        isForcedExit={isForcedExit}
-        useId={userInfo.userId}
-        classId={classData.uuid}
-      />
+      {localUser && (
+        <CameraCapture
+          isCaptureOpen={isCaptureOpen}
+          captureOpen={captureOpen}
+          localUser={localUser}
+        />
+      )}
+      {classData && (
+        <ExitLiveClass
+          exitOpen={exitOpen}
+          isExitOpen={isExitOpen}
+          isHost={isHost}
+          isForcedExit={isForcedExit}
+          useId={userInfo.userId}
+          classId={classData.uuid}
+        />
+      )}
       <div className="min-h-screen min-w-screen flex flex-col items-center justify-center">
         <div className="h-20 w-full flex justify-center items-center">
           <div className="text-2xl">{classData?.title}</div>
