@@ -126,9 +126,9 @@ const EditInfo = () => {
   return (
     <div>
       <p className="font-bold text-2xl">내 정보 수정</p>
-      <br />
+      <hr className="mt-2 mb-4" />
       <p className="font-bold mb-0.5 text-lg">프로필사진</p>
-      <p className="mb-2">
+      <p className="mb-4">
         <IdImage setFiles={handleFileChange} />
       </p>
       <p className="font-bold mb-0.5 text-lg">닉네임</p>
@@ -136,60 +136,61 @@ const EditInfo = () => {
         type="text"
         value={nickname}
         onChange={(e) => setNickname(e.target.value)}
-        className="border border-first-800 w-full rounded-md mb-2"
+        className="border border-first-800 w-full rounded-md mb-3 py-1 pl-3"
       />
       <p className="font-bold mb-0.5 text-lg">비밀번호</p>
       <input
         type="password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
-        className="border border-first-800 w-full rounded-md mb-2"
+        className="border border-first-800 w-full rounded-md mb-3 py-1 pl-3"
       />
       <p className="font-bold mb-0.5 text-lg">비밀번호 확인</p>
       <input
         type="password"
         value={verifyPassword}
         onChange={(e) => setVerifyPassword(e.target.value)}
-        className="border border-first-800 w-full rounded-md mb-2"
+        className="border border-first-800 w-full rounded-md mb-3 py-1 pl-3"
       />
       <p className="font-bold mb-0.5 text-lg">이메일</p>
       <input
         type="email"
         value={email}
         onChange={handleEmailChange}
-        className="border border-first-800 w-full rounded-md mb-2"
+        className="border border-first-800 w-full rounded-md mb-3 py-1 pl-3"
       />
       <p className="font-bold mb-0.5 text-lg">자기소개</p>
-
       <input
         type="textarea"
         value={description}
         onChange={(e) => setDescription(e.target.value)}
-        className="border border-first-800 w-full rounded-md mb-2"
+        className="border border-first-800 w-full rounded-md mb-3 py-1 pl-3"
       />
-      <div className="flex">
-        <p className="font-bold mb-0.5 text-lg">인스타</p>&nbsp;
-        <p>https://www.instagram.com/</p>
+      <div className="flex my-3">
+        <p className="font-bold mb-0.5 text-lg flex items-center">인스타</p>
+        &nbsp;
+        <p className="flex items-center">https://www.instagram.com/</p>
         <input
           type="text"
           value={instaHandle}
           onChange={(e) => setInstaHandle(e.target.value)}
-          className="border border-first-800 rounded-md w-24 mb-2 ml-1"
+          className="border border-first-800 rounded-md ml-1 py-1 pl-3 flex items-center"
         />
       </div>
-      <div className="flex">
-        <p className="font-bold mb-0.5 text-lg">유튜브</p>&nbsp;
-        <p>https://www.youtube.com/@</p>
+      <div className="flex mt-3 items-center">
+        <p className="font-bold mb-0.5 text-lg flex items-center">유튜브</p>
+        &nbsp;
+        <p className="flex items-center">https://www.youtube.com/@</p>
         <input
           type="text"
           value={youtubeHandle}
           onChange={(e) => setYoutubeHandle(e.target.value)}
-          className="border border-first-800 rounded-md w-24 mb-2 ml-1"
+          className="border border-first-800 rounded-md ml-1 py-1 pl-3 flex items-center"
         />
       </div>
       <br />
 
-      <div className="flex justify-around">
+      <div className="flex space-x-1 justify-end">
         <Button text="수정완료" type="edit-complete" onClick={handleSave} />
         <Button
           text="수정취소"
