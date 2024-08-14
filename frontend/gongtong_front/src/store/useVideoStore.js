@@ -20,14 +20,8 @@ const useVideoStore = create((set) => ({
 
   isVideoActive: true,
   isAudioActive: true,
-  setIsVideoActive: () =>
-    set((state) => ({
-      isVideoActive: !state.isVideoActive,
-    })),
-  setIsAudioActive: () =>
-    set((state) => ({
-      isAudioActive: !state.isAudioActive,
-    })),
+  setIsVideoActive: (value) => set({ isVideoActive: value }),
+  setIsAudioActive: (value) => set({ isAudioActive: value }),
 
   liveClassImage: [null, null, null, null],
   setLiveClassImage: (index, value) =>

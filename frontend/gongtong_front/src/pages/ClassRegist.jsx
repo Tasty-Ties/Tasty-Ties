@@ -39,7 +39,10 @@ const validationSchema = yup.object().shape({
   isLimitedAge: yup.boolean(),
   countryCode: yup.string().required("음식 문화권 선택은 필수입니다"),
   cookingClassTags: yup.array().min(1, "해시태그를 입력해주세요."),
-  description: yup.string().required("클래스 소개는 필수입니다"),
+  description: yup
+    .string()
+    .required("클래스 소개는 필수입니다")
+    .max(200, "음식 소개는 최대 200자입니다."),
   languageCode: yup.string().required("클래스 진행 언어는 필수입니다"),
   level: yup.number().required("난이도를 설정해주세요").min(1).max(5),
   cookingClassStartTime: yup.date().required("시작 시간을 입력해주세요"),
@@ -69,9 +72,15 @@ const validationSchema = yup.object().shape({
     .array()
     .of(
       yup.object().shape({
-        ingredientName: yup.string().required("식재료명은 필수입니다"),
+        ingredientName: yup
+          .string()
+          .required("식재료명은 필수입니다")
+          .max(50, "식재료명은 최대 50자입니다."),
         quantity: yup.number().required("수량은 필수입니다"),
-        quantityUnit: yup.string().required("단위는 필수입니다"),
+        quantityUnit: yup
+          .string()
+          .required("단위는 필수입니다")
+          .max(10, "단위는 최대 10자입니다."),
       })
     )
     .min(1, "최소 1개의 식재료가 필요합니다"),
@@ -82,7 +91,7 @@ const validationSchema = yup.object().shape({
         step: yup.number(),
         description: yup
           .string()
-          .max(500, "레시피 설명은 500자 이내여야 합니다"),
+          .max(100, "레시피 설명은 100자 이내여야 합니다"),
       })
     )
     .min(1, "레시피를 입력해주세요"),
@@ -173,6 +182,9 @@ const ClassRegist = () => {
       cookingClassEndTime: calculatedEndTime,
       replayEndTime: calculatedReplayEndTime,
     };
+
+    console.log(updatedData);
+    console.log(files);
 
     try {
       await setClassRegist(updatedData, files);
@@ -351,7 +363,7 @@ const ClassRegist = () => {
               onKeyDown={(e) => handleKeyDown(e, "description")}
             />
             <div className="text-right text-sm text-gray-500">
-              {watch("description").length} / 1000
+              {watch("description").length} / 250
             </div>
             {errors.description && (
               <p className="text-red-500">{errors.description.message}</p>

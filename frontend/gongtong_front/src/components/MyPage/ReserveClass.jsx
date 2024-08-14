@@ -22,7 +22,6 @@ const ReserveClass = () => {
 
   useEffect(() => {
     fetchReserveClasses(currentPage, itemCountPerPage);
-    console.log(reserveClasses);
   }, [currentPage]);
 
   if (reserveClasses.length === 0) {
@@ -31,7 +30,7 @@ const ReserveClass = () => {
 
   return (
     <div>
-      <p className="font-bold text-xl mb-3">예약한 클래스</p>
+      <p className="font-bold text-2xl mb-3">예약한 클래스</p>
       <div className="grid grid-rows-4 gap-3">
         {reserveClasses.map((reserveClasses, index) => (
           <ClassForm

@@ -45,7 +45,7 @@ const Recipe = forwardRef(function Recipe({ onChange }, ref) {
     <div className="regist-component-box">
       <div className="input-box grid grid-cols-12 items-center">
         {recipes.map((field, index) => (
-          <div key={index} className="flex items-center my-4 col-span-9">
+          <div key={index} className="flex items-center my-2 col-span-9">
             <span className="mr-2 text-xl">{index + 1}.</span>
             <input
               type="text"

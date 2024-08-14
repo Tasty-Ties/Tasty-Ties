@@ -1,3 +1,5 @@
+import defaultImage from "./../../assets/MyPage/기본프로필사진.jpg";
+
 const ProfileButton = ({ image, type, size, onClick }) => {
   const typeList = {
     round: "rounded-full bg-gray-50",
@@ -8,8 +10,8 @@ const ProfileButton = ({ image, type, size, onClick }) => {
     <div>
       <img
         alt="프로필사진"
-        src={image}
-        className={`m-1 ${typeList[type]} ${size}`}
+        src={image === null ? defaultImage : image}
+        className={`m-1 ${typeList[type]} ${size} cursor-pointer`}
         onClick={onClick}
       />
     </div>
