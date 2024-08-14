@@ -14,7 +14,7 @@ const OvVideoComponent = ({ user }) => {
   return (
     <div>
       <div className="relative">
-        <label className="absolute left-2 top-2 z-50 bg-white">
+        <label className="absolute left-2 top-2 z-50 p-1 rounded-xl px-3 bg-gray-900 text-white opacity-80">
           {user.nickname}
         </label>
         <video
