@@ -18,7 +18,7 @@ const RankingProfile = (rankingList) => {
               ? "순위없음"
               : rankingList.rankingList.myRanked.rank}
           </div>
-          <Link to={``} className="col-span-2 flex items-center">
+          <div className="col-span-2 flex items-center">
             <span className="mr-3">
               <img
                 src={rankingList.rankingList.myRanked.profileImageUrl}
@@ -26,7 +26,7 @@ const RankingProfile = (rankingList) => {
               />
             </span>
             <span>{rankingList.rankingList.myRanked.nickname}</span>
-          </Link>
+          </div>
           <div className="col-span-1">
             {rankingList.rankingList.myRanked.classesHosted}
           </div>

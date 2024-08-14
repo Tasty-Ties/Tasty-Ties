@@ -1,5 +1,4 @@
 import VideoComponent from "../components/LiveClass/VideoComponent";
-import ChatComponent from "../components/LiveClass/ChatComponent";
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 
