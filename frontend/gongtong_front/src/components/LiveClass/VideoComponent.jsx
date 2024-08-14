@@ -195,7 +195,7 @@ const VideoComponent = ({ isHost }) => {
   // 참여자 목록 정리하는 코드
   useEffect(() => {
     // console.log(partUser);
-    // console.log(userInfo);
+    console.log(classData);
 
     if (!classData || !localUser) return;
     const host = classData.hostProfile;
