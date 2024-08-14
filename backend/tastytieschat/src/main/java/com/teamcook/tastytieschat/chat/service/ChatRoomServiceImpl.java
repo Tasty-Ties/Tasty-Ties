@@ -65,6 +65,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
                     .id(chatRoom.getId())
                     .title(chatRoom.getTitle())
                     .imageUrl(chatRoom.getImageUrl())
+                    .createdTime(chatRoom.getCreatedTime())
                     .build());
         }
 
