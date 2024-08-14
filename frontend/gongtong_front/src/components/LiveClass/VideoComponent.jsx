@@ -1,7 +1,7 @@
 const MAIN_SERVER_URL = import.meta.env.VITE_MAIN_SERVER;
 const CHAT_SERVER_URL = import.meta.env.VITE_CHAT_SERVER;
 
-import { MicOff, Campaign  } from "@mui/icons-material";
+import { MicOff, Campaign } from "@mui/icons-material";
 import api from "../../service/Api";
 import Cookies from "js-cookie";
 import {
@@ -83,7 +83,7 @@ const VideoComponent = ({ isHost }) => {
   const [isCaptureOpen, setIsCaptureOpen] = useState(false);
   const [isPeopleListOpen, setIsPeopleListOpen] = useState(false);
   const [isSliderOn, setIsSliderOn] = useState(false);
-  const [displayMode, setDisplayMode] = useState(1);
+  const [displayMode, setDisplayMode] = useState(0);
   const [isForcedExit, setIsForcedExit] = useState(false);
 
   // 세션id를 로컬 스토리지에 저장
@@ -97,7 +97,7 @@ const VideoComponent = ({ isHost }) => {
     if (!classData) {
       getClassInfo();
     }
-    if (!userInfo) {
+    if (userInfo.length == 0) {
       fetchInformations();
     }
     callPublisher();
@@ -127,10 +127,6 @@ const VideoComponent = ({ isHost }) => {
     setIsVideoActive,
     setIsAudioActive,
   ]);
-
-  useEffect(() => {
-    callPublisher();
-  }, []);
 
   const [isRecognitionActive, setIsRecognitionActive] = useState(false); //음성 인식 추적 변수 (확성기 표시)
   const recognitionRef = useRef(null);
@@ -173,8 +169,31 @@ const VideoComponent = ({ isHost }) => {
     }
   }, [subscribers, localUser?.streamManager]);
 
+  // 화면 좌우 반전 넣는 코드
+  useEffect(() => {
+    if (hostUser && partUser && localUser) {
+      document.getElementById(
+        "video-" + hostUser.getStreamManager().stream.streamId
+      ).style.transform = "scaleX(-1)";
+
+      subscribers.map((data) => {
+        if (
+          document.getElementById(
+            "video-" + data.getStreamManager().stream.streamId
+          ) &&
+          localUser.getStreamManager().stream.streaId !==
+            data.getStreamManager().stream.streamId
+        ) {
+          document.getElementById(
+            "video-" + data.getStreamManager().stream.streamId
+          ).style.transform = "scaleX(-1)";
+        }
+      });
+    }
+  }, [hostUser, partUser, displayMode]);
+
   // 참여자 목록 정리하는 코드
-  useLayoutEffect(() => {
+  useEffect(() => {
     // console.log(partUser);
     // console.log(userInfo);
 
@@ -206,6 +225,9 @@ const VideoComponent = ({ isHost }) => {
 
   useEffect(() => {
     window.addEventListener("beforeunload", onbeforeunload);
+    setSubscribers([]);
+    setLocalUser(undefined);
+    remotes.current.length = 0;
 
     joinSession(sessionIdRef.current);
 
@@ -244,13 +266,12 @@ const VideoComponent = ({ isHost }) => {
       });
     }
 
+    // setDisplayMode(0);
+
     return () => {
       window.removeEventListener("beforeunload", onbeforeunload);
-      if (session.current) {
-        session.current.disconnect();
-      }
     };
-  }, [classData]);
+  }, []);
 
   useEffect(() => {
     initializeSpeechRecognition("ko", "KR"); // 기본 언어 설정
@@ -280,6 +301,7 @@ const VideoComponent = ({ isHost }) => {
   const joinSession = async () => {
     const newOV = OV ? OV : new OpenVidu();
     const newSession = newOV.initSession(sessionIdRef.current);
+    console.log(newSession);
 
     setOV(newOV);
     session.current = newSession;
@@ -304,6 +326,7 @@ const VideoComponent = ({ isHost }) => {
   };
 
   const connect = (session, token, newOV) => {
+    console.log(session, token, sessionIdRef.current);
     session
       .connect(token, { clientData: userInfo.nickname })
       .then(() => {
@@ -318,6 +341,18 @@ const VideoComponent = ({ isHost }) => {
         );
       });
   };
+
+  useEffect(() => {
+    if (userInfo) {
+      localUserSetting.setNickname(userInfo.nickname);
+      setLocalUser((prev) => {
+        if (prev) {
+          return { ...prev, nickname: userInfo.nickname };
+        }
+        return prev;
+      });
+    }
+  }, [userInfo]);
 
   const connectWebCam = async (session, newOV) => {
     try {
@@ -350,6 +385,7 @@ const VideoComponent = ({ isHost }) => {
         });
       }
 
+      console.log(userInfo);
       localUserSetting.setNickname(userInfo.nickname);
       localUserSetting.setConnectionId(session.connection.connectionId);
       localUserSetting.setScreenShareActive(false);
@@ -522,7 +558,13 @@ const VideoComponent = ({ isHost }) => {
     if (session.current) {
       session.current.disconnect();
     }
+    session.current.unpublish(currentPublisher.current);
     event.preventDefault();
+    setOV(null);
+    session.current = null;
+    setSubscribers([]);
+    setLocalUser(undefined);
+    remotes.current.length = 0;
   };
 
   const leaveSession = () => {
@@ -816,31 +858,40 @@ const VideoComponent = ({ isHost }) => {
         </div>
       )} */}
 
-{isRecognitionActive ? (
+      {isRecognitionActive ? (
         <div className="absolute top-0 right-0 mr-8 m-8 p-2 text-white flex items-center">
           <Campaign className="mr-2 text-first-700 font-bold" />
-          <span className="text-first-700 font-bold text-l">음성 인식 중...</span>
+          <span className="text-first-700 font-bold text-l">
+            음성 인식 중...
+          </span>
         </div>
       ) : (
         <div className="absolute top-0  right-0 mr-8 m-8 p-2 text-white flex items-center">
           <MicOff className="mr-2 text-first-700 font-bold" />
-          <span className="text-first-700 font-bold text-l">음성 인식 꺼짐</span>
+          <span className="text-first-700 font-bold text-l">
+            음성 인식 꺼짐
+          </span>
         </div>
       )}
 
-      <CameraCapture
-        isCaptureOpen={isCaptureOpen}
-        captureOpen={captureOpen}
-        localUser={localUser}
-      />
-      <ExitLiveClass
-        exitOpen={exitOpen}
-        isExitOpen={isExitOpen}
-        isHost={isHost}
-        isForcedExit={isForcedExit}
-        useId={userInfo.userId}
-        classId={classData.uuid}
-      />
+      {localUser && (
+        <CameraCapture
+          isCaptureOpen={isCaptureOpen}
+          captureOpen={captureOpen}
+          localUser={localUser}
+        />
+      )}
+      {classData && (
+        <ExitLiveClass
+          exitOpen={exitOpen}
+          isExitOpen={isExitOpen}
+          isHost={isHost}
+          isForcedExit={isForcedExit}
+          useId={userInfo.userId}
+          classId={classData.uuid}
+        />
+      )}
+
       <div className="min-h-screen min-w-screen flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-gray-200 to-white">
         <div className="h-20 w-full mt-3 flex justify-center items-center">
           <div className="text-3xl font-bold">{classData?.title}</div>
