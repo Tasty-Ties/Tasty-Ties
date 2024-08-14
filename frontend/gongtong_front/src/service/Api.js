@@ -1,8 +1,23 @@
 import axios from "axios";
 import Cookies from "js-cookie";
+import { useNavigate } from "react-router-dom";
 
 const MAIN_SERVER_URL = import.meta.env.VITE_MAIN_SERVER;
 const CHAT_SERVER_URL = import.meta.env.VITE_CHAT_SERVER_URL;
+
+const handleLogout = async (nav) => {
+  try {
+    const response = await api.post("/auth/logout");
+    console.log(response);
+  } catch (error) {
+    console.log(error);
+  }
+
+  Cookies.remove("accessToken");
+  Cookies.remove("refreshToken");
+  Cookies.remove("fcmToken");
+  nav("/");
+};
 
 const api = axios.create({
   baseURL: MAIN_SERVER_URL,
@@ -68,6 +83,7 @@ api.interceptors.response.use(
       } catch (err) {
         console.error("리프레시 토큰을 사용한 액세스 토큰 재발급 실패:", err);
         // 필요한 경우 로그아웃 처리 등을 수행
+        handleLogout(useNavigate());
       }
     }
     return Promise.reject(error);
@@ -104,6 +120,7 @@ chatApi.interceptors.response.use(
       } catch (err) {
         console.error("리프레시 토큰을 사용한 액세스 토큰 재발급 실패:", err);
         // 필요한 경우 로그아웃 처리 등을 수행
+        handleLogout(useNavigate());
       }
     }
     return Promise.reject(error);

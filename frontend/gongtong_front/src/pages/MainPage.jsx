@@ -1,15 +1,9 @@
-import Pagination from "../common/components/Pagination";
-import ClassListDropdown from "../components/ClassList/ClassListDropdown";
+import React from "react";
+
+import Main from "../components/Main/Main";
 
 const mainPage = () => {
-  return (
-    <>
-      <div>Helloworld</div>
-      <div className="left-3/4">
-        <ClassListDropdown />
-      </div>
-    </>
-  );
+  return <Main />;
 };
 
 export default mainPage;

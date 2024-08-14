@@ -11,7 +11,7 @@ const ProfileButton = ({ image, type, size, onClick }) => {
       <img
         alt="프로필사진"
         src={image === null ? defaultImage : image}
-        className={`m-1 ${typeList[type]} ${size}`}
+        className={`m-1 ${typeList[type]} ${size} cursor-pointer`}
         onClick={onClick}
       />
     </div>

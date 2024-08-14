@@ -5,38 +5,59 @@ import {
   Typography,
 } from "@material-tailwind/react";
 
-const HorizontalCard = ({ reviews }) => {
-  console.log(reviews);
+const HorizontalCard = ({ review }) => {
+  console.log(review);
+  const date = review.cookingClassReviewCreateTime.substring(
+    0,
+    review.cookingClassReviewCreateTime.indexOf("T")
+  );
+
   return (
-    <Card className="w-full max-w-[48rem] h-40 flex-row">
+    <Card className="w-full w-[46rem] h-32 flex-row items-center">
+      {" "}
+      {/* Card의 고정 너비 */}
       <CardHeader
         shadow={false}
         floated={false}
         className="m-0 h-32 w-52 shrink-0 rounded-lg"
       >
         <img
-          src={reviews?.mainImage}
+          src={review?.mainImage}
           alt="card-image"
           className="h-full w-full object-cover object-center"
         />
       </CardHeader>
-      <CardBody className="overflow-hidden">
-        <Typography variant="h5" color="blue-gray" className="mb-1 truncate">
-          {reviews?.title}
+      <CardBody className="flex flex-col justify-between w-full max-w-[calc(100%-13rem)]">
+        {" "}
+        {/* CardBody의 고정 너비 */}
+        <Typography
+          variant="h5"
+          color="blue-gray"
+          className="font-nanum text-lg mb-1 truncate"
+        >
+          {review?.title}
         </Typography>
         <Typography
           variant="h6"
           color="gray"
-          className="mb-1 uppercase truncate"
+          className="font-nanum text-lg mb-1 uppercase truncate"
         >
-          {reviews?.comment}
+          {review?.comment}
         </Typography>
-        <Typography color="gray" className="text-sm font-normal truncate">
-          {reviews?.date}
-        </Typography>
-        <Typography color="gray" className="text-sm font-normal truncate">
-          {reviews?.nickname}
-        </Typography>
+        <div className="flex justify-between">
+          <Typography
+            color="gray"
+            className="font-nanum text-sm font-normal truncate"
+          >
+            {review?.nickname}
+          </Typography>
+          <Typography
+            color="gray"
+            className="font-nanum text-sm font-normal truncate"
+          >
+            {date}
+          </Typography>
+        </div>
       </CardBody>
     </Card>
   );
