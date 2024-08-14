@@ -4,9 +4,15 @@ import api from "./Api";
 export const getCountries = async () => {
   try {
     const response = await api.get("/countries");
-    return response.data.data.countries;
+    const sortedCountries = response.data.data.countries.sort((a, b) => {
+      return a.koreanName.localeCompare(b.koreanName, "ko", {
+        sensitivity: "base",
+      });
+    });
+    return sortedCountries;
   } catch (error) {
-    console.log("CookingClassAPI - getCountriesError : " + error);
+    console.error("CookingClassAPI - getCountriesError : " + error);
+    return [];
   }
 };
 
@@ -14,9 +20,15 @@ export const getCountries = async () => {
 export const getLanguages = async () => {
   try {
     const response = await api.get("/languages");
-    return response.data.data.languages;
+    const sortedLanguages = response.data.data.languages.sort((a, b) => {
+      return a.koreanName.localeCompare(b.koreanName, "ko", {
+        sensitivity: "base",
+      });
+    });
+    return sortedLanguages;
   } catch (error) {
-    console.log("CookingClassAPI - getLanguagesError : " + error);
+    console.error("CookingClassAPI - getLanguagesError : " + error);
+    return [];
   }
 };
 

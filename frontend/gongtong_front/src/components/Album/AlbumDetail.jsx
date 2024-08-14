@@ -3,6 +3,8 @@ import { useEffect, useMemo, useState } from "react";
 import DraggableImages from "./DraggableImages";
 import useAlbumStore from "./../../store/AlbumStore";
 import { patchAlbumImagesOrder } from "./../../service/AlbumAPI";
+import defaultImage from "./../../assets/MyPage/기본프로필사진.jpg";
+import { Link } from "react-router-dom";
 
 const AlbumDetail = ({ open, setOpen, folderId }) => {
   const { albumDetailImageLists, fetchAlbumDetailImageLists, fetchAlbumLists } =
@@ -118,14 +120,21 @@ const AlbumDetail = ({ open, setOpen, folderId }) => {
                     </p>
                     <div className="text-sm font-medium text-black flex gap-x-1 items-center mt-1">
                       <p className="mr-0.5">호스트 :</p>
-                      <a href="" className="flex items-center gap-x-0.5">
+                      <Link
+                        to={`/otherpage/${albumDetailImageLists.host?.username}`}
+                        className="flex items-center gap-x-0.5"
+                      >
                         <img
-                          // src={albumDetailImageLists.host.profileImageUrl}
+                          src={
+                            albumDetailImageLists.host?.profileImageUrl === null
+                              ? defaultImage
+                              : albumDetailImageLists.host?.profileImageUrl
+                          }
                           alt=""
                           className="size-3.5"
                         />
                         {hostNickname}
-                      </a>
+                      </Link>
                     </div>
                     <div className="text-sm font-medium text-black flex items-center gap-x-1 mt-1">
                       <svg
@@ -163,17 +172,21 @@ const AlbumDetail = ({ open, setOpen, folderId }) => {
                       <div className="flex items-center gap-x-2">
                         {albumDetailImageLists.userProfiles &&
                           albumDetailImageLists.userProfiles.map((profile) => (
-                            <a
-                              href=""
+                            <Link
+                              to={`/otherpage/${profile.username}`}
                               className="flex items-center gap-x-0.5"
                               key={profile.username}
                             >
                               <img
-                                src={profile.profileImageUrl}
+                                src={
+                                  profile.profileImageUrl === null
+                                    ? defaultImage
+                                    : profile.profileImageUrl
+                                }
                                 className="size-3.5"
                               />
                               {profile.nickname}
-                            </a>
+                            </Link>
                           ))}
                       </div>
                     </div>

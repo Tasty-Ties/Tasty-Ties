@@ -4,7 +4,7 @@ const PointTable = ({ log }) => {
   const TABLE_HEAD = ["일자", "내역", "적립", "사용", "총 마일리지"];
 
   return (
-    <table className="w-full min-w-max table-auto text-center border-2 border-gray-400">
+    <table className="w-full min-w-max table-auto text-center border border-gray-400">
       <thead>
         <tr>
           {TABLE_HEAD.map((head) => (
@@ -15,7 +15,7 @@ const PointTable = ({ log }) => {
               <Typography
                 variant="small"
                 color="blue-gray"
-                className="font-normal leading-none opacity-70"
+                className="font-nanum font-normal leading-none opacity-70"
               >
                 {head}
               </Typography>
@@ -43,7 +43,7 @@ const PointTable = ({ log }) => {
                   <Typography
                     variant="small"
                     color="blue-gray"
-                    className="font-normal"
+                    className="font-nanum font-normal"
                   >
                     {date}
                   </Typography>
@@ -52,7 +52,7 @@ const PointTable = ({ log }) => {
                   <Typography
                     variant="small"
                     color="blue-gray"
-                    className="font-normal"
+                    className="font-nanum font-normal"
                   >
                     {description}
                   </Typography>
@@ -62,7 +62,7 @@ const PointTable = ({ log }) => {
                     <Typography
                       variant="small"
                       color="blue-gray"
-                      className="font-normal"
+                      className="font-nanum font-normal"
                     >
                       {plusamount}
                     </Typography>
@@ -73,7 +73,7 @@ const PointTable = ({ log }) => {
                     <Typography
                       variant="small"
                       color="blue-gray"
-                      className="font-normal"
+                      className="font-nanum font-normal"
                     >
                       {minusamount}
                     </Typography>
@@ -83,7 +83,7 @@ const PointTable = ({ log }) => {
                   <Typography
                     variant="small"
                     color="blue-gray"
-                    className="font-normal"
+                    className="font-nanum font-normal"
                   >
                     {totalPoint}
                   </Typography>

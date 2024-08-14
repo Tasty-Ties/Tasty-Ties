@@ -50,7 +50,7 @@ export default withMT({
         },
       },
       fontFamily: {
-        ibm: ["IBM Plex Sans KR"],
+        nanum: ["NanumSquareRound"],
       },
       screens: {
         sm: { max: "480px" },

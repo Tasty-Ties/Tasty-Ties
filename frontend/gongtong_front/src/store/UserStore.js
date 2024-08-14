@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-const userStore = create((set) => ({
+const useUserStore = create((set) => ({
   userForm: {
     username: "", // 아이디
     password: "", // 비밀번호
@@ -33,8 +33,6 @@ const userStore = create((set) => ({
         },
       };
     }),
-
-  // 마일리지 100p 제공
 }));
 
-export default userStore;
+export default useUserStore;

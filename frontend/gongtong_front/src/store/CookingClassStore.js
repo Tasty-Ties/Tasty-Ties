@@ -8,7 +8,7 @@ import {
 } from "./../service/CookingClassAPI";
 
 const useCookingClassStore = create((set) => ({
-  contries: [],
+  countries: [],
   fetchCountries: async () => {
     const countries = await getCountries();
     set({ countries });
@@ -18,6 +18,7 @@ const useCookingClassStore = create((set) => ({
   fetchLanguages: async () => {
     const languages = await getLanguages();
     set({ languages });
+    console.log(languages);
   },
 
   classLists: [],

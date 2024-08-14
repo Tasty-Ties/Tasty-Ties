@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import RankingCount from "./RankingCount";
 import "./../../styles/Ranking/RankingLeft.css";
+import defaultImage from "./../../assets/MyPage/기본프로필사진.jpg";
 
 export default function App({ topRanking, sort }) {
   const data = [
@@ -8,22 +9,46 @@ export default function App({ topRanking, sort }) {
       rank: topRanking[1]?.rank,
       num: topRanking[1]?.score,
       color: "#C0C0C0",
-      profileImg: topRanking[1]?.profileImageUrl,
-      id: topRanking[1]?.nickname,
+      profileImg:
+        topRanking[1]?.profileImageUrl === undefined ||
+        topRanking[1]?.profileImageUrl === null
+          ? defaultImage
+          : topRanking[1]?.profileImageUrl,
+      id:
+        topRanking[1]?.nickname === undefined ||
+        topRanking[1]?.nickname === null
+          ? "순위없음"
+          : topRanking[1]?.nickname,
     },
     {
       rank: topRanking[0]?.rank,
       num: topRanking[0]?.score,
       color: "#FFD700",
-      profileImg: topRanking[0]?.profileImageUrl,
-      id: topRanking[0]?.nickname,
+      profileImg:
+        topRanking[0]?.profileImageUrl === undefined ||
+        topRanking[0]?.profileImageUrl === null
+          ? defaultImage
+          : topRanking[0]?.profileImageUrl,
+      id:
+        topRanking[0]?.nickname === undefined ||
+        topRanking[0]?.nickname === null
+          ? "순위없음"
+          : topRanking[0]?.nickname,
     },
     {
       rank: topRanking[2]?.rank,
       num: topRanking[2]?.score,
       color: "#CD7F32",
-      profileImg: topRanking[2]?.profileImageUrl,
-      id: topRanking[2]?.nickname,
+      profileImg:
+        topRanking[2]?.profileImageUrl === undefined ||
+        topRanking[2]?.profileImageUrl === null
+          ? defaultImage
+          : topRanking[2]?.profileImageUrl,
+      id:
+        topRanking[2]?.nickname === undefined ||
+        topRanking[2]?.nickname === null
+          ? "순위없음"
+          : topRanking[2]?.nickname,
     },
   ];
   const barHeights = [170, 300, 100];
