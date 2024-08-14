@@ -1,7 +1,7 @@
 const MAIN_SERVER_URL = import.meta.env.VITE_MAIN_SERVER;
 const CHAT_SERVER_URL = import.meta.env.VITE_CHAT_SERVER;
 
-import { Mic, MicOff, Campaign  } from "@mui/icons-material";
+import { MicOff, Campaign  } from "@mui/icons-material";
 import api from "../../service/Api";
 import Cookies from "js-cookie";
 import {
@@ -750,7 +750,6 @@ const VideoComponent = ({ isHost }) => {
     }
   };
 
-  // 비디오 레이이아웃
   useEffect(() => {
     return () => {
       if (raiseTimeout.current) {
@@ -762,8 +761,10 @@ const VideoComponent = ({ isHost }) => {
     };
   }, []);
 
+  // 비디오 레이아웃
   const displayChange = () => {
     const newMode = (displayMode + 1) % 3;
+    // console.log(newMode);
     setDisplayMode(newMode);
     setVideoClassName(displaySetting(newMode));
     // console.log(displaySetting(newMode));
@@ -805,17 +806,24 @@ const VideoComponent = ({ isHost }) => {
 
   return (
     <>
-      {isRecognitionActive ? (
+      {/* {isRecognitionActive && (
+        <div className="absolute top-0 right-0 m-4 p-2 bg-red-500 text-white">
+          <i className="fas fa-microphone"></i> 음성 인식 중...
+        </div>
+      )} */}
+
+{isRecognitionActive ? (
         <div className="absolute top-0 right-0 mr-8 m-8 p-2 text-white flex items-center">
-          <Campaign className="mr-2 text-first-700" />
-          <span className="text-first-700 text-l">음성 인식 중...</span>
+          <Campaign className="mr-2 text-first-700 font-bold" />
+          <span className="text-first-700 font-bold text-l">음성 인식 중...</span>
         </div>
       ) : (
         <div className="absolute top-0  right-0 mr-8 m-8 p-2 text-white flex items-center">
-          <MicOff className="mr-2 text-first-700" />
-          <span className="text-first-700 text-l">음성 인식 꺼짐</span>
+          <MicOff className="mr-2 text-first-700 font-bold" />
+          <span className="text-first-700 font-bold text-l">음성 인식 꺼짐</span>
         </div>
       )}
+
       <CameraCapture
         isCaptureOpen={isCaptureOpen}
         captureOpen={captureOpen}
@@ -827,9 +835,9 @@ const VideoComponent = ({ isHost }) => {
         isHost={isHost}
         isForcedExit={isForcedExit}
       />
-      <div className="min-h-screen min-w-screen bg-gradient-to-b from-gray-200 to-white flex flex-col items-center justify-center">
-        <div className="h-20 w-full flex justify-center items-end mb-5">
-          <div className="text-4xl font-bold">{classData?.title}</div>
+      <div className="min-h-screen min-w-screen flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-gray-200 to-white">
+        <div className="h-20 w-full mt-3 flex justify-center items-center">
+          <div className="text-3xl font-bold">{classData?.title}</div>
         </div>
         <div className="h-2/3 w-full items-center justify-center flex-auto flex flex-row">
           {isSliderOn ? (
@@ -883,7 +891,7 @@ const VideoComponent = ({ isHost }) => {
             </div>
           )}
           {isChatOpen && (
-            <div className="w-1/3 mx-3 my-20  mb-24 mr-12 border-solid flex flex-col h-full">
+            <div className="w-1/3 mx-3 my-3 border-solid border-2">
               <ChatLog
                 userProfile={userInfo.profileImageUrl}
                 chatRoomId={classData.chatRoomId}
@@ -896,7 +904,7 @@ const VideoComponent = ({ isHost }) => {
             </div>
           )}
           {isPeopleListOpen && (
-            <div className="w-1/3 mx-3 my-12 mr-12 mb-12 border-solid flex flex-col h-[32rem]">
+            <div className="w-1/3 self-stretch mx-3 my-3 border-solid border-2">
               <AttendeeList
                 setOpen={setIsPeopleListOpen}
                 nickname={userInfo.nickname}
