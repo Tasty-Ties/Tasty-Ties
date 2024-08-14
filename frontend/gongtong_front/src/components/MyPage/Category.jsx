@@ -15,7 +15,6 @@ const Category = () => {
   useEffect(() => {
     fetchInformations();
   }, [fetchInformations]);
-  console.log(informations);
 
   return (
     <div className="flex">

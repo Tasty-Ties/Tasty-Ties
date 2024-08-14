@@ -22,7 +22,6 @@ const ReserveClass = () => {
 
   useEffect(() => {
     fetchReserveClasses(currentPage, itemCountPerPage);
-    console.log(reserveClasses);
   }, [currentPage]);
 
   if (reserveClasses.length === 0) {

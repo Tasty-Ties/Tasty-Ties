@@ -155,13 +155,17 @@ const SignUpSecond = () => {
         >
           {" "}
           {/* <- 여기 추가 */}
-          <Typography color="blue-gray">
+          <Typography color="font-nanum blue-gray">
             Welcome !, Bienvenue!, ようこそ!, Welkom!, स्वागत है!
           </Typography>
-          <Typography variant="h4" color="blue-gray" className="mt-5">
+          <Typography
+            variant="h4"
+            color="blue-gray"
+            className="font-nanum mt-5"
+          >
             회원가입
           </Typography>
-          <Typography color="blue-gray" className="mt-2">
+          <Typography color="blue-gray" className="font-nanum mt-2">
             맛,잇다의 세계로 들어와 다양한 문화의 음식을 즐겨보세요!!
           </Typography>
           <section>
@@ -183,12 +187,18 @@ const SignUpSecond = () => {
               </Button>
             </div>
             {isNicknameAvailable === true && (
-              <Typography color="green" className="text-sm success-message">
+              <Typography
+                color="green"
+                className="font-nanum text-sm success-message"
+              >
                 사용할 수 있는 닉네임입니다.
               </Typography>
             )}
             {isNicknameAvailable === false && (
-              <Typography color="red" className="text-sm nickname-fail-message">
+              <Typography
+                color="red"
+                className="font-nanum text-sm nickname-fail-message"
+              >
                 이미 사용된 닉네임입니다.
               </Typography>
             )}
@@ -200,7 +210,7 @@ const SignUpSecond = () => {
             name="countryCode"
             value=""
             label="국적을 선택하세요"
-            className="relative"
+            className="font-nanum relative"
             onChange={(val) => {
               setForm("countryCode", val);
             }}
@@ -218,6 +228,7 @@ const SignUpSecond = () => {
             name="languageCode"
             value=""
             label="모국어를 선택하세요"
+            className="font-nanum"
             onChange={(val) => {
               setForm("languageCode", val);
             }}

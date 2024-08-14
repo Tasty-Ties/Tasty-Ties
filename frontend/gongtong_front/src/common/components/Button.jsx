@@ -43,6 +43,8 @@ const Button = ({ text, type, onClick }) => {
       "bg-transparent text-first text-sm font-semibold py-1 px-4 border border-first rounded-3xl",
     "month-group":
       "bg-transparent text-gray-500 text-sm font-semibold py-1 px-4 border border-gray-500 rounded-3xl",
+    "click-month-group":
+      "bg-first-100 text-black text-sm font-semibold py-1 px-4 border border-gray-500 rounded-3xl",
   };
   return (
     <button className={`${typeList[type]}`} onClick={onClick}>

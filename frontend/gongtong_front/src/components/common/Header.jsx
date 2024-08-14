@@ -71,7 +71,6 @@ const Header = () => {
     }
     fetchInformations();
   }, [accessToken]);
-  console.log(informations);
 
   const goLogin = () => {
     nav("/login");

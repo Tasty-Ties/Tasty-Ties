@@ -153,13 +153,17 @@ const SignUpFirst = () => {
           className="flex flex-col p-8 bg-white rounded-none shadow-lg w-full"
         >
           {/* <- 여기 추가 */}
-          <Typography color="blue-gray">
+          <Typography color="blue-gray" className="font-nanum">
             Welcome !, Bienvenue!, ようこそ!, Welkom!, स्वागत है!
           </Typography>
-          <Typography variant="h4" color="blue-gray" className="mt-5">
+          <Typography
+            variant="h4"
+            color="blue-gray"
+            className="font-nanum mt-5"
+          >
             회원가입
           </Typography>
-          <Typography color="blue-gray" className="mt-2">
+          <Typography color="blue-gray" className="font-nanum mt-2">
             맛,잇다의 세계로 들어와 다양한 문화의 음식을 즐겨보세요!!
           </Typography>
           <section>
@@ -182,20 +186,23 @@ const SignUpFirst = () => {
               </Button>
             </div>
             {userForm.email !== "" && Emailvalid === false && (
-              <Typography color="red" className="text-sm emailfail-message">
+              <Typography
+                color="red"
+                className="font-nanum text-sm emailfail-message"
+              >
                 이메일은 형식에 맞게 입력해주세요.
               </Typography>
             )}
             {isEmailAvailable === true && (
               <Typography
                 color="green"
-                className="text-sm emailsuccess-message"
+                className="font-nanum text-sm emailsuccess-message"
               >
                 사용할 수 있는 이메일입니다.
               </Typography>
             )}
             {isEmailAvailable === false && (
-              <Typography color="red" className="emailfail-message2">
+              <Typography color="red" className="font-nanum emailfail-message2">
                 이미 사용된 이메일입니다.
               </Typography>
             )}
@@ -221,18 +228,27 @@ const SignUpFirst = () => {
             </div>
             {userForm.username !== "" &&
               (lengthValid === false || charValid === false) && (
-                <div className="idfail-message">
+                <Typography
+                  color="red"
+                  className="font-nanum text-sm idfail-message"
+                >
                   아이디는 영문,숫자를 조합하여 4~20글자로 입력해주세요.
-                </div>
+                </Typography>
               )}
 
             {isUsernameAvailable === true && (
-              <Typography color="green" className="text-sm idsuccess-message">
+              <Typography
+                color="green"
+                className="font-nanum text-sm idsuccess-message"
+              >
                 사용할 수 있는 아이디입니다.
               </Typography>
             )}
             {isUsernameAvailable === false && (
-              <Typography color="red" className="text-sm idfail-message2">
+              <Typography
+                color="red"
+                className="font-nanum text-sm idfail-message2"
+              >
                 이미 사용된 아이디입니다.
               </Typography>
             )}
@@ -250,7 +266,7 @@ const SignUpFirst = () => {
             ></Input>
             {userForm.password !== "" &&
               (isPwLengthValid === false || isPwCharValid === false) && (
-                <Typography color="red" className="pwfail-message">
+                <Typography color="red" className="font-nanum pwfail-message">
                   비밀번호는 영문,숫자,특수기호를 조합해 8~20글자로
                   입력해주세요.
                 </Typography>
@@ -266,7 +282,10 @@ const SignUpFirst = () => {
             onChange={onChangeInput}
           ></Input>
           {userForm.verifyPassword !== "" && passwordMatch === false && (
-            <Typography color="red" className="pwmatchfail-message">
+            <Typography
+              color="red"
+              className="font-nanum text-sm pwmatchfail-message"
+            >
               비밀번호와 일치하지 않습니다.
             </Typography>
           )}

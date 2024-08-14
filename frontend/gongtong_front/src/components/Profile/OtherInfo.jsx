@@ -8,8 +8,6 @@ const OtherInfo = () => {
   const nav = useNavigate();
   const { informations } = useOutletContext();
   const { username } = useParams();
-  console.log(username);
-  console.log(informations.informations.reviews);
 
   return (
     <div>

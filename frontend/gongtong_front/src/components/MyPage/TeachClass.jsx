@@ -20,7 +20,6 @@ const TeachClass = () => {
 
   useEffect(() => {
     fetchTeachClasses(currentPage, itemCountPerPage);
-    console.log(teachClasses);
   }, [currentPage]);
 
   if (teachClasses.length === 0) {
