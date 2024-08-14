@@ -92,11 +92,11 @@ const VideoComponent = ({ isHost }) => {
     setClassData(await getClassDetail(localStorage.getItem("classId")));
   };
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     if (!classData) {
       getClassInfo();
     }
-    if (!userInfo) {
+    if (userInfo.length == 0) {
       fetchInformations();
     }
     callPublisher();
@@ -228,7 +228,7 @@ const VideoComponent = ({ isHost }) => {
       });
     }
 
-    setDisplayMode(1);
+    // setDisplayMode(0);
 
     return () => {
       window.removeEventListener("beforeunload", onbeforeunload);
@@ -324,6 +324,7 @@ const VideoComponent = ({ isHost }) => {
         });
       }
 
+      console.log(userInfo);
       localUserSetting.setNickname(userInfo.nickname);
       localUserSetting.setConnectionId(session.connection.connectionId);
       localUserSetting.setScreenShareActive(false);
