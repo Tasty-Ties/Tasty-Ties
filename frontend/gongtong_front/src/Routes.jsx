@@ -32,6 +32,8 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import ChatRoom from "./pages/ChatRoom";
 import Ranking from "./../src/pages/Ranking";
 import RegistClassComplete from "./components/ClassRegist/RegistClassComplete";
+import ReviewWrite from "./components/LiveClass/ReviewWrite";
+import ClassComplete from "./components/LiveClass/ClassComplete";
 
 const AppRoutes = () => {
   return (
@@ -73,6 +75,8 @@ const AppRoutes = () => {
       <Route path="/album" element={<AlbumPage />} />
       <Route path="/chatting" element={<ChatRoom />} />
       <Route path="/ranking" element={<Ranking />} />
+      <Route path="/reviewWrite" element={<ReviewWrite />} />
+      <Route path="/classComplete" element={<ClassComplete />} />
       {/* <Route path="/" element={< />} /> */}
     </Routes>
   );
