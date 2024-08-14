@@ -172,6 +172,7 @@ public class UserRewardsService {
             int userId = Integer.parseInt((String) result.getValue());
             double score = result.getScore();
             User user = userRepository.findById(userId).orElseThrow();
+            log.debug("userId for test: {}", user.getUserId());
             UserStatistics userStatistics = user.getUserStatistics();
             rankedUsers.add(new RankedUserDto(userId, user.getNickname(), score, rank,
                     userStatistics.getClassesHosted(), userStatistics.getClassesAttended(),
@@ -228,12 +229,15 @@ public class UserRewardsService {
         Pageable pageable = PageRequest.of(page - 1, PAGE_SIZE, Sort.by(Sort.Direction.DESC, "activityPoint"));
         List<User> users = userRepository.findAll(pageable).getContent();
 
-        long count = userRepository.count();
+        long count = userRepository.count()-1;
         int totalPages = (int) Math.ceil((double) count / PAGE_SIZE);
 
         List<RankedUserDto> rankedUsers = new ArrayList<>();
         int rank = (page - 1) * PAGE_SIZE + 1;
         for (User user : users) {
+            if (user.getUserId() == 1) {
+                continue;
+            }
             UserStatistics userStatistics = user.getUserStatistics();
             rankedUsers.add(new RankedUserDto(user.getUserId(), user.getNickname(), user.getActivityPoint(), rank,
                     userStatistics.getClassesHosted(), userStatistics.getClassesAttended(),
