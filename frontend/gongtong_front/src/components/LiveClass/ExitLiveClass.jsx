@@ -13,7 +13,14 @@ import useMyPageStore from "../../store/MyPageStore";
 import { useNavigate } from "react-router-dom";
 import Complete from "../../common/pages/Complete";
 
-const ExitLiveClass = ({ exitOpen, isExitOpen, isHost, isForcedExit }) => {
+const ExitLiveClass = ({
+  exitOpen,
+  isExitOpen,
+  isHost,
+  isForcedExit,
+  userId,
+  classId,
+}) => {
   const liveClassImage = useVideoStore((state) => state.liveClassImage);
   const navigate = useNavigate();
   const setEmptyLiveClassImage = useVideoStore(
@@ -24,8 +31,6 @@ const ExitLiveClass = ({ exitOpen, isExitOpen, isHost, isForcedExit }) => {
 
   const userInfo = useMyPageStore((state) => state.informations);
   const classData = useVideoStore((state) => state.classData);
-
-  useEffect(() => {}, [isForcedExit]);
 
   useEffect(() => {
     for (const image of liveClassImage) {
@@ -41,6 +46,18 @@ const ExitLiveClass = ({ exitOpen, isExitOpen, isHost, isForcedExit }) => {
       alert("기념사진을 찍어주세요!");
       return;
     } else if (isImageExist) {
+      // 세션키 삭제
+      if (isHost) {
+        try {
+          const exitResponse = await api.delete(
+            `/classes/live/sessions/${classId}`
+          );
+          console.log(exitResponse);
+        } catch (error) {
+          console.error();
+        }
+      }
+
       // 앨범 사진 저장
       const formData = new FormData();
       for (let i = 0; i < liveClassImage.length; i++) {
@@ -76,6 +93,7 @@ const ExitLiveClass = ({ exitOpen, isExitOpen, isHost, isForcedExit }) => {
             "Content-Type": "multipart/form-data",
           },
         });
+
         //-------수정한 코드--------------------
         if (response.status === 200 && isHost) {
           navigate(
