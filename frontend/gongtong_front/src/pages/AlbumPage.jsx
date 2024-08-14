@@ -89,7 +89,7 @@ const AlbumPage = () => {
               <img
                 key={album.folderId}
                 src={album.mainImgUrl}
-                className="rounded-3xl w-full h-48"
+                className="rounded-3xl w-full h-48 cursor-pointer"
                 onClick={() => {
                   setFolderId(album.folderId);
                   setOpen(true);
@@ -127,7 +127,7 @@ const AlbumPage = () => {
       </div>
       <div ref={observerRef} id="observer" style={{ height: "10px" }}></div>
       {isLoading && (
-        <div className="loading-spinner">Loading...</div> // 로딩 중일 때 표시
+        <div className="loading-spinner text-center">Loading...</div> // 로딩 중일 때 표시
       )}
     </>
   );

@@ -105,7 +105,7 @@ const Header = () => {
     <Navbar className="sticky top-0 z-10 h-max max-w-full rounded-none px-6 py-2 lg:px-8 lg:py-4">
       <div className="flex items-center justify-between text-blue-gray-900">
         <Link to="/">
-          <img src={logo} alt="맛잇다로고"  className="w-28 h-auto"/>
+          <img src={logo} alt="맛잇다로고" className="w-28 h-auto" />
         </Link>
         <div className="flex items-center gap-4">
           <div className="flex items-center mr-4 lg:block">
