@@ -21,12 +21,7 @@ import profileimage from "../../assets/MyPage/기본프로필사진.jpg";
 
 const NavItem = ({ text, link }) => {
   return (
-    <Typography
-      as="li"
-      variant="small"
-      color="blue-gray"
-      className="p-1 font-normal"
-    >
+    <Typography as="li" variant="small" color="blue-gray" className="p-1 font-normal">
       <Link to={link} className="flex items-center">
         {text}
       </Link>
@@ -78,6 +73,8 @@ const Header = () => {
 
   const profileImage = informations?.profileImageUrl || profileimage;
 
+  const nickname = informations?.nickname;
+
   const goMypage = () => {
     nav("/mypage");
   };
@@ -123,6 +120,8 @@ const Header = () => {
                     <Avatar src={profileImage} alt="avatar" size="sm" />
                   </MenuHandler>
                   <MenuList>
+                    <MenuItem className="flex justify-center">{nickname}</MenuItem>
+                    <hr className="my-3" />
                     <MenuItem className="font-nanum" onClick={goMypage}>
                       마이페이지
                     </MenuItem>
@@ -134,20 +133,10 @@ const Header = () => {
               </>
             ) : (
               <>
-                <Button
-                  variant="text"
-                  size="sm"
-                  className="lg:inline-block"
-                  onClick={goLogin}
-                >
+                <Button variant="text" size="sm" className="lg:inline-block" onClick={goLogin}>
                   <span>로그인</span>
                 </Button>
-                <Button
-                  variant="outlined"
-                  size="sm"
-                  className="lg:inline-block"
-                  onClick={goSignup}
-                >
+                <Button variant="outlined" size="sm" className="lg:inline-block" onClick={goSignup}>
                   <span>회원가입</span>
                 </Button>
               </>
