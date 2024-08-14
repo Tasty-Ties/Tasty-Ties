@@ -1,6 +1,7 @@
 import { Menu } from "@headlessui/react";
 import React from "react";
 import { Link } from "react-router-dom";
+import defaultImage from "./../../assets/MyPage/기본프로필사진.jpg";
 
 const ClassEnrollUsers = ({ classDetail }) => {
   return (
@@ -42,7 +43,11 @@ const ClassEnrollUsers = ({ classDetail }) => {
                     >
                       <div className="flex items-center">
                         <img
-                          src={userProfile.profileImageUrl}
+                          src={
+                            userProfile.profileImageUrl === null
+                              ? defaultImage
+                              : userProfile.profileImageUrl
+                          }
                           alt={userProfile.username}
                           className="w-6 h-6 rounded-full mr-2"
                         />

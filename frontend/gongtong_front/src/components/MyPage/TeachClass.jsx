@@ -20,7 +20,6 @@ const TeachClass = () => {
 
   useEffect(() => {
     fetchTeachClasses(currentPage, itemCountPerPage);
-    console.log(teachClasses);
   }, [currentPage]);
 
   if (teachClasses.length === 0) {
@@ -29,7 +28,7 @@ const TeachClass = () => {
 
   return (
     <div>
-      <p className="font-bold text-xl mb-3">수업할 클래스</p>
+      <p className="font-bold text-2xl mb-3">수업할 클래스</p>
       <div className="grid grid-rows-4 gap-3">
         {teachClasses.map((teachClass, index) => (
           <ClassForm key={index} classInfo={teachClass} classType="teach" />

@@ -39,14 +39,18 @@ const ClassWaiting = () => {
 
   const videoPreviewRef = useRef(null);
 
+  // 클래스 정보 가져옴
   const getClassInfo = async () => {
     setClassData(await getClassDetail(classId));
-    console.log("클래스 인포를 가져옵니다.", classId);
   };
 
   useEffect(() => {
+    localStorage.clear(); // 클래스 입장 전 로컬 스토리지의 모든 아이템 삭제함
     setOV(new OpenVidu());
     getClassInfo();
+    localStorage.setItem("classId", classId);
+
+    // 사용자 정보 가져옴
     if (userInfo.length === 0) {
       fetchInformations();
     }
@@ -77,6 +81,7 @@ const ClassWaiting = () => {
           `/classes/live/sessions/${classData.uuid}`
         );
         setSessionId(response.data.data);
+        localStorage.setItem("sessionId", response.data.data);
       } catch (error) {
         const status = error.response?.data.status;
         switch (status) {
@@ -99,6 +104,7 @@ const ClassWaiting = () => {
           `/classes/live/sessions/${classData.uuid}`
         );
         setSessionId(response.data.data);
+        localStorage.setItem("sessionId", response.data.data);
       } catch (error) {
         const status = error.response.data.status;
         switch (status) {
@@ -124,11 +130,11 @@ const ClassWaiting = () => {
   };
 
   return (
-    <div className="flex flex-col">
-      <div className="text-2xl pt-2 self-center">
+    <div className="flex flex-col  min-h-screen bg-gradient-to-b from-gray-200 to-white">
+      <div className="text-2xl font-bold pt-12 self-center">
         {isHost ? (
           <div>
-            클래스 시작 버튼을 눌러 {classData?.title} 클래스를 시작해주세요
+            클래스 시작 버튼을 눌러 "{classData?.title} " 클래스를 시작해주세요
           </div>
         ) : (
           <div>

@@ -6,7 +6,14 @@ const useRankingStore = create((set) => ({
 
   fetchRankingData: async (sort) => {
     const response = await getRankingList(sort, 1);
-    const topRanking = response.rankedUsers.slice(0, 3);
+    let topRanking;
+    if (response.rankedUsers.length >= 3) {
+      topRanking = response.rankedUsers.slice(0, 3);
+    } else if (response.rankedUsers.length === 2) {
+      topRanking = response.rankedUsers.slice(0, 2);
+    } else {
+      topRanking = response.rankedUsers.slice(0, 1);
+    }
     set({
       topRanking,
     });

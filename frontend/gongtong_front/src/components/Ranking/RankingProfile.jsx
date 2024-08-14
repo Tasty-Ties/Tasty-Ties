@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import Profile from "./../../common/components/Profile";
+import defaultImage from "./../../assets/MyPage/기본프로필사진.jpg";
 
 const RankingProfile = (rankingList) => {
   console.log(rankingList.rankingList);
@@ -18,15 +19,15 @@ const RankingProfile = (rankingList) => {
               ? "순위없음"
               : rankingList.rankingList.myRanked.rank}
           </div>
-          <Link to={``} className="col-span-2 flex items-center">
+          <div className="col-span-2 flex items-center">
             <span className="mr-3">
               <img
                 src={rankingList.rankingList.myRanked.profileImageUrl}
-                className="w-8 truncate"
+                className="w-8 "
               />
             </span>
             <span>{rankingList.rankingList.myRanked.nickname}</span>
-          </Link>
+          </div>
           <div className="col-span-1">
             {rankingList.rankingList.myRanked.classesHosted}
           </div>
@@ -38,7 +39,9 @@ const RankingProfile = (rankingList) => {
           </div>
 
           {rankingList.rankingList.myRanked.description === null ? (
-            <div className="col-span-6 text-gray-600">자기소개가 없습니다.</div>
+            <div className="col-span-6 text-gray-600 truncate">
+              자기소개가 없습니다.
+            </div>
           ) : (
             <div className="col-span-6">
               rankingList.rankingList.myRanked?.description
@@ -51,14 +54,24 @@ const RankingProfile = (rankingList) => {
         rankingList.rankingList.rankedUsers.map((user, index) => (
           <div
             className={`grid grid-cols-12 text-center py-3 items-center ${
-              isMyRankedOnCurrentPage ? "border-2 rounded-xl shadow-md" : ""
+              user.userId === rankingList.rankingList.myRanked?.userId
+                ? "border-2 rounded-xl shadow-md"
+                : ""
             }`}
             key={index}
           >
             <div className="col-span-1">{user.rank}</div>
             <div className="col-span-2 flex items-center">
               <span className="mr-3">
-                <img src={user.profileImageUrl} className="w-8" />
+                <img
+                  src={
+                    user.profileImageUrl === null ||
+                    user.profileImageUrl === undefined
+                      ? defaultImage
+                      : user.profileImageUrl
+                  }
+                  className="w-8"
+                />
               </span>
               <span>{user.nickname}</span>
             </div>

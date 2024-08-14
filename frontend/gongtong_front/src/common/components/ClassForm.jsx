@@ -63,14 +63,14 @@ const ClassForm = ({ classInfo, classType }) => {
   };
 
   return (
-    <div className="flex">
+    <div className="flex" style={{ height: "100px" }}>
       <div className="flex">
         <div className="relative overflow-hidden rounded-lg">
           <div>
             <img
               src={classInfo.mainImage}
               alt="클래스사진"
-              className="w-40 h-20 object-cover"
+              className="w-40 h-full object-cover object-center"
             />
           </div>
           <span className="absolute right-1 top-1">
@@ -81,30 +81,32 @@ const ClassForm = ({ classInfo, classType }) => {
           </span>
         </div>
         <div className="ml-6 w-72">
-          <p className="font-bold mb-2 truncate">{classInfo.title}</p>
+          <p className="font-bold text-lg mb-2 truncate">{classInfo.title}</p>
           <div className="flex">
-            <p className="text-xs">{date}</p>&nbsp;
-            <p className="text-xs">
+            <p className="text-sm">{date}</p>&nbsp;
+            <p className="text-sm">
               {startTime}~{endTime}
             </p>
           </div>
           <button
-            className="font-bold text-xs text-first"
+            className="font-bold text-sm text-first"
             onClick={() => nav(`/class/${classInfo.uuid}`)}
           >
             상세 보기 {">"}
           </button>
         </div>
       </div>
-      {classType !== "attend" && (
-        <div className="m-3 mr-3">
+      <div className="m-3 mr-3">
+        {classType !== "attend" ? (
           <Button
             text={buttonText}
             type={buttonType}
             onClick={handleButtonClick}
           />
-        </div>
-      )}
+        ) : (
+          <div className="w-16"></div>
+        )}
+      </div>
     </div>
   );
 };

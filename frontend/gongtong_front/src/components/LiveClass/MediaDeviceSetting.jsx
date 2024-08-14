@@ -73,14 +73,14 @@ const MediaDeviceSetting = ({ currentPublisher }) => {
     if (currentPublisher) {
       currentPublisher.current.publishVideo(!isVideoActive);
     }
-    setIsVideoActive();
+    setIsVideoActive(!isVideoActive);
   };
 
   const audioOnOff = () => {
     if (currentPublisher) {
       currentPublisher.current.publishAudio(!isAudioActive);
     }
-    setIsAudioActive();
+    setIsAudioActive(!isAudioActive);
   };
 
   useEffect(() => {

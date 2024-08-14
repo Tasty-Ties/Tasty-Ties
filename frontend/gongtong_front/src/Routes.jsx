@@ -1,3 +1,4 @@
+import MainCarouselPage from "./pages/MainCarouselPage";
 import MainPage from "./pages/MainPage";
 import SignUp from "./pages/SignUp";
 import SignUpSecond from "./components/SignUp/SignUpSecond";
@@ -32,11 +33,14 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import ChatRoom from "./pages/ChatRoom";
 import Ranking from "./../src/pages/Ranking";
 import RegistClassComplete from "./components/ClassRegist/RegistClassComplete";
+import ReviewWrite from "./components/LiveClass/ReviewWrite";
+import ClassComplete from "./components/LiveClass/ClassComplete";
 
 const AppRoutes = () => {
   return (
     <Routes>
       <Route path="/" element={<MainPage />} />
+      <Route path="/intro" element={<MainCarouselPage />} />
       <Route path="/signup" element={<SignUp />} />
       <Route path="/signupfin" element={<SignUpSecond />} />
       <Route path="/signupcomplete" element={<SignUpComplete />} />
@@ -73,6 +77,8 @@ const AppRoutes = () => {
       <Route path="/album" element={<AlbumPage />} />
       <Route path="/chatting" element={<ChatRoom />} />
       <Route path="/ranking" element={<Ranking />} />
+      <Route path="/reviewWrite" element={<ReviewWrite />} />
+      <Route path="/classComplete" element={<ClassComplete />} />
       {/* <Route path="/" element={< />} /> */}
     </Routes>
   );

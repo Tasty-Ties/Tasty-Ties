@@ -18,9 +18,9 @@ const TeachedClass = () => {
   return (
     <div>
       <div className="flex">
-        <p className="text-xl mr-2">진행한 클래스</p>
-        <p className="text-sm mt-1">전체</p>
-        <p className="text-xs text-first mt-2 ml-1">
+        <p className="text-2xl mr-2">진행한 클래스</p>
+        <p className="text-sm mt-2">전체</p>
+        <p className="text-xs text-first mt-3 ml-1">
           {teachedClasses.totalElements}
         </p>
       </div>

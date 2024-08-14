@@ -17,7 +17,19 @@ const RankingRight = ({ rankingList, sort, onSortChange }) => {
         <div className="col-span-6">한줄 소개</div>
       </div>
       <hr className="my-4" />
-      <RankingProfile rankingList={rankingList} />
+      {rankingList ? (
+        <div className="mx-auto text-center text-lg my-16 text-gray-500">
+          <div>
+            <img
+              src="/images/classImages/alert.svg"
+              className="mx-auto w-12 mb-5"
+            />
+          </div>
+          <div>랭킹 정보가 존재하지 않습니다.</div>
+        </div>
+      ) : (
+        <RankingProfile rankingList={rankingList} />
+      )}
     </>
   );
 };
