@@ -46,3 +46,4 @@ dump/
 log/
 
 Dockerfile
+package-lock.json
