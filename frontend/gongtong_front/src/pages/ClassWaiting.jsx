@@ -48,6 +48,7 @@ const ClassWaiting = () => {
     localStorage.clear(); // 클래스 입장 전 로컬 스토리지의 모든 아이템 삭제함
     setOV(new OpenVidu());
     getClassInfo();
+    localStorage.setItem("classId", classId);
 
     // 사용자 정보 가져옴
     if (userInfo.length === 0) {
@@ -133,7 +134,7 @@ const ClassWaiting = () => {
       <div className="text-2xl font-bold pt-12 self-center">
         {isHost ? (
           <div>
-            클래스 시작 버튼을 눌러 " {classData?.title} " 클래스를 시작해주세요
+            클래스 시작 버튼을 눌러 "{classData?.title} " 클래스를 시작해주세요
           </div>
         ) : (
           <div>

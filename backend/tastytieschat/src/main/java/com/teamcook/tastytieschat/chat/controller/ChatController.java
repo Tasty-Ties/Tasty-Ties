@@ -13,9 +13,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -43,6 +45,8 @@ public class ChatController {
             }
         }
 
+        chatRooms = sortChatRoomDtos(chatRooms);
+
         Map<String, Object> responseData = new HashMap<>();
         responseData.put("chatRooms", chatRooms);
 
@@ -53,6 +57,15 @@ public class ChatController {
                         .data(responseData)
                         .build()
                 );
+    }
+
+    private List<ChatRoomDto> sortChatRoomDtos(List<ChatRoomDto> chatRoomDtos) {
+        return chatRoomDtos.stream()
+                .sorted(Comparator.comparing(dto ->
+                                dto.getMessage() != null ?
+                                        dto.getMessage().getCreatedTime() : dto.getCreatedTime(),
+                        Comparator.reverseOrder()))
+                .collect(Collectors.toList());
     }
 
     @GetMapping("")

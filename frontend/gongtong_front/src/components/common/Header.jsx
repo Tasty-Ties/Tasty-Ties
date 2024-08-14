@@ -18,6 +18,7 @@ import logo from "../../assets/맛잇다로고3.png";
 import NotificationButton from "../Notification/NotificationButton";
 import useMyPageStore from "../../store/MyPageStore";
 import profileimage from "../../assets/MyPage/기본프로필사진.jpg";
+import { pushApiErrorNotification, pushNotification } from "./Toast";
 
 const NavItem = ({ text, link }) => {
   return (
@@ -78,6 +79,8 @@ const Header = () => {
 
   const profileImage = informations?.profileImageUrl || profileimage;
 
+  const nickname = informations?.nickname;
+
   const goMypage = () => {
     nav("/mypage");
   };
@@ -90,8 +93,8 @@ const Header = () => {
     try {
       const response = await api.post("/auth/logout");
       console.log(response);
-    } catch (error) {
-      console.log(error);
+    } catch (e) {
+      pushApiErrorNotification(e);
     }
 
     Cookies.remove("accessToken");
@@ -123,6 +126,10 @@ const Header = () => {
                     <Avatar src={profileImage} alt="avatar" size="sm" />
                   </MenuHandler>
                   <MenuList>
+                    <MenuItem className="flex justify-center">
+                      {nickname}
+                    </MenuItem>
+                    <hr className="my-3" />
                     <MenuItem className="font-nanum" onClick={goMypage}>
                       마이페이지
                     </MenuItem>
