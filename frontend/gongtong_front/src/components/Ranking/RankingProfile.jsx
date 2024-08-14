@@ -3,7 +3,7 @@ import Profile from "./../../common/components/Profile";
 import defaultImage from "./../../assets/MyPage/기본프로필사진.jpg";
 
 const RankingProfile = (rankingList) => {
-  console.log(rankingList.rankingList);
+  console.log(rankingList);
 
   // myRanked 정보가 현재 페이지에 있는지 확인
   const isMyRankedOnCurrentPage = rankingList.rankingList.rankedUsers?.some(

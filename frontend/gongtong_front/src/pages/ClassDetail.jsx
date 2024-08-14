@@ -35,7 +35,7 @@ const ClassDetail = () => {
   const username = classDetail.hostProfile?.username;
 
   let cookie = Cookies.get("accessToken");
-
+  console.log(classDetail);
   useEffect(() => {
     fetchClassDetail(id);
   }, [id]);

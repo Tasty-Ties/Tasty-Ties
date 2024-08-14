@@ -17,15 +17,15 @@ const Category = () => {
   }, [fetchInformations]);
 
   return (
-    <div className="flex">
-      <div className="w-56 flex-shrink-0">
+    <div className="grid grid-cols-4 gap">
+      <div className="flex-shrink-0 col-span-1">
         <br />
         <div className="flex flex-col">
           <div className="flex">
             <ProfileButton
               image={informations.profileImageUrl || Imageprofile}
               type="square"
-              size="size-16"
+              size="w-16"
               onClick={() => nav("/mypage")}
             />
             &nbsp;&nbsp;
@@ -42,7 +42,7 @@ const Category = () => {
               </p>
             </div>
           </div>
-          <div className="flex justify-around mt-1">
+          <div className="flex justify-around mt-2">
             <div className="flex">
               <img src={instalogo} alt="인스타로고" className="size-6" />
               &nbsp;&nbsp;
@@ -69,14 +69,14 @@ const Category = () => {
         <br />
         <br />
         <ul>
-          <li className="font-bold text-2xl">클래스</li>
-          <hr className="border border-first" />
+          <li className="font-bold text-2xl mb-1">클래스</li>
+          <hr className="border border-first mb-2" />
           <div>
             <NavLink
               to="reserve"
               className={({ isActive }) => (isActive ? "bg-first-100 " : "")}
             >
-              <div className="bg-inherit text-lg">예약한 클래스</div>
+              <div className="bg-inherit text-lg my-1">예약한 클래스</div>
             </NavLink>
           </div>
           <li>
@@ -84,7 +84,7 @@ const Category = () => {
               to="teach"
               className={({ isActive }) => (isActive ? "bg-first-100 " : "")}
             >
-              <div className="bg-inherit text-lg">수업할 클래스</div>
+              <div className="bg-inherit text-lg my-1">수업할 클래스</div>
             </NavLink>
           </li>
           <li>
@@ -92,7 +92,7 @@ const Category = () => {
               to="attend"
               className={({ isActive }) => (isActive ? "bg-first-100 " : "")}
             >
-              <div className="bg-inherit text-lg">참여한 클래스</div>
+              <div className="bg-inherit text-lg my-1">참여한 클래스</div>
             </NavLink>
           </li>
         </ul>
@@ -100,8 +100,8 @@ const Category = () => {
         <br />
         <br />
         <ul className=" flex flex-col">
-          <li className="font-bold text-2xl">나의 활동</li>
-          <hr className="border border-first" />
+          <li className="font-bold text-2xl mb-1">나의 활동</li>
+          <hr className="border border-first mb-2" />
 
           <li>
             <NavLink
@@ -109,7 +109,7 @@ const Category = () => {
               end
               className={({ isActive }) => (isActive ? "bg-first-100 " : "")}
             >
-              <div className="bg-inherit text-lg">내 정보</div>
+              <div className="bg-inherit text-lg my-1">내 정보</div>
             </NavLink>
           </li>
           <li>
@@ -117,7 +117,7 @@ const Category = () => {
               to="point"
               className={({ isActive }) => (isActive ? "bg-first-100 " : "")}
             >
-              <div className="bg-inherit text-lg">마일리지</div>
+              <div className="bg-inherit text-lg my-1">마일리지</div>
             </NavLink>
           </li>
           {/* <li>
@@ -130,7 +130,7 @@ const Category = () => {
           </li> */}
         </ul>
       </div>
-      <div className="m-8 ml-36 flex-grow flex justify-center">
+      <div className="m-8 ml-36 justify-center col-span-3">
         <Outlet />
       </div>
     </div>
