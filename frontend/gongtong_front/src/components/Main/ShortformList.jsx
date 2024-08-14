@@ -7,7 +7,7 @@ import ShortformListItem from "./item/ShortformListItem";
 
 const ShortformList = () => {
   return (
-    <div className="flex flex-col w-3/4 mx-auto content-center relative mt-20">
+    <div className="flex flex-col w-3/4 mx-auto content-center relative mt-24 mb-8">
       <Typography variant="h4" className="ml-12 mb-4">
         # 인기 급상승
       </Typography>
