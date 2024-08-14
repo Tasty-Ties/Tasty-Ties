@@ -21,6 +21,7 @@
     "@mediapipe/camera_utils": "^0.3.1675466862",
     "@mediapipe/hands": "^0.4.1675469240",
     "@mediapipe/tasks-vision": "^0.10.14",
+    "@mui/icons-material": "^5.16.7",
     "@mui/x-date-pickers": "^7.12.1",
     "@stomp/stompjs": "^7.0.0",
     "axios": "^1.7.2",

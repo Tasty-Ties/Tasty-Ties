@@ -70,6 +70,7 @@ public class CookingClass {
     private LocalDateTime createTime;
     private LocalDateTime updateTime;
 
+    @Setter
     private boolean isDelete = false;
 
     @OneToMany(mappedBy = "cookingClass")
@@ -86,7 +87,7 @@ public class CookingClass {
 
     // 쿠킹클래스에 사용되는 이미지
     @OneToMany(mappedBy = "cookingClass")
-    private Set<CookingClassImage> cookingClassImages;
+    private List<CookingClassImage> cookingClassImages;
     // 대표 이미지
     private String mainImage;
     private String chatRoomId;

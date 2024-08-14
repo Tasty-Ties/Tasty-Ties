@@ -70,10 +70,15 @@ public class CookingClassController {
         }
         User user = userDetails.user();
         log.debug("userId= {}", user.getUserId());
+        log.debug("tag: {}", registerDto.getCookingClassTags());
+        log.debug("recipes: {}", registerDto.getRecipe());
+        log.debug("images: {}", images.size());
+
         CookingClass cookingClass = cookingClassService.registerClass(user, registerDto, images);
 
         log.debug("cookingClassId= {}", cookingClass.getUuid());
         log.debug("cookingClassTitle= {}", cookingClass.getTitle());
+
         // TODO: 쿠킹 클래스에 채팅방 ID 저장하기
         createChatRoom(cookingClass, user.getUsername());
         registerDto.setChatRoomId(cookingClass.getChatRoomId());
