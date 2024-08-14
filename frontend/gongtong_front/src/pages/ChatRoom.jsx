@@ -5,6 +5,7 @@ import ChatLog from "../components/ChatRoom/ChatLog";
 import ChatRoomList from "../components/ChatRoom/ChatRoomList";
 import useMyPageStore from "../store/MyPageStore";
 import { chatApi } from "./../service/Api";
+import profileimage from "./../assets/MyPage/기본프로필사진.jpg";
 
 const MAIN_SERVER_URL = import.meta.env.VITE_MAIN_SERVER;
 const CHAT_SERVER = import.meta.env.VITE_CHAT_SERVER;
@@ -23,8 +24,7 @@ const ChatRoom = () => {
   const [messageTime, setMessageTime] = useState();
   const chatRoomRef = useRef();
 
-  const defaultImage =
-    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRF1IwK6-SxM83UpFVY6WtUZxXx-phss_gAUfdKbkTfau6VWVkt";
+  const defaultImage = profileimage;
 
   useEffect(() => {
     fetchInformation();
