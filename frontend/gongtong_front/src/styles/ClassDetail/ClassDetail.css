@@ -1,0 +1,32 @@
+/* 별점CSS */
+.class-detail-rating-box {
+  display: grid;
+  justify-content: center;
+  align-items: center;
+}
+
+.detail-rating-status {
+  display: inline-block; /* 하위 별점 이미지들이 있는 영역만 자리를 차지함.*/
+  direction: rtl;
+  border: 0; /* 필드셋 테두리 제거 */
+  pointer-events: none;
+}
+
+.detail-rating-status input[type="radio"] {
+  display: none; /* 라디오박스 감춤 */
+}
+
+.detail-rating-status label {
+  font-size: 2.3rem; /* 이모지 크기 */
+  color: transparent; /* 기존 이모지 컬러 제거 */
+  text-shadow: 0 0 0 #f0f0f0; /* 기본 색상은 회색 */
+}
+
+.detail-rating-status input[type="radio"]:checked ~ label {
+  text-shadow: 0 0 0 #ffbb1a; /* 체크된 별은 노란색으로 강조 */
+}
+.detail-rating-status label:hover,
+.detail-rating-status label:hover ~ label:hover {
+  text-shadow: 0 0 0 #f0f0f0; /* hover 효과 제거 */
+}
+/* 여기까지*/

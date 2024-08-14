@@ -1,0 +1,19 @@
+@keyframes crownAppear {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) scale(0.5);
+  }
+  50% {
+    opacity: 1;
+    transform: translateX(-50%) scale(1.2);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(-50%) scale(1);
+  }
+}
+
+.crown-effect {
+  position: relative;
+  animation: crownAppear 0.5s ease-out forwards;
+}

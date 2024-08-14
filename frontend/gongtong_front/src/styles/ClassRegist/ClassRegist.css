@@ -1,0 +1,95 @@
+// 별점
+.regReview-box .review-rating-box {
+  display: grid;
+  grid-template-rows: repeat(4, 1fr);
+  justify-content: center;
+  align-items: center;
+}
+
+.rating-status {
+  display: inline-block; /* 하위 별점 이미지들이 있는 영역만 자리를 차지함.*/
+  direction: rtl;
+  border: 0; /* 필드셋 테두리 제거 */
+}
+.rating-status input[type="radio"] {
+  display: none; /* 라디오박스 감춤 */
+}
+.rating-status label {
+  font-size: 3rem; /* 이모지 크기 */
+  color: transparent;
+  /* 기존 이모지 컬러 제거 */
+  text-shadow: 0 0 0 #f0f0f0;
+  /* 새 이모지 색상 부여 */
+}
+
+.rating-status input[type="radio"] {
+  display: none;
+}
+.rating-status label {
+  font-size: 2.3rem;
+  color: transparent;
+  text-shadow: 0 0 0 #f0f0f0;
+}
+
+.rating-status label:hover,
+.rating-status label:hover ~ label,
+.rating-status input[type="radio"]:checked ~ label {
+  text-shadow: 0 0 0 #ffbb1a; /* 마우스 호버 및 클릭 체크 */
+}
+
+.regReview-box .review-rating-box .title {
+  font-size: 1.2rem;
+  text-align: center;
+  margin-bottom: 5px;
+  margin-top: 10px;
+  font-weight: 900;
+}
+
+.regReview-box .review-rating-box .rating {
+  text-align: center;
+}
+.rating .rating div:nth-child(2) {
+  color: #999;
+}
+
+/* .regist-component-box {
+  display: grid;
+  grid-template-columns: 1fr 5fr;
+  padding: 2vh 0;
+  border-bottom: 1px solid rgba(0, 82, 70, 0.2);
+}
+.title-box {
+  width: 15vw;
+  font-weight: bold;
+  align-items: center;
+}
+
+.input-box {
+  align-items: center;
+}
+.input-box input {
+  padding: 7px; 
+   border: 1px solid rgba(0, 82, 70, 1); 
+}
+
+.button-box {
+  margin-top: 2vh;
+  text-align: center;
+}
+.cancel-box {
+  padding: 1vh 4vw;
+  font-size: 1vw;
+  color: #005246;
+  margin-right: 1vw;
+  background-color: transparent;
+  border: 1px solid #005246;
+  border-radius: 10px;
+}
+.regist-box {
+  padding: 1vh 4vw;
+  font-size: 1vw;
+  color: #fff;
+  margin-right: 1vw;
+  background-color: #005246;
+  border-radius: 10px;
+} */
