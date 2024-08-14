@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
+import profileimage from "./../../assets/MyPage/기본프로필사진.jpg";
 
 const ChatMessage = ({ type, imgSrc, nickname, message, chatTime, isNew }) => {
-  const defaultImage =
-    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRF1IwK6-SxM83UpFVY6WtUZxXx-phss_gAUfdKbkTfau6VWVkt";
+  const defaultImage = profileimage;
 
   const [messageDirection, setMessageDirection] = useState();
   const [nicknamePlace, setNicknamePlace] = useState();

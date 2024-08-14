@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import profileimage from "./../../assets/MyPage/기본프로필사진.jpg";
 
 const AttendeeList = ({ setOpen, users, nickname, subscribers }) => {
-  const defaultImage =
-    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRF1IwK6-SxM83UpFVY6WtUZxXx-phss_gAUfdKbkTfau6VWVkt";
+  const defaultImage = profileimage;
 
   console.log(subscribers);
 
