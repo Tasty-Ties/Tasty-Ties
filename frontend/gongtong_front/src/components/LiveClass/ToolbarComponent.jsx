@@ -1,5 +1,13 @@
 import { useNavigate } from "react-router-dom";
 import {
+  CameraAlt,
+  People,
+  Chat,
+  ExitToApp,
+  Tv as DisplayIcon,
+} from "@mui/icons-material";
+
+import {
   Menu,
   MenuHandler,
   MenuList,
@@ -20,20 +28,46 @@ const ToolbarComponent = ({
   console.log(isHost);
   return (
     <>
-      <div>
-        <Button onClick={displayMode}>디스플레이</Button>
-        <Button onClick={captureOpen}>기념사진</Button>
-        <Button onClick={peopleListOpen}>참가자</Button>
-        <Button onClick={chatOpen}>대화</Button>
+      <div className="flex justify-center space-x-4 items-start">
+        <Button
+          onClick={displayMode}
+          className="p-0 m-3 mx-3 bg-transparent hover:bg-transparent flex justify-center items-start"
+        >
+          <DisplayIcon className="text-first-800" />
+        </Button>
+        <Button
+          onClick={captureOpen}
+          className="p-0 m-3 mx-3 bg-transparent hover:bg-transparent flex justify-center items-start"
+        >
+          <CameraAlt className="text-first-800" />
+        </Button>
+        <Button
+          onClick={peopleListOpen}
+          className="p-0 m-3 mx-3 bg-transparent hover:bg-transparent flex justify-center items-start"
+        >
+          <People className="text-first-800" />
+        </Button>
+        <Button
+          onClick={chatOpen}
+          className="p-0 m-3 mx-3 bg-transparent hover:bg-transparent flex justify-center items-start"
+        >
+          <Chat className="text-first-800" />
+        </Button>
 
         {isHost ? (
-          <Button onClick={exitOpen}>나가기</Button>
+          <Button
+            onClick={exitOpen}
+            className="p-0 m-3 mx-3 bg-transparent hover:bg-transparent flex justify-center items-start"
+          >
+            <ExitToApp className="text-first-800" />
+          </Button>
         ) : (
           <Menu placement="top">
             <MenuHandler>
-              <Button>나가기</Button>
+              <Button className="p-0 m-3 mx-3 bg-transparent hover:bg-transparent flex justify-center items-start">
+                <ExitToApp className="text-first-800" />
+              </Button>
             </MenuHandler>
-
             <MenuList>
               <MenuItem
                 onClick={() => {

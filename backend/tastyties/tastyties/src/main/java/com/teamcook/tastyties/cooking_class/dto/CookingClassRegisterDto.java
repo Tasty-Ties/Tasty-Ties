@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 
 // 등록에 필요한 Dto
@@ -22,7 +23,7 @@ public class CookingClassRegisterDto {
     private boolean isLimitedAge;
     private String countryCode;
     private String countryName;
-    private Set<String> cookingClassTags;
+    private List<String> cookingClassTags;
     private String description;
     private String languageCode;
     private String languageName;
