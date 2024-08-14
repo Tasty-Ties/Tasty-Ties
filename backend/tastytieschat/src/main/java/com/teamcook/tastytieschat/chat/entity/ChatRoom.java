@@ -9,10 +9,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Document(collection = "chatroom")
 @NoArgsConstructor
@@ -51,9 +48,11 @@ public class ChatRoom {
     }
 
     public void removeUser(String username) {
-        for (UserDto user : users) {
+        Iterator<UserDto> iterator = users.iterator();
+        while (iterator.hasNext()) {
+            UserDto user = iterator.next();
             if (user.getUsername().equals(username)) {
-                users.remove(user);
+                iterator.remove();
             }
         }
     }

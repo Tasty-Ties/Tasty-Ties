@@ -40,13 +40,16 @@ const useVideoStore = create((set) => ({
   setRemoveLiveClassImage: (index) =>
     set((state) => {
       const newImage = [...state.liveClassImage];
-      newImage[index].revokeObjectURL();
+      URL.revokeObjectURL(newImage[index]);
       newImage[index] = null;
       return { liveClassImage: newImage };
     }),
   setEmptyLiveClassImage: () =>
     set((state) => {
-      state.liveClassImage.map((image, i) => image.revokeObjectURL());
+      state.liveClassImage.forEach((image) => {
+        if (image) URL.revokeObjectURL(image);
+      });
+      return { liveClassImage: [null, null, null, null] };
     }),
 
   classData: null,
