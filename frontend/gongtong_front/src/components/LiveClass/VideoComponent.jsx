@@ -151,8 +151,31 @@ const VideoComponent = ({ isHost }) => {
     }
   }, [subscribers, localUser?.streamManager]);
 
+  // 화면 좌우 반전 넣는 코드
+  useEffect(() => {
+    if (hostUser && partUser && localUser) {
+      document.getElementById(
+        "video-" + hostUser.getStreamManager().stream.streamId
+      ).style.transform = "scaleX(-1)";
+
+      subscribers.map((data) => {
+        if (
+          document.getElementById(
+            "video-" + data.getStreamManager().stream.streamId
+          ) &&
+          localUser.getStreamManager().stream.streaId !==
+            data.getStreamManager().stream.streamId
+        ) {
+          document.getElementById(
+            "video-" + data.getStreamManager().stream.streamId
+          ).style.transform = "scaleX(-1)";
+        }
+      });
+    }
+  }, [hostUser, partUser, displayMode]);
+
   // 참여자 목록 정리하는 코드
-  useLayoutEffect(() => {
+  useEffect(() => {
     // console.log(partUser);
     // console.log(userInfo);
 
@@ -292,6 +315,18 @@ const VideoComponent = ({ isHost }) => {
         );
       });
   };
+
+  useEffect(() => {
+    if (userInfo) {
+      localUserSetting.setNickname(userInfo.nickname);
+      setLocalUser((prev) => {
+        if (prev) {
+          return { ...prev, nickname: userInfo.nickname };
+        }
+        return prev;
+      });
+    }
+  }, [userInfo]);
 
   const connectWebCam = async (session, newOV) => {
     try {

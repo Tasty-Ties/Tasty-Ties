@@ -7,6 +7,8 @@ const OvVideoComponent = ({ user }) => {
     if (user && user.streamManager && videoRef && videoRef.current) {
       user.getStreamManager().addVideoElement(videoRef.current);
     }
+    console.log(user);
+    console.log(user.nickname);
   }, [user]);
 
   return (
