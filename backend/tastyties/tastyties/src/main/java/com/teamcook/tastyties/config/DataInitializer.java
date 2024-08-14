@@ -39,6 +39,8 @@ public class DataInitializer {
             Language language = languageRepository.findById(1).orElse(null);
             User admin = new User(country, language, "admin", passwordEncoder.encode(adminPassword), "admin",
                     LocalDate.now(), "admin@admin.com", "ADMIN");
+
+
             userRepository.save(admin);
         }
     }
