@@ -23,7 +23,7 @@ const MyPage = () => {
   }
 
   return (
-    <div className="w-3/4 mt-10 mx-auto content-center relative">
+    <div className="w-3/5 mt-5 mx-auto justify-center relative">
       <Category informations={informations} />
     </div>
   );
