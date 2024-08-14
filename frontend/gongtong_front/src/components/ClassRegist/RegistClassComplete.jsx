@@ -15,7 +15,7 @@ const RegistClassComplete = () => {
         <p className="text-lg text-first">{classTime}</p>
       </div>
       <Button
-        text="강의 상세페이지로 이동"
+        text="강의 목록 페이지로 이동"
         type="green-long"
         onClick={() => nav("/class")}
       />

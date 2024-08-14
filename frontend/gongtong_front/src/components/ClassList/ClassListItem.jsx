@@ -20,7 +20,9 @@ const ClassListItem = (content) => {
         </span>
       </div>
       <div className="ClassListItem-TextBox">
-        <div className="font-bold text-base mt-2">{content.content.title}</div>
+        <div className="font-bold text-base mt-2 truncate">
+          {content.content.title}
+        </div>
         <div className="flex justify-between mt-1 items-center">
           <div className="text-xs flex-none text-slate-500">
             <span className="flex-initial">
