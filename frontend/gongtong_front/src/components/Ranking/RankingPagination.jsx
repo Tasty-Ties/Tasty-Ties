@@ -36,7 +36,7 @@ const RankingPagination = ({ pageCount, currentPage, totalPage }) => {
                     ...Object.fromEntries(searchParams),
                     page: start + i,
                   })}`}
-                  className={`px-3 py-2 rounded-full ${
+                  className={`px-3 py-2 rounded-full mx-0.5 ${
                     currentPage === start + i
                       ? "bg-teal-600 text-white"
                       : "bg-gray-200 text-gray-700"

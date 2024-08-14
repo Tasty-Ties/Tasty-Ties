@@ -18,7 +18,6 @@ const ClassList = () => {
   let cookie = Cookies.get("accessToken");
 
   useEffect(() => {
-    console.log(searchParams);
     setPage(0);
     fetchClassListData(0, searchParams);
   }, [location]);

@@ -1,10 +1,9 @@
-import axios from "axios";
+import { Client } from "@stomp/stompjs";
+import Cookies from "js-cookie";
 import { useEffect, useRef, useState } from "react";
 import ChatLog from "../components/ChatRoom/ChatLog";
-import { Client } from "@stomp/stompjs";
-import useMyPageStore from "../store/MyPageStore";
-import Cookies from "js-cookie";
 import ChatRoomList from "../components/ChatRoom/ChatRoomList";
+import useMyPageStore from "../store/MyPageStore";
 import { chatApi } from "./../service/Api";
 
 const MAIN_SERVER_URL = import.meta.env.VITE_MAIN_SERVER;
@@ -26,8 +25,6 @@ const ChatRoom = () => {
 
   const defaultImage =
     "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRF1IwK6-SxM83UpFVY6WtUZxXx-phss_gAUfdKbkTfau6VWVkt";
-
-  console.log("유저 정보입니다.", userInfo);
 
   useEffect(() => {
     fetchInformation();
@@ -68,11 +65,9 @@ const ChatRoom = () => {
 
   const getRoomList = async () => {
     if (userInfo && userInfo.length === 0) {
-      console.log("userInfo가 비어 있어서 리턴함");
       return;
     }
     try {
-      console.log("유저의 정보입니다.", userInfo);
       const response = await chatApi.get(`/chats/rooms`);
       console.log("유저의 채팅방 목록입니다.", response);
       setChatRoomList(response.data.data.chatRooms);

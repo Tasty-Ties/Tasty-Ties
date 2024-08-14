@@ -3,11 +3,11 @@ import { useOutletContext } from "react-router-dom";
 const ClassCookingTools = () => {
   const { cookingTools } = useOutletContext();
   return (
-    <div>
+    <div className="mt-10">
       {cookingTools && cookingTools.length > 0 ? (
         cookingTools.map((cookingTool, index) => (
           <div key={index}>
-            <div>{cookingTool}</div>
+            <div className="mb-3">{cookingTool}</div>
           </div>
         ))
       ) : (

@@ -125,40 +125,41 @@ const EditInfo = () => {
 
   return (
     <div>
-      <p className="text-xl mb-4">내 정보 수정</p>
-      <p className="mb-1 text-sm">프로필사진</p>
+      <p className="font-bold text-2xl">내 정보 수정</p>
+      <br />
+      <p className="font-bold mb-0.5 text-lg">프로필사진</p>
       <p className="mb-2">
         <IdImage setFiles={handleFileChange} />
       </p>
-      <p className="mb-1 text-sm">닉네임</p>
+      <p className="font-bold mb-0.5 text-lg">닉네임</p>
       <input
         type="text"
         value={nickname}
         onChange={(e) => setNickname(e.target.value)}
         className="border border-first-800 w-full rounded-md mb-2"
       />
-      <p className="mb-1 text-sm">비밀번호</p>
+      <p className="font-bold mb-0.5 text-lg">비밀번호</p>
       <input
         type="password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
         className="border border-first-800 w-full rounded-md mb-2"
       />
-      <p className="mb-1 text-sm">비밀번호 확인</p>
+      <p className="font-bold mb-0.5 text-lg">비밀번호 확인</p>
       <input
         type="password"
         value={verifyPassword}
         onChange={(e) => setVerifyPassword(e.target.value)}
         className="border border-first-800 w-full rounded-md mb-2"
       />
-      <p className="mb-1 text-sm">이메일</p>
+      <p className="font-bold mb-0.5 text-lg">이메일</p>
       <input
         type="email"
         value={email}
         onChange={handleEmailChange}
         className="border border-first-800 w-full rounded-md mb-2"
       />
-      <p className="mb-1 text-sm">자기소개</p>
+      <p className="font-bold mb-0.5 text-lg">자기소개</p>
 
       <input
         type="textarea"
@@ -167,7 +168,8 @@ const EditInfo = () => {
         className="border border-first-800 w-full rounded-md mb-2"
       />
       <div className="flex">
-        <p className="mb-1 text-sm">인스타 https://www.instagram.com/</p>
+        <p className="font-bold mb-0.5 text-lg">인스타</p>&nbsp;
+        <p>https://www.instagram.com/</p>
         <input
           type="text"
           value={instaHandle}
@@ -176,7 +178,8 @@ const EditInfo = () => {
         />
       </div>
       <div className="flex">
-        <p className="mb-1 text-sm">유튜브 https://www.youtube.com/@</p>
+        <p className="font-bold mb-0.5 text-lg">유튜브</p>&nbsp;
+        <p>https://www.youtube.com/@</p>
         <input
           type="text"
           value={youtubeHandle}
@@ -186,7 +189,7 @@ const EditInfo = () => {
       </div>
       <br />
 
-      <div className="space-x-40">
+      <div className="flex justify-around">
         <Button text="수정완료" type="edit-complete" onClick={handleSave} />
         <Button
           text="수정취소"

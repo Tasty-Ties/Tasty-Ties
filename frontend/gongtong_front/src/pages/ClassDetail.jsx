@@ -89,21 +89,27 @@ const ClassDetail = () => {
     let subtratedTime = Math.floor((endTime - startTime) / 1000 / 60);
     let hours = Math.floor(subtratedTime / 60);
     let minutes = subtratedTime % 60;
-    let cookingTime = hours > 0 ? `${hours}시간 ${minutes}분` : `${minutes}분`;
+    let cookingTime;
+    if (hours > 0) {
+      if (minutes > 0) {
+        cookingTime = `${hours}시간 ${minutes}분`;
+      } else {
+        cookingTime = `${hours}시간`;
+      }
+    } else {
+      cookingTime = `${minutes}분`;
+    }
     return cookingTime;
   };
   let cookingTime = timeCalculate();
-
-  console.log(classDetail);
-
-  const currentTime = new Date();
-  const classTime = new Date(classDetail.cookingClassStartTime);
 
   return (
     <div className="w-3/6 mx-auto justify-center mt-8">
       <ClassImageCarousel classDetail={classDetail} />
       <div className="mt-6">
-        <div className="text-4xl font-extrabold">{classDetail.title}</div>
+        <div className="text-4xl font-extrabold break-words">
+          {classDetail.title}
+        </div>
         <div className="mt-4 leading-6 flex items-center text-2xl font-bold">
           <span>{classDetail.dishName}</span>
           <CountryFlags countryCode={classDetail.countryCode} size="w-10" />
@@ -145,26 +151,19 @@ const ClassDetail = () => {
                 />
               )}
 
-            {!cookie &&
-              classDetail.host &&
-              // currentTime > classTime &&
-              classDetail.quota <= classDetail.reservedCount &&
+            {classDetail.quota <= classDetail.reservedCount &&
               !classDetail.userEnrolled && (
                 <Button text="마감" type="green-border-short" />
               )}
 
-            {cookie &&
-              !classDetail.host &&
-              // currentTime < classTime &&
-              classDetail.userEnrolled && (
-                <Button
-                  text="예약 취소하기"
-                  type="green-border-short"
-                  onClick={handleCancelReservation}
-                />
-              )}
+            {cookie && !classDetail.host && classDetail.userEnrolled && (
+              <Button
+                text="예약 취소하기"
+                type="green-border-short"
+                onClick={handleCancelReservation}
+              />
+            )}
 
-            {/* {currentTime < classTime && classDetail.host && ( */}
             {cookie && classDetail.host && (
               <Button
                 text="강의 삭제하기"
@@ -232,12 +231,12 @@ const ClassDetail = () => {
             <span className="ml-1">{classDetail.languageName}</span>
           </div>
         </div>
-        <div className="my-6">
+        <div className="my-6 flex flex-wrap">
           {classDetail.cookingClassTags &&
             classDetail.cookingClassTags.map((tag, index) => (
               <span
                 key={index}
-                className="border border-third text-third py-1 px-2 rounded-xl font-medium mr-2"
+                className="border border-third text-third py-1 px-2 rounded-xl font-medium mr-2 my-1"
               >
                 {tag}
               </span>

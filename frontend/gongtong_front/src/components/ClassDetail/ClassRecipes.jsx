@@ -8,8 +8,8 @@ const ClassRecipes = () => {
       ? [...recipes].sort((a, b) => Number(a.step) - Number(b.step))
       : [];
   return (
-    <div className="">
-      <div className="flex items-center">
+    <div className="mt-10">
+      <div className="flex items-center mb-5">
         <span className="mr-1">
           <svg
             width="20"
@@ -29,8 +29,8 @@ const ClassRecipes = () => {
       </div>
       {sortedRecipes.length > 0 ? (
         sortedRecipes.map((recipe, index) => (
-          <div key={index}>
-            <div>{recipe.step}</div>
+          <div key={index} className="flex my-2">
+            <div className="mr-3">{recipe.step}.</div>
             <div>{recipe.description}</div>
           </div>
         ))
