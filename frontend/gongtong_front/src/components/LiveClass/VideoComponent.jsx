@@ -104,12 +104,12 @@ const VideoComponent = ({ isHost }) => {
   }, []);
 
   useEffect(() => {
-    console.log(classData, userInfo);
+    // console.log(classData, userInfo);
   }, [classData, userInfo]);
 
   // 로컬 스토리지에 저장된 요소값들을 불러와서 저장
   const callPublisher = useCallback(() => {
-    console.log("callPublisher 호출됨");
+    // console.log("callPublisher 호출됨");
     const savedVideoDevice = localStorage.getItem("selectedVideoDevice");
     const savedAudioDevice = localStorage.getItem("selectedAudioDevice");
     const savedIsVideoActive = localStorage.getItem("isVideoActive") === "true";
@@ -254,7 +254,7 @@ const VideoComponent = ({ isHost }) => {
 
   useEffect(() => {
     initializeSpeechRecognition("ko", "KR"); // 기본 언어 설정
-    console.log("SpeechRecognition initialized", recognitionRef.current);
+    // console.log("SpeechRecognition initialized", recognitionRef.current);
   }, []);
 
   useEffect(() => {
@@ -286,7 +286,7 @@ const VideoComponent = ({ isHost }) => {
 
     await connectToSession(newSession, newOV);
     subscribeToStreamCreated(newSession);
-    console.log(newSession);
+    // console.log(newSession);
   };
 
   const connectToSession = async (session, newOV) => {
@@ -365,12 +365,12 @@ const VideoComponent = ({ isHost }) => {
 
   // 미디어 디바이스 교체
   useEffect(() => {
-    console.log("switchCam 호출됨");
+    // console.log("switchCam 호출됨");
     switchCamera();
   }, [selectedVideoDevice]);
 
   useEffect(() => {
-    console.log("switchMic 호출됨");
+    // console.log("switchMic 호출됨");
     switchMic();
   }, [selectedAudioDevice]);
 
@@ -429,7 +429,7 @@ const VideoComponent = ({ isHost }) => {
   };
 
   const subscribeToUserChanged = (session) => {
-    console.log("유저에게 변경사항이 있음");
+    // console.log("유저에게 변경사항이 있음");
     session.on("signal:userChanged", (event) => {
       const data = JSON.parse(event.data);
       const updatedSubscribers = subscribers.map((user) => {
@@ -456,7 +456,7 @@ const VideoComponent = ({ isHost }) => {
     session.on("streamDestroyed", (event) => {
       deleteSubscriber(event.stream);
       const connection = event.stream.connection;
-      console.log(hostUser);
+      // console.log(hostUser);
       if (connection.data.split(`"`)[3] === classData.hostProfile.nickname) {
         session.signal({
           type: "host-left",
@@ -541,11 +541,11 @@ const VideoComponent = ({ isHost }) => {
   }, []);
 
   const createToken = useCallback(async (sessionId) => {
-    console.log(sessionId);
+    // console.log(sessionId);
     const response = await api.post(
       `${MAIN_SERVER_URL}/classes/live/sessions/${sessionId}/connections`
     );
-    console.log(response.data);
+    // console.log(response.data);
     return response.data.data;
   }, []);
 
@@ -565,12 +565,12 @@ const VideoComponent = ({ isHost }) => {
       recognitionRef.current.maxAlternatives = 1;
 
       recognitionRef.current.onstart = () => {
-        console.log("Speech recognition started");
+        // console.log("Speech recognition started");
         setIsRecognitionActive(true); // 음성 인식이 시작될 때 상태 업데이트
       };
 
       recognitionRef.current.onend = () => {
-        console.log("Speech recognition ended");
+        // console.log("Speech recognition ended");
         setIsRecognitionActive(false); // 음성 인식이 종료될 때 상태 업데이트
       };
 
@@ -634,7 +634,7 @@ const VideoComponent = ({ isHost }) => {
 
       await gestureRecognizer.setOptions({ runningMode: "video" });
 
-      console.log("손 감지 대기 중...");
+      // console.log("손 감지 대기 중...");
       detectHandPresence(videoElement); // 손 감지 루프 시작
     } catch (error) {
       console.error("Gesture Recognizer 초기화 중 오류 발생:", error);
@@ -650,13 +650,13 @@ const VideoComponent = ({ isHost }) => {
 
     if (results.gestures && results.gestures.length > 0) {
       if (!isGestureActive) {
-        console.log("손 감지됨 - 제스처 인식 시작");
+        // console.log("손 감지됨 - 제스처 인식 시작");
         isGestureActive = true;
         startGestureRecognition(videoElement); // 손이 감지되면 제스처 인식 루프 시작
       }
     } else {
       if (isGestureActive) {
-        console.log("손이 화면에서 사라짐 - 제스처 인식 중지");
+        // console.log("손이 화면에서 사라짐 - 제스처 인식 중지");
         isGestureActive = false;
         cancelAnimationFrame(animationFrameId); // 손이 사라지면 루프 중지
       }
@@ -689,10 +689,10 @@ const VideoComponent = ({ isHost }) => {
     if (results.gestures && results.gestures.length > 0) {
       const gesture = results.gestures[0][0].categoryName;
       if (gesture === "Open_Palm" && !isRecognitionActive) {
-        console.log("손을 들었음, 음성 인식 시작");
+        // console.log("손을 들었음, 음성 인식 시작");
         startSpeechRecognition();
       } else if (gesture === "Closed_Fist" && isRecognitionActive) {
-        console.log("주먹을 쥐었음, 음성 인식 중지");
+        // console.log("주먹을 쥐었음, 음성 인식 중지");
         stopSpeechRecognition();
       }
     }
@@ -701,10 +701,10 @@ const VideoComponent = ({ isHost }) => {
   //음성 인식 시작 함수
   const startSpeechRecognition = () => {
     if (recognitionRef.current && recognitionRef.current.state !== "started") {
-      console.log("Starting speech recognition...");
+      // console.log("Starting speech recognition...");
       recognitionRef.current.start();
     } else {
-      console.log("Speech recognition is already active or object is null");
+      // console.log("Speech recognition is already active or object is null");
     }
   };
 
@@ -716,8 +716,6 @@ const VideoComponent = ({ isHost }) => {
 
   const sendMessage = (e) => {
     // e.preventDefault();
-
-    console.log("메세지 보내요::" + e);
     if (e === null || e === "") {
       return;
     }
