@@ -25,7 +25,7 @@ const Category = () => {
             <ProfileButton
               image={informations.profileImageUrl || Imageprofile}
               type="square"
-              size="size-16"
+              size="w-16"
               onClick={() => nav("/mypage")}
             />
             &nbsp;&nbsp;
