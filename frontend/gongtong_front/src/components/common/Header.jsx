@@ -16,10 +16,17 @@ import {
 import api from "../../service/Api";
 import logo from "../../assets/맛잇다로고3.png";
 import NotificationButton from "../Notification/NotificationButton";
+import useMyPageStore from "../../store/MyPageStore";
+import profileimage from "../../assets/MyPage/기본프로필사진.jpg";
 
 const NavItem = ({ text, link }) => {
   return (
-    <Typography as="li" variant="small" color="blue-gray" className="p-1 font-normal">
+    <Typography
+      as="li"
+      variant="small"
+      color="blue-gray"
+      className="p-1 font-normal"
+    >
       <Link to={link} className="flex items-center">
         {text}
       </Link>
@@ -31,7 +38,7 @@ const NavList = () => {
   return (
     <>
       <NavItem text="쿠킹클래스" link="/class" />
-      <NavItem text="숏폼" link="" />
+      {/* <NavItem text="숏폼" link="" /> */}
       <NavItem text="랭킹" link="/ranking" />
     </>
   );
@@ -53,17 +60,23 @@ const Header = () => {
 
   const accessToken = Cookies.get("accessToken");
 
+  const informations = useMyPageStore((state) => state.informations);
+  const fetchInformations = useMyPageStore((state) => state.fetchInformations);
+
   useEffect(() => {
     if (accessToken) {
       setIsLogin(true);
     } else {
       setIsLogin(false);
     }
+    fetchInformations();
   }, [accessToken]);
 
   const goLogin = () => {
     nav("/login");
   };
+
+  const profileImage = informations?.profileImageUrl || profileimage;
 
   const goMypage = () => {
     nav("/mypage");
@@ -107,24 +120,34 @@ const Header = () => {
                 <NotificationButton />
                 <Menu>
                   <MenuHandler className="hover:scale-105 cursor-pointer">
-                    <Avatar
-                      src="https://docs.material-tailwind.com/img/face-2.jpg"
-                      alt="avatar"
-                      size="sm"
-                    />
+                    <Avatar src={profileImage} alt="avatar" size="sm" />
                   </MenuHandler>
                   <MenuList>
-                    <MenuItem onClick={goMypage}>마이페이지</MenuItem>
-                    <MenuItem onClick={handleLogout}>로그아웃</MenuItem>
+                    <MenuItem className="font-nanum" onClick={goMypage}>
+                      마이페이지
+                    </MenuItem>
+                    <MenuItem className="font-nanum" onClick={handleLogout}>
+                      로그아웃
+                    </MenuItem>
                   </MenuList>
                 </Menu>
               </>
             ) : (
               <>
-                <Button variant="text" size="sm" className="lg:inline-block" onClick={goLogin}>
+                <Button
+                  variant="text"
+                  size="sm"
+                  className="lg:inline-block"
+                  onClick={goLogin}
+                >
                   <span>로그인</span>
                 </Button>
-                <Button variant="outlined" size="sm" className="lg:inline-block" onClick={goSignup}>
+                <Button
+                  variant="outlined"
+                  size="sm"
+                  className="lg:inline-block"
+                  onClick={goSignup}
+                >
                   <span>회원가입</span>
                 </Button>
               </>

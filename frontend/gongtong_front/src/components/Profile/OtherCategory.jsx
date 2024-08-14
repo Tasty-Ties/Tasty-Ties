@@ -10,8 +10,8 @@ const OtherCategory = (informations) => {
   console.log(information);
 
   return (
-    <div className="flex">
-      <div className="w-56">
+    <div className="flex h-screen">
+      <div className="w-56 flex-shrink-0">
         <br />
         <div className="flex flex-col">
           {information.userProfileDto && (
@@ -34,37 +34,44 @@ const OtherCategory = (informations) => {
                   />
                 </p>
 
-                <p className="text-sm ml-1 mt-1">
+                <p className="text-base ml-1 mt-1">
                   {information.userProfileDto?.nickname}
                 </p>
-                <p className="text-sm ml-1 mt-1">
+                <p className="text-base ml-1 mt-1">
                   {information.userProfileDto?.description}
                 </p>
               </div>
             </div>
           )}
-          <div className="flex mt-1">
+          <div className="flex justify-around mt-1">
             <p className="flex">
               <img src={instalogo} alt="인스타로고" className="size-6" />
-              &nbsp;
-              <p className="text-sm">
-                {information.userProfileDto?.instagramHandle}
-              </p>
               &nbsp;&nbsp;
+              <a
+                className="text-base text-gray-700"
+                href={information.userProfileDto?.instagramUrl}
+              >
+                {information.userProfileDto?.instagramHandle}
+              </a>
+              &nbsp;&nbsp;&nbsp;&nbsp;
               <p className="flex">
                 <img src={youtubelogo} alt="유튜브로고" className="size-6" />
-                &nbsp;
-                <p className="text-sm">
+                &nbsp;&nbsp;
+                <a
+                  className="text-base text-gray-700"
+                  href={information.userProfileDto?.youtubeUrl}
+                >
                   {information.userProfileDto?.youtubeHandle}
-                </p>
+                </a>
               </p>
             </p>
           </div>
         </div>
 
         <br />
+        <br />
         <hr />
-        <ul>
+        <ul className="text-lg">
           <li>
             <NavLink
               to=""
