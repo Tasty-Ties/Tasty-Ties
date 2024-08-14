@@ -1,4 +1,5 @@
 import AppRoutes from "./Routes";
+import Cookies from "js-cookie";
 
 import Header from "./components/common/Header";
 import { useLocation, Navigate, useNavigate } from "react-router-dom";
@@ -25,12 +26,18 @@ function App() {
   const nav = useNavigate();
 
   useEffect(() => {
-    if (location.pathname === "/liveclass") {
+    if (location.pathname === "/liveclass" || location.pathname === "/intro") {
       setIsHeaderVisible(false);
     } else {
       setIsHeaderVisible(true);
     }
   }, [location.pathname]);
+
+  useEffect(() => {
+    if (!Cookies.get("accessToken")) {
+      nav("/intro");
+    }
+  }, []);
 
   return (
     <>
