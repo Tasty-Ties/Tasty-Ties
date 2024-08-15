@@ -124,7 +124,7 @@ const MainCarousel = () => {
   return (
     <div ref={outerDivRef} className="h-full overflow-y-auto scrollbar-hidden">
       <MainCarouselItem className="bg-first-600">
-        <div className="flex flex-row">
+        <div className="flex flex-row items-center justify-center">
           <div className="flex flex-col">
             <Typography variant="h1" color="white" className="font-nanum">
               맛으로 문화를 잇는 공간
@@ -147,47 +147,58 @@ const MainCarousel = () => {
               </Button>
             </div>
           </div>
+          <img
+            className="w-[36%] ml-16 rounded-lg object-cover object-center shadow-xl shadow-blue-gray-900/50"
+            src="/images/main/메인화면.png"
+            alt="nature image"
+          />
         </div>
       </MainCarouselItem>
       <MainCarouselItem className="bg-white">
-        <div className="flex flex-row">
-          <div className="flex flex-col items-center">
-            <Typography variant="h1" className="font-nanum">
-              요리와 소통을 음성으로 간편하게
-            </Typography>
-            <Typography variant="h6" className="mt-8 font-nanum">
-              요리 중 손으로 채팅하기 힘들 때 음성 채팅으로 손쉽게 소통해 보세요.
-            </Typography>
-            <Typography variant="h6" className="font-nanum">
-              손이 바쁜 상황에서도 편리하게 대화할 수 있어요.
-            </Typography>
+        <div className="flex flex-col items-center">
+          <Typography variant="h1" className="font-nanum">
+            요리와 소통을 음성으로 간편하게
+          </Typography>
+          <Typography variant="h6" className="mt-8 font-nanum">
+            요리 중 손으로 채팅하기 힘들 때 음성 채팅으로 손쉽게 소통해 보세요.
+          </Typography>
+          <Typography variant="h6" className="font-nanum">
+            손이 바쁜 상황에서도 편리하게 대화할 수 있어요.
+          </Typography>
+          <img
+            className="w-[44%] mt-20 rounded-lg object-cover object-center shadow-xl shadow-blue-gray-900/50"
+            src="/images/main/실시간클래스화면.png"
+            alt="nature image"
+          />
+        </div>
+      </MainCarouselItem>
+      <MainCarouselItem className="bg-second-200">
+        <div className="flex flex-col w-[48%] mx-auto items-center">
+          <Typography variant="h1" className="font-nanum">
+            언어 걱정 없이,
+          </Typography>
+          <Typography variant="h1" className="font-nanum">
+            전 세계 친구들과 소통하세요
+          </Typography>
+          <Typography variant="h6" className="mt-8 font-nanum">
+            서로 다른 언어로 채팅해도 자동 번역으로 모두가 이해할 수 있어요.
+          </Typography>
+          <Typography variant="h6" className="font-nanum">
+            전 세계 사람들과 편하게 대화하세요!
+          </Typography>
+          <div className="flex flex-row mt-10 mb-12 gap-x-1 gap-y-2 flex-wrap justify-center">
+            {countries.map((country) => (
+              <CountryChip key={country.code} country={country} />
+            ))}
           </div>
+          <img
+            className="object-cover object-center w-[88%]"
+            src="/images/main/메신저화면.png"
+            alt="nature image"
+          />
         </div>
       </MainCarouselItem>
       <MainCarouselItem className="bg-third-100">
-        <div className="flex flex-row">
-          <div className="flex flex-col w-[48%] mx-auto">
-            <Typography variant="h1" className="font-nanum">
-              언어 걱정 없이,
-            </Typography>
-            <Typography variant="h1" className="font-nanum">
-              전 세계 친구들과 소통하세요
-            </Typography>
-            <Typography variant="h6" className="mt-10 font-nanum">
-              서로 다른 언어로 채팅해도 자동 번역으로 모두가 이해할 수 있어요.
-            </Typography>
-            <Typography variant="h6" className="font-nanum">
-              전 세계 사람들과 편하게 대화하세요!
-            </Typography>
-            <div className="flex flex-row mt-20 gap-x-1 gap-y-2 flex-wrap">
-              {countries.map((country) => (
-                <CountryChip key={country.code} country={country} />
-              ))}
-            </div>
-          </div>
-        </div>
-      </MainCarouselItem>
-      <MainCarouselItem className="bg-second-100">
         <div className="flex flex-row">
           <div className="flex flex-col items-center">
             <Typography variant="h1" className="font-nanum">
@@ -199,6 +210,11 @@ const MainCarousel = () => {
             <Typography variant="h6" className="font-nanum">
               당신의 요리 여정이 한층 더 특별해집니다.
             </Typography>
+            <img
+              className="w-[44%] mt-20 rounded-lg object-cover object-center shadow-xl shadow-blue-gray-900/50"
+              src="/images/main/앨범화면.png"
+              alt="nature image"
+            />
           </div>
         </div>
       </MainCarouselItem>

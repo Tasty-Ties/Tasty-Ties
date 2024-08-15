@@ -1,6 +1,6 @@
 import React, { useState, useRef } from "react";
 
-const ShortformListItem = () => {
+const ShortformListItem = ({ vedioUrl }) => {
   const [isHovered, setIsHovered] = useState(false);
   const videoRef = useRef(null);
 
@@ -25,7 +25,7 @@ const ShortformListItem = () => {
       onMouseLeave={handleMouseLeave}
     >
       <video ref={videoRef} className="w-full h-full object-contain" controls={isHovered}>
-        <source src="/vedios/main/sample_shortform.mp4" type="video/mp4" />
+        <source src={vedioUrl ? vedioUrl : "/vedios/main/sample_shortform.mp4"} type="video/mp4" />
         Your browser does not support the video tag.
       </video>
 
