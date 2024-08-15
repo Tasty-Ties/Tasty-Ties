@@ -326,7 +326,7 @@ const VideoComponent = ({ isHost }) => {
         error.message
       );
       pushNotification("error", "유효한 토큰이 아닙니다.");
-      nav("/classwaiting");
+      nav("/mypage");
     }
   };
 
@@ -339,6 +339,7 @@ const VideoComponent = ({ isHost }) => {
       })
       .catch((error) => {
         pushNotification("error", "유효한 세션이 아닙니다.");
+        nav("/mypage");
       });
   };
 
