@@ -11,6 +11,7 @@ import api from "./../service/Api";
 import Button from "../common/components/Button";
 import { getClassDetail } from "../service/CookingClassAPI";
 import useMyPageStore from "../store/MyPageStore";
+import videoOff from "./../assets/LiveClass/videoOff.png";
 
 const ClassWaiting = () => {
   const nav = useNavigate();
@@ -152,10 +153,7 @@ const ClassWaiting = () => {
             className="transform scale-x-[-1]"
           ></video>
         ) : (
-          <img
-            className=""
-            src="https://cdn.pixabay.com/video/2023/11/22/190276-887495682_tiny.jpg"
-          />
+          <img className="" src={videoOff} />
         )}
       </div>
       <div className="flex flex-row self-center pt-1">
