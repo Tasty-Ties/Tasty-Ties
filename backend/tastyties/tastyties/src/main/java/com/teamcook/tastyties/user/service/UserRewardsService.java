@@ -173,11 +173,13 @@ public class UserRewardsService {
             double score = result.getScore();
             User user = userRepository.findById(userId).orElseThrow();
             log.debug("userId for test: {}", user.getUserId());
-            UserStatistics userStatistics = user.getUserStatistics();
-            rankedUsers.add(new RankedUserDto(userId, user.getUsername(), user.getNickname(), score, rank,
-                    userStatistics.getClassesHosted(), userStatistics.getClassesAttended(),
-                    user.getProfileImageUrl(), user.getDescription()));
-            rank++;
+            if (!user.isDeleted()) {
+                UserStatistics userStatistics = user.getUserStatistics();
+                rankedUsers.add(new RankedUserDto(userId, user.getUsername(), user.getNickname(), score, rank,
+                        userStatistics.getClassesHosted(), userStatistics.getClassesAttended(),
+                        user.getProfileImageUrl(), user.getDescription()));
+                rank++;
+            }
         }
 
 
@@ -238,11 +240,13 @@ public class UserRewardsService {
             if (user.getUserId() == 1) {
                 continue;
             }
-            UserStatistics userStatistics = user.getUserStatistics();
-            rankedUsers.add(new RankedUserDto(user.getUserId(), user.getUsername(), user.getNickname(), user.getActivityPoint(), rank,
-                    userStatistics.getClassesHosted(), userStatistics.getClassesAttended(),
-                    user.getProfileImageUrl(), user.getDescription()));
-            rank++;
+            if (!user.isDeleted()) {
+                UserStatistics userStatistics = user.getUserStatistics();
+                rankedUsers.add(new RankedUserDto(user.getUserId(), user.getUsername(), user.getNickname(), user.getActivityPoint(), rank,
+                        userStatistics.getClassesHosted(), userStatistics.getClassesAttended(),
+                        user.getProfileImageUrl(), user.getDescription()));
+                rank++;
+            }
         }
 
         RankedUserDto myRank = null;
