@@ -117,21 +117,13 @@ const ExitLiveClass = ({
 
     // 이동
     if (isHost) {
-      navigate(
-        "/classcomplete",
-        {
-          replace: true,
-        },
-        100
-      );
+      navigate("/classcomplete", {
+        replace: true,
+      });
     } else {
-      navigate(
-        "/reviewWrite",
-        {
-          replace: true,
-        },
-        100
-      );
+      navigate("/reviewWrite", {
+        replace: true,
+      });
     }
   };
 

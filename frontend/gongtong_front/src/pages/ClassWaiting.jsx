@@ -12,6 +12,7 @@ import Button from "../common/components/Button";
 import { getClassDetail } from "../service/CookingClassAPI";
 import useMyPageStore from "../store/MyPageStore";
 import videoOff from "./../assets/LiveClass/videoOff.png";
+import { pushNotification } from "../components/common/Toast";
 
 const ClassWaiting = () => {
   const nav = useNavigate();
@@ -84,14 +85,14 @@ const ClassWaiting = () => {
         setSessionId(response.data.data);
         localStorage.setItem("sessionId", response.data.data);
       } catch (error) {
-        const status = error.response?.data.status;
+        const status = error.response.status;
         switch (status) {
           case 403:
-            alert("해당 클래스의 호스트가 아닙니다.");
+            pushNotification("error", "해당 클래스의 호스트가 아닙니다.");
             nav("/mypage");
             break;
           case 404:
-            alert("해당 쿠킹 클래스가 존재하지 않습니다.");
+            pushNotification("error", "해당 쿠킹 클래스가 존재하지 않습니다.");
             nav("/class");
             break;
           default:
@@ -107,14 +108,17 @@ const ClassWaiting = () => {
         setSessionId(response.data.data);
         localStorage.setItem("sessionId", response.data.data);
       } catch (error) {
-        const status = error.response.data.status;
+        const status = error.response.status;
         switch (status) {
           case 403:
-            alert("해당 클래스의 게스트가 아닙니다.");
+            pushNotification("error", "해당 클래스의 게스트가 아닙니다.");
             nav("/mypage");
             break;
           case 404:
-            alert("호스트가 아직 클래스를 시작하지 않았습니다.");
+            pushNotification(
+              "error",
+              "호스트가 아직 클래스를 시작하지 않았습니다."
+            );
             break;
           default:
         }
