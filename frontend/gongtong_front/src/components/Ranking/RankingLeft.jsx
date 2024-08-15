@@ -5,7 +5,6 @@ import defaultImage from "./../../assets/MyPage/기본프로필사진.jpg";
 import { Link } from "react-router-dom";
 
 export default function App({ topRanking, sort }) {
-  console.log(topRanking);
   const data = [
     {
       rank: topRanking[1]?.rank,

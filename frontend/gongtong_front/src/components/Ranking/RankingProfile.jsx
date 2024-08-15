@@ -7,7 +7,6 @@ const RankingProfile = ({ rankingList }) => {
   const isMyRankedOnCurrentPage = rankingList.rankedUsers?.some(
     (user) => user.userId === rankingList.myRanked?.userId
   );
-
   return (
     <>
       {!isMyRankedOnCurrentPage && rankingList.myRanked && (
@@ -17,18 +16,16 @@ const RankingProfile = ({ rankingList }) => {
               ? "순위없음"
               : rankingList.myRanked.rank}
           </div>
-          <div className="col-span-2 flex items-center">
-            <Link to="/mypage">
-              <span className="mr-3">
-                <img
-                  src={rankingList.myRanked.profileImageUrl || defaultImage}
-                  className="w-8 h-8 bg-center rounded-full"
-                  alt="Profile"
-                />
-              </span>
-              <span>{rankingList.myRanked.nickname}</span>
-            </Link>
-          </div>
+          <Link to="/mypage" className="col-span-2 flex items-center">
+            <span className="mr-3">
+              <img
+                src={rankingList.myRanked.profileImageUrl || defaultImage}
+                className="w-8 h-8 bg-center rounded-full"
+                alt="Profile"
+              />
+            </span>
+            <span>{rankingList.myRanked.nickname}</span>
+          </Link>
           <div className="col-span-1">{rankingList.myRanked.classesHosted}</div>
           <div className="col-span-1">
             {rankingList.myRanked.classesAttended}
