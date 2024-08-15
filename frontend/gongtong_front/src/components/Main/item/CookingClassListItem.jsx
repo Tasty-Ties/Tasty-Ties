@@ -28,7 +28,7 @@ const CookingClassListItem = ({ cookingClass }) => {
 
   useEffect(() => {
     countries.forEach((country) => {
-      if (country.code === cookingClass.hostCountry.alpha2) {
+      if (country.code === cookingClass.classCountry.alpha2) {
         setCountry(country);
       }
     });
