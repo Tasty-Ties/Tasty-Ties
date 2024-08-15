@@ -35,7 +35,7 @@ const CookingClassList = () => {
   return (
     <div className="flex flex-col mx-auto content-center relative">
       <Typography variant="h4" className="ml-12 font-nanum">
-        최신 등록된 강의
+        최근 등록된 강의
       </Typography>
       <Carousel
         className="h-auto px-6 flex items-center overflow-hidden"
@@ -77,12 +77,18 @@ const CookingClassList = () => {
       >
         <div className="grid grid-cols-4 w-full h-[90%]">
           {cookingClasses.slice(0, 4).map((cookingClass) => (
-            <CookingClassListItem key={cookingClass.uuid} cookingClass={cookingClass} />
+            <CookingClassListItem
+              key={cookingClass.uuid}
+              cookingClass={cookingClass}
+            />
           ))}
         </div>
         <div className="ml-12 grid grid-cols-4 w-full h-[90%]">
           {cookingClasses.slice(4, 8).map((cookingClass) => (
-            <CookingClassListItem key={cookingClass.uuid} cookingClass={cookingClass} />
+            <CookingClassListItem
+              key={cookingClass.uuid}
+              cookingClass={cookingClass}
+            />
           ))}
         </div>
       </Carousel>

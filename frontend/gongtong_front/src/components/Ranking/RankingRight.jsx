@@ -10,11 +10,11 @@ const RankingRight = ({ rankingList, sort, onSortChange }) => {
       </div>
       <div className="grid grid-cols-12 text-center">
         <div className="col-span-1">순위</div>
-        <div className="col-span-2">닉네임</div>
+        <div className="col-span-3">닉네임</div>
         <div className="col-span-1">개강</div>
         <div className="col-span-1">수강</div>
         <div className="col-span-1">마일리지</div>
-        <div className="col-span-6">한줄 소개</div>
+        <div className="col-span-5">한줄 소개</div>
       </div>
       <hr className="my-4" />
       {!rankingList ? (

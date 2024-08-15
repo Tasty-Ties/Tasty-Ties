@@ -5,7 +5,6 @@ import defaultImage from "./../../assets/MyPage/기본프로필사진.jpg";
 import { Link } from "react-router-dom";
 
 export default function App({ topRanking, sort }) {
-  console.log(topRanking);
   const data = [
     {
       rank: topRanking[1]?.rank,
@@ -53,7 +52,7 @@ export default function App({ topRanking, sort }) {
         <div
           key={index}
           style={{
-            margin: "0 20px",
+            margin: "0 15px",
             textAlign: "center",
             height: 400,
             display: "flex",
@@ -73,6 +72,7 @@ export default function App({ topRanking, sort }) {
                       width: "100px",
                       height: "100px",
                       borderRadius: "50%",
+                      objectFit: "cover",
                     }}
                   />
                   {entry.rank === 1 && showCrown && (

@@ -50,8 +50,8 @@ const ClassDetail = () => {
         pushNotification("success", "예약 되었습니다.");
       }
       fetchClassDetail(id);
-    } catch (error) {
-      console.error("클래스 예약 실패:", error);
+    } catch (e) {
+      pushApiErrorNotification(e);
     }
   };
 
@@ -83,7 +83,6 @@ const ClassDetail = () => {
       let isTrue = confirm("정말 삭제하시겠습니까?");
       if (isTrue) {
         const response = await setDeleteClass(id);
-        console.log(response);
         if (response.status === 204 || response.status === 200) {
           nav("/class", {
             resplace: true,
@@ -91,8 +90,8 @@ const ClassDetail = () => {
           pushNotification("success", "클래스 삭제가 완료되었습니다.");
         }
       }
-    } catch (error) {
-      console.error("클래스 삭제 실패", error);
+    } catch (e) {
+      pushApiErrorNotification(e);
     }
   };
 
@@ -164,7 +163,8 @@ const ClassDetail = () => {
                 />
               )}
             {classDetail.quota <= classDetail.reservedCount &&
-              !classDetail.userEnrolled && (
+              !classDetail.userEnrolled &&
+              !classDetail.host && (
                 <Button text="마감" type="green-border-short" />
               )}
 

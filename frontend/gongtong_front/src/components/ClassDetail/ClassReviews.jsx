@@ -14,7 +14,7 @@ const ClassReview = () => {
   return (
     <>
       <div className="w-full mt-20">
-        {classReviews > 0 ? (
+        {classReviews ? (
           classReviews.map((classReview, index) => (
             <div key={index} className="flex my-6">
               <div className="basis-4/6 truncate mr-4 ">

@@ -39,7 +39,6 @@ const AlbumPage = () => {
 
   useEffect(() => {
     setPage(currentPage);
-    console.log(currentPage, countryCode);
     try {
       fetchAlbumLists(currentPage, countryCode);
     } catch (e) {
