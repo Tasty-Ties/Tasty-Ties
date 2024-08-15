@@ -13,6 +13,7 @@ const ReviewWrite = () => {
   const classData = useVideoStore((state) => state.classData);
   const [comment, setComment] = useState();
 
+  console.log(classData);
   const registReview = async () => {
     if (comment.trim() === "") {
       alert("수강평을 작성해주세요.");
