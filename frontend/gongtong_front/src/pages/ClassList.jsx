@@ -111,11 +111,12 @@ const ClassList = () => {
       {cookie ? (
         <Link
           to="/classregist"
-          className="fixed bottom-32 right-36 float-right"
+          className="fixed bottom-24 right-32 float-right"
         >
           <img
             src={"/images/classImages/add-icon.svg"}
             alt="요리클래스 등록하기"
+            className="w-20"
           />
         </Link>
       ) : (

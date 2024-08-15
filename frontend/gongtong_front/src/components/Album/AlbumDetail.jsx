@@ -130,7 +130,7 @@ const AlbumDetail = ({ open, setOpen, folderId }) => {
                               ? defaultImage
                               : albumDetailImageLists.host?.profileImageUrl
                           }
-                          className="size-3.5 rounded-full"
+                          className="size-3.5 rounded-full object-fit"
                         />
                         {hostNickname}
                       </Link>

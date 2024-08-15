@@ -16,7 +16,7 @@ const RankingProfile = ({ rankingList }) => {
               ? "순위없음"
               : rankingList.myRanked.rank}
           </div>
-          <Link to="/mypage" className="col-span-2 flex items-center">
+          <Link to="/mypage" className="col-span-3 flex items-center">
             <span className="mr-3">
               <img
                 src={rankingList.myRanked.profileImageUrl || defaultImage}
@@ -24,14 +24,14 @@ const RankingProfile = ({ rankingList }) => {
                 alt="Profile"
               />
             </span>
-            <span>{rankingList.myRanked.nickname}</span>
+            <span className="truncate">{rankingList.myRanked.nickname}</span>
           </Link>
           <div className="col-span-1">{rankingList.myRanked.classesHosted}</div>
           <div className="col-span-1">
             {rankingList.myRanked.classesAttended}
           </div>
           <div className="col-span-1">{rankingList.myRanked.score}</div>
-          <div className="col-span-6">
+          <div className="col-span-5">
             {rankingList.myRanked.description || "자기소개가 없습니다."}
           </div>
         </div>
@@ -49,19 +49,19 @@ const RankingProfile = ({ rankingList }) => {
           >
             <div className="col-span-1">{user.rank}</div>
             {user.userId === rankingList.myRanked?.userId ? (
-              <Link to="/mypage" className="col-span-2 flex items-center">
+              <Link to="/mypage" className="col-span-3 flex items-center">
                 <span className="mr-3">
                   <img
                     src={user.profileImageUrl || defaultImage}
                     className="w-8 h-8 bg-center rounded-full"
                   />
                 </span>
-                <span>{user.nickname}</span>
+                <span className="truncate">{user.nickname}</span>
               </Link>
             ) : (
               <Link
                 to={`/otherpage/${user.username}`}
-                className="col-span-2 flex items-center"
+                className="col-span-3 flex items-center"
               >
                 <span className="mr-3">
                   <img
@@ -69,13 +69,13 @@ const RankingProfile = ({ rankingList }) => {
                     className="w-8 h-8 bg-center rounded-full"
                   />
                 </span>
-                <span>{user.nickname}</span>
+                <span className="truncate">{user.nickname}</span>
               </Link>
             )}
             <div className="col-span-1">{user.classesHosted}</div>
             <div className="col-span-1">{user.classesAttended}</div>
             <div className="col-span-1">{user.score}</div>
-            <div className="col-span-6 truncate">
+            <div className="col-span-5 truncate">
               {user.description || "자기소개가 없습니다."}
             </div>
           </div>

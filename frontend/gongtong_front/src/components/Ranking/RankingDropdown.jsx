@@ -10,7 +10,7 @@ const RankingDropdown = ({ sort, onSortChange }) => {
   return (
     <Menu placement="bottom-end">
       <MenuHandler>
-        <Button className="bg-transparent text-black text-sm border border-2 shadow-none mb-4 px-4 py-2">
+        <Button className="bg-transparent text-black text-sm border border-2 shadow-none mb-2 px-4 py-2">
           {sort === "weekly"
             ? "주간"
             : sort === "monthly"

@@ -38,11 +38,11 @@ const Ranking = () => {
   }, [sort, currentPage]);
 
   return (
-    <div className="grid grid-cols-10 mx-auto ">
-      <div className="col-span-4 mr-24 mt-36">
+    <div className="grid grid-cols-10 mx-auto w-5/6 ">
+      <div className="col-span-4 mr-16 mt-36">
         <RankingLeft topRanking={topRanking} />
       </div>
-      <div className="col-span-6 mt-10">
+      <div className="col-span-6 mt-6">
         <RankingRight
           rankingList={rankingList}
           sort={sort}

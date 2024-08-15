@@ -14,7 +14,7 @@ const RankingPagination = ({ pageCount, currentPage, totalPage }) => {
   }, [currentPage, pageCount, start]);
 
   return (
-    <div className="flex justify-center items-center mt-8">
+    <div className="flex justify-center items-center mt-5">
       <ul className="flex">
         <li className={`mx-1 ${noPrev ? "invisible" : ""}`}>
           <Link
