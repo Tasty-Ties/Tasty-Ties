@@ -46,18 +46,6 @@ const ExitLiveClass = ({
       alert("기념사진을 찍어주세요!");
       return;
     } else if (isImageExist) {
-      // 세션키 삭제
-      if (isHost) {
-        try {
-          const exitResponse = await api.delete(
-            `/classes/live/sessions/${classId}`
-          );
-          console.log(exitResponse);
-        } catch (error) {
-          console.error();
-        }
-      }
-
       // 앨범 사진 저장
       const formData = new FormData();
       for (let i = 0; i < liveClassImage.length; i++) {
@@ -93,26 +81,6 @@ const ExitLiveClass = ({
             "Content-Type": "multipart/form-data",
           },
         });
-
-        //-------수정한 코드--------------------
-        if (response.status === 200 && isHost) {
-          navigate(
-            "/classcomplete",
-            {
-              replace: true,
-            },
-            100
-          );
-        } else if (response.status === 200 && !isHost) {
-          navigate(
-            "/reviewWrite",
-            {
-              replace: true,
-            },
-            100
-          );
-        }
-        //---------------------------------------
       } catch (error) {
         console.error(error);
       } finally {
@@ -120,7 +88,17 @@ const ExitLiveClass = ({
       }
     }
 
-    // const mileage = {isHost ? 50 : 5}
+    // 세션키 삭제
+    if (isHost) {
+      try {
+        const exitResponse = await api.delete(
+          `/classes/live/sessions/${classId}`
+        );
+        console.log(exitResponse);
+      } catch (error) {
+        console.error();
+      }
+    }
 
     // 마일리지 추가
     try {
@@ -136,6 +114,25 @@ const ExitLiveClass = ({
     } catch (error) {
       console.error(error);
     }
+
+    // 이동
+    if (isHost) {
+      navigate(
+        "/classcomplete",
+        {
+          replace: true,
+        },
+        100
+      );
+    } else {
+      navigate(
+        "/reviewWrite",
+        {
+          replace: true,
+        },
+        100
+      );
+    }
   };
 
   return (
@@ -143,11 +140,28 @@ const ExitLiveClass = ({
       <Dialog open={isExitOpen} handler={exitOpen}>
         <DialogHeader>클래스 퇴장</DialogHeader>
         <DialogBody>
-          {isHost
-            ? "정말 클래스를 나가시겠습니까?\n퇴장 시 수업이 종료되고 아래 사진이 요리 앨범에 저장됩니다."
-            : isForcedExit
-            ? "호스트가 클래스를 종료했습니다.\n아래 사진이 요리 앨범에 저장됩니다."
-            : "지금 나가시면 재입장이 불가합니다.\n퇴장 시 아래 사진이 요리 앨범에 저장됩니다."}
+          {isHost ? (
+            <>
+              <div>정말 클래스를 나가시겠습니까?</div>
+              <div>
+                퇴장 시 수업이 종료되고 아래 사진이 요리 앨범에 저장됩니다.
+              </div>
+            </>
+          ) : isForcedExit ? (
+            <>
+              <div>호스트가 클래스를 종료했습니다.</div>
+              {isImageExist ? (
+                <div>아래 사진이 요리 앨범에 저장됩니다.</div>
+              ) : null}
+            </>
+          ) : (
+            <>
+              <div>지금 나가시면 재입장이 불가합니다.</div>
+              {isImageExist ? (
+                <div>퇴장 시 아래 사진이 요리 앨범에 저장됩니다.</div>
+              ) : null}
+            </>
+          )}
           <div className="mt-2 grid grid-cols-4 grid-rows-1 gap-2">
             {liveClassImage.map((image, i) =>
               image ? <img src={image} key={i} /> : null

@@ -8,9 +8,7 @@ const StreamComponent = ({ user }) => {
         <div className="streamComponent">
           <OvVideoComponent user={user} />
         </div>
-      ) : (
-        <h1>뭔가 잘못됏다...</h1>
-      )}
+      ) : null}
     </div>
   );
 };
