@@ -69,8 +69,9 @@ public class AlbumService {
     @Transactional
     public String registerFolder(Album album, List<MultipartFile> images,
                                  FolderRegisterDto registerDto) {
-
-        Folder folder = folderRepository.findByCookingClassUuid(registerDto.getCookingClassUuid());
+        log.debug("images.size: {}", images.size());
+        log.debug("registerDto: {}", registerDto);
+        Folder folder = folderRepository.findByCookingClassUuidAndAlbum(registerDto.getCookingClassUuid(), album);
 
         if (folder != null) {
             folder.updateFolder(album, registerDto.getCookingClassUuid(),
@@ -101,6 +102,7 @@ public class AlbumService {
 
     public FolderListResponseDto getFolderList(Album album, Pageable pageable, String countryCode) {
         Page<FolderListDto> folderListByAlbum = folderRepository.getFolderListByAlbum(album, pageable, countryCode);
+        log.debug("folderListByAlbum.size: {}", folderListByAlbum.getSize());
         List<CountrySearchDto> countryDistinctList = folderRepository.getCountryDistinctList(album);
         return new FolderListResponseDto(folderListByAlbum, countryDistinctList);
     }
