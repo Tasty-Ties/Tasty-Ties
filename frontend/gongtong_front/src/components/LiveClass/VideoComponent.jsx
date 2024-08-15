@@ -228,7 +228,6 @@ const VideoComponent = ({ isHost }) => {
   }, [partUser, localUser]);
 
   useEffect(() => {
-    window.addEventListener("beforeunload", onbeforeunload);
     setSubscribers([]);
     setLocalUser(undefined);
     remotes.current.length = 0;
@@ -273,7 +272,7 @@ const VideoComponent = ({ isHost }) => {
     // setDisplayMode(0);
 
     return () => {
-      window.removeEventListener("beforeunload", onbeforeunload);
+      leaveSession();
     };
   }, []);
 
@@ -558,23 +557,21 @@ const VideoComponent = ({ isHost }) => {
     }
   };
 
-  const onbeforeunload = (event) => {
-    if (session.current) {
-      session.current.disconnect();
-    }
-    session.current.unpublish(currentPublisher.current);
-    event.preventDefault();
-    setOV(null);
-    session.current = null;
-    setSubscribers([]);
-    setLocalUser(undefined);
-    remotes.current.length = 0;
-  };
-
   const leaveSession = () => {
+    currentPublisher.current.stream.mediaStream.getTracks().forEach((track) => {
+      console.log(track);
+      track.stop();
+      track.enabled = false;
+      console.log(track);
+      currentPublisher.current.stream.mediaStream.removeTrack(track);
+    });
+
     if (session.current) {
       session.current.disconnect();
     }
+
+    session.current.unpublish(currentPublisher.current);
+
     setOV(null);
     session.current = null;
     setSubscribers([]);
