@@ -50,11 +50,11 @@ const ShortformList = () => {
         )}
       >
         <div className="grid grid-cols-5 gap-4 w-full">
-          <ShortformListItem />
-          <ShortformListItem />
-          <ShortformListItem />
-          <ShortformListItem />
-          <ShortformListItem />
+          <ShortformListItem vedioUrl="/vedios/main/shortform_1.mp4" />
+          <ShortformListItem vedioUrl="/vedios/main/shortform_2.mp4" />
+          <ShortformListItem vedioUrl="/vedios/main/shortform_3.mp4" />
+          <ShortformListItem vedioUrl="/vedios/main/shortform_4.mp4" />
+          <ShortformListItem vedioUrl="/vedios/main/shortform_5.mp4" />
         </div>
         <div className="ml-24 grid grid-cols-5 gap-4 w-full">
           <ShortformListItem />
