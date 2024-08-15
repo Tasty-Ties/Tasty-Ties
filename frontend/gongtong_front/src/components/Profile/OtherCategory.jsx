@@ -16,7 +16,7 @@ const OtherCategory = (informations) => {
         <br />
         <div className="flex flex-col">
           {information.userProfileDto && (
-            <div className="flex">
+            <div className="flex w-96">
               <ProfileButton
                 image={information.userProfileDto.profileImageUrl}
                 type="rounded"
