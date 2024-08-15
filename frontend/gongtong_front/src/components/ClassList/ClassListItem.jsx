@@ -10,7 +10,7 @@ const ClassListItem = (content) => {
         <img
           src={content.content.mainImage}
           alt="클래스 썸네일"
-          className="w-full rounded-xl h-40"
+          className="w-full rounded-xl h-44 bg-center"
         />
         <span className="absolute right-1 top-1">
           <CountryFlags

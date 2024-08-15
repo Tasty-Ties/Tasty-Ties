@@ -53,14 +53,16 @@ const Alert = ({ open, setOpen, onConfirm }) => {
             <div className="bg-gray-50 px-4 py-3 flex flex-row-reverse sm:flex sm:flex-row-reverse sm:px-6">
               <button
                 type="button"
-                className="inline-flex rounded-md border border-gray-300 shadow-sm px-3 py-1 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 sm:mt-0 sm:w-auto sm:text-sm"
+                className="
+                inline-flex rounded-md border border-transparent shadow-sm px-3 py-1 bg-second-400 text-base font-medium text-white hover:bg-second-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-second-600 sm:ml-3 sm:w-auto sm:text-sm
+                "
                 onClick={onConfirm}
               >
                 확인
               </button>
               <button
                 type="button"
-                className="mr-3 inline-flex rounded-md border border-transparent shadow-sm px-3 py-1 bg-second-400 text-base font-medium text-white hover:bg-second-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-second-600 sm:ml-3 sm:w-auto sm:text-sm"
+                className="mr-3 inline-flex rounded-md border border-gray-300 shadow-sm px-3 py-1 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 sm:mt-0 sm:w-auto sm:text-sm"
                 onClick={() => setOpen(false)}
               >
                 취소

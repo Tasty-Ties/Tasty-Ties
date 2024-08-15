@@ -18,7 +18,6 @@ const useCookingClassStore = create((set) => ({
   fetchLanguages: async () => {
     const languages = await getLanguages();
     set({ languages });
-    console.log(languages);
   },
 
   classLists: [],

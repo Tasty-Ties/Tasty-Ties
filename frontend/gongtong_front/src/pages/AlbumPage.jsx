@@ -4,65 +4,52 @@ import { HTML5Backend } from "react-dnd-html5-backend";
 import AlbumSort from "./../components/Album/AlbumSort";
 import AlbumDetail from "./../components/Album/AlbumDetail";
 import CountryFlags from "./../common/components/CountryFlags";
-import useAlbumStore from "./../store/AlbumStore";
 import Button from "../common/components/Button";
 import { useNavigate } from "react-router-dom";
+import { pushApiErrorNotification } from "../components/common/Toast";
+import AlbumPagination from "../components/Album/AlbumPagination";
+import { useSearchParams } from "react-router-dom";
+import { getAlbums } from "../service/AlbumAPI";
 
 const AlbumPage = () => {
   const [open, setOpen] = useState(false);
-  const { albumLists, fetchAlbumLists, hasMoreContent } = useAlbumStore();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [countryCode, setCountryCode] = useState(null);
+  const [albumLists, setAlbumLists] = useState([]);
   const [countryName, setCountryName] = useState(null);
   const [folderId, setFolderId] = useState(null);
-  const [page, setPage] = useState(0);
-  const [isLoading, setIsLoading] = useState(false);
-  const observerRef = useRef(null);
+  const [page, setPage] = useState(1);
+  const [totalPage, setTotalPage] = useState(0);
   const navigate = useNavigate();
+  const [country, setCountry] = useState(
+    searchParams.get("countryCode") || null
+  );
+  const currentPage = parseInt(searchParams.get("page") || "1", 10);
+  const pageCount = 12;
 
-  const isInitialLoad = useRef(true);
+  const fetchAlbumLists = async (page, countryCode) => {
+    try {
+      const response = await getAlbums(page, countryCode);
+      setAlbumLists(response.folderListDtoPage.content);
+      setTotalPage(response.folderListDtoPage.totalPages);
+    } catch (e) {
+      pushApiErrorNotification(e);
+    }
+  };
 
   useEffect(() => {
-    const loadAlbums = async () => {
-      setIsLoading(true);
-      await fetchAlbumLists(page, countryCode);
-      setIsLoading(false);
-      isInitialLoad.current = false;
-    };
-
-    if (!isLoading && (page === 0 || hasMoreContent)) {
-      loadAlbums();
+    setPage(currentPage);
+    console.log(currentPage, countryCode);
+    try {
+      fetchAlbumLists(currentPage, countryCode);
+    } catch (e) {
+      pushApiErrorNotification(e);
     }
-  }, [page, countryCode, fetchAlbumLists, hasMoreContent]);
-
-  useEffect(() => {
-    const handleObserver = (entries) => {
-      const target = entries[0];
-      if (target.isIntersecting && !isLoading && hasMoreContent) {
-        setPage((prev) => prev + 1);
-      }
-    };
-
-    const options = {
-      root: null,
-      rootMargin: "0px",
-      threshold: 1.0,
-    };
-
-    const observer = new IntersectionObserver(handleObserver, options);
-    if (observerRef.current) {
-      observer.observe(observerRef.current);
-    }
-
-    return () => {
-      if (observerRef.current) {
-        observer.unobserve(observerRef.current);
-      }
-    };
-  }, [isLoading, hasMoreContent]);
+  }, [currentPage, countryCode]);
 
   return (
     <>
-      <div className="w-9/12 mx-auto mt-24">
+      <div className="w-9/12 mx-auto mt-14">
         <div className="flex justify-between items-center mb-8">
           {!countryCode && (
             <div className="text-3xl font-extrabold flex items-baseline gap-x-2">
@@ -84,7 +71,7 @@ const AlbumPage = () => {
           </div>
         </div>
         <div className="grid grid-cols-4 gap-5">
-          {albumLists.length > 0 ? (
+          {albumLists ? (
             albumLists.map((album) => (
               <img
                 key={album.folderId}
@@ -121,14 +108,17 @@ const AlbumPage = () => {
             </>
           )}
         </div>
+        <div className="my-10">
+          <AlbumPagination
+            pageCount={pageCount}
+            currentPage={currentPage}
+            totalPage={totalPage}
+          />
+        </div>
         <DndProvider backend={HTML5Backend}>
           <AlbumDetail open={open} setOpen={setOpen} folderId={folderId} />
         </DndProvider>
       </div>
-      <div ref={observerRef} id="observer" style={{ height: "10px" }}></div>
-      {isLoading && (
-        <div className="loading-spinner text-center">Loading...</div> // 로딩 중일 때 표시
-      )}
     </>
   );
 };
