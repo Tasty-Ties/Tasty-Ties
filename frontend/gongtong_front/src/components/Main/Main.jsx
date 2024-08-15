@@ -22,7 +22,7 @@ const Main = () => {
           <img className="h-full mr-8" src="/images/main/main_culture.png" />
         </div>
       </div>
-      <div className="flex flex-col w-[72%] mx-auto mt-20">
+      <div className="flex flex-col w-[72%] mx-auto mt-20 mb-28">
         <CookingClassList />
         <ShortfromList />
       </div>
