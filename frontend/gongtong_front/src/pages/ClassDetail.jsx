@@ -163,7 +163,8 @@ const ClassDetail = () => {
                 />
               )}
             {classDetail.quota <= classDetail.reservedCount &&
-              !classDetail.userEnrolled && (
+              !classDetail.userEnrolled &&
+              !classDetail.host && (
                 <Button text="마감" type="green-border-short" />
               )}
 
