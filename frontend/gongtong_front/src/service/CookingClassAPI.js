@@ -90,10 +90,7 @@ export const setDeleteClass = async (id) => {
 // 클래스 등록
 export const setClassRegist = async (data, files) => {
   const formData = new FormData();
-  formData.append(
-    "registerDto",
-    new Blob([JSON.stringify(data)], { type: "application/json" })
-  );
+  formData.append("registerDto", new Blob([JSON.stringify(data)], { type: "application/json" }));
   for (const file of files) {
     formData.append("images", file);
   }
@@ -118,3 +115,6 @@ export const getClassReviews = async (id) => {
     console.log("CookingClassAPI - setDeleteClassReservation : " + error);
   }
 };
+
+// 최신 클래스 목록 조회
+export const getLatestClasses = () => api.get(`/classes?page=0&size=8&sort=createTime,desc`);
