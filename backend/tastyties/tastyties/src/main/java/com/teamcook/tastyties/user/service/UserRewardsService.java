@@ -173,11 +173,13 @@ public class UserRewardsService {
             double score = result.getScore();
             User user = userRepository.findById(userId).orElseThrow();
             log.debug("userId for test: {}", user.getUserId());
-            UserStatistics userStatistics = user.getUserStatistics();
-            rankedUsers.add(new RankedUserDto(userId, user.getNickname(), score, rank,
-                    userStatistics.getClassesHosted(), userStatistics.getClassesAttended(),
-                    user.getProfileImageUrl(), user.getDescription()));
-            rank++;
+            if (!user.isDeleted()) {
+                UserStatistics userStatistics = user.getUserStatistics();
+                rankedUsers.add(new RankedUserDto(userId, user.getUsername(), user.getNickname(), score, rank,
+                        userStatistics.getClassesHosted(), userStatistics.getClassesAttended(),
+                        user.getProfileImageUrl(), user.getDescription()));
+                rank++;
+            }
         }
 
 
@@ -189,7 +191,7 @@ public class UserRewardsService {
 
             int userId = user.getUserId();
             String userKey = String.valueOf(userId);
-            myRank = new RankedUserDto(userId, user.getNickname(),
+            myRank = new RankedUserDto(userId, user.getUsername(), user.getNickname(),
                     getUserScore(leaderboardKey, userKey),
                     getUserRank(leaderboardKey, userKey),
                     userStatistics.getClassesHosted(), userStatistics.getClassesAttended(),
@@ -238,18 +240,20 @@ public class UserRewardsService {
             if (user.getUserId() == 1) {
                 continue;
             }
-            UserStatistics userStatistics = user.getUserStatistics();
-            rankedUsers.add(new RankedUserDto(user.getUserId(), user.getNickname(), user.getActivityPoint(), rank,
-                    userStatistics.getClassesHosted(), userStatistics.getClassesAttended(),
-                    user.getProfileImageUrl(), user.getDescription()));
-            rank++;
+            if (!user.isDeleted()) {
+                UserStatistics userStatistics = user.getUserStatistics();
+                rankedUsers.add(new RankedUserDto(user.getUserId(), user.getUsername(), user.getNickname(), user.getActivityPoint(), rank,
+                        userStatistics.getClassesHosted(), userStatistics.getClassesAttended(),
+                        user.getProfileImageUrl(), user.getDescription()));
+                rank++;
+            }
         }
 
         RankedUserDto myRank = null;
         if (userDetails != null) {
             User user = userDetails.user();
             UserStatistics userStatistics = user.getUserStatistics();
-            myRank = new RankedUserDto(user.getUserId(), user.getNickname(), user.getActivityPoint(),
+            myRank = new RankedUserDto(user.getUserId(), user.getUsername(), user.getNickname(), user.getActivityPoint(),
                     getUserRankByActivityPoint(user), userStatistics.getClassesHosted(),
                     userStatistics.getClassesAttended(), user.getProfileImageUrl(), user.getDescription());
         }
