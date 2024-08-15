@@ -64,7 +64,7 @@ const Login = () => {
       } else if (status === 500) {
         pushNotification(
           "error",
-          "입력하신 아이디에 해당하는 사용자가 없습니다."
+          "입력하신 아이디에 해당하는 사용자가 없습니다. 가입 후 이용해주세요."
         );
       } else {
         pushApiErrorNotification(e);

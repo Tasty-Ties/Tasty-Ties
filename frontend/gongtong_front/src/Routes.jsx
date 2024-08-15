@@ -11,7 +11,6 @@ import AttendClass from "./components/MyPage/AttendClass";
 import MyInfo from "./components/MyPage/Myinfo";
 import DeleteId from "./components/MyPage/MyInfo/DeleteId";
 import MyPoint from "./components/MyPage/MyPoint";
-import MyShorts from "./components/MyPage/MyShorts";
 import EditInfo from "./components/MyPage/EditInfo";
 import Profile from "./pages/Profile";
 import OtherInfo from "./components/Profile/OtherInfo";
@@ -51,7 +50,6 @@ const AppRoutes = () => {
         <Route path="attend" element={<AttendClass />} />
         <Route path="" element={<MyInfo />} />
         <Route path="point" element={<MyPoint />} />
-        <Route path="shorts" element={<MyShorts />} />
         <Route path="editinfo" element={<EditInfo />} />
       </Route>
       <Route path="/delete" element={<DeleteId />} />

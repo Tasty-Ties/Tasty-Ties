@@ -5,7 +5,6 @@ import { useNavigate } from "react-router-dom";
 const Lecture = ({ classInfo }) => {
   const nav = useNavigate();
   const { username } = useParams();
-  console.log(username);
   const date = classInfo.startTime.substring(
     0,
     classInfo.startTime.indexOf("T")

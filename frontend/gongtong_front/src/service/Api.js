@@ -1,6 +1,7 @@
 import axios from "axios";
 import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
+import { pushNotification } from "../components/common/Toast";
 
 const MAIN_SERVER_URL = import.meta.env.VITE_MAIN_SERVER;
 const CHAT_SERVER_URL = import.meta.env.VITE_CHAT_SERVER_URL;
@@ -80,10 +81,11 @@ api.interceptors.response.use(
         originalRequest.headers["Authorization"] = `Bearer ${accessToken}`;
 
         return api(originalRequest);
-      } catch (err) {
-        console.error("리프레시 토큰을 사용한 액세스 토큰 재발급 실패:", err);
+      } catch (e) {
+        console.error("리프레시 토큰을 사용한 액세스 토큰 재발급 실패:", e);
         // 필요한 경우 로그아웃 처리 등을 수행
         handleLogout(useNavigate());
+        pushNotification("error", "로그아웃 후 다시 이용해주세요.");
       }
     }
     return Promise.reject(error);
@@ -117,10 +119,11 @@ chatApi.interceptors.response.use(
         originalRequest.headers["Authorization"] = `Bearer ${accessToken}`;
 
         return api(originalRequest);
-      } catch (err) {
-        console.error("리프레시 토큰을 사용한 액세스 토큰 재발급 실패:", err);
+      } catch (e) {
+        console.error("리프레시 토큰을 사용한 액세스 토큰 재발급 실패:", e);
         // 필요한 경우 로그아웃 처리 등을 수행
         handleLogout(useNavigate());
+        pushNotification("error", "로그아웃 후 다시 이용해주세요.");
       }
     }
     return Promise.reject(error);

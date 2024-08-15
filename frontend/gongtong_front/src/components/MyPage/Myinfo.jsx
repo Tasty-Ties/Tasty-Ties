@@ -80,23 +80,23 @@ const MyInfo = () => {
         </div>
         <div>
           <p className="text-lg mb-0.5 font-semibold">SNS 연동 현황</p>
-          <p className="flex text-lg mb-2">
-            <p className="flex">
+          <div className="flex text-lg mb-2">
+            <div className="flex">
               <img src={instalogo} alt="인스타로고" className="size-5" />
               &nbsp;
               <p className="text-lg  text-gray-500">
                 {informations.instagramHandle || "연결된 계정이 없습니다"}
               </p>
-            </p>
+            </div>
             &nbsp;&nbsp;
-            <p className="flex">
+            <div className="flex">
               <img src={youtubelogo} alt="유튜브로고" className="size-5" />
               &nbsp;
               <p className="text-lg  text-gray-500">
                 {informations.youtubeHandle || "연결된 계정이 없습니다"}
               </p>
-            </p>
-          </p>
+            </div>
+          </div>
         </div>
         <br />
         <div className="flex space-x-60">
