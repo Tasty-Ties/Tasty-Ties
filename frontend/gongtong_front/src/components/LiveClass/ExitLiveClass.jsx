@@ -125,9 +125,12 @@ const ExitLiveClass = ({
     // 마일리지 추가
     try {
       const response = await api.post("/ranking/add", {
-        userId: userInfo.userId,
-        score: isHost ? 50 : 5,
-        description: isHost ? `클래스 진행` : "클래스 참여",
+        activityPointRequestDto: {
+          userId: userInfo.userId,
+          score: isHost ? 50 : 5,
+          description: isHost ? `클래스 진행` : "클래스 참여",
+        },
+        host: isHost,
       });
       console.log(response);
     } catch (error) {
