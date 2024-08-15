@@ -194,8 +194,7 @@ const ClassDetail = () => {
           <Link to={`/otherpage/${username}`} className="flex">
             <ProfileButton
               image={classDetail.hostProfile?.profileImageUrl}
-              type="round"
-              size="size-14"
+              size="size-md"
             />
             <p className="ml-2 mt-4 font-semibold text-xl">
               {classDetail.hostProfile?.nickname}

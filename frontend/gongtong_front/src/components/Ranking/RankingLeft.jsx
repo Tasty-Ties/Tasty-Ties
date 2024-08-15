@@ -12,48 +12,24 @@ export default function App({ topRanking, sort }) {
       num: topRanking[1]?.score,
       username: topRanking[1]?.username,
       color: "#C0C0C0",
-      profileImg:
-        topRanking[1]?.profileImageUrl === undefined ||
-        topRanking[1]?.profileImageUrl === null
-          ? defaultImage
-          : topRanking[1]?.profileImageUrl,
-      id:
-        topRanking[1]?.nickname === undefined ||
-        topRanking[1]?.nickname === null
-          ? "순위없음"
-          : topRanking[1]?.nickname,
+      profileImg: topRanking[1]?.profileImageUrl || defaultImage,
+      id: topRanking[1]?.nickname || "순위없음",
     },
     {
       rank: topRanking[0]?.rank,
       num: topRanking[0]?.score,
       username: topRanking[0]?.username,
       color: "#FFD700",
-      profileImg:
-        topRanking[0]?.profileImageUrl === undefined ||
-        topRanking[0]?.profileImageUrl === null
-          ? defaultImage
-          : topRanking[0]?.profileImageUrl,
-      id:
-        topRanking[0]?.nickname === undefined ||
-        topRanking[0]?.nickname === null
-          ? "순위없음"
-          : topRanking[0]?.nickname,
+      profileImg: topRanking[0]?.profileImageUrl || defaultImage,
+      id: topRanking[0]?.nickname || "순위없음",
     },
     {
       rank: topRanking[2]?.rank,
       num: topRanking[2]?.score,
       username: topRanking[2]?.username,
       color: "#CD7F32",
-      profileImg:
-        topRanking[2]?.profileImageUrl === undefined ||
-        topRanking[2]?.profileImageUrl === null
-          ? defaultImage
-          : topRanking[2]?.profileImageUrl,
-      id:
-        topRanking[2]?.nickname === undefined ||
-        topRanking[2]?.nickname === null
-          ? "순위없음"
-          : topRanking[2]?.nickname,
+      profileImg: topRanking[2]?.profileImageUrl || defaultImage,
+      id: topRanking[2]?.nickname || "순위없음",
     },
   ];
   const barHeights = [170, 300, 100];

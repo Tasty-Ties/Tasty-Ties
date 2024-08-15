@@ -5,13 +5,14 @@ import RankingPagination from "../components/Ranking/RankingPagination";
 import RankingRight from "../components/Ranking/RankingRight";
 import { getRankingList } from "../service/RankingAPI";
 import useRankingStore from "../store/RankingStore";
+import { pushApiErrorNotification } from "../components/common/Toast";
 
 const Ranking = () => {
   const { topRanking, fetchRankingData } = useRankingStore();
   const [searchParams, setSearchParams] = useSearchParams();
   const [rankingList, setRankingList] = useState([]);
   const [totalPage, setTotalPage] = useState(0);
-  const [sort, setSort] = useState(searchParams.get("sort") || "weekly");
+  const [sort, setSort] = useState(searchParams.get("sort") || "total");
 
   const currentPage = parseInt(searchParams.get("page") || "1", 10);
   const pageCount = 5;
@@ -21,8 +22,8 @@ const Ranking = () => {
       const response = await getRankingList(sort, page);
       setRankingList(response);
       setTotalPage(response.totalPage);
-    } catch (error) {
-      console.error("랭킹 리스트를 가져오는 데 실패했습니다:", error);
+    } catch (e) {
+      pushApiErrorNotification(e);
     }
   };
 
