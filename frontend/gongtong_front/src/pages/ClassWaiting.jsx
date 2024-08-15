@@ -84,7 +84,7 @@ const ClassWaiting = () => {
         setSessionId(response.data.data);
         localStorage.setItem("sessionId", response.data.data);
       } catch (error) {
-        const status = error.response?.data.status;
+        const status = error.response.status;
         switch (status) {
           case 403:
             alert("해당 클래스의 호스트가 아닙니다.");
@@ -107,7 +107,7 @@ const ClassWaiting = () => {
         setSessionId(response.data.data);
         localStorage.setItem("sessionId", response.data.data);
       } catch (error) {
-        const status = error.response.data.status;
+        const status = error.response.status;
         switch (status) {
           case 403:
             alert("해당 클래스의 게스트가 아닙니다.");
