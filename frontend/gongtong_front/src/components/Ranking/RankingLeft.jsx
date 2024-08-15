@@ -1,13 +1,16 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import RankingCount from "./RankingCount";
 import "./../../styles/Ranking/RankingLeft.css";
 import defaultImage from "./../../assets/MyPage/기본프로필사진.jpg";
+import { Link } from "react-router-dom";
 
 export default function App({ topRanking, sort }) {
+  console.log(topRanking);
   const data = [
     {
       rank: topRanking[1]?.rank,
       num: topRanking[1]?.score,
+      username: topRanking[1]?.username,
       color: "#C0C0C0",
       profileImg:
         topRanking[1]?.profileImageUrl === undefined ||
@@ -23,6 +26,7 @@ export default function App({ topRanking, sort }) {
     {
       rank: topRanking[0]?.rank,
       num: topRanking[0]?.score,
+      username: topRanking[0]?.username,
       color: "#FFD700",
       profileImg:
         topRanking[0]?.profileImageUrl === undefined ||
@@ -38,6 +42,7 @@ export default function App({ topRanking, sort }) {
     {
       rank: topRanking[2]?.rank,
       num: topRanking[2]?.score,
+      username: topRanking[2]?.username,
       color: "#CD7F32",
       profileImg:
         topRanking[2]?.profileImageUrl === undefined ||
@@ -82,33 +87,67 @@ export default function App({ topRanking, sort }) {
           }}
         >
           <div>
-            <div className="relative">
-              <img
-                src={entry.profileImg}
-                alt={`${entry.id}'s profile`}
-                style={{
-                  width: "100px",
-                  height: "100px",
-                  borderRadius: "50%",
-                }}
-              />
-              {entry.rank === 1 && showCrown && (
-                <span
-                  className="crown-effect"
-                  style={{
-                    position: "absolute",
-                    top: "-70px",
-                    left: "50%",
-                    transform: "translateX(-50%)",
-                  }}
-                >
-                  <img src="images/ranking/crown_gold.svg" alt="" />
-                </span>
-              )}
-            </div>
-            <div className="text-black mt-2 font-bold text-base">
-              {entry.id}
-            </div>
+            {entry.username !== undefined ? (
+              <Link to={`/otherpage/${entry.username}`}>
+                <div className="relative">
+                  <img
+                    src={entry.profileImg}
+                    alt={`${entry.id}'s profile`}
+                    style={{
+                      width: "100px",
+                      height: "100px",
+                      borderRadius: "50%",
+                    }}
+                  />
+                  {entry.rank === 1 && showCrown && (
+                    <span
+                      className="crown-effect"
+                      style={{
+                        position: "absolute",
+                        top: "-70px",
+                        left: "50%",
+                        transform: "translateX(-50%)",
+                      }}
+                    >
+                      <img src="images/ranking/crown_gold.svg" alt="" />
+                    </span>
+                  )}
+                </div>
+                <div className="text-black mt-2 font-bold text-base">
+                  {entry.id}
+                </div>
+              </Link>
+            ) : (
+              <React.Fragment>
+                <div className="relative">
+                  <img
+                    src={entry.profileImg}
+                    alt={`${entry.id}'s profile`}
+                    style={{
+                      width: "100px",
+                      height: "100px",
+                      borderRadius: "50%",
+                    }}
+                  />
+                  {entry.rank === 1 && showCrown && (
+                    <span
+                      className="crown-effect"
+                      style={{
+                        position: "absolute",
+                        top: "-70px",
+                        left: "50%",
+                        transform: "translateX(-50%)",
+                      }}
+                    >
+                      <img src="images/ranking/crown_gold.svg" alt="" />
+                    </span>
+                  )}
+                </div>
+                <div className="text-black mt-2 font-bold text-base">
+                  {entry.id}
+                </div>
+              </React.Fragment>
+            )}
             <div
               style={{
                 fontSize: "12px",
