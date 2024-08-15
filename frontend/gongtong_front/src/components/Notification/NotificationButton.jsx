@@ -106,9 +106,9 @@ const NotificationButton = () => {
           <i className="fa fa-bell text-lg" />
         </IconButton>
       </PopoverHandler>
-      <PopoverContent className="w-[30%] max-h-[80%] overflow-auto scrollbar-hidden mt-3">
+      <PopoverContent className="w-[30%] max-h-[80%] overflow-auto scrollbar-hidden mt-5">
         <div className="flex flex-row items-center justify-between mt-4 mb-3">
-          <Typography variant="h5" className="text-black ml-2">
+          <Typography variant="h5" className="text-black ml-2 font-nanum">
             알림
           </Typography>
           {isAllDeleteButtonVisible && (
@@ -116,19 +116,21 @@ const NotificationButton = () => {
               variant="text"
               size="sm"
               color="red"
-              className="p-1.5"
+              className="p-1.5 font-nanum"
               onClick={handleDeleteAllNotifications}
             >
               전체 삭제
             </Button>
           )}
         </div>
-        <Typography className="text-sm text-black ml-2 mb-4">
+        <Typography className="text-sm text-black ml-2 mb-4 font-nanum">
           전체 알림({notifications.length})개
         </Typography>
         <List>
           {notifications.length === 0 ? (
-            <Typography className="flex justify-center text-gray-600">알림없음</Typography>
+            <Typography className="flex justify-center text-gray-600 font-nanum">
+              알림없음
+            </Typography>
           ) : (
             notifications.map((notification) => (
               <NotificationListItem notification={notification} key={notification.id} />
