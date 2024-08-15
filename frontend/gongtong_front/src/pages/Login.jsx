@@ -11,6 +11,10 @@ import {
   Button,
   Typography,
 } from "@material-tailwind/react";
+import {
+  pushApiErrorNotification,
+  pushNotification,
+} from "../components/common/Toast";
 
 const Login = () => {
   const nav = useNavigate();
@@ -44,7 +48,6 @@ const Login = () => {
         password: input.password,
         fcmToken: Cookies.get("fcmToken"),
       });
-      console.log(response);
 
       if (response.status === 200) {
         const accessToken = response.data.data.accessToken;
@@ -53,14 +56,18 @@ const Login = () => {
         document.cookie = `refreshToken=${refreshToken}; path=/; SameSite=Lax`;
         nav("/");
       }
-    } catch (error) {
-      console.log(error);
-      if (error.response.status === 401) {
-        alert("비밀번호가 잘못되었습니다.");
-      } else if (error.response.status === 500) {
-        alert("존재하지 않는 아이디 입니다. 회원가입을 해주세요.");
+    } catch (e) {
+      const status = e.response.status;
+
+      if (status === 401) {
+        pushNotification("error", "입력하신 비밀번호가 일치하지 않습니다.");
+      } else if (status === 500) {
+        pushNotification(
+          "error",
+          "입력하신 아이디에 해당하는 사용자가 없습니다. 가입 후 이용해주세요."
+        );
       } else {
-        alert("인증 오류가 발생했습니다.");
+        pushApiErrorNotification(e);
       }
     }
   };

@@ -33,6 +33,8 @@ import ExitLiveClass from "./ExitLiveClass";
 
 import "./../../styles/LiveClass/LiveClass.css";
 import { OpenVidu } from "openvidu-browser";
+import { useNavigate } from "react-router-dom";
+import { pushNotification } from "../common/Toast";
 
 const localUserSetting = new UserModel();
 
@@ -88,6 +90,8 @@ const VideoComponent = ({ isHost }) => {
 
   // 세션id를 로컬 스토리지에 저장
   const sessionIdRef = useRef(localStorage.getItem("sessionId"));
+
+  const nav = useNavigate();
 
   const getClassInfo = async () => {
     setClassData(await getClassDetail(localStorage.getItem("classId")));
@@ -195,7 +199,7 @@ const VideoComponent = ({ isHost }) => {
   // 참여자 목록 정리하는 코드
   useEffect(() => {
     // console.log(partUser);
-    // console.log(userInfo);
+    console.log(classData);
 
     if (!classData || !localUser) return;
     const host = classData.hostProfile;
@@ -274,7 +278,7 @@ const VideoComponent = ({ isHost }) => {
   }, []);
 
   useEffect(() => {
-    initializeSpeechRecognition("ko", "KR"); // 기본 언어 설정
+    // initializeSpeechRecognition("ko", "KR"); // 기본 언어 설정
     // console.log("SpeechRecognition initialized", recognitionRef.current);
   }, []);
 
@@ -321,7 +325,8 @@ const VideoComponent = ({ isHost }) => {
         error.code,
         error.message
       );
-      alert("토큰을 가져오는데 문제가 있어용 :", error.message);
+      pushNotification("error", "유효한 토큰이 아닙니다.");
+      nav("/classwaiting");
     }
   };
 
@@ -333,12 +338,7 @@ const VideoComponent = ({ isHost }) => {
         connectWebCam(session, newOV);
       })
       .catch((error) => {
-        alert("세션에 연결하는데 문제가 있음 : ", error.message);
-        console.log(
-          "세션에 연결하는데 문제가 있어용 :",
-          error.code,
-          error.message
-        );
+        pushNotification("error", "유효한 세션이 아닙니다.");
       });
   };
 
@@ -385,7 +385,7 @@ const VideoComponent = ({ isHost }) => {
         });
       }
 
-      console.log(userInfo);
+      // console.log(userInfo);
       localUserSetting.setNickname(userInfo.nickname);
       localUserSetting.setConnectionId(session.connection.connectionId);
       localUserSetting.setScreenShareActive(false);
@@ -395,7 +395,10 @@ const VideoComponent = ({ isHost }) => {
       subscribeToStreamDestroyed(session);
     } catch (error) {
       console.error("Error accessing media devices:", error);
-      alert("오디오 또는 비디오 장치에 접근할 수 없습니다: " + error.message);
+      pushNotification(
+        "error",
+        "오디오 또는 비디오 장치에 접근할 수 없습니다."
+      );
     }
   };
 
@@ -603,6 +606,9 @@ const VideoComponent = ({ isHost }) => {
     if (!recognitionRef.current) {
       recognitionRef.current = new SpeechRecognition();
       recognitionRef.current.lang = languageCode + "-" + countryCode || "ko-KR";
+      console.log(
+        "인식 언어::::::::::::::::::::::::::::::" + recognitionRef.current.lang
+      );
       recognitionRef.current.interimResults = false;
       recognitionRef.current.maxAlternatives = 1;
 

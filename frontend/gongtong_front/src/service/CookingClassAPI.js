@@ -63,7 +63,8 @@ export const getClassDetail = async (classId) => {
 // 클래스 예약
 export const setClassReservation = async (id) => {
   try {
-    await api.post(`/classes/reservation/${id}`);
+    const response = await api.post(`/classes/reservation/${id}`);
+    return response;
   } catch (error) {
     console.log("CookingClassAPI - setClassReservationError : " + error);
   }
@@ -72,7 +73,8 @@ export const setClassReservation = async (id) => {
 // 클래스 예약 취소
 export const setDeleteClassReservation = async (id) => {
   try {
-    await api.delete(`/classes/reservation/${id}`, null);
+    const response = await api.delete(`/classes/reservation/${id}`, null);
+    return response;
   } catch (error) {
     console.log("CookingClassAPI - setDeleteClassReservation : " + error);
   }
@@ -81,7 +83,8 @@ export const setDeleteClassReservation = async (id) => {
 // 클래스 삭제
 export const setDeleteClass = async (id) => {
   try {
-    api.delete(`classes/${id}`, null);
+    const response = api.delete(`classes/${id}`, null);
+    return response;
   } catch (error) {
     console.log("CookingClassAPI - setDeleteClass : " + error);
   }
@@ -90,19 +93,17 @@ export const setDeleteClass = async (id) => {
 // 클래스 등록
 export const setClassRegist = async (data, files) => {
   const formData = new FormData();
-  formData.append(
-    "registerDto",
-    new Blob([JSON.stringify(data)], { type: "application/json" })
-  );
+  formData.append("registerDto", new Blob([JSON.stringify(data)], { type: "application/json" }));
   for (const file of files) {
     formData.append("images", file);
   }
   try {
-    await api.post("/classes", formData, {
+    const response = await api.post("/classes", formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
     });
+    return response;
   } catch (error) {
     console.log("CookingClassAPI - setClassRegist : " + error);
   }
@@ -112,9 +113,11 @@ export const setClassRegist = async (data, files) => {
 export const getClassReviews = async (id) => {
   try {
     const response = await api.get(`/classes/${id}/reviews`);
-    // console.log(response.data.data.content[0]);
     return response.data.data.content;
   } catch (error) {
     console.log("CookingClassAPI - setDeleteClassReservation : " + error);
   }
 };
+
+// 최신 클래스 목록 조회
+export const getLatestClasses = () => api.get(`/classes?page=0&size=8&sort=createTime,desc`);

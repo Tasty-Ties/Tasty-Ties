@@ -28,15 +28,23 @@ public enum Language {
     }
 
     public boolean equals(String language) {
-        return this.name.equals(language);
+        return this.name.equals(capitalizeFirstLetter(language));
     }
 
     public static boolean contains(String language) {
-        for (Language l : Language.values()) {
+        language = capitalizeFirstLetter(language);
+        for (Language l: Language.values()) {
             if (l.getName().equals(language)) {
                 return true;
             }
         }
         return false;
+    }
+
+    public static String capitalizeFirstLetter(String input) {
+        if (input == null || input.isEmpty()) {
+            return input;
+        }
+        return input.substring(0, 1).toUpperCase() + input.substring(1).toLowerCase();
     }
 }

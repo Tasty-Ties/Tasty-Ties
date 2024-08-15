@@ -15,8 +15,12 @@ const CountryChip = ({ country }) => {
         />
       }
       value={
-        <Typography variant="small" color="black" className="font-medium capitalize leading-none">
-          {country.name}
+        <Typography
+          variant="small"
+          color="black"
+          className="font-medium capitalize leading-none font-nanum"
+        >
+          {country.name ? country.name : "클래스 진행 언어"}
         </Typography>
       }
       className="rounded-full w-auto"

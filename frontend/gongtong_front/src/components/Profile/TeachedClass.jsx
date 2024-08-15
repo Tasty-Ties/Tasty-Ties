@@ -13,7 +13,6 @@ const TeachedClass = () => {
   useEffect(() => {
     fetchTeachedClasses(username);
   }, []);
-  console.log(teachedClasses);
 
   return (
     <div>

@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import useVideoStore from "../../store/useVideoStore";
 import Button from "./../../common/components/Button";
+import { pushNotification } from "../common/Toast";
 
 const MediaDeviceSetting = ({ currentPublisher }) => {
   const [videoDevices, setVideoDevices] = useState([]);
@@ -34,7 +35,10 @@ const MediaDeviceSetting = ({ currentPublisher }) => {
         },
       });
     } catch (error) {
-      alert("사용자 디바이스 접근 거부됨");
+      pushNotification(
+        "error",
+        "오디오 또는 비디오 장치에 접근할 수 없습니다."
+      );
       if (error.name === "NotAllowedError") {
         console.log("User denied access to media devices.");
       } else if (error.name === "NotFoundError") {
@@ -52,7 +56,7 @@ const MediaDeviceSetting = ({ currentPublisher }) => {
       setVideoDevices(devices.filter((device) => device.kind === "videoinput"));
       setAudioDevices(devices.filter((device) => device.kind === "audioinput"));
     } catch (error) {
-      console.error("디바이스를 가져오는 과정에서 오류가 발생했어용: ", error);
+      // console.error("디바이스를 가져오는 과정에서 오류가 발생했어용: ", error);
     }
   };
   useEffect(() => {

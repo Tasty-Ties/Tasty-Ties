@@ -13,7 +13,7 @@ const OtherInfo = () => {
     <div>
       {informations && (
         <div>
-          <p className="text-2xl mb-2">수집한 국기</p>
+          <div className="text-2xl mb-2">수집한 국기</div>
           <div className="flex">
             {informations.informations.userProfileDto?.collectedFlags.map(
               (flag, index) => (
@@ -27,7 +27,7 @@ const OtherInfo = () => {
           </div>
           <br />
           <br />
-          <p className="text-2xl mb-2">진행한 클래스</p>
+          <div className="text-2xl mb-2">진행한 클래스</div>
           <div className="grid grid-cols-4 space-x-3">
             {informations.informations.hostingClasses?.map(
               (teachClass, index) => (
@@ -45,7 +45,7 @@ const OtherInfo = () => {
           <br />
           <br />
           <br />
-          <p className="text-2xl mb-2">참여한 클래스</p>
+          <div className="text-2xl mb-2">참여한 클래스</div>
           <div className="grid grid-cols-4 space-x-3">
             {informations.informations.reservedClasses?.map(
               (attendClass, index) => (
@@ -63,7 +63,7 @@ const OtherInfo = () => {
           <br />
           <br />
           <br />
-          <p className="text-2xl mb-2">수강평</p>
+          <div className="text-2xl mb-2">수강평</div>
           <div className="grid grid-rows-3 gap-3">
             {informations.informations.reviews?.map((review, index) => (
               <ReviewCard key={index} review={review} />

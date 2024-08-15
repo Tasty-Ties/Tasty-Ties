@@ -14,10 +14,10 @@ import {
 } from "@material-tailwind/react";
 
 import api from "../../service/Api";
-import logo from "../../assets/맛잇다로고3.png";
 import NotificationButton from "../Notification/NotificationButton";
 import useMyPageStore from "../../store/MyPageStore";
 import profileimage from "../../assets/MyPage/기본프로필사진.jpg";
+import { pushApiErrorNotification, pushNotification } from "./Toast";
 
 const NavItem = ({ text, link }) => {
   return (
@@ -61,10 +61,10 @@ const Header = () => {
   useEffect(() => {
     if (accessToken) {
       setIsLogin(true);
+      fetchInformations();
     } else {
       setIsLogin(false);
     }
-    fetchInformations();
   }, [accessToken]);
 
   const goLogin = () => {
@@ -85,10 +85,9 @@ const Header = () => {
 
   const handleLogout = async () => {
     try {
-      const response = await api.post("/auth/logout");
-      console.log(response);
-    } catch (error) {
-      console.log(error);
+      await api.post("/auth/logout");
+    } catch (e) {
+      pushApiErrorNotification(e);
     }
 
     Cookies.remove("accessToken");
@@ -99,10 +98,10 @@ const Header = () => {
   };
 
   return (
-    <Navbar className="sticky top-0 z-10 h-max max-w-full rounded-none px-6 py-2 lg:px-8 lg:py-4">
-      <div className="flex items-center justify-between text-blue-gray-900">
+    <Navbar className="sticky top-0 z-10 h-max max-w-full rounded-none px-52 py-2 lg:px-8 lg:py-4">
+      <div className="flex items-center justify-between text-blue-gray-900 my-3">
         <Link to="/">
-          <img src={logo} alt="맛잇다로고" className="w-28 h-auto" />
+          <img src="/logo.png" alt="맛잇다로고" className="w-auto h-10" />
         </Link>
         <div className="flex items-center gap-4">
           <div className="flex items-center mr-4 lg:block">
@@ -119,8 +118,8 @@ const Header = () => {
                   <MenuHandler className="hover:scale-105 cursor-pointer">
                     <Avatar src={profileImage} alt="avatar" size="sm" />
                   </MenuHandler>
-                  <MenuList>
-                    <MenuItem className="flex justify-center">{nickname}</MenuItem>
+                  <MenuList className="mt-5">
+                    <MenuItem className="flex justify-center font-nanum">{nickname}</MenuItem>
                     <hr className="my-3" />
                     <MenuItem className="font-nanum" onClick={goMypage}>
                       마이페이지

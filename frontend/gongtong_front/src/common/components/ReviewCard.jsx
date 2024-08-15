@@ -6,7 +6,6 @@ import {
 } from "@material-tailwind/react";
 
 const HorizontalCard = ({ review }) => {
-  console.log(review);
   const date = review.cookingClassReviewCreateTime.substring(
     0,
     review.cookingClassReviewCreateTime.indexOf("T")

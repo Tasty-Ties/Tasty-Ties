@@ -9,6 +9,12 @@ export const pushNotification = (type, message) => {
     case "error":
       toast.error(message);
       break;
+    case "success":
+      toast.success(message);
+      break;
+    case "info":
+      toast.info(message);
+      break;
   }
 };
 

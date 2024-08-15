@@ -1,9 +1,10 @@
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 
 import useAlbumStore from "./../../store/AlbumStore";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 const AlbumSort = ({ setCountryCode, setCountryName }) => {
+  const [title, setTitle] = useState();
   const { albumSortLists, fetchAlbumSortLists } = useAlbumStore((state) => ({
     albumSortLists: state.albumSortLists,
     fetchAlbumSortLists: state.fetchAlbumSortLists,
@@ -22,7 +23,7 @@ const AlbumSort = ({ setCountryCode, setCountryName }) => {
     <Menu as="div" className="relative inline-block text-left">
       <div>
         <MenuButton className="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 items-center">
-          정렬
+          {title || "정렬"}
           <svg
             width="12"
             height="6"
@@ -48,7 +49,10 @@ const AlbumSort = ({ setCountryCode, setCountryName }) => {
         <MenuItem>
           <a
             className="block px-4 py-1 text-sm text-gray-700 data-[focus]:bg-gray-100 data-[focus]:text-gray-900 cursor-pointer"
-            onClick={() => handleAlbumFilter()}
+            onClick={() => {
+              handleAlbumFilter(null, null);
+              setTitle("전체보기");
+            }}
           >
             전체보기
           </a>
@@ -59,9 +63,10 @@ const AlbumSort = ({ setCountryCode, setCountryName }) => {
               <MenuItem>
                 <a
                   className="block px-4 py-1 text-sm text-gray-700 data-[focus]:bg-gray-100 data-[focus]:text-gray-900 cursor-pointer"
-                  onClick={() =>
-                    handleAlbumFilter(country.alpha2, country.koreanName)
-                  }
+                  onClick={() => {
+                    handleAlbumFilter(country.alpha2, country.koreanName);
+                    setTitle(country.koreanName);
+                  }}
                 >
                   {country.koreanName}
                 </a>
