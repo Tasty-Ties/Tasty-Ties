@@ -23,7 +23,9 @@ const NotificationListItem = ({ notification }) => {
     <ListItem className="focus:bg-white">
       <div className="flex flex-col text-black w-full">
         <div className="flex flex-row w-full items-center justify-between">
-          <Typography variant="h6">{notification.title}</Typography>
+          <Typography variant="h6" className="font-nanum">
+            {notification.title}
+          </Typography>
           <input
             type="checkbox"
             className="h-3 w-3 rounded-full bg-third border border-third transition-all hover:scale-105 appearance-none checked:bg-white checked:border-gray-900/20"
@@ -31,11 +33,13 @@ const NotificationListItem = ({ notification }) => {
             onClick={handleCeckNotifiaction}
           />
         </div>
-        <Typography variant="small" className="mt-1">
+        <Typography variant="small" className="mt-1 font-nanum">
           {notification.body}
         </Typography>
         <div className="flex justify-end mt-3">
-          <Typography className="text-xs text-gray-500">{notification.createTime}</Typography>
+          <Typography className="text-xs text-gray-500 font-nanum">
+            {notification.createTime}
+          </Typography>
         </div>
       </div>
     </ListItem>

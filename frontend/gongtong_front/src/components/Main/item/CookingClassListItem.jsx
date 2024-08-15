@@ -59,13 +59,13 @@ const CookingClassListItem = ({ cookingClass }) => {
           <Typography
             variant="h5"
             color="blue-gray"
-            className="mt-2.5 mb-1 whitespace-nowrap overflow-hidden text-ellipsis"
+            className="mt-2.5 mb-1 whitespace-nowrap overflow-hidden text-ellipsis font-nanum"
           >
             {cookingClass.title}
           </Typography>
           <Typography
             color="blue-gray"
-            className="text-sm whitespace-nowrap overflow-hidden text-ellipsis"
+            className="text-sm whitespace-nowrap overflow-hidden text-ellipsis font-nanum"
           >
             {cookingClass.hostName}
           </Typography>

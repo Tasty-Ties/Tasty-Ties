@@ -8,7 +8,7 @@ import ShortformListItem from "./item/ShortformListItem";
 const ShortformList = () => {
   return (
     <div className="flex flex-col mx-auto content-center relative mt-24 mb-8">
-      <Typography variant="h4" className="ml-12 mb-4">
+      <Typography variant="h4" className="ml-12 mb-4 font-nanum">
         # 인기 급상승
       </Typography>
       <Carousel
