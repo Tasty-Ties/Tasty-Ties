@@ -42,6 +42,7 @@ public class AlbumController {
     public ResponseEntity<CommonResponseDto> registerFolder(@AuthenticationPrincipal CustomUserDetails userDetails,
                                                             @RequestPart("images") List<MultipartFile> images,
                                                             @RequestPart("folderRegisterDto") FolderRegisterDto registerDto) {
+
         User user = userDetails.user();
         Album album = albumService.getAlbum(user);
         String folderName = albumService.registerFolder(album, images, registerDto);
@@ -60,6 +61,8 @@ public class AlbumController {
                                                       @RequestParam(required = false) String countryCode) {
         log.debug("countryCode: {}", countryCode);
         Album album = albumService.getAlbum(userDetails.user());
+        log.debug("call getAlbum");
+        log.debug("album: {}", album.getAlbumId());
         FolderListResponseDto folderList = albumService.getFolderList(album, pageable, countryCode);
 
         return ResponseEntity.ok()

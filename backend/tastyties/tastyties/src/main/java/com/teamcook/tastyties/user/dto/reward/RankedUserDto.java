@@ -7,6 +7,7 @@ import lombok.Data;
 @AllArgsConstructor
 public class RankedUserDto {
     private int userId;
+    private String username;
     private String nickname;
     private double score;
     private int rank;
@@ -15,7 +16,7 @@ public class RankedUserDto {
     private String profileImageUrl;
     private String description;
 
-    public RankedUserDto(int userId, String nickname, int classesHosted, int classesAttended,
+    public RankedUserDto(int userId, String username, String nickname, int classesHosted, int classesAttended,
                          String profileImageUrl, String description, double score) {
         this.userId = userId;
         this.nickname = nickname;
