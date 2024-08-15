@@ -7,28 +7,28 @@ const CookingClassListItem = ({ cookingClass }) => {
   const nav = useNavigate();
 
   const countries = [
-    { code: "KR", name: "한국어", imgSrc: "/images/countries/KR.svg" },
-    { code: "US", name: "영어", imgSrc: "/images/countries/US.svg" },
-    { code: "CN", name: "중국어", imgSrc: "/images/countries/CN.svg" },
-    { code: "JP", name: "일본어", imgSrc: "/images/countries/JP.svg" },
-    { code: "ES", name: "스페인어", imgSrc: "/images/countries/ES.svg" },
-    { code: "FR", name: "프랑스어", imgSrc: "/images/countries/FR.svg" },
-    { code: "DE", name: "독일어", imgSrc: "/images/countries/DE.svg" },
-    { code: "RU", name: "러시아어", imgSrc: "/images/countries/RU.svg" },
-    { code: "IT", name: "이탈리아어", imgSrc: "/images/countries/IT.svg" },
-    { code: "PT", name: "포르투갈어", imgSrc: "/images/countries/PT.svg" },
-    { code: "SA", name: "아랍어", imgSrc: "/images/countries/SA.svg" },
-    { code: "IN", name: "힌디어", imgSrc: "/images/countries/IN.svg" },
-    { code: "VN", name: "베트남어", imgSrc: "/images/countries/VN.svg" },
-    { code: "TH", name: "태국어", imgSrc: "/images/countries/TH.svg" },
-    { code: "TR", name: "터키어", imgSrc: "/images/countries/TR.svg" },
+    { code: "KR", name: "대한민국", imgSrc: "/images/countries/KR.svg" },
+    { code: "US", name: "미국", imgSrc: "/images/countries/US.svg" },
+    { code: "CN", name: "중국", imgSrc: "/images/countries/CN.svg" },
+    { code: "JP", name: "일본", imgSrc: "/images/countries/JP.svg" },
+    { code: "ES", name: "스페인", imgSrc: "/images/countries/ES.svg" },
+    { code: "FR", name: "프랑스", imgSrc: "/images/countries/FR.svg" },
+    { code: "DE", name: "독일", imgSrc: "/images/countries/DE.svg" },
+    { code: "RU", name: "러시아", imgSrc: "/images/countries/RU.svg" },
+    { code: "IT", name: "이탈리아", imgSrc: "/images/countries/IT.svg" },
+    { code: "PT", name: "포르투갈", imgSrc: "/images/countries/PT.svg" },
+    { code: "SA", name: "사우디아라비아", imgSrc: "/images/countries/SA.svg" },
+    { code: "IN", name: "인도", imgSrc: "/images/countries/IN.svg" },
+    { code: "VN", name: "베트남", imgSrc: "/images/countries/VN.svg" },
+    { code: "TH", name: "태국", imgSrc: "/images/countries/TH.svg" },
+    { code: "TR", name: "터키", imgSrc: "/images/countries/TR.svg" },
   ];
 
   const [country, setCountry] = useState({});
 
   useEffect(() => {
     countries.forEach((country) => {
-      if (country.code === cookingClass.classCountry.alpha2) {
+      if (country.code === cookingClass.hostCountry.alpha2) {
         setCountry(country);
       }
     });
