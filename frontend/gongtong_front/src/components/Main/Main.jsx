@@ -5,7 +5,7 @@ import { Typography } from "@material-tailwind/react";
 
 const Main = () => {
   return (
-    <div className="flex flex-col w-full">
+    <div className="flex flex-col w-full overflow-auto scrollbar-hidden">
       <div className="flex flex-row justify-center items-center bg-first-600 w-full h-76">
         <div className="h-full w-[62%] mx-auto flex justify-between">
           <div className="flex flex-col justify-center">

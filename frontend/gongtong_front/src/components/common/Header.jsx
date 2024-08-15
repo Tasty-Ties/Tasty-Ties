@@ -119,8 +119,8 @@ const Header = () => {
                   <MenuHandler className="hover:scale-105 cursor-pointer">
                     <Avatar src={profileImage} alt="avatar" size="sm" />
                   </MenuHandler>
-                  <MenuList>
-                    <MenuItem className="flex justify-center">{nickname}</MenuItem>
+                  <MenuList className="mt-5">
+                    <MenuItem className="flex justify-center font-nanum">{nickname}</MenuItem>
                     <hr className="my-3" />
                     <MenuItem className="font-nanum" onClick={goMypage}>
                       마이페이지

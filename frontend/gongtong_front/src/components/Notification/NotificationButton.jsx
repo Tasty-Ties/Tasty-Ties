@@ -106,7 +106,7 @@ const NotificationButton = () => {
           <i className="fa fa-bell text-lg" />
         </IconButton>
       </PopoverHandler>
-      <PopoverContent className="w-[30%] max-h-[80%] overflow-auto scrollbar-hidden mt-3">
+      <PopoverContent className="w-[30%] max-h-[80%] overflow-auto scrollbar-hidden mt-5">
         <div className="flex flex-row items-center justify-between mt-4 mb-3">
           <Typography variant="h5" className="text-black ml-2 font-nanum">
             알림
