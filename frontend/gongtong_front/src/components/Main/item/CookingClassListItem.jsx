@@ -47,7 +47,7 @@ const CookingClassListItem = ({ cookingClass }) => {
         <img
           src={cookingClass.mainImage ? cookingClass.mainImage : "/images/main/no_image.jpg"}
           alt="profile-picture"
-          className="object-cover rounded-md"
+          className="object-cover rounded-md h-[18rem]"
           onError={(e) => {
             e.target.src = "/images/main/no_image.jpg";
           }}

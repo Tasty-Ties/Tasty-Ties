@@ -49,7 +49,9 @@ const CameraCapture = ({ isCaptureOpen, captureOpen, localUser }) => {
 
       canvas.width = video.videoWidth;
       canvas.height = video.videoHeight;
-      context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+      context.scale(-1, 1);
+      context.drawImage(video, -canvas.width, 0, canvas.width, canvas.height);
 
       const dataUrl = canvas.toDataURL("image/jpeg");
       const blob = dataURLToBlob(dataUrl);
@@ -64,22 +66,25 @@ const CameraCapture = ({ isCaptureOpen, captureOpen, localUser }) => {
     }
   };
 
-  const xIcon = (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-      strokeWidth={1.5}
-      stroke="currentColor"
-      className="size-6 rotate-45"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-      />
-    </svg>
-  );
+  const xIcon = (index) => {
+    return (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="white"
+        viewBox="0 0 24 24"
+        strokeWidth={1.5}
+        stroke="currentColor"
+        className="size-6 rotate-45 absolute -right-2 -top-2 z-50"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+          onClick={() => setRemoveLiveClassImage(index)}
+        />
+      </svg>
+    );
+  };
 
   return (
     <Dialog
@@ -129,7 +134,10 @@ const CameraCapture = ({ isCaptureOpen, captureOpen, localUser }) => {
 
                   <div className="mt-2 grid grid-cols-4 grid-rows-2 gap-2">
                     {liveClassImage[0] ? (
-                      <img src={liveClassImage[0]} />
+                      <div className="relative">
+                        <img src={liveClassImage[0]} />
+                        {xIcon(0)}
+                      </div>
                     ) : (
                       <IconButton
                         type="screen-capture"
@@ -139,7 +147,10 @@ const CameraCapture = ({ isCaptureOpen, captureOpen, localUser }) => {
                       />
                     )}
                     {liveClassImage[1] ? (
-                      <img src={liveClassImage[1]} />
+                      <div className="relative">
+                        <img src={liveClassImage[1]} />
+                        {xIcon(1)}
+                      </div>
                     ) : (
                       <IconButton
                         type="screen-capture"
@@ -152,7 +163,10 @@ const CameraCapture = ({ isCaptureOpen, captureOpen, localUser }) => {
                       <StreamComponent user={localUser} />
                     </div>
                     {liveClassImage[2] ? (
-                      <img src={liveClassImage[2]} />
+                      <div className="relative">
+                        <img src={liveClassImage[2]} />
+                        {xIcon(2)}
+                      </div>
                     ) : (
                       <IconButton
                         type="screen-capture"
@@ -162,7 +176,10 @@ const CameraCapture = ({ isCaptureOpen, captureOpen, localUser }) => {
                       />
                     )}
                     {liveClassImage[3] ? (
-                      <img src={liveClassImage[3]} />
+                      <div className="relative">
+                        <img src={liveClassImage[3]} />
+                        {xIcon(3)}
+                      </div>
                     ) : (
                       <IconButton
                         type="screen-capture"
