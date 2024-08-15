@@ -6,6 +6,7 @@ import useVideoStore from "../../store/useVideoStore";
 
 import { useNavigate } from "react-router-dom";
 import api from "./../../service/Api";
+import { pushApiErrorNotification, pushNotification } from "../common/Toast";
 
 const ReviewWrite = () => {
   const navigate = useNavigate();
@@ -25,17 +26,18 @@ const ReviewWrite = () => {
       });
 
       if (response.status === 200 || response.status === 201) {
-        alert("수강평이 등록되었습니다.");
+        pushNotification("success", "수강평이 등록되었습니다.");
         navigate("/album");
       } else {
-        alert("수강평 등록에 실패했습니다. 다시 시도해주세요.");
+        pushNotification(
+          "error",
+          "수강평 등록에 실패했습니다. 다시 시도해주세요."
+        );
       }
-    } catch (error) {
-      console.error("수강평 등록 중 오류 발생:", error);
-      alert("수강평 등록 중 오류가 발생했습니다. 다시 시도해주세요.");
+    } catch (e) {
+      pushApiErrorNotification(e);
     }
   };
-  console.log(classData.uuid);
   return (
     <div className="flex flex-col items-center justify-center text-center mt-10 max-w-lg mx-auto">
       <img src={Check} alt="완료표시" className="size-36 mb-10" />
