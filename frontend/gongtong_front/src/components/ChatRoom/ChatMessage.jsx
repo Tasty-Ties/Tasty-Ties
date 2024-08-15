@@ -15,7 +15,7 @@ const ChatMessage = ({ type, imgSrc, nickname, message, chatTime, isNew }) => {
   }, []);
 
   const typeInput = (type) => {
-    setTextBox("p-3 break-words");
+    setTextBox("p-2 break-words");
     setTimeMessageBox("flex flex-row");
     switch (type) {
       case "ME":
@@ -34,9 +34,9 @@ const ChatMessage = ({ type, imgSrc, nickname, message, chatTime, isNew }) => {
         );
         break;
       case "SYSTEM":
-        setNicknamePlace("flex justify-center");
-        setMessageBox("bg-white rounded-2xl px-3");
-        setTextBox("py-1 px-3 break-words");
+        setNicknamePlace("flex justify-center py-1 ");
+        setMessageBox("px-1");
+        setTextBox("px-3 break-words");
         break;
       default:
         setMessageDirection("flex flex-row px-4 py-2");
@@ -57,7 +57,7 @@ const ChatMessage = ({ type, imgSrc, nickname, message, chatTime, isNew }) => {
           <img
             alt=""
             src={imgSrc ? imgSrc : defaultImage}
-            className="h-12 w-12 flex-none rounded-full"
+            className="h-12 w-12 flex-none rounded-full object-cover"
           />
         )}
         <div className={nicknamePlace}>
@@ -75,7 +75,7 @@ const ChatMessage = ({ type, imgSrc, nickname, message, chatTime, isNew }) => {
             {type === "SYSTEM" ? (
               <></>
             ) : (
-              <div className="self-end my-2 tex t-xs px-2">
+              <div className="self-end my-2 text-xs px-2">
                 {chatTime
                   ? isNew
                     ? chatTime

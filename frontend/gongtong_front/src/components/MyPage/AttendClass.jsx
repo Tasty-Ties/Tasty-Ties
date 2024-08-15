@@ -23,6 +23,7 @@ const AttendClass = () => {
   useEffect(() => {
     fetchAttendClasses(currentPage, itemCountPerPage);
   }, [currentPage]);
+  console.log(attendClasses);
 
   if (attendClasses.length === 0) {
     return <div className="text-xl">참여한 클래스가 없습니다.</div>;

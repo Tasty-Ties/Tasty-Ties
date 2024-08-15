@@ -13,7 +13,6 @@ const AttendClass = () => {
   useEffect(() => {
     fetchAttendedClasses(username);
   }, []);
-  console.log(attendedClasses);
 
   return (
     <div>

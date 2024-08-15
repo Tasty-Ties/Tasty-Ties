@@ -2,6 +2,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import Button from "../../common/components/Button";
 import api from "../../service/Api";
+import { pushNotification, pushApiErrorNotification } from "../common/Toast";
 
 const EditInfo = () => {
   const location = useLocation();
@@ -78,7 +79,10 @@ const EditInfo = () => {
 
   const handleSave = async () => {
     if (password !== verifyPassword) {
-      alert("비밀번호와 비밀번호 확인이 일치하지 않습니다.");
+      pushNotification(
+        "error",
+        "비밀번호와 비밀번호 확인이 일치하지 않습니다."
+      );
       return;
     }
 
@@ -105,7 +109,7 @@ const EditInfo = () => {
         });
 
         if (response.status !== 200) {
-          alert("프로필 이미지 업데이트에 실패했습니다.");
+          pushNotification("error", "프로필 이미지 업데이트에 실패했습니다.");
           return;
         }
       }
@@ -117,9 +121,14 @@ const EditInfo = () => {
       } else {
         alert("정보 업데이트에 실패했습니다.");
       }
-    } catch (error) {
-      console.error("업데이트 중 오류 발생:", error);
-      alert("모든 값을 입력해주세요.");
+    } catch (e) {
+      const status = e.response.status;
+
+      if (status === 500) {
+        pushNotification("error", "수정할 정보를 모두 입력해주세요.");
+      } else {
+        pushApiErrorNotification(e);
+      }
     }
   };
 
@@ -128,9 +137,9 @@ const EditInfo = () => {
       <p className="font-bold text-2xl">내 정보 수정</p>
       <hr className="mt-2 mb-4" />
       <p className="font-bold mb-0.5 text-lg">프로필사진</p>
-      <p className="mb-4">
+      <div className="mb-4">
         <IdImage setFiles={handleFileChange} />
-      </p>
+      </div>
       <p className="font-bold mb-0.5 text-lg">닉네임</p>
       <input
         type="text"
@@ -167,25 +176,29 @@ const EditInfo = () => {
         className="border border-first-800 w-full rounded-md mb-3 py-1 pl-3"
       />
       <div className="flex my-3">
-        <p className="font-bold mb-0.5 text-lg flex items-center">인스타</p>
+        <p className="font-bold mb-0.5 text-lg w-28 flex items-center">
+          인스타
+        </p>
         &nbsp;
         <p className="flex items-center">https://www.instagram.com/</p>
         <input
           type="text"
           value={instaHandle}
           onChange={(e) => setInstaHandle(e.target.value)}
-          className="border border-first-800 rounded-md ml-1 py-1 pl-3 flex items-center"
+          className="border border-first-800 rounded-md ml-1 py-1 pl-3 flex w-full items-center"
         />
       </div>
       <div className="flex mt-3 items-center">
-        <p className="font-bold mb-0.5 text-lg flex items-center">유튜브</p>
+        <p className="font-bold mb-0.5 text-lg w-28 flex items-center">
+          유튜브
+        </p>
         &nbsp;
         <p className="flex items-center">https://www.youtube.com/@</p>
         <input
           type="text"
           value={youtubeHandle}
           onChange={(e) => setYoutubeHandle(e.target.value)}
-          className="border border-first-800 rounded-md ml-1 py-1 pl-3 flex items-center"
+          className="border border-first-800 rounded-md ml-1 py-1 pl-3 flex w-full items-center"
         />
       </div>
       <br />

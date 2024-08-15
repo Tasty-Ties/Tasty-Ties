@@ -11,11 +11,10 @@ const ClassReview = () => {
   useEffect(() => {
     fetchClassReviews(reviews.id);
   }, []);
-  console.log(classReviews);
   return (
     <>
       <div className="w-full mt-20">
-        {classReviews &&
+        {classReviews > 0 ? (
           classReviews.map((classReview, index) => (
             <div key={index} className="flex my-6">
               <div className="basis-4/6 truncate mr-4 ">
@@ -28,7 +27,18 @@ const ClassReview = () => {
                 {classReview.cookingClassReviewCreateTime?.substring(0, 10)}
               </div>
             </div>
-          ))}
+          ))
+        ) : (
+          <div className="text-center mt-5">
+            <div>
+              <img
+                src="/images/classImages/alert.svg"
+                className="mx-auto w-12 mb-5"
+              />
+            </div>
+            리뷰가 존재하지 않습니다.
+          </div>
+        )}
       </div>
     </>
   );

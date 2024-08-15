@@ -61,10 +61,10 @@ const Header = () => {
   useEffect(() => {
     if (accessToken) {
       setIsLogin(true);
+      fetchInformations();
     } else {
       setIsLogin(false);
     }
-    fetchInformations();
   }, [accessToken]);
 
   const goLogin = () => {
@@ -85,8 +85,7 @@ const Header = () => {
 
   const handleLogout = async () => {
     try {
-      const response = await api.post("/auth/logout");
-      console.log(response);
+      await api.post("/auth/logout");
     } catch (e) {
       pushApiErrorNotification(e);
     }
