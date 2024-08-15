@@ -3,7 +3,6 @@ import RankingProfile from "./RankingProfile";
 import Pagination from "./../../common/components/Pagination";
 
 const RankingRight = ({ rankingList, sort, onSortChange }) => {
-  console.log(rankingList);
   return (
     <>
       <div className="flex flex-row-reverse">

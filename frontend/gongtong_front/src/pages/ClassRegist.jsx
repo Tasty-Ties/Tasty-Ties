@@ -17,6 +17,7 @@ import "./../styles/ClassRegist/ClassRegist.css";
 import Cookies from "js-cookie";
 
 import dayjs from "dayjs";
+import { pushApiErrorNotification } from "../components/common/Toast";
 
 const validationSchema = yup.object().shape({
   title: yup
@@ -183,31 +184,29 @@ const ClassRegist = () => {
       replayEndTime: calculatedReplayEndTime,
     };
 
-    console.log(updatedData);
-    console.log(files);
-
     try {
-      await setClassRegist(updatedData, files);
-      navigate("/registcomplete", {
-        replace: true,
-        state: {
-          message: "클래스 등록이 완료되었습니다.",
-          classTitle: updatedData.title,
-          classTime: `${updatedData.cookingClassStartTime.substring(
-            0,
-            10
-          )} ${updatedData.cookingClassStartTime.substring(
-            11,
-            16
-          )} ~ ${updatedData.cookingClassEndTime.substring(
-            0,
-            10
-          )} ${updatedData.cookingClassEndTime.substring(11, 16)}`,
-        },
-      });
-    } catch (error) {
-      console.error("클래스 등록 실패:", error);
-      alert("클래스 등록에 실패했습니다. 다시 시도해주세요.");
+      const response = await setClassRegist(updatedData, files);
+      if (response.status === 200 || response.status === 201) {
+        navigate("/registcomplete", {
+          replace: true,
+          state: {
+            message: "클래스 등록이 완료되었습니다.",
+            classTitle: updatedData.title,
+            classTime: `${updatedData.cookingClassStartTime.substring(
+              0,
+              10
+            )} ${updatedData.cookingClassStartTime.substring(
+              11,
+              16
+            )} ~ ${updatedData.cookingClassEndTime.substring(
+              0,
+              10
+            )} ${updatedData.cookingClassEndTime.substring(11, 16)}`,
+          },
+        });
+      }
+    } catch (e) {
+      pushApiErrorNotification(e);
     }
   };
 

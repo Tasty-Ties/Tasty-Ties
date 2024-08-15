@@ -49,9 +49,7 @@ const Alert = ({ open, setOpen }) => {
                   </Dialog.Title> */}
                   <hr className="mt-2" />
                   <div className="mt-4 mx-3">
-                    <p className="text-lg text-gray-500">
-                      정말 예약을 취소하시겠습니까?
-                    </p>
+                    <p className="text-lg text-gray-500">{title}</p>
                   </div>
                 </div>
               </div>

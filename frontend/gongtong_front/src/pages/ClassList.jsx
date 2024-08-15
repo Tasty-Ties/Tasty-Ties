@@ -4,6 +4,7 @@ import ClassListItem from "./../components/ClassList/ClassListItem";
 import SearchBar from "./../components/ClassList/SearchBar";
 import useCookingClassStore from "./../store/CookingClassStore";
 import Cookies from "js-cookie";
+import { pushApiErrorNotification } from "../components/common/Toast";
 
 const ClassList = () => {
   const { classLists, hasMoreContent, getClassLists } = useCookingClassStore();
@@ -40,8 +41,8 @@ const ClassList = () => {
           page === 0 ? searchResults : [...state.classLists, ...searchResults],
         hasMoreContent: searchResults.length === 12,
       }));
-    } catch (error) {
-      console.error("Failed to fetch class list data", error);
+    } catch (e) {
+      pushApiErrorNotification(e);
     } finally {
       isLoading.current = false;
     }
@@ -63,7 +64,7 @@ const ClassList = () => {
 
     const options = {
       root: null,
-      rootMargin: "0px",
+      rootMargin: "10px",
       threshold: 0.1,
     };
 

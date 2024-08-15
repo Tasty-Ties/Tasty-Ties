@@ -55,11 +55,11 @@ const ClassImageCarousel = ({ classDetail }) => {
   return (
     <div className="container mx-auto relative mb-8">
       <div className="overflow-hidden">
-        <Slider {...settings} className="-mx-2">
+        <Slider {...settings} dots={false} className="-mx-2">
           {classDetail.imageUrls &&
             classDetail.imageUrls.map((imageUrl, index) => (
               <div key={index} className="px-2">
-                <div className="aspect-video bg-gray-200 rounded-2xl">
+                <div className="aspect-video bg-gray-200/50 rounded-2xl">
                   <img
                     src={imageUrl}
                     alt={`Slide ${index + 1}`}
