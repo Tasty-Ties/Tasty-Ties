@@ -67,10 +67,10 @@ const Header = () => {
   useEffect(() => {
     if (accessToken) {
       setIsLogin(true);
+      fetchInformations();
     } else {
       setIsLogin(false);
     }
-    fetchInformations();
   }, [accessToken]);
 
   const goLogin = () => {
@@ -91,8 +91,7 @@ const Header = () => {
 
   const handleLogout = async () => {
     try {
-      const response = await api.post("/auth/logout");
-      console.log(response);
+      await api.post("/auth/logout");
     } catch (e) {
       pushApiErrorNotification(e);
     }
@@ -126,9 +125,11 @@ const Header = () => {
                     <Avatar src={profileImage} alt="avatar" size="sm" />
                   </MenuHandler>
                   <MenuList>
-                    <MenuItem className="flex justify-center">
-                      {nickname}
-                    </MenuItem>
+                    {nickname && (
+                      <MenuItem className="flex justify-center">
+                        {nickname}
+                      </MenuItem>
+                    )}
                     <hr className="my-3" />
                     <MenuItem className="font-nanum" onClick={goMypage}>
                       마이페이지

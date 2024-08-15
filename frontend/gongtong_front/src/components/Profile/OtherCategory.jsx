@@ -1,4 +1,4 @@
-import { NavLink, Outlet } from "react-router-dom";
+import { NavLink, Outlet, useNavigate, useParams } from "react-router-dom";
 import instalogo from "../../assets/MyPage/insta.png";
 import youtubelogo from "../../assets/MyPage/Youtube.png";
 import CountryFlags from "../../common/components/CountryFlags";
@@ -6,8 +6,9 @@ import ProfileButton from "../../common/components/ProfileButton";
 import Imageprofile from "../../assets/MyPage/기본프로필사진.jpg";
 
 const OtherCategory = (informations) => {
+  const nav = useNavigate();
+  const { username } = useParams();
   const information = informations.informations;
-  console.log(information);
 
   return (
     <div className="flex h-screen">
@@ -17,22 +18,21 @@ const OtherCategory = (informations) => {
           {information.userProfileDto && (
             <div className="flex">
               <ProfileButton
-                image={
-                  information.userProfileDto.profileImageUrl || Imageprofile
-                }
-                type="square"
-                size="size-16"
+                image={information.userProfileDto.profileImageUrl}
+                type="rounded"
+                size="lg"
+                onClick={() => nav(`/otherpage/${username}`)}
               />
               &nbsp;&nbsp;
               <div className="flex flex-col mt-2">
-                <p>
+                <div>
                   <CountryFlags
                     countryCode={
                       information.userProfileDto.country?.countryCode
                     }
                     size="w-5"
                   />
-                </p>
+                </div>
 
                 <p className="text-base ml-1 mt-1">
                   {information.userProfileDto?.nickname}
@@ -44,7 +44,7 @@ const OtherCategory = (informations) => {
             </div>
           )}
           <div className="flex justify-around mt-1">
-            <p className="flex">
+            <div className="flex">
               <img src={instalogo} alt="인스타로고" className="size-6" />
               &nbsp;&nbsp;
               <a
@@ -64,7 +64,7 @@ const OtherCategory = (informations) => {
                   {information.userProfileDto?.youtubeHandle}
                 </a>
               </p>
-            </p>
+            </div>
           </div>
         </div>
 

@@ -65,12 +65,12 @@ const ClassForm = ({ classInfo, classType }) => {
   return (
     <div className="flex" style={{ height: "100px" }}>
       <div className="flex">
-        <div className="relative overflow-hidden rounded-lg">
-          <div>
+        <div className="relative">
+          <div className="">
             <img
               src={classInfo.mainImage}
               alt="클래스사진"
-              className="w-40 h-full object-cover object-center"
+              className="h-24 w-44 rounded-lg object-center object-cover"
             />
           </div>
           <span className="absolute right-1 top-1">
@@ -80,7 +80,7 @@ const ClassForm = ({ classInfo, classType }) => {
             />
           </span>
         </div>
-        <div className="ml-6 w-72">
+        <div className="ml-6 w-56">
           <p className="font-bold text-lg mb-2 truncate">{classInfo.title}</p>
           <div className="flex">
             <p className="text-sm">{date}</p>&nbsp;

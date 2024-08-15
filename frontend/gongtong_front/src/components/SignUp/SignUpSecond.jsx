@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import useUserStore from "../../store/UserStore";
 import api from "../../service/Api";
+import { pushApiErrorNotification } from "../common/Toast";
 
 import {
   Card,
@@ -19,9 +20,8 @@ const SignUpSecond = () => {
 
   const userRegister = async (e) => {
     e.preventDefault();
-    console.log("회원정보", userForm);
     try {
-      const response = await api.post("/users", {
+      await api.post("/users", {
         username: userForm.username,
         password: userForm.password,
         nickname: userForm.nickname,
@@ -31,27 +31,24 @@ const SignUpSecond = () => {
         emailDomain: userForm.emailDomain,
         birth: userForm.birth,
       });
-      console.log(response);
       try {
-        const nextResponse = await api.post("/ranking/addByUsername", {
+        await api.post("/ranking/addByUsername", {
           username: userForm.username,
           score: "100.0",
           description: "회원가입 감사 마일리지",
         });
-        console.log(nextResponse);
       } catch (error) {
-        console.log("마일리지더하기실패", error);
+        pushApiErrorNotification(error);
       }
       nav("/SignUpComplete");
     } catch (error) {
-      console.log(error);
+      pushApiErrorNotification(error);
     }
   };
 
   const { userForm, setForm, resetForm } = useUserStore();
 
   useEffect(() => {
-    console.log("첫번째 넘어오는 정보", userForm);
     return () => {
       resetForm(["nickname", "countryCode", "languageCode", "birth"]);
     };
@@ -60,7 +57,6 @@ const SignUpSecond = () => {
   const [isNicknameAvailable, setIsNicknameAvailable] = useState("");
 
   const onChangeInput = (e) => {
-    console.log("test:", e);
     let name = e.target.name;
     let value = e.target.value;
 
@@ -68,12 +64,7 @@ const SignUpSecond = () => {
       setIsNicknameAvailable("");
     }
 
-    if (name === "countryCode" || name === "languageCode") {
-      setForm(name, e);
-    } else {
-      setForm(name, value);
-    }
-    console.log(userForm);
+    setForm(name, value);
   };
 
   const checkNickname = async () => {
@@ -81,7 +72,6 @@ const SignUpSecond = () => {
       const response = await api.get(
         `/users/check-nickname?nickname=${userForm.nickname}`
       );
-      console.log(response);
       if (response.data.stateCode === 200) {
         setIsNicknameAvailable(true);
       } else {
@@ -92,7 +82,7 @@ const SignUpSecond = () => {
         setIsNicknameAvailable(false);
         setForm("nickname");
       } else {
-        console.log(error);
+        pushApiErrorNotification(error);
       }
     }
   };
@@ -104,7 +94,6 @@ const SignUpSecond = () => {
     const fetchCountries = async () => {
       try {
         const response = await api.get("/countries");
-        console.log(response.data.data);
         const sortedCountries = response.data.data.countries.sort((a, b) => {
           return a.koreanName.localeCompare(b.koreanName, "KR", {
             sensitivity: "base",
@@ -119,7 +108,6 @@ const SignUpSecond = () => {
     const fetchLanguages = async () => {
       try {
         const response = await api.get(`/languages`);
-        console.log(response.data.data);
         const sortedLanguages = response.data.data.languages.sort((a, b) => {
           return a.koreanName.localeCompare(b.koreanName, "kr", {
             sensitivity: "base",
@@ -135,12 +123,6 @@ const SignUpSecond = () => {
     fetchLanguages();
   }, []);
 
-  const [value, setValue] = useState("react");
-
-  useEffect(() => {
-    console.log(userForm);
-  }, [userForm]);
-
   return (
     <div
       className="h-screen flex justify-center items-center bg-cover bg-center" // <- 여기
@@ -155,7 +137,7 @@ const SignUpSecond = () => {
         >
           {" "}
           {/* <- 여기 추가 */}
-          <Typography color="font-nanum blue-gray">
+          <Typography color="blue-gray" className="font-nanum">
             Welcome !, Bienvenue!, ようこそ!, Welkom!, स्वागत है!
           </Typography>
           <Typography
@@ -168,7 +150,7 @@ const SignUpSecond = () => {
           <Typography color="blue-gray" className="font-nanum mt-2">
             맛,잇다의 세계로 들어와 다양한 문화의 음식을 즐겨보세요!!
           </Typography>
-          <section>
+          <div>
             <div className="text-md font-semibold text-gray-700 mb-2 mt-10">
               닉네임
             </div>
@@ -202,7 +184,7 @@ const SignUpSecond = () => {
                 이미 사용된 닉네임입니다.
               </Typography>
             )}
-          </section>
+          </div>
           <div className="text-md font-semibold text-gray-700 mb-2 mt-4">
             국적
           </div>

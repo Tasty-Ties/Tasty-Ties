@@ -22,7 +22,6 @@ const Review = () => {
   useEffect(() => {
     fetchReviews(username, currentPage, itemCountPerPage);
   }, [currentPage]);
-  console.log(reviews);
 
   return (
     <div>

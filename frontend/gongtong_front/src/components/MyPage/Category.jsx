@@ -21,11 +21,11 @@ const Category = () => {
       <div className="flex-shrink-0 col-span-1">
         <br />
         <div className="flex flex-col">
-          <div className="flex">
+          <div className="flex w-96">
             <ProfileButton
-              image={informations.profileImageUrl || Imageprofile}
-              type="square"
-              size="size-16"
+              image={informations.profileImageUrl}
+              type="rounded"
+              size="lg"
               onClick={() => nav("/mypage")}
             />
             &nbsp;&nbsp;
@@ -37,8 +37,7 @@ const Category = () => {
 
               <p className="text-base ml-1 mt-1">{informations.nickname}</p>
               <p className="text-base text-gray-700 ml-1 mt-1">
-                {informations.description ||
-                  "아직 자기소개를 입력하지 않았어요."}
+                {informations.description || ""}
               </p>
             </div>
           </div>
@@ -50,7 +49,7 @@ const Category = () => {
                 className="text-base text-gray-700"
                 href={informations.instagramUrl}
               >
-                {informations.instagramHandle || "연결된 계정이 없습니다."}
+                {informations.instagramHandle || ""}
               </a>
             </div>
             &nbsp;&nbsp;&nbsp;&nbsp;
@@ -61,7 +60,7 @@ const Category = () => {
                 className="text-base text-gray-700"
                 href={informations.youtubeUrl}
               >
-                {informations.youtubeHandle || "연결된 계정이 없습니다."}
+                {informations.youtubeHandle || ""}
               </a>
             </div>
           </div>
@@ -120,14 +119,6 @@ const Category = () => {
               <div className="bg-inherit text-lg my-1">마일리지</div>
             </NavLink>
           </li>
-          {/* <li>
-            <NavLink
-              to="shorts"
-              className={({ isActive }) => (isActive ? "bg-first-100 " : "")}
-            >
-              <div className="bg-inherit text-lg">숏폼</div>
-            </NavLink>
-          </li> */}
         </ul>
       </div>
       <div className="m-8 ml-36 justify-center col-span-3">
