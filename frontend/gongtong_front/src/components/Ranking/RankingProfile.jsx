@@ -2,59 +2,51 @@ import { Link } from "react-router-dom";
 import Profile from "./../../common/components/Profile";
 import defaultImage from "./../../assets/MyPage/기본프로필사진.jpg";
 
-const RankingProfile = (rankingList) => {
-  console.log(rankingList.rankingList);
+const RankingProfile = ({ rankingList }) => {
+  console.log(rankingList);
 
   // myRanked 정보가 현재 페이지에 있는지 확인
-  const isMyRankedOnCurrentPage = rankingList.rankingList.rankedUsers?.some(
-    (user) => user.userId === rankingList.rankingList.myRanked?.userId
+  const isMyRankedOnCurrentPage = rankingList.rankedUsers?.some(
+    (user) => user.userId === rankingList.myRanked?.userId
   );
 
   return (
     <>
-      {!isMyRankedOnCurrentPage && rankingList.rankingList.myRanked && (
+      {!isMyRankedOnCurrentPage && rankingList.myRanked && (
         <div className="grid grid-cols-12 text-center py-3 items-center border-2 rounded-xl shadow-md">
           <div className="col-span-1">
-            {rankingList.rankingList.myRanked.rank === 0
-              ? "순위없음"
-              : rankingList.rankingList.myRanked.rank}
+            {rankingList.myRanked.rank === 0 ? "순위없음" : rankingList.myRanked.rank}
           </div>
           <div className="col-span-2 flex items-center">
             <span className="mr-3">
               <img
-                src={rankingList.rankingList.myRanked.profileImageUrl}
-                className="w-8 "
+                src={rankingList.myRanked.profileImageUrl || defaultImage}
+                className="w-8"
+                alt="Profile"
               />
             </span>
-            <span>{rankingList.rankingList.myRanked.nickname}</span>
+            <span>{rankingList.myRanked.nickname}</span>
           </div>
           <div className="col-span-1">
-            {rankingList.rankingList.myRanked.classesHosted}
+            {rankingList.myRanked.classesHosted}
           </div>
           <div className="col-span-1">
-            {rankingList.rankingList.myRanked.classesAttended}
+            {rankingList.myRanked.classesAttended}
           </div>
           <div className="col-span-1">
-            {rankingList.rankingList.myRanked.score}
+            {rankingList.myRanked.score}
           </div>
-
-          {rankingList.rankingList.myRanked.description === null ? (
-            <div className="col-span-6 text-gray-600 truncate">
-              자기소개가 없습니다.
-            </div>
-          ) : (
-            <div className="col-span-6">
-              rankingList.rankingList.myRanked?.description
-            </div>
-          )}
+          <div className="col-span-6">
+            {rankingList.myRanked.description || "자기소개가 없습니다."}
+          </div>
         </div>
       )}
 
-      {rankingList.rankingList.rankedUsers &&
-        rankingList.rankingList.rankedUsers.map((user, index) => (
+      {rankingList.rankedUsers &&
+        rankingList.rankedUsers.map((user, index) => (
           <div
             className={`grid grid-cols-12 text-center py-3 items-center ${
-              user.userId === rankingList.rankingList.myRanked?.userId
+              user.userId === rankingList.myRanked?.userId
                 ? "border-2 rounded-xl shadow-md"
                 : ""
             }`}
@@ -64,13 +56,9 @@ const RankingProfile = (rankingList) => {
             <div className="col-span-2 flex items-center">
               <span className="mr-3">
                 <img
-                  src={
-                    user.profileImageUrl === null ||
-                    user.profileImageUrl === undefined
-                      ? defaultImage
-                      : user.profileImageUrl
-                  }
+                  src={user.profileImageUrl || defaultImage}
                   className="w-8"
+                  alt="Profile"
                 />
               </span>
               <span>{user.nickname}</span>
@@ -78,16 +66,13 @@ const RankingProfile = (rankingList) => {
             <div className="col-span-1">{user.classesHosted}</div>
             <div className="col-span-1">{user.classesAttended}</div>
             <div className="col-span-1">{user.score}</div>
-            {user.description === null ? (
-              <div className="col-span-6 text-gray-600">
-                자기소개가 없습니다.
-              </div>
-            ) : (
-              <div className="col-span-6 truncate">{user.description}</div>
-            )}
+            <div className="col-span-6 truncate">
+              {user.description || "자기소개가 없습니다."}
+            </div>
           </div>
         ))}
     </>
   );
 };
+
 export default RankingProfile;
