@@ -26,10 +26,14 @@ const useMyPageStore = create((set) => ({
     set({ reserveClasses: classes, totalItems });
   },
 
+  // 참여한 클래스 중에서 endTime이 지난 것만 filter
   attendClasses: [],
   fetchAttendClasses: async (page = 1, size = 4) => {
     const { classes, totalItems } = await getAttendClass(page, size);
-    set({ attendClasses: classes, totalItems });
+    const filteredClasses = classes.filter((attendClass) => {
+      return new Date(attendClass.endTime).getTime() < new Date().getTime();
+    });
+    set({ attendClasses: filteredClasses, totalItems });
   },
 
   mileageLogs: [],
