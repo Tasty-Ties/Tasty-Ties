@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @AllArgsConstructor
 @Builder
 @Getter
@@ -14,4 +16,5 @@ public class ChatRoomDto {
     private String imageUrl;
     private String title;
     private ChatMessageDto message;
+    private LocalDateTime createdTime;
 }

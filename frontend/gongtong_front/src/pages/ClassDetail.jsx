@@ -21,6 +21,10 @@ import ClassImageCarousel from "../components/ClassDetail/ClassImageCarousel";
 import Button from "./../common/components/Button";
 import "./../styles/ClassDetail/ClassDetail.css";
 import Cookies from "js-cookie";
+import {
+  pushApiErrorNotification,
+  pushNotification,
+} from "../components/common/Toast";
 
 const FRONT_SERVER_URL = import.meta.env.VITE_FRONT_SERVER;
 
@@ -35,15 +39,16 @@ const ClassDetail = () => {
   const username = classDetail.hostProfile?.username;
 
   let cookie = Cookies.get("accessToken");
-
   useEffect(() => {
     fetchClassDetail(id);
   }, [id]);
 
   const handleClassReservation = async (e) => {
     try {
-      await setClassReservation(id);
-      alert("등록 완료!");
+      const response = await setClassReservation(id);
+      if (response.status === 201) {
+        pushNotification("success", "예약 되었습니다.");
+      }
       fetchClassDetail(id);
     } catch (error) {
       console.error("클래스 예약 실패:", error);
@@ -54,10 +59,13 @@ const ClassDetail = () => {
 
   const cancelClassReservation = async (e) => {
     try {
-      await setDeleteClassReservation(id);
+      const response = await setDeleteClassReservation(id);
+      if (response.status === 204) {
+        pushNotification("success", "예약 취소 되었습니다..");
+      }
       fetchClassDetail(id);
-    } catch (error) {
-      console.error("클래스 예약 취소 실패:", error);
+    } catch (e) {
+      pushApiErrorNotification(e);
     }
   };
 
@@ -74,9 +82,14 @@ const ClassDetail = () => {
     try {
       let isTrue = confirm("정말 삭제하시겠습니까?");
       if (isTrue) {
-        await setDeleteClass(id);
-        alert("삭제 완료!");
-        window.location.replace("/class");
+        const response = await setDeleteClass(id);
+        console.log(response);
+        if (response.status === 204 || response.status === 200) {
+          nav("/class", {
+            resplace: true,
+          });
+          pushNotification("success", "클래스 삭제가 완료되었습니다.");
+        }
       }
     } catch (error) {
       console.error("클래스 삭제 실패", error);
@@ -144,13 +157,12 @@ const ClassDetail = () => {
                     if (cookie) {
                       handleClassReservation();
                     } else {
-                      alert("로그인 후 이용 가능합니다.");
+                      pushNotification("message", "로그인 후 이용 가능합니다");
                       nav("/login");
                     }
                   }}
                 />
               )}
-
             {classDetail.quota <= classDetail.reservedCount &&
               !classDetail.userEnrolled && (
                 <Button text="마감" type="green-border-short" />

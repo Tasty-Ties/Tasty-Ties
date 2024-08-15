@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { getAlbumDetail, getAlbums, getAlbumSort } from "./../service/AlbumAPI";
 
 const useAlbumStore = create((set) => ({
+  // 앨범 목록
   albumLists: [],
   hasMoreContent: true,
   fetchAlbumLists: async (page, countryCode) => {
@@ -15,6 +16,7 @@ const useAlbumStore = create((set) => ({
       }));
     }
   },
+  // 앨범 페이지 정렬(국적 호출코드)
   albumSortLists: [],
   fetchAlbumSortLists: async () => {
     const albumSortLists = await getAlbumSort();

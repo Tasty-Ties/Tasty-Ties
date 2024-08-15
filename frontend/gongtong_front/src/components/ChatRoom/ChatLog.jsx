@@ -88,6 +88,9 @@ const ChatLog = ({
           ],
         }));
       });
+
+      console.log(response.data.data);
+      console.log(userProfileList);
     } catch (error) {
       console.error(error);
       return;
@@ -118,6 +121,8 @@ const ChatLog = ({
 
   useEffect(() => {
     if (newMessage.messages?.[userLang]) {
+      console.log(userProfileList);
+      console.log(receivedType);
       setMessageLog((prev) => [
         ...prev,
         {
@@ -127,6 +132,8 @@ const ChatLog = ({
             new Date().getHours().toString().padStart(2, "0") +
             " : " +
             new Date().getMinutes().toString().padStart(2, "0"),
+          userPicture: userProfileList[newMessage.username]?.[1],
+          userType: receivedType,
         },
       ]);
     }
@@ -243,16 +250,16 @@ const ChatLog = ({
           {messageLog &&
             messageLog.map((message, i) => (
               <div key={i}>
-                {
+                {userProfileList ? (
                   <ChatMessage
-                    type={receivedType}
-                    imgSrc={userProfile}
+                    type={message.userType}
+                    imgSrc={message.userPicture}
                     nickname={message.userNickname}
                     message={message.translation}
                     chatTime={message.timeLine}
                     isNew={true}
                   />
-                }
+                ) : null}
               </div>
             ))}
         </div>

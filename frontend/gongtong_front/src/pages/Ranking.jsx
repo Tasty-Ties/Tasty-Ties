@@ -14,7 +14,6 @@ const Ranking = () => {
   const [sort, setSort] = useState(searchParams.get("sort") || "weekly");
 
   const currentPage = parseInt(searchParams.get("page") || "1", 10);
-  const countPerPage = 7;
   const pageCount = 5;
 
   const fetchRankingList = async (sort, page) => {

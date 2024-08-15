@@ -151,6 +151,7 @@ public class RabbitMQConsumerImpl implements RabbitMQConsumer {
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId).orElse(null);
 
         if (chatRoom != null) {
+            log.debug("leave chat room");
             String username = rabbitMQRequestDto.getUsername();
             if (chatRoom.isContainedUser(username)) {
                 chatRoom.removeUser(username);

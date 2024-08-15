@@ -195,7 +195,7 @@ const VideoComponent = ({ isHost }) => {
   // 참여자 목록 정리하는 코드
   useEffect(() => {
     // console.log(partUser);
-    // console.log(userInfo);
+    console.log(classData);
 
     if (!classData || !localUser) return;
     const host = classData.hostProfile;
@@ -274,7 +274,7 @@ const VideoComponent = ({ isHost }) => {
   }, []);
 
   useEffect(() => {
-    initializeSpeechRecognition("ko", "KR"); // 기본 언어 설정
+    // initializeSpeechRecognition("ko", "KR"); // 기본 언어 설정
     // console.log("SpeechRecognition initialized", recognitionRef.current);
   }, []);
 
@@ -603,6 +603,9 @@ const VideoComponent = ({ isHost }) => {
     if (!recognitionRef.current) {
       recognitionRef.current = new SpeechRecognition();
       recognitionRef.current.lang = languageCode + "-" + countryCode || "ko-KR";
+      console.log(
+        "인식 언어::::::::::::::::::::::::::::::" + recognitionRef.current.lang
+      );
       recognitionRef.current.interimResults = false;
       recognitionRef.current.maxAlternatives = 1;
 

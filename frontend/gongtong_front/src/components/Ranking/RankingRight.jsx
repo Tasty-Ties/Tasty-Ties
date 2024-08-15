@@ -17,7 +17,7 @@ const RankingRight = ({ rankingList, sort, onSortChange }) => {
         <div className="col-span-6">한줄 소개</div>
       </div>
       <hr className="my-4" />
-      {rankingList ? (
+      {!rankingList ? (
         <div className="mx-auto text-center text-lg my-16 text-gray-500">
           <div>
             <img

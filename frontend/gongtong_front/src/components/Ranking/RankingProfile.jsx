@@ -3,8 +3,6 @@ import Profile from "./../../common/components/Profile";
 import defaultImage from "./../../assets/MyPage/기본프로필사진.jpg";
 
 const RankingProfile = (rankingList) => {
-  console.log(rankingList.rankingList);
-
   // myRanked 정보가 현재 페이지에 있는지 확인
   const isMyRankedOnCurrentPage = rankingList.rankingList.rankedUsers?.some(
     (user) => user.userId === rankingList.rankingList.myRanked?.userId
@@ -22,8 +20,15 @@ const RankingProfile = (rankingList) => {
           <div className="col-span-2 flex items-center">
             <span className="mr-3">
               <img
-                src={rankingList.rankingList.myRanked.profileImageUrl}
-                className="w-8 "
+                src={
+                  rankingList.rankingList.myRanked.profileImageUrl
+                    .profileImageUrl === null ||
+                  rankingList.rankingList.myRanked.profileImageUrl
+                    .profileImageUrl === undefined
+                    ? defaultImage
+                    : rankingList.rankingList.myRanked.profileImageUrl
+                }
+                className="w-8 h-8 bg-center rounded-full"
               />
             </span>
             <span>{rankingList.rankingList.myRanked.nickname}</span>
@@ -44,7 +49,7 @@ const RankingProfile = (rankingList) => {
             </div>
           ) : (
             <div className="col-span-6">
-              rankingList.rankingList.myRanked?.description
+              {rankingList.rankingList.myRanked?.description}
             </div>
           )}
         </div>
@@ -70,7 +75,7 @@ const RankingProfile = (rankingList) => {
                       ? defaultImage
                       : user.profileImageUrl
                   }
-                  className="w-8"
+                  className="w-8 h-8 bg-center rounded-full"
                 />
               </span>
               <span>{user.nickname}</span>
