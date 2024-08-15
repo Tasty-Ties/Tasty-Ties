@@ -57,10 +57,10 @@ const CameraCapture = ({ isCaptureOpen, captureOpen, localUser }) => {
 
       setLiveClassImage(e.target.value, objectURL);
 
-      const link = document.createElement("a");
-      link.href = dataUrl;
-      link.download = "screenshot.jpg";
-      link.click();
+      // const link = document.createElement("a");
+      // link.href = dataUrl;
+      // link.download = "screenshot.jpg";
+      // link.click();
     }
   };
 
