@@ -80,7 +80,7 @@ const CookingClassList = () => {
             <CookingClassListItem key={cookingClass.uuid} cookingClass={cookingClass} />
           ))}
         </div>
-        <div className="ml-12 grid grid-cols-4 w-full">
+        <div className="ml-12 grid grid-cols-4 w-full h-[90%]">
           {cookingClasses.slice(4, 8).map((cookingClass) => (
             <CookingClassListItem key={cookingClass.uuid} cookingClass={cookingClass} />
           ))}

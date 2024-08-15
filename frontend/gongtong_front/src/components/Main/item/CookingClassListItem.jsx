@@ -56,10 +56,17 @@ const CookingClassListItem = ({ cookingClass }) => {
           <CountryChip country={country} />
         </div>
         <div className="ml-1">
-          <Typography variant="h5" color="blue-gray" className="mt-2.5 mb-1">
+          <Typography
+            variant="h5"
+            color="blue-gray"
+            className="mt-2.5 mb-1 whitespace-nowrap overflow-hidden text-ellipsis"
+          >
             {cookingClass.title}
           </Typography>
-          <Typography color="blue-gray" className="text-sm">
+          <Typography
+            color="blue-gray"
+            className="text-sm whitespace-nowrap overflow-hidden text-ellipsis"
+          >
             {cookingClass.hostName}
           </Typography>
         </div>

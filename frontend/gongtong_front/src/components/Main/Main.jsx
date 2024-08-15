@@ -4,7 +4,7 @@ import ShortfromList from "./ShortformList";
 
 const Main = () => {
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col w-[80%] mx-auto">
       <CookingClassList />
       <img
         className="w-[70%] h-[20%] mx-auto object-cover object-center mt-24"
