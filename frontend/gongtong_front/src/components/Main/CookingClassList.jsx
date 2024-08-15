@@ -33,7 +33,7 @@ const CookingClassList = () => {
   }, []);
 
   return (
-    <div className="flex flex-col w-3/4 mx-auto content-center relative">
+    <div className="flex flex-col mx-auto content-center relative">
       <Typography variant="h4" className="ml-12">
         최신 등록된 강의
       </Typography>
