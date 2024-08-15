@@ -1,3 +1,4 @@
+import { pushApiErrorNotification } from "../components/common/Toast";
 import api from "./Api";
 
 // 앨범 목록
@@ -10,7 +11,7 @@ export const getRankingList = async (sort, page) => {
     });
     return response.data.data;
   } catch (error) {
-    console.log("RankingAPI - getRankingListError : " + error);
+    pushApiErrorNotification(e);
     return [];
   }
 };

@@ -130,8 +130,7 @@ const AlbumDetail = ({ open, setOpen, folderId }) => {
                               ? defaultImage
                               : albumDetailImageLists.host?.profileImageUrl
                           }
-                          alt=""
-                          className="size-3.5"
+                          className="size-3.5 rounded-full"
                         />
                         {hostNickname}
                       </Link>
@@ -169,12 +168,12 @@ const AlbumDetail = ({ open, setOpen, folderId }) => {
                     </div>
                     <div className="text-sm font-medium text-black flex gap-x-1 items-center mt-1">
                       <p className="mr-0.5">참여자 :</p>
-                      <div className="flex items-center gap-x-2">
+                      <div className="grid grid-cols-3 items-center gap-x-2">
                         {albumDetailImageLists.userProfiles &&
                           albumDetailImageLists.userProfiles.map((profile) => (
                             <Link
                               to={`/otherpage/${profile.username}`}
-                              className="flex items-center gap-x-0.5"
+                              className="flex items-center gap-x-0.5 "
                               key={profile.username}
                             >
                               <img
@@ -183,7 +182,7 @@ const AlbumDetail = ({ open, setOpen, folderId }) => {
                                     ? defaultImage
                                     : profile.profileImageUrl
                                 }
-                                className="size-3.5"
+                                className="size-3.5 rounded-full"
                               />
                               {profile.nickname}
                             </Link>

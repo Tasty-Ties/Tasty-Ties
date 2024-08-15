@@ -1,3 +1,4 @@
+import { pushApiErrorNotification } from "../components/common/Toast";
 import api from "./Api";
 
 // 앨범 목록
@@ -11,8 +12,8 @@ export const getAlbums = async (page, countryCode) => {
       },
     });
     return response.data.data;
-  } catch (error) {
-    console.log("AlbumAPI - getAlbumsError : " + error);
+  } catch (e) {
+    pushApiErrorNotification(e);
     return [];
   }
 };
@@ -22,8 +23,8 @@ export const getAlbumDetail = async (folderId) => {
   try {
     const response = await api.get(`/albums/${folderId}`);
     return response.data.data;
-  } catch (error) {
-    console.log("AlbumAPI - getAlbumDetailError : " + error);
+  } catch (e) {
+    pushApiErrorNotification(e);
   }
 };
 
@@ -31,8 +32,8 @@ export const getAlbumDetail = async (folderId) => {
 export const patchAlbumImagesOrder = async (folderId, photoOrderChangeDtos) => {
   try {
     await api.patch(`/albums/${folderId}/order`, photoOrderChangeDtos);
-  } catch (error) {
-    console.log("AlbumAPI - patchAlbumImagesOrderError : " + error);
+  } catch (e) {
+    pushApiErrorNotification(e);
   }
 };
 
@@ -41,7 +42,7 @@ export const getAlbumSort = async () => {
   try {
     const response = await api.get("/albums");
     return response.data.data.countrySearchDtoList;
-  } catch (error) {
-    console.log("AlbumAPI - getAlbumSortError : " + error);
+  } catch (e) {
+    pushApiErrorNotification(e);
   }
 };
