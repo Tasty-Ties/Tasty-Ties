@@ -36,7 +36,6 @@ out/
 ### VS Code ###
 .vscode/
 
-application.properties
 serviceAccountKey.json
 
 ### test index.html ###
@@ -46,3 +45,4 @@ dump/
 log/
 
 Dockerfile
+.env
